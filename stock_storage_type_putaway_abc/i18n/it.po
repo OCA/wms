@@ -6,68 +6,70 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-09 09:09+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_storage_type_putaway_abc
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_putaway_abc.product_template_form_view_inherit
 msgid "ABC Storage preference"
-msgstr ""
+msgstr "Prefeenze stoccaggio ABC"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_product__abc_storage
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template__abc_storage
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__abc_storage
 msgid "Abc Storage"
-msgstr ""
+msgstr "Stoccaggio ABC"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields.selection,name:stock_storage_type_putaway_abc.selection__stock_location__pack_putaway_strategy__abc
 msgid "Chaotic ABC"
-msgstr ""
+msgstr "ABC caotico"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__display_abc_storage
 msgid "Display Abc Storage"
-msgstr ""
+msgstr "Visualizza stoccaggio ABC"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template__display_name
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template__id
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model,name:stock_storage_type_putaway_abc.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_product_template____last_update
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,field_description:stock_storage_type_putaway_abc.field_stock_location__pack_putaway_strategy
 msgid "Packs Put-Away Strategy"
-msgstr ""
+msgstr "Strategia inoltro pacchi"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model,name:stock_storage_type_putaway_abc.model_product_template
 msgid "Product Template"
-msgstr ""
+msgstr "Modello prodotto"
 
 #. module: stock_storage_type_putaway_abc
 #: model:ir.model.fields,help:stock_storage_type_putaway_abc.field_stock_location__pack_putaway_strategy
@@ -76,3 +78,11 @@ msgid ""
 "None: when a pack is moved to this location, it will not be put away any further.\n"
 "Ordered Children Locations: when a pack is moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
 msgstr ""
+"Questo definisce la strategia di stoccaggio da utilizzare quanto un pacco è "
+"depositato in questa ubicazione.\n"
+"Nessuna: quanto un pacco è movimentato in questa ubicazione, non verrà "
+"movimentato ulteriormente.\n"
+"Ordinamento per ubicazioni figlie: quanto un pacco è movimentato in questa "
+"ubicazione, verrà cercata una ubicazine idonea nelle ubicazioni figlie in "
+"accordo con le restrizioni definite nei rispettivi tipi stoccaggio "
+"ubicazione."
