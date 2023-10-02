@@ -10,6 +10,41 @@ from odoo.addons.component.core import Component
 class Reception(Component):
     _inherit = "shopfloor.reception"
 
+    # Recover from the header the current shipment ID being worked on.
+    #
+    # If the move being received was choosen from a shipment advice when
+    # redirected back to a move selection, this allows to display the shipment
+    # advice related data.
+
+    @property
+    def _validation_rules(self):
+        return super()._validation_rules + (
+            (self.SHIPMENT_ID_HEADER_RULE, self._is_active_header_shipment),
+        )
+
+    SHIPMENT_ID_HEADER_RULE = (
+        # header name, coerce func, ctx handler, mandatory
+        "HTTP_SERVICE_CTX_SHIPMENT_ID",
+        int,
+        "_work_ctx_get_shipment_id",
+        False,
+    )
+
+    def _work_ctx_get_shipment_id(self, rec_id):
+        return (
+            "current_shipment_advice",
+            self.env["shipment.advice"].browse(rec_id).exists(),
+        )
+
+    def _is_active_header_shipment(self, request, method):
+        return True
+
+    @property
+    def shipment_advice(self):
+        if hasattr(self.work, "current_shipment_advice"):
+            return self.work.current_shipment_advice
+        return self.env["shipment.advice"]
+
     def _scan_document__by_dock(self, dock, barcode):
         if not dock:
             return
@@ -34,8 +69,8 @@ class Reception(Component):
             return self._response_for_select_document(
                 message=self.msg_store.shipment_nothing_to_unload(shipment)
             )
-
-        return self._response_for_select_move(picking=pickings, shipment=shipment)
+        self.work.current_shipment_advice = shipment
+        return self._response_for_select_move(picking=pickings)
 
     def _scan_document__get_handlers_by_type(self):
         res = super()._scan_document__get_handlers_by_type()
@@ -43,13 +78,13 @@ class Reception(Component):
         res["dock"] = self._scan_document__by_dock
         return res
 
-    def _response_for_select_move_get_data(self, picking, **kwargs):
+    def _response_for_select_move_get_data(self, picking):
         data = {}
         if picking:
             data = super()._response_for_select_move_get_data(picking)
-        if "shipment" in kwargs.keys():
+        if self.shipment_advice:
             data["shipment"] = self.data_detail.shipment_advice_detail(
-                kwargs["shipment"]
+                self.shipment_advice
             )
             data.pop("picking", None)
         return data
@@ -77,9 +112,7 @@ class Reception(Component):
         message = self._check_move_available(move, "product")
         picking = move.picking_id
         if message:
-            return self._response_for_select_move(
-                picking, message=message, shipment=shipment
-            )
+            return self._response_for_select_move(picking, message=message)
         return self._scan_line__find_or_create_line(picking, move)
 
     def _scan_line_shipment__by_packaging(self, shipment, packaging):
@@ -91,18 +124,25 @@ class Reception(Component):
         message = self._check_move_available(move, "product")
         picking = move.picking_id
         if message:
-            return self._response_for_select_move(
-                picking, message=message, shipment=shipment
-            )
+            return self._response_for_select_move(picking, message=message)
         return self._scan_line__find_or_create_line(picking, move)
 
+    def _check_shipment_status(self, shipment):
+        # TODO check if the shipment is still workable ?
+        return False
+
     def scan_line(self, picking_id, barcode, **kwargs):
+        message = None
         if "shipment_id" not in kwargs:
             return super().scan_line(picking_id, barcode, **kwargs)
         shipment = self.env["shipment.advice"].browse(kwargs["shipment_id"])
-        # check shipment status ?
         if not shipment:
-            return super().scan_line(picking_id, barcode, **kwargs)
+            message = self.msg_store.shipment_not_found()
+        else:
+            message = self._check_shipment_status(shipment)
+        if message:
+            # Shipment is not workable anymore
+            return self._response_for_select_document()
         handlers_by_type = {
             "product": self._scan_line_shipment__by_product,
             "packaging": self._scan_line_shipment__by_packaging,
@@ -110,13 +150,11 @@ class Reception(Component):
         }
         search = self._actions_for("search")
         search_result = search.find(barcode, handlers_by_type.keys())
-        # Fallback handler, returns a barcode not found error
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(shipment, search_result.record)
-        # return self._scan_line__fallback(picking, barcode)
         message = self.msg_store.barcode_not_found()
-        return self._response_for_select_move(None, shipment=shipment, message=message)
+        return self._response_for_select_move(None, message=message)
 
 
 class ShopfloorReceptionValidator(Component):

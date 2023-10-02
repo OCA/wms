@@ -19,11 +19,29 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
         cls.shipment_in.action_confirm()
         cls.shipment_out = cls.shipment_advice_out
 
+    def setUp(self):
+        super().setUp()
+        self.service = self.get_service(
+            "reception",
+            menu=self.menu,
+            profile=self.profile,
+            current_shipment_advice=self.shipment_in,
+        )
+
     def _get_today_picking(self):
         return self.env["stock.picking"].search(
             self.service._domain_stock_picking(today_only=True),
             order=self.service._order_stock_picking(),
         )
+
+    def _data_for_shipment(self, picking=None, shipment=None):
+        data = {}
+        if picking:
+            data = self._data_for_select_move(picking)
+        if shipment:
+            data.pop("picking", None)
+            data["shipment"] = self.data_detail.shipment_advice_detail(shipment)
+        return data
 
     def test_scan_dock_ok(self):
         """Check scanning a dock returns the list of available shipments."""
@@ -52,7 +70,11 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self._data_for_pickings(self._get_today_picking())},
+            data={
+                "pickings": self.service._data_for_stock_pickings(
+                    self._get_today_picking(), with_lines=False
+                )
+            },
             message=self.service.msg_store.shipment_incoming_type_only(),
         )
 
@@ -65,18 +87,13 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
         self.assert_response(
             response,
             next_state="select_document",
-            data={"pickings": self._data_for_pickings(self._get_today_picking())},
+            data={
+                "pickings": self.service._data_for_stock_pickings(
+                    self._get_today_picking(), with_lines=False
+                )
+            },
             message=self.service.msg_store.shipment_nothing_to_unload(shipment),
         )
-
-    def _data_for_shipment(self, picking=None, shipment=None):
-        data = {}
-        if picking:
-            data = self._data_for_select_move(picking)
-        if shipment:
-            data.pop("picking", None)
-            data["shipment"] = self.data_detail.shipment_advice_detail(shipment)
-        return data
 
     def test_scan_shipment_advice_with_one_picking(self):
         shipment = self.shipment_advice_in
