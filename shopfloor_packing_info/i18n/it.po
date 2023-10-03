@@ -6,56 +6,58 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-09 09:09+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__active
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.shopfloor_packing_info_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.shopfloor_packing_info_search_view
 msgid "Archived"
-msgstr ""
+msgstr "In archivio"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_partner__shopfloor_packing_info_id
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_users__shopfloor_packing_info_id
 msgid "Checkout Packing Information"
-msgstr ""
+msgstr "Informazione imballaggio check-out"
 
 #. module: shopfloor_packing_info
 #: model:ir.actions.act_window,name:shopfloor_packing_info.action_shopfloor_packing_info
 #: model:ir.ui.menu,name:shopfloor_packing_info.menu_action_shopfloor_packing_info
 msgid "Checkout Packing Informations"
-msgstr ""
+msgstr "Informazioni imballaggio check-out"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contatto"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.actions.act_window,help:shopfloor_packing_info.action_shopfloor_packing_info
 msgid "Create a shopfloor packing information to be reused among customers."
-msgstr ""
+msgstr "Crea una informazione imballaggio reparto da riutilizzare tra clienti."
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_partner__display_name
@@ -63,13 +65,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__display_name
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking_type__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking_type__shopfloor_display_packing_info
 msgid "Display customer packing info"
-msgstr ""
+msgstr "Visualizza infrmazione imballaggio cliente"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
@@ -78,6 +80,8 @@ msgid ""
 "For the Shopfloor Checkout/Packing scenarios to display the customer packing"
 " info."
 msgstr ""
+"Per lo scenario check-out/imballaggio reparto per visualizzare le "
+"informazioni imballaggio cliente."
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_partner__id
@@ -85,7 +89,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__id
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking_type__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_res_partner____last_update
@@ -93,49 +97,49 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking____last_update
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking_type____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__name
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_stock_picking__shopfloor_packing_info_id
 msgid "Packing information"
-msgstr ""
+msgstr "Informazioni spedizione"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Tipologia prelievo"
 
 #. module: shopfloor_packing_info
 #: model_terms:ir.ui.view,arch_db:shopfloor_packing_info.view_partner_form
 msgid "Shopfloor"
-msgstr ""
+msgstr "Reparto"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_shopfloor_packing_info
 msgid "Shopfloor Packing Information"
-msgstr ""
+msgstr "Informazione imballaggio reparto"
 
 #. module: shopfloor_packing_info
 #: model:ir.model.fields,field_description:shopfloor_packing_info.field_shopfloor_packing_info__text
 msgid "Text"
-msgstr ""
+msgstr "Testo"
 
 #. module: shopfloor_packing_info
 #: model:ir.model,name:shopfloor_packing_info.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Trasferimento"
