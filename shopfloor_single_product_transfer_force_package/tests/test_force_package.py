@@ -30,7 +30,7 @@ class TestForcePackage(CommonCase):
         )
         data = {
             "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": False,
+            "asking_confirmation": None,
         }
         expected_message = self.msg_store.location_requires_package()
         self.assert_response(
