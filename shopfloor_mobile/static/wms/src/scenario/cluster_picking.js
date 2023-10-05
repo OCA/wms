@@ -18,6 +18,8 @@ const ClusterPicking = {
                 v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
+                :input_type="searchbar_input_type"
+                :input_model="searchbar_input_type"
                 />
             <get-work
                 v-if="state_is('start')"
@@ -125,6 +127,9 @@ const ClusterPicking = {
                 {path: "picking_count", label: "Operations"},
                 {path: "move_line_count", label: "Lines"},
             ];
+        },
+        searchbar_input_type: function () {
+            return "text";
         },
     },
     methods: {
