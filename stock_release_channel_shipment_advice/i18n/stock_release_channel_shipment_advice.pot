@@ -1,0 +1,114 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_shipment_advice
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_shipment_advice
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_kanban_view
+msgid "<span>Plan Shipment</span>"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__can_plan_shipment
+msgid "Can Plan Shipment"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__dock_id
+msgid "Dock"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice.selection__stock_release_channel__shipment_planning_method__none
+msgid "None"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__picking_to_plan_ids
+msgid "Picking To Plan"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_shipment_advice_planner__picking_to_plan_ids
+msgid "Pickings to plan"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_form_view
+msgid "Plan Shipment"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_shipment_advice__release_channel_id
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_shipment_advice_planner__release_channel_id
+msgid "Release Channel"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#. odoo-python
+#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
+#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
+#: model:ir.model,name:stock_release_channel_shipment_advice.model_shipment_advice
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_form_view
+#, python-format
+msgid "Shipment Advice"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model,name:stock_release_channel_shipment_advice.model_shipment_advice_planner
+msgid "Shipment Advice Planner"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__shipment_advice_ids
+msgid "Shipment Advices"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__shipment_planning_method
+msgid "Shipment Planning Method"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#. odoo-python
+#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
+#, python-format
+msgid "Shipment planning not allowed"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice.selection__stock_release_channel__shipment_planning_method__simple
+msgid "Simple"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model,name:stock_release_channel_shipment_advice.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#. odoo-python
+#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
+#, python-format
+msgid "The dock doesn't belong to the selected warehouse."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__warehouse_id
+msgid "Warehouse"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice
+#: model:ir.model.fields,help:stock_release_channel_shipment_advice.field_stock_release_channel__warehouse_id
+msgid "Warehouse for which this channel is relevant"
+msgstr ""
