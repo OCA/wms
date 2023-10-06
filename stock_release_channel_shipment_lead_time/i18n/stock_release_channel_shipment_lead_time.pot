@@ -1,0 +1,67 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_shipment_lead_time
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_shipment_advice__delivery_date
+msgid "Delivery Date"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model,name:stock_release_channel_shipment_lead_time.model_shipment_advice
+msgid "Shipment Advice"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model,name:stock_release_channel_shipment_lead_time.model_shipment_advice_planner
+msgid "Shipment Advice Planner"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_date
+msgid "Shipment Date"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_lead_time
+msgid "Shipment Lead Time"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_lead_time
+msgid "Shipment Lead Time (days)"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model,name:stock_release_channel_shipment_lead_time.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model,name:stock_release_channel_shipment_lead_time.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_date
+msgid ""
+"if no warehouse or no calendar on the warehouse:process end date + shipment "
+"lead time.Otherwise, it's counted by calendar included leaves:number of days"
+" = lead time + 1"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_shipment_advice__delivery_date
+msgid "maxium shipment date on the channel of related pickings"
+msgstr ""
