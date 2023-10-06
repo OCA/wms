@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form_stock" model="ir.ui.view">
+        <field
+            name="name"
+        >stock_release_channel_end_time res.config.settings form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <div id="annual_inventory_date" position="after">
+                <div
+                    class="col-12 col-lg-6 o_setting_box"
+                    id="stock_release_use_channel_end_date"
+                    groups='stock.group_stock_manager'
+                >
+                    <div class="o_setting_left_pane">
+                        <field name="stock_release_use_channel_end_date" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="stock_release_use_channel_end_date" />
+                        <div class="text-muted" id="update_scheduled_date">
+                            Allow to update scheduled date follow process end date/time on stock release channel.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </field>
+    </record>
+</odoo>

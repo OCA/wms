@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field
+            name="name"
+        >stock.release.channel.form (in stock_release_channel_process_end_date)</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook" position="before">
+                <group>
+                    <field name="process_end_time_can_edit" invisible="1" />
+                <field
+                        name="process_end_time"
+                        widget="float_time"
+                        attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
+                    />
+                <field
+                        name="process_end_date"
+                        attrs="{'readonly': [('process_end_time_can_edit', '=', False)]}"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_search_view">
+        <field
+            name="name"
+        >stock.release.channel.search (in stock_release_channel_process_end_date)</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_search_view"
+        />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="process_end_time" />
+                <field name="process_end_date" />
+            </field>
+
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_tree_view">
+        <field
+            name="name"
+        >stock.release.channel.tree (in stock_release_channel_process_end_date)</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_tree_view"
+        />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="process_end_time" />
+                <field name="process_end_date" />
+            </field>
+        </field>
+    </record>
+
+    <record id="stock_release_channel_kanban_view" model="ir.ui.view">
+        <field name="name">stock.release.channel.kanban</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='is_release_allowed']/parent::div/parent::div"
+                position="before"
+            >
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-5">
+                                <field
+                                    class="badge rounded-pill bg-o-color-1 mb4"
+                                    name="process_end_time"
+                                    widget="float_time"
+                                />
+                            </div>
+                            <div class="col-7">
+                                <field
+                                    name="process_end_date"
+                                    title="End Date"
+                                    attrs="{'invisible': [('process_end_date', '=', False)]}"
+                                    class="badge rounded-pill bg-o-color-1 mb4"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
