@@ -30,6 +30,7 @@ addon | version | maintainers | summary
 [stock_release_channel_batch_mode_commercial_partner](stock_release_channel_batch_mode_commercial_partner/) | 16.0.1.0.1 |  | Release pickings into channels by batch of same commercial entity
 [stock_release_channel_process_end_time](stock_release_channel_process_end_time/) | 16.0.1.0.0 | [![rousseldenis](https://github.com/rousseldenis.png?size=30px)](https://github.com/rousseldenis) | Allows to define an end date (and time) on a release channel and propagate it to the concerned pickings
 [stock_release_channel_shipment_advice](stock_release_channel_shipment_advice/) | 16.0.1.0.0 | [![jbaudoux](https://github.com/jbaudoux.png?size=30px)](https://github.com/jbaudoux) | Plan shipment advices for ready and released pickings
+[stock_release_channel_shipment_lead_time](stock_release_channel_shipment_lead_time/) | 16.0.1.0.0 | [![jbaudoux](https://github.com/jbaudoux.png?size=30px)](https://github.com/jbaudoux) | Release channel with shipment lead time
 [stock_storage_type](stock_storage_type/) | 16.0.1.0.3 |  | Manage packages and locations storage types
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 16.0.1.0.0 |  | Advanced storage strategy ABC for WMS
 [stock_warehouse_flow](stock_warehouse_flow/) | 16.0.1.0.0 |  | Configure routing flow for stock moves
