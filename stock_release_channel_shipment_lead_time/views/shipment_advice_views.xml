@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="shipment_advice_view_form">
+        <field name="name">shipment.advice.form</field>
+        <field name="model">shipment.advice</field>
+        <field name="inherit_id" ref="shipment_advice.shipment_advice_view_form" />
+        <field name="arch" type="xml">
+            <field name="departure_date" position="after">
+                <field name="delivery_date" />
+            </field>
+        </field>
+    </record>
+</odoo>
