@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-21 13:36+0000\n"
+"PO-Revision-Date: 2023-10-09 07:59+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -50,7 +50,7 @@ msgstr "Azienda"
 #. module: stock_warehouse_flow
 #: model_terms:ir.actions.act_window,help:stock_warehouse_flow.stock_warehouse_flow_action
 msgid "Create a new Routing Flow"
-msgstr "Crea nuovo flusso di inoltro"
+msgstr "Crea nuovo flusso di instradamento"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__create_uid
@@ -217,7 +217,7 @@ msgstr ""
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Operation Types"
-msgstr "Tipo di operazione"
+msgstr "TIpi di operazione"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
@@ -274,7 +274,7 @@ msgstr "Qta."
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__flow_id
 msgid "Routing Flow"
-msgstr "Flusso inoltro"
+msgstr "Flusso instradamento"
 
 #. module: stock_warehouse_flow
 #: model:ir.actions.act_window,name:stock_warehouse_flow.stock_warehouse_flow_action
@@ -283,12 +283,12 @@ msgstr "Flusso inoltro"
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_delivery_carrier_form
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_warehouse
 msgid "Routing Flows"
-msgstr "Flussi inoltro"
+msgstr "Flussi instradamento"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_delivery_carrier__flow_ids
 msgid "Routing flows"
-msgstr "Flussi inoltro"
+msgstr "Flussi instradamento"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__rule_ids
@@ -365,7 +365,7 @@ msgstr "Movimento di magazzino"
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse_flow
 msgid "Stock Warehouse Routing Flow"
-msgstr "Flusso inoltro giacenza magazzino"
+msgstr "Flusso instradamento giacenza magazzino"
 
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
