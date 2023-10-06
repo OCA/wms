@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                    name="button_plan_shipments"
+                    type="object"
+                    string="Plan Shipment"
+                    groups="stock.group_stock_manager"
+                    attrs="{'invisible': [('can_plan_shipment', '=', False)]}"
+                />
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    class="oe_stat_button"
+                    type="object"
+                    name="button_show_shipment_advice"
+                    icon="fa-calendar"
+                    string="Shipment Advice"
+                    context="{'default_release_channel_id':active_id}"
+                />
+            </xpath>
+            <xpath expr="//field[@name='release_mode']" position="before">
+                <field name="can_plan_shipment" invisible="1" />
+                <field name="shipment_planning_method" />
+                <field
+                    name="dock_id"
+                    attrs="{'invisible': [('warehouse_id', '=', False)]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_kanban_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='count_picking_chain']" position="after">
+                <field name="shipment_planning_method" />
+                <field name="can_plan_shipment" />
+            </xpath>
+            <xpath
+                expr="//button[@name='action_picking_all_related']/parent::div/parent::div//div[hasclass('bottom_buttons_left')]"
+                position="inside"
+            >
+                <button
+                    class="btn btn-secondary"
+                    attrs="{'invisible': [('can_plan_shipment', '=', False)]}"
+                    name="button_plan_shipments"
+                    type="object"
+                    groups="stock.group_stock_manager"
+                >
+                    <span>Plan Shipment</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+
+
+</odoo>

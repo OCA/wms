@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="shipment_advice_form_view">
+        <field name="model">shipment.advice</field>
+        <field name="inherit_id" ref="shipment_advice.shipment_advice_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='shipment_type']" position="after">
+                <field name="release_channel_id" />
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="shipment_advice_search_view">
+        <field name="model">shipment.advice</field>
+        <field name="inherit_id" ref="shipment_advice.shipment_advice_view_search" />
+        <field name="arch" type="xml">
+<xpath expr="//field[@name='ref']" position="after">
+                <field name="release_channel_id" />
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="shipment_advice_tree_view">
+        <field name="model">shipment.advice</field>
+        <field name="inherit_id" ref="shipment_advice.shipment_advice_view_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='shipment_type']" position="after">
+                <field name="release_channel_id" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
