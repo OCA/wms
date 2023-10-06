@@ -6,7 +6,8 @@
     "summary": """Plan shipment advices for ready and released pickings""",
     "version": "16.0.1.0.0",
     "license": "AGPL-3",
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux"],
     "website": "https://github.com/OCA/wms",
     "depends": ["shipment_advice_planner", "stock_release_channel"],
     "data": [
@@ -14,5 +15,4 @@
         "views/shipment_advice.xml",
         "views/stock_release_channel.xml",
     ],
-    "demo": [],
 }
