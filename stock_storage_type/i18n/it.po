@@ -529,7 +529,7 @@ msgid ""
 "Storage Category {storage_category} defines max height of {max_h} but the "
 "package is bigger: {height}."
 msgstr ""
-"La categoria stccaggio {storage_category} ha una altezza massima di {max_h} "
+"La categoria stoccaggio {storage_category} ha una altezza massima di {max_h} "
 "ma il pacco è più grande: {height}."
 
 #. module: stock_storage_type
@@ -540,7 +540,7 @@ msgid ""
 "Storage Category {storage_category} defines max weight of {max_w} but the "
 "package is heavier: {weight_kg}."
 msgstr ""
-"La categoria stccaggio {storage_category} ha un peso massimo di {max_h} ma "
+"La categoria stoccaggio {storage_category} ha un peso massimo di {max_w} ma "
 "il pacco è più pesante: {weight_kg}."
 
 #. module: stock_storage_type
