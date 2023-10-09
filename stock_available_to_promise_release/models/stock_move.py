@@ -332,13 +332,7 @@ class StockMove(models.Model):
                 }
             return res
 
-        location_domain = [
-            (
-                "location_id.parent_path",
-                "=like",
-                warehouse.view_location_id.parent_path + "%",
-            )
-        ]
+        location_domain = warehouse.view_location_id._get_available_to_promise_domain()
         domain_quant = expression.AND(
             [[("product_id", "in", self.product_id.ids)], location_domain]
         )
