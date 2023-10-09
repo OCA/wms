@@ -77,8 +77,8 @@ msgstr "Visualizza infrmazione imballaggio cliente"
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking_type__shopfloor_display_packing_info
 msgid ""
-"For the Shopfloor Checkout/Packing scenarios to display the customer packing"
-" info."
+"For the Shopfloor Checkout/Packing scenarios to display the customer packing "
+"info."
 msgstr ""
 "Per lo scenario check-out/imballaggio reparto per visualizzare le "
 "informazioni imballaggio cliente."
