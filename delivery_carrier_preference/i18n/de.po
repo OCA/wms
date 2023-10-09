@@ -123,8 +123,8 @@ msgstr ""
 #. module: delivery_carrier_preference
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_location_route__force_recompute_preferred_carrier_on_release
 msgid ""
-"Mark this box to trigger a recomputation of preferred carrier on the release"
-" of operations."
+"Mark this box to trigger a recomputation of preferred carrier on the release "
+"of operations."
 msgstr ""
 
 #. module: delivery_carrier_preference
@@ -224,8 +224,7 @@ msgstr ""
 #: model:ir.model.fields,help:delivery_carrier_preference.field_stock_picking__estimated_shipping_weight
 msgid ""
 "This weight is calculated according to the move quantity available to "
-"promise and existing product packagings weight for each product on the "
-"moves."
+"promise and existing product packagings weight for each product on the moves."
 msgstr ""
 
 #. module: delivery_carrier_preference
