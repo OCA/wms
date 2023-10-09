@@ -270,14 +270,7 @@ class StockMove(models.Model):
         # locations" of all the warehouses: we may release as soon as we have
         # the quantity somewhere. Do not use "qty_available" to get a faster
         # computation.
-        location_domain = []
-        for location in locations:
-            location_domain = expression.OR(
-                [
-                    location_domain,
-                    [("location_id.parent_path", "=like", location.parent_path + "%")],
-                ]
-            )
+        location_domain = locations._get_available_to_promise_domain()
         domain_quant = expression.AND(
             [[("product_id", "in", moves.product_id.ids)], location_domain]
         )
