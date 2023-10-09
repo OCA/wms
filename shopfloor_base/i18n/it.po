@@ -479,8 +479,8 @@ msgstr "URL"
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid ""
-"Use the action \"Sync registry\" to make changes effective once you are done"
-" with edits and creates."
+"Use the action \"Sync registry\" to make changes effective once you are done "
+"with edits and creates."
 msgstr ""
 "Utilizzare l'azione \"Sincronizza registro\" per rendere effettive le "
 "modificHe una volta completate le mdifiche e le creazioni."
