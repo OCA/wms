@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* wms
+# 	* wms
 #
 msgid ""
 msgstr ""
@@ -16,7 +16,9 @@ msgstr ""
 
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
-msgid "A location can be configured to insert an operation with a different picking type to move goods."
+msgid ""
+"A location can be configured to insert an operation with a different picking "
+"type to move goods."
 msgstr ""
 
 #. module: wms
@@ -71,7 +73,8 @@ msgstr ""
 
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
-msgid "Display on current document completion information about next operations."
+msgid ""
+"Display on current document completion information about next operations."
 msgstr ""
 
 #. module: wms
