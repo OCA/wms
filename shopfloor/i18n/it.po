@@ -61,7 +61,8 @@ msgstr ""
 msgid ""
 "\n"
 "When picking a move,\n"
-"allow to set a destination package that was already used for the other lines.\n"
+"allow to set a destination package that was already used for the other "
+"lines.\n"
 msgstr ""
 
 #. module: shopfloor
@@ -78,9 +79,11 @@ msgstr ""
 msgid ""
 "\n"
 "With this option, the lines you process by putting on a package during the\n"
-"picking process will be put as bulk products at the final destination location.\n"
+"picking process will be put as bulk products at the final destination "
+"location.\n"
 "\n"
-"This is useful if your picking device is emptied at the destination location or\n"
+"This is useful if your picking device is emptied at the destination location "
+"or\n"
 "if you want to provide bulk products to the next operation.\n"
 "\n"
 "Incompatible with: \"Pick and pack at the same time\"\n"
@@ -414,8 +417,8 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
 msgid ""
-"If you tick this box, the transfer is reserved only if the put-away can find"
-" a sublocation (when putaway destination is different from the operation "
+"If you tick this box, the transfer is reserved only if the put-away can find "
+"a sublocation (when putaway destination is different from the operation "
 "type's destination)."
 msgstr ""
 
@@ -472,8 +475,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/completion_info.py:0
 #, python-format
-msgid ""
-"Last operation of transfer {}. Next operation ({}) is ready to proceed."
+msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
 msgstr ""
 
 #. module: shopfloor
@@ -770,8 +772,8 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"Not all lines have been processed with full quantity. Do you confirm partial"
-" operation?"
+"Not all lines have been processed with full quantity. Do you confirm partial "
+"operation?"
 msgstr ""
 
 #. module: shopfloor
@@ -1157,7 +1159,6 @@ msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/location_content_transfer.py:0
-#: code:addons/shopfloor/services/location_content_transfer.py:0
 #, python-format
 msgid "Scan the package"
 msgstr ""
@@ -1230,8 +1231,7 @@ msgstr ""
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid ""
-"Several transfers found, please scan a package or select a transfer "
-"manually."
+"Several transfers found, please scan a package or select a transfer manually."
 msgstr ""
 
 #. module: shopfloor
@@ -1324,9 +1324,9 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_move_create
 msgid ""
-"Some scenario may create move(s) when a product or package is scanned and no"
-" move already exists. Any new move is created in the selected operation "
-"type, so it can be active only when one type is selected."
+"Some scenario may create move(s) when a product or package is scanned and no "
+"move already exists. Any new move is created in the selected operation type, "
+"so it can be active only when one type is selected."
 msgstr ""
 
 #. module: shopfloor
@@ -1413,8 +1413,8 @@ msgstr ""
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%d\">%s</a> has been created."
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
+"\">%s</a> has been created."
 msgstr ""
 
 #. module: shopfloor
@@ -1470,8 +1470,8 @@ msgstr ""
 msgid ""
 "The picking done in Shopfloor scenarios will respect this order. The "
 "sequence is a char so it can be composed of fields such as 'corridor-rack-"
-"side-level'. Pay attention to the padding ('09' is before '19', '9' is not)."
-" It is recommended to use an Export then an Import to populate this field "
+"side-level'. Pay attention to the padding ('09' is before '19', '9' is not). "
+"It is recommended to use an Export then an Import to populate this field "
 "using a spreadsheet."
 msgstr ""
 
@@ -1485,8 +1485,8 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"The quantity scanned for one or more lines cannot be higher than the maximum"
-" allowed."
+"The quantity scanned for one or more lines cannot be higher than the maximum "
+"allowed."
 msgstr ""
 
 #. module: shopfloor
@@ -1583,8 +1583,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"This product is part of a package with other products, please scan a "
-"package."
+"This product is part of a package with other products, please scan a package."
 msgstr ""
 
 #. module: shopfloor
@@ -1830,8 +1829,8 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"You scanned a different package with the same product, do you want to change"
-" pack? Scan it again to confirm"
+"You scanned a different package with the same product, do you want to change "
+"pack? Scan it again to confirm"
 msgstr ""
 
 #. module: shopfloor
