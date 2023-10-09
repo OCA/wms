@@ -117,8 +117,8 @@ msgstr ""
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__date_priority
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking__date_priority
 msgid ""
-"Date/time used to sort moves to deliver first. Used to calculate the ordered"
-" available to promise."
+"Date/time used to sort moves to deliver first. Used to calculate the ordered "
+"available to promise."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -284,8 +284,8 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__previous_promised_qty
 msgid ""
-"Quantities promised to moves with higher priority than this move (in default"
-" UoM of the product)."
+"Quantities promised to moves with higher priority than this move (in default "
+"UoM of the product)."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -370,8 +370,8 @@ msgstr ""
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>%s</a> has"
-" been created."
+"The backorder <a href=# data-oe-model=stock.picking data-oe-id=%d>%s</a> has "
+"been created."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -396,7 +396,8 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
 msgid ""
 "This menu gives you the full traceability of inventory\n"
-"                operations on a specific product. You can filter on the product\n"
+"                operations on a specific product. You can filter on the "
+"product\n"
 "                to see all the past or future movements for the product."
 msgstr ""
 
@@ -445,7 +446,6 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "Unsupported operator %s"
@@ -474,9 +474,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid ""
 "When your release transfers, their expected date\n"
-"                                is rescheduled to now + this preparation time (in minutes).\n"
-"                                Their scheduled date represents the latest the\n"
-"                                transfers should be done, and therefore, past\n"
+"                                is rescheduled to now + this preparation "
+"time (in minutes).\n"
+"                                Their scheduled date represents the latest "
+"the\n"
+"                                transfers should be done, and therefore, "
+"past\n"
 "                                this timestamp, considered late."
 msgstr ""
 
