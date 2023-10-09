@@ -86,14 +86,15 @@ msgstr "Non c'è altro da caricare dalla consegna {}."
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "No shipment advice in progress found for this loading dock."
-msgstr "Non c'è un avviso di spedizione in corso per questa banchina di carico."
+msgstr ""
+"Non c'è un avviso di spedizione in corso per questa banchina di carico."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid ""
-"No shipment advice in progress found for this loading dock. Scan again {} to"
-" create a new one."
+"No shipment advice in progress found for this loading dock. Scan again {} to "
+"create a new one."
 msgstr ""
 "Non c'è un avviso di spedizione in corso per questa banchina di carico. "
 "Scansionare nuovamente {} per crearne uno."
