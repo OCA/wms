@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* wms_demo
+# 	* wms_demo
 #
 msgid ""
 msgstr ""
@@ -17,7 +17,9 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_202001508
 #: model:product.template,name:wms_demo.product_202001508_product_template
-msgid "Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block (MN1604/6LF22/ST10)"
+msgid ""
+"Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block "
+"(MN1604/6LF22/ST10)"
 msgstr ""
 
 #. module: wms_demo
@@ -29,7 +31,8 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_180002461
 #: model:product.template,name:wms_demo.product_180002461_product_template
-msgid "Beinbeutel Careline steril 750ml Schlauchlänge 8.5cmml Schlauchlänge 8.5cm"
+msgid ""
+"Beinbeutel Careline steril 750ml Schlauchlänge 8.5cmml Schlauchlänge 8.5cm"
 msgstr ""
 
 #. module: wms_demo
@@ -70,7 +73,8 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_379002117
 #: model:product.template,name:wms_demo.product_379002117_product_template
-msgid "Einlagebeutel 28-35Liter transparent Verschlussbandparent Verschlussband"
+msgid ""
+"Einlagebeutel 28-35Liter transparent Verschlussbandparent Verschlussband"
 msgstr ""
 
 #. module: wms_demo
@@ -82,19 +86,24 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_109000260
 #: model:product.template,name:wms_demo.product_109000260_product_template
-msgid "Frischhaltefolie Freshstar 30cmx300m Grossrolle in Cutterboxmx300m Grossrolle in Cutterbox"
+msgid ""
+"Frischhaltefolie Freshstar 30cmx300m Grossrolle in Cutterboxmx300m "
+"Grossrolle in Cutterbox"
 msgstr ""
 
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_105000621
 #: model:product.template,name:wms_demo.product_105000621_product_template
-msgid "Geschlossenes System atmungsaktiv TENA Slip Ultima Ltiv TENA Slip Ultima L"
+msgid ""
+"Geschlossenes System atmungsaktiv TENA Slip Ultima Ltiv TENA Slip Ultima L"
 msgstr ""
 
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_104000190
 #: model:product.template,name:wms_demo.product_104000190_product_template
-msgid "Handtuch Tork Advanced V-Falz 2-lg weiss 23x23cm (BxL)2-lg weiss 23x23cm (BxL)"
+msgid ""
+"Handtuch Tork Advanced V-Falz 2-lg weiss 23x23cm (BxL)2-lg weiss 23x23cm "
+"(BxL)"
 msgstr ""
 
 #. module: wms_demo
@@ -148,7 +157,9 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_400008525
 #: model:product.template,name:wms_demo.product_400008525_product_template
-msgid "OP-Maske Sandel Zellulosebeschichtung Bänder weiss Typ IIRichtung Bänder weiss Typ IIR"
+msgid ""
+"OP-Maske Sandel Zellulosebeschichtung Bänder weiss Typ IIRichtung Bänder "
+"weiss Typ IIR"
 msgstr ""
 
 #. module: wms_demo
@@ -318,7 +329,9 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_132003147
 #: model:product.template,name:wms_demo.product_132003147_product_template
-msgid "Sanitärreiniger AvenisFoam Schaumreiniger Sprühflasche 750mlaumreiniger Sprühflasche 750ml"
+msgid ""
+"Sanitärreiniger AvenisFoam Schaumreiniger Sprühflasche 750mlaumreiniger "
+"Sprühflasche 750ml"
 msgstr ""
 
 #. module: wms_demo
@@ -329,7 +342,9 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_200106094
 #: model:product.template,name:wms_demo.product_200106094_product_template
-msgid "Schutzserviette Finess gefaltet 2-lg 37x70cm ungebleichtt 2-lg 37x70cm ungebleicht"
+msgid ""
+"Schutzserviette Finess gefaltet 2-lg 37x70cm ungebleichtt 2-lg 37x70cm "
+"ungebleicht"
 msgstr ""
 
 #. module: wms_demo
@@ -359,7 +374,8 @@ msgstr ""
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_396001471
 #: model:product.template,name:wms_demo.product_396001471_product_template
-msgid "Sterilisationsvlies Halyard Smart-Fold H650 101x119cmart-Fold H650 101x119cm"
+msgid ""
+"Sterilisationsvlies Halyard Smart-Fold H650 101x119cmart-Fold H650 101x119cm"
 msgstr ""
 
 #. module: wms_demo
