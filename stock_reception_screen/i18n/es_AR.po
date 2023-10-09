@@ -163,6 +163,11 @@ msgstr ""
 "de stock con tipo \"interno\"."
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_qty
+msgid "Demand"
+msgstr ""
+
+#. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_stored_id
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Destination"
@@ -174,6 +179,10 @@ msgid "Destination Location"
 msgstr "Ubicación de Destino"
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__display_name
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__display_name
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__display_name
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking__display_name
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__display_name
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__display_name
 msgid "Display Name"
@@ -186,10 +195,10 @@ msgid "Done"
 msgstr "Hecho"
 
 #. module: stock_reception_screen
-#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__lot_life_date
-#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_life_date
-msgid "End of Life Date"
-msgstr "Fecha de Fin de Vida"
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__lot_expiration_date
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_expiration_date
+msgid "End of Expiration Date"
+msgstr ""
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_has_tracking
@@ -229,17 +238,20 @@ msgid "Height required for packages"
 msgstr "Altura requerida para paquetes"
 
 #. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__id
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__id
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__id
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking__id
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__id
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__id
 msgid "ID"
 msgstr "ID"
 
 #. module: stock_reception_screen
-#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_qty
-msgid "Initial Demand"
-msgstr "Demanda Inicial"
-
-#. module: stock_reception_screen
+#: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging____last_update
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move____last_update
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line____last_update
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking____last_update
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode____last_update
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen____last_update
 msgid "Last Modified on"
@@ -273,7 +285,7 @@ msgid "Manual Barcode Input"
 msgstr "Ingreso Manual de Código de Barras"
 
 #. module: stock_reception_screen
-#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_last_lot_life_date
+#: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_last_lot_expiration_date
 msgid "Most recent exp. date"
 msgstr "Fecha de exp. más reciente"
 
@@ -530,7 +542,7 @@ msgid "The storage type is mandatory before going further."
 msgstr "El tipo de almacenamiento es obligatorio antes de continuar."
 
 #. module: stock_reception_screen
-#: model:ir.model.fields,help:stock_reception_screen.field_stock_move_line__lot_life_date
+#: model:ir.model.fields,help:stock_reception_screen.field_stock_move_line__lot_expiration_date
 msgid ""
 "This is the date on which the goods with this Serial Number may become "
 "dangerous and must not be consumed."
@@ -637,3 +649,9 @@ msgstr "Tiene que configurar la cantidad recibida."
 #, python-format
 msgid "Your transfer has to be ready to receive goods."
 msgstr "Su transferencia debe estar lista para recibir mercancías."
+
+#~ msgid "End of Life Date"
+#~ msgstr "Fecha de Fin de Vida"
+
+#~ msgid "Initial Demand"
+#~ msgstr "Demanda Inicial"
