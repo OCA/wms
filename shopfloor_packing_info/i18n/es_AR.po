@@ -76,8 +76,8 @@ msgstr "Mostrar información de embalaje del cliente"
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking__shopfloor_display_packing_info
 #: model:ir.model.fields,help:shopfloor_packing_info.field_stock_picking_type__shopfloor_display_packing_info
 msgid ""
-"For the Shopfloor Checkout/Packing scenarios to display the customer packing"
-" info."
+"For the Shopfloor Checkout/Packing scenarios to display the customer packing "
+"info."
 msgstr ""
 "Para que los escenarios de Caja/Embalaje en el taller muestren la "
 "información de embalaje del cliente."
