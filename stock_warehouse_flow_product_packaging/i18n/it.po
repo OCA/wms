@@ -43,8 +43,7 @@ msgstr "Tipo imballaggio"
 
 #. module: stock_warehouse_flow_product_packaging
 #: model:ir.model.fields,help:stock_warehouse_flow_product_packaging.field_stock_warehouse_flow__split_method
-msgid ""
-"Simple => move will be split by the qty of the flow or a multiple of it"
+msgid "Simple => move will be split by the qty of the flow or a multiple of it"
 msgstr ""
 "Semplice => il movimento verrà diviso per la quantità del flusso o un suo "
 "multiplo"
