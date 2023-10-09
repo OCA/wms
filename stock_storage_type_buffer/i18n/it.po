@@ -61,9 +61,9 @@ msgstr "Ubicazini buffer"
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,help:stock_storage_type_buffer.field_stock_location_storage_buffer__buffer_location_ids
 msgid ""
-"Buffers where goods are temporarily stored. When all these locations contain"
-" goods or will receive goods, the destination locations are not available "
-"for putaway."
+"Buffers where goods are temporarily stored. When all these locations contain "
+"goods or will receive goods, the destination locations are not available for "
+"putaway."
 msgstr ""
 "Buffer dove la merce è depositata temporaneamente. Quando tutte queste "
 "ubicazioni contengono merce o devono ricevere merce, le ubicazioni "
