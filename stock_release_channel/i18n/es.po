@@ -19,15 +19,17 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid ""
-"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
-"title=\"Automatic Release\"/>"
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
+"\"Automatic Release\"/>"
 msgstr ""
 "<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
 "\"Automatic Release\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title=\"Details\"/>"
+msgid ""
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
+"\"Details\"/>"
 msgstr ""
 "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
 "\"Details\"/>"
@@ -585,8 +587,7 @@ msgstr "Campo técnico para comprobar si la acción 'Bloquear' está permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_release_allowed
-msgid ""
-"Technical field to check if the action 'Release Next Batch' is allowed."
+msgid "Technical field to check if the action 'Release Next Batch' is allowed."
 msgstr ""
 "Campo técnico para comprobar si la acción 'Liberar siguiente lote' está "
 "permitida."
@@ -599,7 +600,8 @@ msgstr "Campo técnico para comprobar si la acción 'Dormir' está permitida."
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_unlock_allowed
 msgid "Technical field to check if the action 'Unlock' is allowed."
-msgstr "Campo técnico para comprobar si la acción 'Desbloquear' está permitida."
+msgstr ""
+"Campo técnico para comprobar si la acción 'Desbloquear' está permitida."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
@@ -610,8 +612,7 @@ msgstr "Campo técnico para comprobar si la acción 'Despertar' está permitida.
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
-msgid ""
-"The number of released transfers in progress is already at the maximum."
+msgid "The number of released transfers in progress is already at the maximum."
 msgstr "El número de transferencias liberadas en curso ya está al máximo."
 
 #. module: stock_release_channel
@@ -625,9 +626,12 @@ msgstr "La liberación de recogidas no está permitida para el canal %(name)s."
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state
 msgid ""
 "The state allows you to control the availability of the release channel.\n"
-"* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
-" * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
-"* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
+"* Open: Manual and automatic picking assignment to the release is effective "
+"and release operations are allowed.\n"
+" * Locked: Release operations are forbidden. (Assignement processes are "
+"still working)\n"
+"* Asleep: Assigned pickings not processed are unassigned from the release "
+"channel.\n"
 msgstr ""
 "El estado permite controlar la disponibilidad del canal de liberación.\n"
 "* Abierto: La asignación de picking manual y automático a la liberación es "

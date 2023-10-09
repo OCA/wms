@@ -19,15 +19,17 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid ""
-"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
-"title=\"Automatic Release\"/>"
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
+"\"Automatic Release\"/>"
 msgstr ""
 "<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Rilascio\" title="
 "\"Rilascio automatico\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title=\"Details\"/>"
+msgid ""
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
+"\"Details\"/>"
 msgstr ""
 "<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Dettagli\" title="
 "\"Dettagli\"/>"
@@ -583,8 +585,7 @@ msgstr "Campo tecnico per controllare se è consentita l'azione 'Blocco'."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__is_release_allowed
-msgid ""
-"Technical field to check if the action 'Release Next Batch' is allowed."
+msgid "Technical field to check if the action 'Release Next Batch' is allowed."
 msgstr ""
 "Campo tecnico per controllare se è consentita l'azione 'Rilascia lotto "
 "successivo'."
@@ -608,8 +609,7 @@ msgstr "Campo tecnico per controllare se è consentita l'azione 'Attiva'."
 #. odoo-python
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
-msgid ""
-"The number of released transfers in progress is already at the maximum."
+msgid "The number of released transfers in progress is already at the maximum."
 msgstr "Il numero di trasferimenti in corso è già al massimo."
 
 #. module: stock_release_channel
@@ -623,9 +623,12 @@ msgstr "Il rilascio dei prelievi non è consentito per il canale %(name)s."
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state
 msgid ""
 "The state allows you to control the availability of the release channel.\n"
-"* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
-" * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
-"* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
+"* Open: Manual and automatic picking assignment to the release is effective "
+"and release operations are allowed.\n"
+" * Locked: Release operations are forbidden. (Assignement processes are "
+"still working)\n"
+"* Asleep: Assigned pickings not processed are unassigned from the release "
+"channel.\n"
 msgstr ""
 "Lo stato consenti di controllare la disponibilità del canale di rilascio.\n"
 "* Aperto: assegnazione manuale e automatica del prelievo al rilascio è "
@@ -678,7 +681,8 @@ msgstr "Progresso trasferimenti"
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "Transfers that couldn't be assigned in a release channel"
-msgstr "Trasferimenti che non possono essere assegnati in un canale di rilascio"
+msgstr ""
+"Trasferimenti che non possono essere assegnati in un canale di rilascio"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
