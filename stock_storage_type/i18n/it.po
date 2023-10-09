@@ -358,8 +358,8 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid ""
-"Location storage type %s defines max height of %s but the package is bigger:"
-" %s."
+"Location storage type %s defines max height of %s but the package is bigger: "
+"%s."
 msgstr ""
 
 #. module: stock_storage_type
@@ -487,7 +487,8 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid ""
-"Package %s is not allowed into location %s, because there isn't any location storage type that allows package storage type %s into it:\n"
+"Package %s is not allowed into location %s, because there isn't any location "
+"storage type that allows package storage type %s into it:\n"
 "\n"
 "%s"
 msgstr ""
@@ -685,9 +686,13 @@ msgstr ""
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__pack_putaway_strategy
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_location_sequence__location_putaway_strategy
 msgid ""
-"This defines the storage strategy to use when packs are put away in this location.\n"
-"None: when a pack is moved to this location, it will not be put away any further.\n"
-"Ordered Children Locations: when a pack is moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
+"This defines the storage strategy to use when packs are put away in this "
+"location.\n"
+"None: when a pack is moved to this location, it will not be put away any "
+"further.\n"
+"Ordered Children Locations: when a pack is moved to this location, a "
+"suitable location will be searched in its children locations according to "
+"the restrictions defined on their respective location storage types."
 msgstr ""
 
 #. module: stock_storage_type
@@ -715,11 +720,11 @@ msgstr ""
 #, python-format
 msgid ""
 "When a package with storage type %s is put away, the strategy will look for "
-"an allowed location in the following locations: <br/><br/>%s "
-"<br/><br/><b>Note</b>: this happens as long as these locations <u>are "
-"children of the stock move destination location</u> or as long as these "
-"locations are children of the destination location after the (product or "
-"category) put-away is applied."
+"an allowed location in the following locations: <br/><br/>%s <br/><br/"
+"><b>Note</b>: this happens as long as these locations <u>are children of the "
+"stock move destination location</u> or as long as these locations are "
+"children of the destination location after the (product or category) put-"
+"away is applied."
 msgstr ""
 
 #. module: stock_storage_type
