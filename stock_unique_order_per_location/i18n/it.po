@@ -59,8 +59,8 @@ msgstr ""
 #. module: stock_unique_order_per_location
 #: model:ir.model.fields,help:stock_unique_order_per_location.field_stock_picking_type__same_next_picking
 msgid ""
-"When checked, the destination location must either be empty or contain stock"
-" reserved only by the next picking. This ensures that you do not mix "
+"When checked, the destination location must either be empty or contain stock "
+"reserved only by the next picking. This ensures that you do not mix "
 "different sales order on the destination location"
 msgstr ""
 "Quando selezionata, l'ubicazione destinazione deve essere o vuota o "
