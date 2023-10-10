@@ -142,8 +142,8 @@ msgstr "ID (identificación)"
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__qty
 msgid ""
-"If a qty is set the flow can be applied on moves where the move's qty >= the"
-" qty set on the flow\n"
+"If a qty is set the flow can be applied on moves where the move's qty >= the "
+"qty set on the flow\n"
 msgstr ""
 "Si se fija una cantidad, el flujo puede aplicarse a los movimientos cuya "
 "cantidad sea >= la cantidad fijada en el flujo.\n"
@@ -207,7 +207,8 @@ msgstr ""
 #: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
 #, python-format
 msgid ""
-"No rule corresponding to '%(picking_type)s' operation type has been found on delivery route '%(delivery_route)s'.\n"
+"No rule corresponding to '%(picking_type)s' operation type has been found on "
+"delivery route '%(delivery_route)s'.\n"
 "Please check your configuration."
 msgstr ""
 "No se ha encontrado ninguna regla correspondiente al tipo de operación "
@@ -299,8 +300,8 @@ msgstr "Reglas"
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
 msgid ""
-"Same than 'To operation type' field, displayed here to get a global overview"
-" of the flow configuration."
+"Same than 'To operation type' field, displayed here to get a global overview "
+"of the flow configuration."
 msgstr ""
 "Igual que el campo 'A tipo de operación', mostrado aquí para tener una "
 "visión general de la configuración del flujo."
@@ -341,8 +342,7 @@ msgstr "Sencillo"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__split_method
-msgid ""
-"Simple => move will be split by the qty of the flow or a multiple of it"
+msgid "Simple => move will be split by the qty of the flow or a multiple of it"
 msgstr ""
 "Simple => el movimiento será desglosado en la cantidad del flujo o un "
 "múltiplo de él"
