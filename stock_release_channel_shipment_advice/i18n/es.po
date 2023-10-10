@@ -60,7 +60,6 @@ msgstr "Canal de liberación"
 #. module: stock_release_channel_shipment_advice
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
-#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
 #: model:ir.model,name:stock_release_channel_shipment_advice.model_shipment_advice
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_form_view
 #, python-format
