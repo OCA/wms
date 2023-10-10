@@ -30,7 +30,8 @@ msgstr "Aziende abilitate"
 #: code:addons/shopfloor_base_multicompany/services/service.py:0
 #, python-format
 msgid "Current user belongs to a company that is not allowed on this app."
-msgstr "L'utente attuale appartiene ad una azienda non abilitata in questa app."
+msgstr ""
+"L'utente attuale appartiene ad una azienda non abilitata in questa app."
 
 #. module: shopfloor_base_multicompany
 #: model:ir.model.fields,field_description:shopfloor_base_multicompany.field_shopfloor_app__display_name
