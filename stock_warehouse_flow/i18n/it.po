@@ -142,8 +142,8 @@ msgstr "ID"
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__qty
 msgid ""
-"If a qty is set the flow can be applied on moves where the move's qty >= the"
-" qty set on the flow\n"
+"If a qty is set the flow can be applied on moves where the move's qty >= the "
+"qty set on the flow\n"
 msgstr ""
 "Se è impostata una qantità il flusso può essere applicato ai movimenti dove "
 "la quantità del movimento è => alla qantità impostata nel flusso\n"
@@ -207,7 +207,8 @@ msgstr ""
 #: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
 #, python-format
 msgid ""
-"No rule corresponding to '%(picking_type)s' operation type has been found on delivery route '%(delivery_route)s'.\n"
+"No rule corresponding to '%(picking_type)s' operation type has been found on "
+"delivery route '%(delivery_route)s'.\n"
 "Please check your configuration."
 msgstr ""
 "Non è stata trovata una regola corrispondente al tipo operazione "
@@ -299,8 +300,8 @@ msgstr "Regole"
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
 msgid ""
-"Same than 'To operation type' field, displayed here to get a global overview"
-" of the flow configuration."
+"Same than 'To operation type' field, displayed here to get a global overview "
+"of the flow configuration."
 msgstr ""
 "Pari al campo 'A tipo operazione', vsualizzato qui per avere una visione "
 "globale della configurazione del flusso."
@@ -341,8 +342,7 @@ msgstr "Semplice"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__split_method
-msgid ""
-"Simple => move will be split by the qty of the flow or a multiple of it"
+msgid "Simple => move will be split by the qty of the flow or a multiple of it"
 msgstr ""
 "Semplice => il movimento verrà diviso per la quantità del flusso o un suo "
 "multiplo"
@@ -404,8 +404,8 @@ msgid ""
 "Used to generate the default prefix of new operation types. (e.g. 'DG' => "
 "'WH/OUT/DG/')"
 msgstr ""
-"Utilizzao per generare il prefisso predefinito del nuovo tipo operazione. ("
-"es. 'DG' => 'WH/OUT/DG/')"
+"Utilizzao per generare il prefisso predefinito del nuovo tipo operazione. "
+"(es. 'DG' => 'WH/OUT/DG/')"
 
 #. module: stock_warehouse_flow
 #: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse
