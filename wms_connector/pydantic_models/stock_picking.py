@@ -6,7 +6,7 @@ from pydantic import validator
 
 
 class StockPickingExporter(NaiveOrmModel):
-    id: int
+    # WIP EXEMPLE
     name: str
 
     @validator("name")

@@ -47,7 +47,7 @@ class StockWarehouse(models.Model):
                         "attachment_synchronize.model_attachment_synchronize_task"
                     ).id,
                     "state": "code",
-                    "code": "",
+                    "code": "", # TODO
                 }
             )
 

@@ -15,7 +15,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
     _description = "Synchronizable export mixin"
     wms_export_date = fields.Date()
     wms_export_attachment = fields.Char()
-    wms_export_flag = fields.Boolean()
+    wms_export_state = fields.Selection(
+        [("to_send", "To send"), ("sent", "Sent"), ("error", "Error")]
+    )
     wms_export_error = fields.Char()
 
     def synchronize_export(self):
@@ -25,10 +27,11 @@ class SynchronizeExportableMixin(models.AbstractModel):
                 return self.env["attachment.queue"]
             attachment = self._format_to_exportfile(data)
             self.track_export(attachment)
-            self.wms_export_flag = False
+            self.wms_export_state = "sent"
             return attachment
         except Exception as e:
             self.wms_export_error = str(e)
+            self.wms_export_state = "error"
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
