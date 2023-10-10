@@ -11,19 +11,18 @@ class StockWarehouse(models.Model):
         inverse="_inverse_active_wms_sync", readonly=False, store=True
     )
     sync_task_id = fields.Many2one("attachment.synchronize.task", readonly=True)
-    sync_cron_id = fields.Many2one("ir.cron", readonly=True)
+    sync_cron_id = fields.Many2one("ir.cron")
 
     def _inverse_active_wms_sync(self):
         for rec in self:
             if rec.active_wms_sync:
-                rec._activate_cron_attachment_task()
+                rec._activate_cron_task()
             else:
-                rec._deactivate_cron_attachment_task()
+                rec._deactivate_cron_task()
 
-    def _activate_crons_attachment_queues(self):
-        if self.sync_task_id and self.sync_cron_id:
+    def _activate_cron_task(self):
+        if self.sync_task_id:
             self.sync_task_id.active = True
-            self.sync_cron_id.active = True
         else:
             self.sync_task_id = self.env["attachment.synchronize.task"].create(
                 {
@@ -35,6 +34,9 @@ class StockWarehouse(models.Model):
                     ),
                 }
             )
+        if self.sync_cron_id:
+            self.sync_cron_id.active = True
+        else:
             self.sync_cron_id = self.env["ir.cron"].create(
                 {
                     "name": "WMS Sync {}".format(self.name),
@@ -49,9 +51,10 @@ class StockWarehouse(models.Model):
                 }
             )
 
-    def _deactivate_cron_attachment_task(self):
+    def _deactivate_cron_task(self):
         self.sync_task_id.active = False
-        self.sync_cron_id.active = False
+        if not self.sync_cron_id.warehouse_ids:
+            self.sync_cron_id.active = False
 
     def action_open_flows(self):
         raise NotImplementedError

@@ -9,15 +9,18 @@
     "license": "AGPL-3",
     "author": "Akretion,Odoo Community Association (OCA)",
     "website": "https://www.akretion.com",
-    "depends": [
-        "stock",
-        "sale",
-        "attachment_synchronize",
-    ],
+    "depends": ["stock", "sale", "attachment_synchronize", "pydantic", "extendable"],
     "data": [
+        "views/attachment_queue.xml",
+        "views/stock_picking.xml",
+        "views/product_product.xml",
         "views/stock_warehouse.xml",
     ],
     "demo": [
+        "demo/attachment_queue.xml",
+        "demo/stock_picking.xml",
+        "demo/product_product.xml",
         "demo/stock_warehouse.xml",
     ],
+    "external_dependencies": {"python": ["extendable-pydantic", "pydantic<2"]},
 }
