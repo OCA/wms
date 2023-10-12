@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-20 05:02+0000\n"
+"PO-Revision-Date: 2023-10-12 14:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -25,6 +25,9 @@ msgid ""
 "- Origin picking(s):\n"
 "\t -%(picking_names)s."
 msgstr ""
+"\n"
+"- Prelievo origine(s):\n"
+"\t -%(picking_names)s."
 
 #. module: stock_available_to_promise_release
 #. odoo-python
@@ -34,6 +37,8 @@ msgid ""
 "\n"
 "- Picking: %(picking_name)s."
 msgstr ""
+"\n"
+"- Prelievo: %(picking_name)s."
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
@@ -201,7 +206,7 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_route
