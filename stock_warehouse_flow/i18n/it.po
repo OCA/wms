@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-09 09:09+0000\n"
+"PO-Revision-Date: 2023-10-12 09:39+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -368,7 +368,7 @@ msgstr "Flusso instradamento giacenza magazzino"
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Technical Information"
-msgstr "Informazione tecnica"
+msgstr "Informazioni tecniche"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__company_id
