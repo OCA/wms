@@ -25,3 +25,4 @@ class AttachmentQueue(models.Model):
 
     def _run_wms_delivery_confirmed(self):
         raise NotImplementedError
+

@@ -24,3 +24,4 @@ class AttachmentSynchronizeTask(models.Model):
             ("delivery_confirmed", "Delivery confirmed"),
         ]
     )
+

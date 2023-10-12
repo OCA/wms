@@ -43,6 +43,7 @@ class StockWarehouse(models.Model):
         required=True,
         default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
+    wms_product_sync_ids = fields.One2many("product.product", "warehouse_id")
 
     def _inverse_active_wms_sync(self):
         for rec in self:

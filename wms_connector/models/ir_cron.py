@@ -14,3 +14,4 @@ class IrCron(models.Model):
     warehouse_import_confirm_delivery_ids = fields.One2many(
         "stock.warehouse", "wms_import_confirm_delivery_cron_id"
     )
+    product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
