@@ -8,5 +8,10 @@ from odoo.addons.wms_connector.pydantic_models.stock_picking import StockPicking
 class StockPicking(models.Model):
     _inherit = ["stock.picking", "synchronize.exportable.mixin"]
 
-    def _prepare_export_data(self):
-        return StockPickingExporter.from_orm(self)
+    def button_create_aq(self):
+        self.synchronize_export()
+
+    def _get_export_name(self):
+        if self.file_creation_mode == "per_record":
+            return self.name + ".csv"
+        return super()._get_export_name()

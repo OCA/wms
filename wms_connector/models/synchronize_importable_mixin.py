@@ -13,10 +13,10 @@ class SynchronizeImportableMixin(models.AbstractModel):
     import_date = fields.Date()
     import_file_id = fields.Many2one("attachment.queue")
 
-    def track_model_import(self):
+    def track_model_import(self, attachment_queue):
         self.write(
             {
                 "import_date": datetime.datetime.now(),
-                "import_file_id": self.env.context.get("attachment_queue"),
+                "import_file_id": attachment_queue.id,
             }
         )

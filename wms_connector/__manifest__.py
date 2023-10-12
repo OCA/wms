@@ -11,12 +11,17 @@
     "website": "https://www.akretion.com",
     "depends": ["stock", "sale", "attachment_synchronize", "pydantic", "extendable"],
     "data": [
+        "security/wms_product_sync.xml",
+        "views/wms_product_sync.xml",
+        "data/cron.xml",
+        "data/ir_filters.xml",
         "views/attachment_queue.xml",
         "views/stock_picking.xml",
         "views/product_product.xml",
         "views/stock_warehouse.xml",
     ],
     "demo": [
+        "demo/wms_product_sync.xml",
         "demo/attachment_queue.xml",
         "demo/stock_picking.xml",
         "demo/product_product.xml",

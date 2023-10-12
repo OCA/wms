@@ -7,4 +7,10 @@ from odoo import _, api, fields, models
 class IrCron(models.Model):
     _inherit = "ir.cron"
 
-    warehouse_ids = fields.One2many("stock.warehouse", "sync_cron_id")
+    warehouse_export_ids = fields.One2many("stock.warehouse", "wms_export_cron_id")
+    warehouse_import_confirm_reception_ids = fields.One2many(
+        "stock.warehouse", "wms_import_confirm_reception_cron_id"
+    )
+    warehouse_import_confirm_delivery_ids = fields.One2many(
+        "stock.warehouse", "wms_import_confirm_delivery_cron_id"
+    )

@@ -6,3 +6,4 @@ from . import ir_cron
 from . import product_product
 from . import stock_picking
 from . import attachment_queue
+from . import wms_product_sync

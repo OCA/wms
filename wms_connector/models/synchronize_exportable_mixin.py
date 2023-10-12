@@ -14,24 +14,49 @@ class SynchronizeExportableMixin(models.AbstractModel):
     _name = "synchronize.exportable.mixin"
     _description = "Synchronizable export mixin"
     wms_export_date = fields.Date()
-    wms_export_attachment = fields.Char()
-    wms_export_state = fields.Selection(
-        [("to_send", "To send"), ("sent", "Sent"), ("error", "Error")]
-    )
+    wms_export_attachment = fields.Many2one("attachment.queue", index=True)
     wms_export_error = fields.Char()
+    file_creation_mode = fields.Selection(
+        [("per_record", "Per Record"), ("per_recordset", "Per recordset")],
+        default="per_record",
+    )
 
     def synchronize_export(self):
-        try:
-            data = self._prepare_export_data()
-            if not data:
-                return self.env["attachment.queue"]
-            attachment = self._format_to_exportfile(data)
-            self.track_export(attachment)
-            self.wms_export_state = "sent"
-            return attachment
-        except Exception as e:
-            self.wms_export_error = str(e)
-            self.wms_export_state = "error"
+        if self.file_creation_mode == "per_record":
+            res = self.env["attachment.queue"]
+            for rec in self:
+                try:
+                    rec.wms_export_error = ""
+                    data = rec._prepare_export_data()
+                    if not data:
+                        continue
+                    attachment = rec._format_to_exportfile(data)
+                    rec.track_export(attachment)
+                    res += attachment
+                except Exception as e:
+                    rec.wms_export_error = str(e)
+            return res
+
+        if self.file_creation_mode == "per_recordset":
+            data = []
+            for rec in self:
+                try:
+                    rec.wms_export_error = ""
+                    data += rec._prepare_export_data()
+                    if not data:
+                        continue
+                except Exception as e:
+                    self.wms_export_error = "Error during data preparation:\n{}".format(
+                        str(e)
+                    )
+            try:
+                attachment = self._format_to_exportfile(data)
+                self.track_export(attachment)
+                return attachment
+            except Exception as e:
+                self.wms_export_error = "Error during file formatting:\n{}".format(
+                    str(e)
+                )
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
@@ -62,4 +87,4 @@ class SynchronizeExportableMixin(models.AbstractModel):
         return self.env["attachment.queue"].create(vals)
 
     def _get_export_name(self):
-        return str(uuid.uuid4())
+        raise NotImplementedError
