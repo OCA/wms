@@ -27,5 +27,4 @@
         "demo/product_product.xml",
         "demo/stock_warehouse.xml",
     ],
-    "external_dependencies": {"python": ["extendable-pydantic", "pydantic<2"]},
 }
