@@ -5,7 +5,6 @@ from odoo.tests.common import TransactionCase
 
 
 class TestImport(TransactionCase):
-
     def setUp(self):
         super().setUp()
 

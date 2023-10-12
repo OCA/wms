@@ -8,4 +8,3 @@ class ProductProduct(models.Model):
     _inherit = "product.product"
 
     wms_sync_ids = fields.One2many("wms.product.sync", "product_id")
-

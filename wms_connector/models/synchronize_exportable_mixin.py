@@ -21,6 +21,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
         default="per_record",
     )
 
+    def button_trigger_export(self):
+        self.synchronize_export()
+
     def synchronize_export(self):
         if self.file_creation_mode == "per_record":
             res = self.env["attachment.queue"]

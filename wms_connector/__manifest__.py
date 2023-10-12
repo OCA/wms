@@ -9,7 +9,7 @@
     "license": "AGPL-3",
     "author": "Akretion,Odoo Community Association (OCA)",
     "website": "https://www.akretion.com",
-    "depends": ["stock", "sale", "attachment_synchronize", "pydantic", "extendable"],
+    "depends": ["stock", "sale", "attachment_synchronize"],
     "data": [
         "security/wms_product_sync.xml",
         "views/wms_product_sync.xml",

@@ -4,8 +4,14 @@
 
 <odoo noupdate="1">
 
-    <record model="ir.cron" id="errors_email_alert">
-       <field name="name">WMS: Errors email alert</field>
+    <record model="ir.cron" id="refresh_wms_products">
+        <field name="name">WMS: refresh products</field>
+        <field name="active" eval="True" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="state">code</field>
+        <field name="code">env["stock.warehouse"].search([("active_wms_sync", "=", True)]).refresh_wms_products()</field>
     </record>
 
 </odoo>

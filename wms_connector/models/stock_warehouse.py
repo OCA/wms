@@ -30,17 +30,14 @@ class StockWarehouse(models.Model):
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_product_filter_id = fields.Many2one(
         "ir.filters",
-        required=True,
         default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
     wms_picking_ar_filter_id = fields.Many2one(
         "ir.filters",
-        required=True,
         default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
     wms_picking_prp_filter_id = fields.Many2one(
         "ir.filters",
-        required=True,
         default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
     wms_product_sync_ids = fields.One2many("product.product", "warehouse_id")
@@ -104,3 +101,13 @@ class StockWarehouse(models.Model):
     def action_open_flows(self):
         raise NotImplementedError
         return {"type": "ir.action"}
+
+    def refresh_wms_products(self):
+        for rec in self:
+            rec.wms_product_sync_ids.unlink()
+            for prd in self.env["product.product"].search(
+                rec.wms_product_filter_id._get_eval_domain()
+            ):
+                self.env["wms.product.sync"].create(
+                    {"product_id": prd.id, "warehouse_id": rec.id}
+                )
