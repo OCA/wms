@@ -1,0 +1,117 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_process_end_time
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: stock_release_channel_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_process_end_time.res_config_settings_view_form_stock
+msgid ""
+"Allow to update scheduled date follow process end date/time on stock release"
+" channel."
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model,name:stock_release_channel_process_end_time.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_process_end_time.stock_release_channel_kanban_view
+msgid "End Date"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time
+msgid ""
+"Fill in this to indicates when this channel release process would be ended. "
+"This information will be used to compute the channel pickings scheduled date"
+" at channel awaking."
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#. odoo-python
+#: code:addons/stock_release_channel_process_end_time/models/stock_picking.py:0
+#, python-format
+msgid "Operation not supported"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_release_channel__process_end_date
+msgid "Process End Date"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time
+msgid "Process End Time"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time_can_edit
+msgid "Process End Time Can Edit"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time_tz
+msgid "Process End Time Tz"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
+msgid "Schedule Date Prior To Channel Process End Date Search"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model,name:stock_release_channel_process_end_time.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_res_config_settings__stock_release_use_channel_end_date
+msgid "Stock Release Use Channel End Date"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time_can_edit
+msgid ""
+"Technical field in order to know if user can edit the end date in views"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time_tz
+msgid "Technical field to compute the timezone for the process end time."
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
+msgid ""
+"Technical field to search on not processed pickings where the scheduled date"
+" is prior to the process end date of available channels."
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_date
+msgid "This is the end date for this window of opened channel."
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model,name:stock_release_channel_process_end_time.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_res_config_settings__stock_release_use_channel_end_date
+msgid ""
+"Will update scheduled date of picking based on process end date instead of "
+"release date + delay."
+msgstr ""
