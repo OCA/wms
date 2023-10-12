@@ -13,6 +13,7 @@ class WmsConnectorCommon(TransactionCase):
         cls.backend = cls.env.ref("wms_connector.demo_wms_backend")
         cls.backend.directory_path = str(uuid.uuid1()) + "/"
         cls.aq_before = cls.env["attachment.queue"].search([])
+        cls.warehouse = cls.env.ref("stock.warehouse0")
         # cls.loader = FakeModelLoader(cls.env, cls.__module__)
         # cls.loader.backup_registry()
         #
