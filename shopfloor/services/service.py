@@ -85,6 +85,22 @@ class BaseShopfloorProcess(AbstractComponent):
             moves.picking_id.location_dest_id, func=all
         ) or location.is_sublocation_of(moves.location_dest_id, func=all)
 
+    def validate_dest_location(self, moves, location):
+        """Validate the destination for given moves.
+
+        The previous function `is_dest_location_valid` has a limited use
+        because it only returns a Boolean for the check.
+        Returning an error message allows inheriting modules to commnuicate
+        their own error.
+
+        Returns a an error message if not valid.
+        """
+        if not location:
+            return self.msg_store.no_location_found()
+        if not self.is_dest_location_valid(moves, location):
+            return self.msg_store.dest_location_not_allowed()
+        return ""
+
     def is_dest_location_to_confirm(self, location_dest_id, location):
         """Check the destination location requires confirmation
 

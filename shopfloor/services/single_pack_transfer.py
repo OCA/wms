@@ -205,18 +205,6 @@ class SinglePackTransfer(Component):
     def _is_move_state_valid(self, moves):
         return all(move.state != "cancel" for move in moves)
 
-    def _validate_destination_location(self, package_level, location):
-        moves = package_level.move_line_ids.move_id
-        if not location:
-            return self._response_for_scan_location(
-                package_level, message=self.msg_store.no_location_found()
-            )
-        if not self.is_dest_location_valid(moves, location):
-            return self._response_for_scan_location(
-                package_level, message=self.msg_store.dest_location_not_allowed()
-            )
-        return None
-
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         search = self._actions_for("search")
@@ -236,9 +224,9 @@ class SinglePackTransfer(Component):
             )
 
         scanned_location = search.location_from_scan(location_barcode)
-        response = self._validate_destination_location(package_level, scanned_location)
-        if response:
-            return response
+        message = self.validate_dest_location(moves, scanned_location)
+        if message:
+            return self._response_for_scan_location(package_level, message=message)
 
         if not confirmation and self.is_dest_location_to_confirm(
             package_level.location_dest_id, scanned_location

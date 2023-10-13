@@ -899,7 +899,7 @@ class ZonePicking(Component):
         # if `confirmation is True
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
-        message = self._validate_destination(location, move_line.move_id)
+        message = self.validate_dest_location(move_line.move_id, location)
         if message:
             response = self._response_for_set_line_destination(
                 move_line,
@@ -1543,7 +1543,7 @@ class ZonePicking(Component):
             # check if the scanned location is allowed
             moves = buffer_lines.mapped("move_id")
             if not message:
-                message = self._validate_destination(location, moves)
+                message = self.validate_dest_location(moves, location)
 
             if message:
                 return self._set_destination_all_response(buffer_lines, message=message)
@@ -1571,11 +1571,6 @@ class ZonePicking(Component):
         else:
             message = self.msg_store.no_location_found()
         return self._set_destination_all_response(buffer_lines, message=message)
-
-    def _validate_destination(self, location, moves):
-        if not self.is_dest_location_valid(moves, location):
-            return self.msg_store.dest_location_not_allowed()
-        return None
 
     def _write_destination_on_lines(self, lines, location):
         self._lock_lines(lines)
