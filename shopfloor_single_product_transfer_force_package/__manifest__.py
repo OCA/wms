@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Single Product Transfer Force Select Package",
     "summary": "Force to select package if location already contains packages.",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.1.1",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
