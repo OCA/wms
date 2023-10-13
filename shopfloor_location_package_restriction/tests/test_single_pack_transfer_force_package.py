@@ -27,19 +27,21 @@ class TestSinglePackTransferForcePackage(SinglePackTransferCommonBase):
             )
         )
         cls.picking = cls._create_initial_move(lines=[(cls.product_a, 1)])
-        cls.package_level = cls.picking.move_line_ids.package_level_id
+        cls.move_line = cls.picking.move_line_ids
+        cls.package_level = cls.move_line.package_level_id
         cls.package_level.is_done = True
         cls.picking.move_line_ids.qty_done = 1
         # Add restriction on destination location
         cls.shelf2.sudo().package_restriction = "singlepackage"
         # Add a package on the destination location
+        cls.pack_1 = cls.env["stock.quant.package"].create(
+            {"location_id": cls.shelf2.id}
+        )
         cls._update_qty_in_location(
             cls.shelf2,
             cls.product_a,
             1,
-            package=cls.env["stock.quant.package"].create(
-                {"location_id": cls.shelf2.id}
-            ),
+            package=cls.pack_1,
         )
 
     def test_scan_location_has_restrictions(self):
@@ -51,9 +53,17 @@ class TestSinglePackTransferForcePackage(SinglePackTransferCommonBase):
                 "location_barcode": self.shelf2.barcode,
             },
         )
+        message = {
+            "message_type": "error",
+            "body": (
+                f"Only one package is allowed on the location "
+                f"{self.shelf2.display_name}.You cannot add "
+                f"the {self.move_line.package_id.name}, there is already {self.pack_1.name}."
+            ),
+        }
         self.assert_response(
             response,
             next_state="scan_location",
             data=self.ANY,
-            message=self.service.msg_store.location_has_restrictions(),
+            message=message,
         )
