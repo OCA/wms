@@ -24,6 +24,15 @@
                         <field name="wms_import_confirm_delivery_cron_id"/>
                         <field name="wms_import_confirm_reception_cron_id"/>
                     </group>
+                    <group>
+                        <button name="refresh_wms_products" type="object" string="Refresh WMS products"/>
+                        <field name="wms_product_sync_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="product_id"/>
+                            </tree>
+                        </field>
+                    </group>
                 </page>
             </xpath>
 
