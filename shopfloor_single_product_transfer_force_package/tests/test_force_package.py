@@ -64,7 +64,7 @@ class TestForcePackage(CommonCase):
     def test_force_package_not_mandatory(self):
         picking = self._setup_picking()
         move_line = picking.move_line_ids
-        self.dispatch_location.sudo().package_restriction = "norestriction"
+        self.dispatch_location.sudo().package_restriction = ""
         response = self.service.dispatch(
             "set_quantity",
             params={
