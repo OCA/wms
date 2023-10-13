@@ -11,10 +11,7 @@ class ShopfloorSingleProductTransfer(Component):
     def _set_quantity__check_location(self, move_line, location, confirmation=False):
         # We add an additional check to verify if the location requires packages
         # and return a message to the user accordingly.
-        if (
-            location.package_restriction != "norestriction"
-            and not move_line.result_package_id
-        ):
+        if location.package_restriction and not move_line.result_package_id:
             message = self.msg_store.location_requires_package()
             return self._response_for_set_quantity(
                 move_line, message=message, asking_confirmation=None
