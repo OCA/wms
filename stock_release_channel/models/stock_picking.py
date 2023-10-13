@@ -10,7 +10,10 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     release_channel_id = fields.Many2one(
-        comodel_name="stock.release.channel", index=True, ondelete="restrict"
+        comodel_name="stock.release.channel",
+        index=True,
+        ondelete="restrict",
+        copy=False,
     )
 
     def _delay_assign_release_channel(self):
