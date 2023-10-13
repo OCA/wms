@@ -6,23 +6,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-13 10:41+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel_cutoff
 #: model:ir.model.fields,field_description:stock_release_channel_cutoff.field_stock_release_channel__cutoff_time
 msgid "Cutoff Time"
-msgstr ""
+msgstr "Orario limite"
 
 #. module: stock_release_channel_cutoff
 #: model:ir.model.fields,field_description:stock_release_channel_cutoff.field_stock_release_channel__cutoff_warning
 msgid "Cutoff Warning"
-msgstr ""
+msgstr "Avviso limite"
 
 #. module: stock_release_channel_cutoff
 #: model:ir.model.fields,help:stock_release_channel_cutoff.field_stock_release_channel__cutoff_time
@@ -30,8 +32,10 @@ msgid ""
 "Fill in this to warning on kanban view if the current time becomes the "
 "cutoff time."
 msgstr ""
+"Compilarlo per avvisare nella vista Kanban se l'orario attuale diventa "
+"l'orario limite."
 
 #. module: stock_release_channel_cutoff
 #: model:ir.model,name:stock_release_channel_cutoff.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canali rilascio magazzino"
