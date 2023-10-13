@@ -64,15 +64,6 @@ class MessageAction(Component):
             ),
         }
 
-    def location_has_restrictions(self):
-        return {
-            "message_type": "warning",
-            "body": _(
-                "This location has restrictions. It requires a package and may have "
-                "some limit on package quantity."
-            ),
-        }
-
     def already_running_ask_confirmation(self):
         return {
             "message_type": "warning",
