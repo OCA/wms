@@ -11,6 +11,7 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
         <field name="state">code</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
         <field name="code">env["stock.warehouse"].search([("active_wms_sync", "=", True)]).refresh_wms_products()</field>
     </record>
 

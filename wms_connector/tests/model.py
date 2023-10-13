@@ -3,9 +3,17 @@
 
 from odoo import models
 
+import uuid
 
-# class ResUsers(models.Model):
-#     _inherit = ["res.users", "synchronize.exportable.mixin", "synchronize.importable.mixin"]
-#
-#     def _prepare_export_data(self):
-#
+
+class WmsProductSync(models.Model):
+    _inherit = ["wms.product.sync"]
+
+    def _prepare_export_data(self):
+        return [
+            {"name": rec.product_id.name, "reference": rec.product_id.default_code}
+            for rec in self
+        ]
+
+    def _get_export_name(self):
+        return str(uuid.uuid4())

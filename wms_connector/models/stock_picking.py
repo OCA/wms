@@ -6,6 +6,7 @@ from odoo import _, api, fields, models
 
 class StockPicking(models.Model):
     _inherit = ["stock.picking", "synchronize.exportable.mixin"]
+    _name = "stock.picking"
 
     def _get_export_name(self):
         if self.file_creation_mode == "per_record":

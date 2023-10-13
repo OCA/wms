@@ -4,14 +4,14 @@
 
 <odoo>
 
-    <record model="ir.ui.view" id="product_product_form_view">
-        <field name="name">product.product.form (in wms_connector)</field>
-        <field name="model">product.product</field>
-        <field name="inherit_id" ref="TODO othermodule.form_view"/>
-        <field name="arch" type="xml">
-            <!-- TODO -->
-        </field>
-    </record>
+<!--    <record model="ir.ui.view" id="product_product_form_view">-->
+<!--        <field name="name">product.product.form (in wms_connector)</field>-->
+<!--        <field name="model">product.product</field>-->
+<!--        <field name="inherit_id" ref="TODO othermodule.form_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; TODO &ndash;&gt;-->
+<!--        </field>-->
+<!--    </record>-->
 
 
 

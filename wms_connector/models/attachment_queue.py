@@ -12,7 +12,7 @@ WMS_IMPORT_FILETYPES = [
 class AttachmentQueue(models.Model):
     _inherit = "attachment.queue"
 
-    file_type = fields.Selection(selection_add=[WMS_IMPORT_FILETYPES])
+    file_type = fields.Selection(selection_add=WMS_IMPORT_FILETYPES)
 
     def _run(self):
         for filetype in [el[0] for el in WMS_IMPORT_FILETYPES]:

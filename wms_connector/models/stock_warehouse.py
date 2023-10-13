@@ -3,13 +3,37 @@
 
 from odoo import fields, models
 
-TASKS = [
-    ("export", "exports (products, awaiting receptions, preparation orders"),
-    ("import_confirm_reception", "reception confirmation"),
-    ("import_confirm_delivery", "delivery confirmation"),
+MAPPINGS_FILTERS = [
+    ("wms_export_product_filter_id", "wms.product.sync"),
+    ("wms_export_picking_in_filter_id", "stock.picking"),
+    ("wms_export_picking_out_filter_id", "stock.picking"),
 ]
-TASK_FIELDNAME = "wms_{}_task_id"
-CRON_FIELDNAME = "wms_{}_cron_id"
+MAPPINGS = {
+    "export": {
+        "fieldname_task": "wms_export_task_id",
+        "fieldname_cron": "wms_export_cron_id",
+        "filetype": "export",
+        "name_fragment": "exports (products, awaiting receptions, preparation orders",
+        "code": "wh = env['stock.warehouse'].browse({0})\n"
+        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())\n'
+        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())\n'
+        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())',
+    },
+    "reception": {
+        "fieldname_task": "wms_import_confirm_reception_task_id",
+        "fieldname_cron": "wms_import_confirm_reception_cron_id",
+        "filetype": "reception_confirmed",
+        "name_fragment": "reception confirmation",
+        "code": "env['stock.warehouse'].browse({}).{}.run_import()",
+    },
+    "delivery": {
+        "fieldname_task": "wms_import_confirm_delivery_task_id",
+        "fieldname_cron": "wms_import_confirm_delivery_cron_id",
+        "filetype": "delivery_confirmed",
+        "name_fragment": "delivery confirmation",
+        "code": "env['stock.warehouse'].browse({}).{}.run_import()",
+    },
+}
 
 
 class StockWarehouse(models.Model):
@@ -28,19 +52,16 @@ class StockWarehouse(models.Model):
     wms_export_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
-    wms_product_filter_id = fields.Many2one(
+    wms_export_product_filter_id = fields.Many2one(
         "ir.filters",
-        default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
-    wms_picking_ar_filter_id = fields.Many2one(
+    wms_export_picking_in_filter_id = fields.Many2one(
         "ir.filters",
-        default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
-    wms_picking_prp_filter_id = fields.Many2one(
+    wms_export_picking_out_filter_id = fields.Many2one(
         "ir.filters",
-        default=lambda r: r.env.ref("wms_connector.default_empty_filter"),
     )
-    wms_product_sync_ids = fields.One2many("product.product", "warehouse_id")
+    wms_product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
 
     def _inverse_active_wms_sync(self):
         for rec in self:
@@ -50,53 +71,66 @@ class StockWarehouse(models.Model):
                 rec._deactivate_crons_tasks()
 
     def _activate_crons_tasks(self):
-        for kind in TASKS:
-            task_field_name = TASK_FIELDNAME.format(kind[0])
-            task = getattr(self, task_field_name)
-            if task:
-                task.active = True
-            else:
-                setattr(
-                    self,
-                    task_field_name,
-                    self.env["attachment.synchronize.task"].create(
-                        {
-                            "name": "WMS task for {} ({})".format(self.name, kind[1]),
-                            "method_type": "export",
-                            "filepath": "OUT/",
-                            "backend_id": self.env.ref(
-                                "storage_backend.default_storage_backend"
-                            ),
-                        }
-                    ),
-                )
-            cron_field_name = CRON_FIELDNAME.format(kind[0])
-            cron = getattr(self, cron_field_name)
-            if cron:
-                cron.active = True
-            else:
-                setattr(
-                    self,
-                    cron_field_name,
-                    self.env["ir.cron"].create(
-                        {
-                            "name": "WMS cron for {} ({})".format(self.name, kind[1]),
-                            "active": False,
-                            "interval_type": "days",
-                            "interval_number": 1,
-                            "model_id": self.env.ref(
-                                "attachment_synchronize.model_attachment_synchronize_task"
-                            ).id,
-                            "state": "code",
-                            "code": "",  # TODO
-                        }
-                    ),
-                )
+        for rec in self:
+            for kind, mappings in MAPPINGS.items():
+                task_field_name = mappings["fieldname_task"]
+                task = rec[task_field_name]
+                if task:
+                    task.active = True
+                else:
+                    rec[task_field_name] = self.env[
+                        "attachment.synchronize.task"
+                    ].create(
+                        rec._prepare_wms_task_vals(
+                            mappings["name_fragment"], mappings["filetype"]
+                        )
+                    )
+                cron_field_name = mappings["fieldname_cron"]
+                cron = rec[cron_field_name]
+                if cron:
+                    cron.active = True
+                else:
+                    code = mappings["code"].format(self.id, task_field_name)
+                    if kind == "export":
+                        for el in MAPPINGS_FILTERS:
+                            code = code.replace("taskfield", el[0], 1)
+                            code = code.replace("model", el[1], 1)
+                    rec[cron_field_name] = self.env["ir.cron"].create(
+                        rec._prepare_wms_cron_vals(mappings["name_fragment"], code)
+                    )
+            for field in [fieldname for fieldname, _ in MAPPINGS_FILTERS]:
+                if not getattr(rec, field):
+                    rec[field] = self.env.ref(
+                        "wms_connector.default_{}".format(field[:-3])
+                    )
+
+    def _prepare_wms_task_vals(self, name, filetype):
+        return {
+            "name": "WMS task for {} ({})".format(self.name, name),
+            "method_type": "export",
+            "filepath": "OUT/",
+            "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
+            "file_type": filetype,
+        }
+
+    def _prepare_wms_cron_vals(self, name, code=""):
+        return {
+            "name": "WMS cron for {} ({})".format(self.name, name),
+            "active": False,
+            "interval_type": "days",
+            "interval_number": 1,
+            "model_id": self.env.ref(
+                "attachment_synchronize.model_attachment_synchronize_task"
+            ).id,
+            "state": "code",
+            "code": code,
+        }
 
     def _deactivate_crons_tasks(self):
-        for kind in TASKS:
-            setattr(self, TASK_FIELDNAME.format(kind[0]), False)
-            setattr(self, CRON_FIELDNAME.format(kind[0]), False)
+        for rec in self:
+            for _, mappings in MAPPINGS.items():
+                rec[mappings["fieldname_task"]].active = False
+                rec[mappings["fieldname_cron"]].active = False
 
     def action_open_flows(self):
         raise NotImplementedError
@@ -106,7 +140,9 @@ class StockWarehouse(models.Model):
         for rec in self:
             rec.wms_product_sync_ids.unlink()
             for prd in self.env["product.product"].search(
-                rec.wms_product_filter_id._get_eval_domain()
+                rec.wms_export_product_filter_id
+                and rec.wms_export_product_filter_id._get_eval_domain()
+                or []
             ):
                 self.env["wms.product.sync"].create(
                     {"product_id": prd.id, "warehouse_id": rec.id}

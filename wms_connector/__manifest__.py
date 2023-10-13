@@ -12,9 +12,9 @@
     "depends": ["stock", "sale", "attachment_synchronize"],
     "data": [
         "security/wms_product_sync.xml",
-        "views/wms_product_sync.xml",
         "data/cron.xml",
         "data/ir_filters.xml",
+        "views/wms_product_sync.xml",
         "views/attachment_queue.xml",
         "views/stock_picking.xml",
         "views/product_product.xml",
@@ -26,5 +26,6 @@
         "demo/stock_picking.xml",
         "demo/product_product.xml",
         "demo/stock_warehouse.xml",
+        "demo/storage_backend.xml",
     ],
 }

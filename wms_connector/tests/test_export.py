@@ -4,6 +4,7 @@
 from odoo.tests.common import TransactionCase
 from .common import WmsConnectorCommon
 
+
 class TestExportFile(WmsConnectorCommon):
     def setUp(self):
         super().setUp()

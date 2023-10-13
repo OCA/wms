@@ -14,11 +14,18 @@
             </field>
             <xpath expr="//notebook" position="inside">
                 <page name="wms_sync" string="Synchronization" attrs="{'invisible': [('active_wms_sync', '=', False)]}">
-                    <field name="sync_task_id"/>
-                    <field name="sync_cron_id"/>
+                    <group>
+                        <field name="wms_export_task_id"/>
+                        <field name="wms_import_confirm_delivery_task_id"/>
+                        <field name="wms_import_confirm_reception_task_id"/>
+                    </group>
+                    <group>
+                        <field name="wms_export_cron_id"/>
+                        <field name="wms_import_confirm_delivery_cron_id"/>
+                        <field name="wms_import_confirm_reception_cron_id"/>
+                    </group>
                 </page>
             </xpath>
-
 
             <div class="oe_button_box" position="inside">
                 <button name="action_open_flows"

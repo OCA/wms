@@ -5,6 +5,7 @@ from odoo import _, api, fields, models
 
 
 class ProductProduct(models.Model):
-    _inherit = "product.product"
+    _inherit = ["product.product", "synchronize.exportable.mixin"]
+    _name = "product.product"
 
     wms_sync_ids = fields.One2many("wms.product.sync", "product_id")

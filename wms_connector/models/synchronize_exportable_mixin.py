@@ -9,6 +9,8 @@ from io import StringIO
 
 from odoo import fields, models
 
+DEBUGMODE = True
+
 
 class SynchronizeExportableMixin(models.AbstractModel):
     _name = "synchronize.exportable.mixin"
@@ -16,10 +18,10 @@ class SynchronizeExportableMixin(models.AbstractModel):
     wms_export_date = fields.Date()
     wms_export_attachment = fields.Many2one("attachment.queue", index=True)
     wms_export_error = fields.Char()
-    file_creation_mode = fields.Selection(
-        [("per_record", "Per Record"), ("per_recordset", "Per recordset")],
-        default="per_record",
-    )
+
+    @property
+    def file_creation_mode(self):
+        return "per_record"
 
     def button_trigger_export(self):
         self.synchronize_export()
@@ -27,8 +29,8 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def synchronize_export(self):
         if self.file_creation_mode == "per_record":
             res = self.env["attachment.queue"]
-            for rec in self:
-                try:
+            if DEBUGMODE:
+                for rec in self:
                     rec.wms_export_error = ""
                     data = rec._prepare_export_data()
                     if not data:
@@ -36,9 +38,20 @@ class SynchronizeExportableMixin(models.AbstractModel):
                     attachment = rec._format_to_exportfile(data)
                     rec.track_export(attachment)
                     res += attachment
-                except Exception as e:
-                    rec.wms_export_error = str(e)
-            return res
+                return res
+            else:
+                for rec in self:
+                    try:
+                        rec.wms_export_error = ""
+                        data = rec._prepare_export_data()
+                        if not data:
+                            continue
+                        attachment = rec._format_to_exportfile(data)
+                        rec.track_export(attachment)
+                        res += attachment
+                    except Exception as e:
+                        rec.wms_export_error = str(e)
+                return res
 
         if self.file_creation_mode == "per_recordset":
             data = []
