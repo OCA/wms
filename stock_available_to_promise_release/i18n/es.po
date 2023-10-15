@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-09 11:39+0000\n"
+"PO-Revision-Date: 2023-10-15 20:37+0000\n"
 "Last-Translator: Ivorra78 <informatica@totmaterial.es>\n"
 "Language-Team: none\n"
 "Language: es\n"
@@ -206,7 +206,7 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Localizaciones de Inventario"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_route
