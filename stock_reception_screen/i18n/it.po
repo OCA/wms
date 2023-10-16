@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-16 13:37+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__picking_state
@@ -33,91 +35,109 @@ msgid ""
 " * Done: The transfer has been processed.\n"
 " * Cancelled: The transfer has been cancelled."
 msgstr ""
+" * Bozza: Il trasferimento non è ancora confermato. Non è possibile "
+"riservare.\n"
+" * Attesa altra operazione: questo trasferimento è in attesa di un'altra "
+"operazione prima di essere pronto.\n"
+" * In attesa: il trasferimento è in attesa della disponibilità di alcuni "
+"prodotti.\n"
+"(a) La politica di spedizione è \"Il prima possibile\": non è stato "
+"possibile riservare alcun prodotto.\n"
+"(b) La politica di spedizione \"Quando tutti i prodotti sono pronti\": non è "
+"stato possibile riservare tutti i prodotti.\n"
+" * Pronto: il trasferimento è pronto per essere completato.\n"
+"(a) La politica di spedizione è \"Il prima possibile\": almeno un prodotto è "
+"stato riservato.\n"
+"(b) La politica di spedizione \"Quando tutti i prodotti sono pronti\": tutti "
+"i prodotti sono stati riservati.\n"
+" * Fatto: il trasferimento è stato completato.\n"
+" * Annullato: il trasferimento è stato annullato."
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_picking_manual_barcode
 msgid "Action to input a barcode"
-msgstr ""
+msgstr "Azione per inserire un codice a barre"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__allowed_location_dest_ids
 msgid "Allowed destination locations"
-msgstr ""
+msgstr "Ubicazioni destinazione consentite"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__allowed_location_dest_ids
 msgid "Allowed destination locations based on the package storage type."
 msgstr ""
+"Ubicazioni destinazione consentite in base al tipo stoccaggio confezione."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__barcode
 #, python-format
 msgid "Barcode"
-msgstr ""
+msgstr "Codice a barre"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Barcode Input"
-msgstr ""
+msgstr "Ingresso code a barre"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen___barcode_scanned
 msgid "Barcode Scanned"
-msgstr ""
+msgstr "Barcode scansionato"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Check"
-msgstr ""
+msgstr "Controllo"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_picking_manual_barcode_form
 msgid "Confirm"
-msgstr ""
+msgstr "Conferma"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_partner_id
 msgid "Contact"
-msgstr ""
+msgstr "Contatto"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__create_uid
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__create_date
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_id
 msgid "Current Move"
-msgstr ""
+msgstr "Movimento attuale"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_id
 msgid "Current Move Line"
-msgstr ""
+msgstr "Riga movimento attuale"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_package_stored
 msgid "Current Move Line Package Stored"
-msgstr ""
+msgstr "Riga movimento attuale confezione depositata"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__reception_screen_current_step
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step
 msgid "Current Step"
-msgstr ""
+msgstr "Passo corrente"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_qty_available
@@ -132,22 +152,29 @@ msgid ""
 "Otherwise, this includes goods stored in any Stock Location with 'internal' "
 "type."
 msgstr ""
+"Quantità attuale di prodotti.\n"
+"In un contesto con una sola ubicazione di magazzino, include beni stoccati "
+"in questa ubicazione o qualsiasi delle sue figlie.\n"
+"In un contesto con un solo magazzino, include beni stoccati nell'ubicazione "
+"di questo magazzino o una qualsiasi delle figlie.\n"
+"Stoccate nell'ubicazione di questo negozio, o qualsiasi delle sue figlie.\n"
+"Altrimenti, include beni stoccati in qualsiasi ubicazione di tipo 'interno'."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_qty
 msgid "Demand"
-msgstr ""
+msgstr "Fabbisogno"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_stored_id
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Destination"
-msgstr ""
+msgstr "Destinazione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_location_dest_id
 msgid "Destination Location"
-msgstr ""
+msgstr "Ubicazione di destinazione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__display_name
@@ -157,54 +184,56 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__display_name
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Done"
-msgstr ""
+msgstr "Evasa"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__lot_expiration_date
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_expiration_date
 msgid "End of Expiration Date"
-msgstr ""
+msgstr "Fine data scadenza"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_has_tracking
 msgid "Ensure the traceability of a storable product in your warehouse."
-msgstr ""
+msgstr "Consente la tracciabilità di un prodotto stoccabile nel magazzino."
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Exit"
-msgstr ""
+msgstr "Uscita"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_filter_product
 msgid "Filter product"
-msgstr ""
+msgstr "Filtra prodotto"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step_focus_field
 msgid "Focus field"
-msgstr ""
+msgstr "Seleziona campo"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_packaging_ids
 msgid "Gives the different ways to package the same product."
-msgstr ""
+msgstr "Consente di imballare diversamente lo stesso prodotto."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__package_storage_type_height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
+"L'altezza è obbligatoria per confezioni configurate con questo tipo "
+"stoccaggio."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_storage_type_height_required
 msgid "Height required for packages"
-msgstr ""
+msgstr "Altezza richiesta per le confezioni"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__id
@@ -214,7 +243,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__id
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging____last_update
@@ -224,137 +253,137 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode____last_update
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__last_move_line_lot_id
 msgid "Last Move Line Lot"
-msgstr ""
+msgstr "Lotto riga ultimo movimento"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__write_uid
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking_manual_barcode__write_date
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_lot_id
 msgid "Lot NumBer"
-msgstr ""
+msgstr "Numero lotto"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_picking_manual_barcode_form
 msgid "Manual Barcode Input"
-msgstr ""
+msgstr "Inserimento manuale codice a barre"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_last_lot_expiration_date
 msgid "Most recent exp. date"
-msgstr ""
+msgstr "Data scadenza più recente"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_id
 msgid "Move's product"
-msgstr ""
+msgstr "Prodotto del movimento"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Next"
-msgstr ""
+msgstr "Successiva"
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Next PACK"
-msgstr ""
+msgstr "Pacco successivo"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_step_descr
 msgid "Operation"
-msgstr ""
+msgstr "Operazione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_outgoing_qty
 msgid "Outgoing"
-msgstr ""
+msgstr "In partenza"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_height
 msgid "Package Height"
-msgstr ""
+msgstr "Altezza confezione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_package
 msgid "Package N°"
-msgstr ""
+msgstr "Confezione n*"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_storage_type_id
 msgid "Package Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio confezione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_filtered_move_lines
 msgid "Picking Filtered Move Lines"
-msgstr ""
+msgstr "Righe movimento prelievi filtrati"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_display_name
 msgid "Product"
-msgstr ""
+msgstr "Prodotto"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Product '{}' not found."
-msgstr ""
+msgstr "Prodotto '{}' non trovato."
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr ""
+msgstr "Movimenti prodotto (riga movimento magazzino)"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_packaging_ids
 msgid "Product Packages"
-msgstr ""
+msgstr "Confezioni prodotto"
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_product_packaging
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__product_packaging_id
 msgid "Product Packaging"
-msgstr ""
+msgstr "Imballaggio prodotto"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Product packaging info are missing. Please use the CUBISCAN."
-msgstr ""
+msgstr "Informazioni imballaggio prodotto non disponibili. Utilizzare CUBISCAN."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_has_tracking
 msgid "Product with Tracking"
-msgstr ""
+msgstr "Prodotto con tracciamento"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_qty_status
 msgid "Qty Status"
-msgstr ""
+msgstr "Stato qta"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_qty_done
 msgid "Quantity"
-msgstr ""
+msgstr "Quantità"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_qty_available
 msgid "Quantity On Hand"
-msgstr ""
+msgstr "Quantità disponibile"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_outgoing_qty
@@ -367,117 +396,123 @@ msgid ""
 "Otherwise, this includes goods leaving any Stock Location with 'internal' "
 "type."
 msgstr ""
+"Quantità dei prodotti in uscita pianificati.\n"
+"Nel caso di una singola ubicazione di magazzino, include i beni in uscita da "
+"questa ubicazione, o una delle sue figlie.\n"
+"Nel caso di un singolo magazzino, include i beni in partenza dalla "
+"ubicazione di questo magazzino, o una delle sue figlie.\n"
+"Altrimenti, include beni in uscita in qualsiasi ubicazione di tipo 'interno'."
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_move_line_tree
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.view_picking_form
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.vpicktree
 msgid "Reception"
-msgstr ""
+msgstr "Ricezione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking__reception_screen_id
 msgid "Reception Screen"
-msgstr ""
+msgstr "Schermo ricezione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__name
 msgid "Reference"
-msgstr ""
+msgstr "Riferimento"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__picking_origin
 msgid "Reference of the document"
-msgstr ""
+msgstr "Riferimento del documento"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Reuse the existing lot {}."
-msgstr ""
+msgstr "Riutilizza lotto esistente {}."
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Select"
-msgstr ""
+msgstr "Seleziona"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Select Move"
-msgstr ""
+msgstr "Seleziona movimento"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Select Packaging"
-msgstr ""
+msgstr "Seleziona imballaggio"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Select Product"
-msgstr ""
+msgstr "Seleziona prodotto"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Set Destination"
-msgstr ""
+msgstr "Imposta destinazione"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Set Expiry Date"
-msgstr ""
+msgstr "Imposta data scadenza"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Set Lot Number"
-msgstr ""
+msgstr "Imposta numero lotto"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Set Package"
-msgstr ""
+msgstr "Imposta confezione"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Set Quantity"
-msgstr ""
+msgstr "Imposta quantità"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_origin
 msgid "Source Document"
-msgstr ""
+msgstr "Documento sorgente"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_state
 msgid "Status"
-msgstr ""
+msgstr "Stati"
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_move_lines
 msgid "Stock Moves"
-msgstr ""
+msgstr "Movimenti di magazzino"
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_reception_screen
 msgid "Stock Reception Screen"
-msgstr ""
+msgstr "Schermo ricezione magazzino"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__storage_type_name
 msgid "Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_picking.py:0
@@ -486,18 +521,20 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
 "\">%s</a> has been created."
 msgstr ""
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock.picking\""
+" data-oe-id=\"%d\">%s</a> ."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "The move is already processed, aborting."
-msgstr ""
+msgstr "Il movimento è già stato elaborato, annullamento."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "The storage type is mandatory before going further."
-msgstr ""
+msgstr "Il tipo stoccaggio è obbligatorio prima di procedere."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_move_line__lot_expiration_date
@@ -505,6 +542,8 @@ msgid ""
 "This is the date on which the goods with this Serial Number may become "
 "dangerous and must not be consumed."
 msgstr ""
+"Questa è la data nella quale la merce con questo numero di serie può "
+"diventare pericolosa e non deve essere consumata."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_qty
@@ -516,86 +555,92 @@ msgid ""
 "this quantity on assigned moves affects the product reservation, and should "
 "be done with care."
 msgstr ""
+"Questa è la quantità di prodotto dal punto di vista dell'inventario. Per "
+"movimenti in stato 'eseguito', questa è la quantità di prodotto che è stata "
+"effettivamente movimentata. Per altri movimenti, questa è la quantità del "
+"prodotto pianificata per essere movimentata. Ridurre la quantità non genera "
+"un ordine residuo. Modificare questa quantità nei movimenti assegnati incide "
+"sulla prenotazione del prodotto e deve essere eseguita con attenzione."
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_location_dest_id
 msgid "To"
-msgstr ""
+msgstr "A"
 
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_picking
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_id
 msgid "Transfer"
-msgstr ""
+msgstr "Trasferimento"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_uom_id
 msgid "Unit of Measure"
-msgstr ""
+msgstr "Unità di misura"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_uom_id
 msgid "UoM"
-msgstr ""
+msgstr "UdM"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen___barcode_scanned
 msgid "Value of the last barcode scanned."
-msgstr ""
+msgstr "Valore dell'ultimo codice a barre scansionato."
 
 #. module: stock_reception_screen
 #: model_terms:ir.ui.view,arch_db:stock_reception_screen.stock_reception_screen_view_form
 msgid "Vendor"
-msgstr ""
+msgstr "Fornitore"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__vendor_code
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_vendor_code
 msgid "Vendor Code"
-msgstr ""
+msgstr "Codice fornitore"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification
 msgid "Warn Notification"
-msgstr ""
+msgstr "Notifica allerta"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__warn_notification_html
 msgid "Warn Notification Html"
-msgstr ""
+msgstr "HTML notifica allerta"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You cannot set a date prior to previous one ({})"
-msgstr ""
+msgstr "Non si può impostare una data antecedente la precedente ({})"
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You have to fill the lot number."
-msgstr ""
+msgstr "Bisogna compilare il numero lotto."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You have to set an expiry date."
-msgstr ""
+msgstr "Bisogna impostare una data scadenza."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You have to set the destination."
-msgstr ""
+msgstr "Bisogna impostare la destinazione."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "You have to set the received quantity."
-msgstr ""
+msgstr "Bisogna impostare la quantità ricevuta."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_picking.py:0
 #, python-format
 msgid "Your transfer has to be ready to receive goods."
-msgstr ""
+msgstr "Il trasferimento deve essere pronto a ricevere merce."
