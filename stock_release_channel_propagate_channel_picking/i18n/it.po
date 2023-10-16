@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-16 12:38+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model.fields,help:stock_release_channel_propagate_channel_picking.field_stock_picking_type__propagate_to_pickings_chain
@@ -20,18 +22,20 @@ msgid ""
 "Check this field if you want to propagate the release channel from to the "
 "destination moves."
 msgstr ""
+"Selezionare questo campo se si vuole propagare il canale di rilascio dai "
+"movimenti di destinazione."
 
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model,name:stock_release_channel_propagate_channel_picking.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Tipo prelievo"
 
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model.fields,field_description:stock_release_channel_propagate_channel_picking.field_stock_picking_type__propagate_to_pickings_chain
 msgid "Propagate the release channel to pickings chain"
-msgstr ""
+msgstr "Propaga il canale di rilascio alla serie di prelievi"
 
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model,name:stock_release_channel_propagate_channel_picking.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
