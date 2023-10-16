@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-21 13:36+0000\n"
+"PO-Revision-Date: 2023-10-16 12:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -207,12 +207,13 @@ msgstr "Altezza in metri"
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_type__height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
-"L'altezza è obbligatoria per imballi configurati con questo tipo stoccaggio."
+"L'altezza è obbligatoria per confezioni configurate con questo tipo "
+"stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_type__height_required
 msgid "Height required for packages"
-msgstr "Altezza richiesta per gli imabllaggi"
+msgstr "Altezza richiesta per le confezioni"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
