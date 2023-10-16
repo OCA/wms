@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 12:38+0000\n"
+"PO-Revision-Date: 2023-10-16 16:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -113,7 +113,7 @@ msgstr "Esempio codice"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence_cond__code_snippet_docs
 msgid "Code Snippet Docs"
-msgstr "Document esempio codice"
+msgstr "Documenti esempio codice"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__computed_location_ids
@@ -446,7 +446,7 @@ msgstr "Sequenza"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence
 msgid "Sequence of locations to put-away the package storage type"
-msgstr "Sequenza ubicazioni per deposito del tipo stoccaggio imballo"
+msgstr "Sequenza ubicazioni per deposito del tipo stoccaggio confezione"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
@@ -456,7 +456,7 @@ msgstr "Visualizza ubicazioni"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_level
 msgid "Stock Package Level"
-msgstr "Livello pacco magazzino"
+msgstr "Livello confezione magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence_cond
@@ -477,7 +477,7 @@ msgstr "Tipo pacco magazzino"
 #: model:ir.model.constraint,message:stock_storage_type.constraint_stock_storage_location_sequence_cond_name
 msgid "Stock storage location sequence condition name must be unique"
 msgstr ""
-"Il nome della seqanza condizione ubicazione stoccaggio magazzino deve essere "
+"Il nome della seqenza condizione ubicazione stoccaggio magazzino deve essere "
 "univoco"
 
 #. module: stock_storage_type
@@ -586,7 +586,7 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant_package.py:0
 #, python-format
 msgid "The height is mandatory on package {}."
-msgstr "L'altezza è obbligatria per il pacco {}."
+msgstr "L'altezza è obbligatria per la confezione {}."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height
@@ -713,16 +713,14 @@ msgstr ""
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__in_move_line_ids
 msgid "technical field: the pending incoming stock.move.lines in the location"
 msgstr ""
-"campo tecnico: le righe movimento magazzino ingresso in attesa "
-"nell'ubicazione"
+"campo tecnico: le stock.move.lines in attesa in ingresso nell'ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__in_move_ids
 msgid "technical field: the pending incoming stock.moves in the location"
-msgstr "campo tecnico: i movimenti di magazzino in attesa nell'ubicazione"
+msgstr "campo tecnico: i stock.moves in attesa nell'ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__out_move_line_ids
 msgid "technical field: the pending outgoing stock.move.lines in the location"
-msgstr ""
-"campo tecnico: le rige movimenti magazzino di uscita in atesa nell'ubicazione"
+msgstr "campo tecnico: le stock.move.lines in uscita in atesa nell'ubicazione"
