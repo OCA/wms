@@ -104,7 +104,7 @@ class StockWarehouse(models.Model):
         return {
             "name": "WMS task for {} {}".format(self.name, name_fragment),
             "method_type": "export",
-            "filepath": "OUT/",
+            "filepath": "IN/",
             "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
             "file_type": filetype,
         }
