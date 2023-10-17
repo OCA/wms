@@ -6,9 +6,7 @@
     <record model="ir.filters" id="default_wms_export_product_filter">
         <field name="name">WMS: Default filter for products</field>
         <field name="model_id">product.product</field>
-        <field name="domain">[
-            ("wms_export_date", "=", False)
-        ]</field>
+        <field name="domain">[]</field>
     </record>
     <record model="ir.filters" id="default_wms_export_picking_in_filter">
         <field name="name">WMS: Default filter for picking in</field>

@@ -52,6 +52,9 @@ class StockWarehouse(models.Model):
     wms_export_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
+    wms_product_sync_filter_id = fields.Many2one(
+        "ir.filters",
+    )
     wms_export_product_filter_id = fields.Many2one(
         "ir.filters",
     )
@@ -136,8 +139,8 @@ class StockWarehouse(models.Model):
         for rec in self:
             rec.wms_product_sync_ids.unlink()
             for prd in self.env["product.product"].search(
-                rec.wms_export_product_filter_id
-                and rec.wms_export_product_filter_id._get_eval_domain()
+                rec.wms_product_sync_filter_id
+                and rec.wms_product_sync_filter_id._get_eval_domain()
                 or []
             ):
                 self.env["wms.product.sync"].create(
