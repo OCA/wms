@@ -17,3 +17,18 @@ class WmsProductSync(models.Model):
 
     def _get_export_name(self):
         return str(uuid.uuid4())
+
+
+class StockPicking(models.Model):
+    _inherit = "stock.picking"
+
+    def _prepare_export_data(self):
+        return [
+            {
+                "name": rec.name,
+            }
+            for rec in self
+        ]
+
+    def _get_export_name(self):
+        return str(uuid.uuid4())

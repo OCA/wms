@@ -1,10 +1,10 @@
 # Copyright 2023 Akretion
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import SavepointCase
 
 
-class TestActivateSync(TransactionCase):
+class TestActivateSync(SavepointCase):
     def setUp(self):
         super().setUp()
         self.warehouse = self.env.ref("stock.warehouse0")

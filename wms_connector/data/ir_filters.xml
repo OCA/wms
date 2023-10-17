@@ -6,16 +6,25 @@
     <record model="ir.filters" id="default_wms_export_product_filter">
         <field name="name">WMS: Default filter for products</field>
         <field name="model_id">product.product</field>
+        <field name="domain">[
+            ("wms_export_date", "=", False)
+        ]</field>
     </record>
     <record model="ir.filters" id="default_wms_export_picking_in_filter">
         <field name="name">WMS: Default filter for picking in</field>
         <field name="model_id">stock.picking</field>
-        <field name="domain">[("picking_type_id.code", "=", "incoming")]</field>
+        <field name="domain">[
+            ("wms_export_date", "=", False),
+            ("picking_type_id.code", "=", "incoming")
+        ]</field>
     </record>
     <record model="ir.filters" id="default_wms_export_picking_out_filter">
         <field name="name">WMS: Default filter picking out</field>
         <field name="model_id">stock.picking</field>
-        <field name="domain">[("picking_type_id.code", "=", "outgoing")]</field>
+        <field name="domain">[
+            ("wms_export_date", "=", False),
+            ("picking_type_id.code", "=", "outgoing")
+        ]</field>
     </record>
 
 </odoo>

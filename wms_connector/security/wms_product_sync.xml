@@ -4,10 +4,9 @@
 
 <odoo>
 
-    <record model="ir.model.access" id="wms_product_sync_access_name"> <!-- TODO acl id -->
-        <field name="name">wms.product.sync access name</field> <!-- TODO acl name -->
+    <record model="ir.model.access" id="wms_product_sync_access_name">
+        <field name="name">wms.product.sync access name</field>
         <field name="model_id" ref="model_wms_product_sync"/>
-        <!-- TODO review and adapt -->
         <field name="group_id" ref="base.group_user"/>
         <field name="perm_read" eval="1"/>
         <field name="perm_create" eval="1"/>

@@ -15,9 +15,9 @@ MAPPINGS = {
         "filetype": "export",
         "name_fragment": "exports (products, awaiting receptions, preparation orders",
         "code": "wh = env['stock.warehouse'].browse({0})\n"
-        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())\n'
-        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())\n'
-        'wh.{1}.scheduler_export("model",wh["taskfield"]._get_eval_domain())',
+        'wh.{1}.scheduler_export("wms.product.sync", wh["wms_export_product_filter_id"]._get_eval_domain())\n'
+        'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_in_filter_id"]._get_eval_domain())\n'
+        'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_out_filter_id"]._get_eval_domain())',
     },
     "reception": {
         "fieldname_task": "wms_import_confirm_reception_task_id",
@@ -82,7 +82,7 @@ class StockWarehouse(models.Model):
                         "attachment.synchronize.task"
                     ].create(
                         rec._prepare_wms_task_vals(
-                            mappings["name_fragment"], mappings["filetype"]
+                            mappings["filetype"], mappings["name_fragment"]
                         )
                     )
                 cron_field_name = mappings["fieldname_cron"]
@@ -91,12 +91,8 @@ class StockWarehouse(models.Model):
                     cron.active = True
                 else:
                     code = mappings["code"].format(self.id, task_field_name)
-                    if kind == "export":
-                        for el in MAPPINGS_FILTERS:
-                            code = code.replace("taskfield", el[0], 1)
-                            code = code.replace("model", el[1], 1)
                     rec[cron_field_name] = self.env["ir.cron"].create(
-                        rec._prepare_wms_cron_vals(mappings["name_fragment"], code)
+                        rec._prepare_wms_cron_vals(code, mappings["name_fragment"])
                     )
             for field in [fieldname for fieldname, _ in MAPPINGS_FILTERS]:
                 if not getattr(rec, field):
@@ -104,18 +100,18 @@ class StockWarehouse(models.Model):
                         "wms_connector.default_{}".format(field[:-3])
                     )
 
-    def _prepare_wms_task_vals(self, name, filetype):
+    def _prepare_wms_task_vals(self, filetype, name_fragment=""):
         return {
-            "name": "WMS task for {} ({})".format(self.name, name),
+            "name": "WMS task for {} {}".format(self.name, name_fragment),
             "method_type": "export",
             "filepath": "OUT/",
             "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
             "file_type": filetype,
         }
 
-    def _prepare_wms_cron_vals(self, name, code=""):
+    def _prepare_wms_cron_vals(self, code="", name_fragment=""):
         return {
-            "name": "WMS cron for {} ({})".format(self.name, name),
+            "name": "WMS cron for {} {}".format(self.name, name_fragment),
             "active": False,
             "interval_type": "days",
             "interval_number": 1,
