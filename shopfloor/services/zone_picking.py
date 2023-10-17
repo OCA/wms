@@ -10,6 +10,7 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor_base.utils import catch_errors
 
 from ..exceptions import ConcurentWorkOnTransfer
 from ..utils import to_float
@@ -1075,6 +1076,21 @@ class ZonePicking(Component):
             return response
         return response
 
+    def _set_destination_catch_error(
+        self,
+        move_line_id,
+        barcode,
+        quantity,
+        confirmation=False,
+        handle_complete_mix_pack=False,
+        message=None,
+    ):
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        return self._response_for_set_line_destination(
+            move_line, message=message, confirmation_required=confirmation
+        )
+
+    @catch_errors(_set_destination_catch_error)
     # flake8: noqa: C901
     def set_destination(
         self,
@@ -1535,17 +1551,16 @@ class ZonePicking(Component):
         message = None
         buffer_lines = self._find_buffer_move_lines()
         if location:
-            error = None
             location_dest = buffer_lines.mapped("location_dest_id")
             # check if move lines share the same destination
             if len(location_dest) != 1:
-                error = self.msg_store.lines_different_dest_location()
+                message = self.msg_store.lines_different_dest_location()
             # check if the scanned location is allowed
             moves = buffer_lines.mapped("move_id")
             if not self.is_dest_location_valid(moves, location):
-                error = self.msg_store.location_not_allowed()
-            if error:
-                return self._set_destination_all_response(buffer_lines, message=error)
+                message = self.msg_store.location_not_allowed()
+            if message:
+                return self._set_destination_all_response(buffer_lines, message=message)
             # check if the destination location is not the expected one
             #   - OK if the scanned destination is a child of the current
             #     destination set on buffer lines

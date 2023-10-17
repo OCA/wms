@@ -6,6 +6,7 @@ from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor_base.utils import catch_errors
 
 
 class SinglePackTransfer(Component):
@@ -205,10 +206,18 @@ class SinglePackTransfer(Component):
     def _is_move_state_valid(self, moves):
         return all(move.state != "cancel" for move in moves)
 
+    def _validate_catch_error(
+        self, package_level_id, location_barcode, confirmation=False, message=None
+    ):
+        package_level = self.env["stock.package_level"].browse(package_level_id)
+        return self._response_for_scan_location(
+            package_level, message=message, confirmation_required=confirmation
+        )
+
+    @catch_errors(_validate_catch_error)
     def validate(self, package_level_id, location_barcode, confirmation=False):
         """Validate the transfer"""
         search = self._actions_for("search")
-
         package_level = self.env["stock.package_level"].browse(package_level_id)
         if not package_level.exists():
             return self._response_for_start(
