@@ -5,6 +5,7 @@ import logging
 import os
 from functools import wraps
 
+from odoo.exceptions import ValidationError
 from odoo.modules.module import load_information_from_description_file
 from odoo.tools.config import config as odoo_config
 
@@ -31,6 +32,31 @@ def ensure_model(model_name):
         return wrapped
 
     return _ensure_model
+
+
+def catch_errors(response_error):
+    """Decorator for service endpoints to gracefully handle some exceptions.
+
+    The decorator is passed a function with the same arguments than the function
+    handlling the endpoint, plus a keyword argument called `message`.
+    """
+
+    def _catch_errors(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            try:
+                res = fn(*args, **kwargs)
+            except ValidationError as ex:
+                message = {
+                    "message_type": "error",
+                    "body": ex.name,
+                }
+                return response_error(*args, **kwargs, message=message)
+            return res
+
+        return wrapper
+
+    return _catch_errors
 
 
 APP_VERSIONS = {}
