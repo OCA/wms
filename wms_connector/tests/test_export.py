@@ -1,14 +1,14 @@
 # Copyright 2023 Akretion
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from .common import WmsConnectorCommon
+from .common import WmsConnectorCase
 
 FN_EXPORT_VALS = (
     "odoo.addons.wms_connector.tests.model.WmsProductSync._prepare_export_data"
 )
 
 
-class TestExportFile(WmsConnectorCommon):
+class TestExportFile(WmsConnectorCase):
     def setUp(self):
         super().setUp()
         self.warehouse.active_wms_sync = True

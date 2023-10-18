@@ -1,10 +1,10 @@
 # Copyright 2023 Akretion
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import TransactionCase
+from .common import WmsConnectorCase
 
 
-class TestImport(TransactionCase):
+class TestImport(WmsConnectorCase):
     def setUp(self):
         super().setUp()
 

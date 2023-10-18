@@ -21,6 +21,22 @@ class WmsConnectorCommon(SyncCommon):
         cls.backend.directory_path = str(uuid.uuid1()) + "/"
         cls.aq_before = cls.env["attachment.queue"].search([])
         cls.warehouse = cls.env.ref("stock.warehouse0")
+        cls.setUpComponent()
+
+    def assertNewAttachmentQueue(self, n=1):
+        aq_after = self.env["attachment.queue"].search([])
+        self.assertEqual(len(aq_after - self.aq_before), n)
+        return aq_after
+
+    def setAllExported(self):
+        self.env["stock.picking"].search([]).wms_export_date = datetime.date.today()
+        self.env["wms.product.sync"].search([]).wms_export_date = datetime.date.today()
+
+
+class WmsConnectorCase(WmsConnectorCommon):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
         from .model import StockPicking, WmsProductSync
@@ -31,18 +47,8 @@ class WmsConnectorCommon(SyncCommon):
                 StockPicking,
             )
         )
-        cls.setUpComponent()
 
     @classmethod
     def tearDownClass(cls):
         cls.loader.restore_registry()
         super().tearDownClass()
-
-    def assertNewAttachmentQueue(self, n=1):
-        aq_after = self.env["attachment.queue"].search([])
-        self.assertEqual(len(aq_after - self.aq_before), n)
-        return aq_after
-
-    def setAllExported(self):
-        self.env["stock.picking"].search([]).wms_export_date = datetime.date.today()
-        self.env["wms.product.sync"].search([]).wms_export_date = datetime.date.today()
