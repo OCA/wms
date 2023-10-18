@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2023 Akretion
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
-
 <odoo>
 
     <record model="ir.ui.view" id="wms_product_sync_form_view">
@@ -10,13 +9,17 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="button_trigger_export" type="object" string="Trigger export"/>
+                    <button
+                        name="button_trigger_export"
+                        type="object"
+                        string="Trigger export"
+                    />
                 </header>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="product_id"/>
-                        <field name="warehouse_id"/>
+                        <field name="name" />
+                        <field name="product_id" />
+                        <field name="warehouse_id" />
                     </group>
                 </sheet>
             </form>
@@ -54,9 +57,9 @@
 
     <record model="ir.ui.menu" id="wms_product_sync_menu">
         <field name="name">Wms Product Sync</field>
-        <field name="parent_id" ref="stock.menu_stock_root"/> <!-- TODO -->
-        <field name="action" ref="wms_product_sync_act_window"/>
-        <field name="sequence" eval="16"/>
+        <field name="parent_id" ref="stock.menu_stock_root" /> <!-- TODO -->
+        <field name="action" ref="wms_product_sync_act_window" />
+        <field name="sequence" eval="16" />
     </record>
 
 </odoo>

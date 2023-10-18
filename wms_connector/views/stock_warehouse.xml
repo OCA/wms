@@ -1,41 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2023 Akretion
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
-
 <odoo>
 
     <record model="ir.ui.view" id="stock_warehouse_form_view">
         <field name="name">stock.warehouse.form (in wms_connector)</field>
         <field name="model">stock.warehouse</field>
-        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="inherit_id" ref="stock.view_warehouse" />
         <field name="arch" type="xml">
             <field name="code" position="after">
-                <field name="active_wms_sync"/>
+                <field name="active_wms_sync" />
             </field>
             <xpath expr="//notebook" position="inside">
-                <page name="wms_sync" string="Synchronization" attrs="{'invisible': [('active_wms_sync', '=', False)]}">
+                <page
+                    name="wms_sync"
+                    string="Synchronization"
+                    attrs="{'invisible': [('active_wms_sync', '=', False)]}"
+                >
                     <group>
-                        <field name="wms_export_task_id"/>
-                        <field name="wms_import_confirm_delivery_task_id"/>
-                        <field name="wms_import_confirm_reception_task_id"/>
+                        <field name="wms_export_task_id" />
+                        <field name="wms_import_confirm_delivery_task_id" />
+                        <field name="wms_import_confirm_reception_task_id" />
                     </group>
                     <group>
-                        <field name="wms_export_cron_id"/>
-                        <field name="wms_import_confirm_delivery_cron_id"/>
-                        <field name="wms_import_confirm_reception_cron_id"/>
+                        <field name="wms_export_cron_id" />
+                        <field name="wms_import_confirm_delivery_cron_id" />
+                        <field name="wms_import_confirm_reception_cron_id" />
                     </group>
                     <group>
-                        <field name="wms_product_sync_filter_id"/>
-                        <field name="wms_export_product_filter_id"/>
-                        <field name="wms_export_picking_in_filter_id"/>
-                        <field name="wms_export_picking_out_filter_id"/>
+                        <field name="wms_product_sync_filter_id" />
+                        <field name="wms_export_product_filter_id" />
+                        <field name="wms_export_picking_in_filter_id" />
+                        <field name="wms_export_picking_out_filter_id" />
                     </group>
                     <group>
-                        <button name="refresh_wms_products" type="object" string="Refresh WMS products"/>
+                        <button
+                            name="refresh_wms_products"
+                            type="object"
+                            string="Refresh WMS products"
+                        />
                         <field name="wms_product_sync_ids">
                             <tree>
-                                <field name="name"/>
-                                <field name="product_id"/>
+                                <field name="name" />
+                                <field name="product_id" />
                             </tree>
                         </field>
                     </group>
@@ -43,11 +50,13 @@
             </xpath>
 
             <div class="oe_button_box" position="inside">
-                <button name="action_open_flows"
-                        string="View flows"
-                        icon="fa-refresh"
-                        class="oe_stat_button"
-                        type="object"/>
+                <button
+                    name="action_open_flows"
+                    string="View flows"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
             </div>
 
         </field>

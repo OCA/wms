@@ -1,12 +1,12 @@
 # Copyright 2023 Akretion
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import SavepointCase
-import uuid
-from odoo_test_helper import FakeModelLoader
-from odoo.addons.component.tests.common import ComponentMixin
-from odoo.addons.attachment_synchronize.tests.common import SyncCommon
 import datetime
+import uuid
+
+from odoo_test_helper import FakeModelLoader
+
+from odoo.addons.attachment_synchronize.tests.common import SyncCommon
 
 
 class WmsConnectorCommon(SyncCommon):
@@ -23,7 +23,8 @@ class WmsConnectorCommon(SyncCommon):
         cls.warehouse = cls.env.ref("stock.warehouse0")
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
-        from .model import WmsProductSync, StockPicking
+        from .model import StockPicking, WmsProductSync
+
         cls.loader.update_registry(
             (
                 WmsProductSync,

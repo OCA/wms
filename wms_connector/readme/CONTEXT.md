@@ -3,7 +3,8 @@ module's usefulness in their context. ]
 
 It should explain the “why” of the module:
 
-- in which context or use cases this module can be useful (practical examples are welcome!).
+- in which context or use cases this module can be useful (practical examples are
+  welcome!).
 - what is the business requirement that generated the need to develop this module
 
 It can also inform on related modules:

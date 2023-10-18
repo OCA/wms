@@ -3,8 +3,6 @@
 
 from odoo import models
 
-import uuid
-
 
 class WmsProductSync(models.Model):
     _inherit = ["wms.product.sync"]

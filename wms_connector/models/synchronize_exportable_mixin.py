@@ -4,7 +4,6 @@
 import base64
 import csv
 import datetime
-import uuid
 from io import StringIO
 
 from odoo import fields, models

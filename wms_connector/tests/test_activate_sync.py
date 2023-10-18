@@ -35,7 +35,9 @@ class TestActivateSync(SavepointCase):
 
     def test_wms_product_sync_created_filter(self):
         self.warehouse.active_wms_sync = True
-        self.warehouse.wms_export_product_filter_id.domain = '[("id" ,"=", {})]'.format(self.env.ref("product.product_product_1").id)
+        self.warehouse.wms_export_product_filter_id.domain = '[("id" ,"=", {})]'.format(
+            self.env.ref("product.product_product_1").id
+        )
         self.warehouse.refresh_wms_products()
         self.assertEqual(
             1,

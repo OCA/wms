@@ -5,10 +5,10 @@
     "name": "Wms Connector",
     "summary": """
         WMS Connector""",
-    "version": "16.0.1.0.0",
+    "version": "14.0.1.0.0",
     "license": "AGPL-3",
     "author": "Akretion,Odoo Community Association (OCA)",
-    "website": "https://www.akretion.com",
+    "website": "https://github.com/OCA/wms",
     "depends": ["stock", "sale", "attachment_synchronize"],
     "data": [
         "security/wms_product_sync.xml",
