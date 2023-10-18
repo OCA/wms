@@ -16,9 +16,15 @@ MAPPINGS = {
         "filetype": "export",
         "name_fragment": "exports (products, awaiting receptions, preparation orders",
         "code": "wh = env['stock.warehouse'].browse({0})\n"
-        'wh.{1}.scheduler_export("wms.product.sync", wh["wms_product_sync_filter_id"]._get_eval_domain())\n'
-        'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_in_filter_id"]._get_eval_domain())\n'
-        'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_out_filter_id"]._get_eval_domain())',
+        "wh.{1}.scheduler_export("
+        '"wms.product.sync", wh["wms_product_sync_filter_id"]._get_eval_domain()'
+        ")\n"
+        "wh.{1}.scheduler_export("
+        '"stock.picking", wh["wms_export_picking_in_filter_id"]._get_eval_domain()'
+        ")\n"
+        "wh.{1}.scheduler_export("
+        '"stock.picking", wh["wms_export_picking_out_filter_id"]._get_eval_domain()'
+        ")",
     },
     "reception": {
         "fieldname_task": "wms_import_confirm_reception_task_id",
@@ -76,7 +82,7 @@ class StockWarehouse(models.Model):
 
     def _activate_crons_tasks(self):
         for rec in self:
-            for kind, mappings in MAPPINGS.items():
+            for mappings in MAPPINGS.values():
                 task_field_name = mappings["fieldname_task"]
                 task = rec[task_field_name]
                 if task:
@@ -128,12 +134,11 @@ class StockWarehouse(models.Model):
 
     def _deactivate_crons_tasks(self):
         for rec in self:
-            for _, mappings in MAPPINGS.items():
+            for mappings in MAPPINGS.values():
                 rec[mappings["fieldname_task"]].active = False
                 rec[mappings["fieldname_cron"]].active = False
 
     def action_open_flows(self):
-        raise NotImplementedError
         return {"type": "ir.action"}
 
     def refresh_wms_products(self):
