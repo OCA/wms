@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-09 09:09+0000\n"
+"PO-Revision-Date: 2023-10-18 12:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -103,19 +103,19 @@ msgstr ""
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "Package {} can not been loaded in the shipment {}."
-msgstr "Il pacco{} non può essere caricato nella spedizione {}."
+msgstr "Il collo {} non può essere caricato nella spedizione {}."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "Package {} has not been planned in the shipment {}."
-msgstr "Il pacco {} non è stato pianificato per la psedizione {}."
+msgstr "Il collo {} non è stato pianificato per la psedizione {}."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "Package {} is already loaded in the shipment {}."
-msgstr "Il pacco {} è già stato caricato nella spedizione {}."
+msgstr "Il collo {} è già stato caricato nella spedizione {}."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
