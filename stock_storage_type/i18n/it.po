@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 16:38+0000\n"
+"PO-Revision-Date: 2023-10-18 13:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 " * <span style=\"color: orange;\">{location} (ATTENZIONE: ci sono "
 "restrizioni attive nei tipi stoccaggio ubicazione corrispondenti a questo "
-"tipo stoccaggio pacco)</span>"
+"tipo stoccaggio collo)</span>"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -49,8 +49,8 @@ msgid ""
 "span>"
 msgstr ""
 "<span style=\"color: red;\">La \"Sequenza deposito\" deve essere definita "
-"per depositare i pacchi utilizzando questo tipo stoccaggio pacco ({storage})."
-"</span>"
+"per depositare i colli utilizzando questo tipo stoccaggio collo "
+"({storage}).</span>"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_type__active
@@ -82,8 +82,8 @@ msgid ""
 "Allow to sort the valid locations by sequence for the storage strategy based "
 "on package type"
 msgstr ""
-"Consente di ordinare le ubicazioni valide per sequenza per lA trategia di "
-"stoccaggio basata sul tipo imballo"
+"Consente di ordinare le ubicazioni valide per sequenza per la strategia di "
+"stoccaggio basata sul tipo collo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__allowed_location_dest_ids
@@ -163,9 +163,9 @@ msgid ""
 "without product packagings and on put-away computation based on package type "
 "for product not in a package"
 msgstr ""
-"Definisce un tipo imballo 'predefinito' per questo prodotto da utilizzare "
-"nei pacchi senza imballaggio prdotto e nel calcolo del deposito in base al "
-"tipo imballo per prodotto non imballato"
+"Definisce un tipo collo 'predefinito' per questo prodotto da utilizzare nei "
+"colli senza imballaggio prdotto e nel calcolo del deposito in base al tipo "
+"collo per prodotto non in un collo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__length_uom_id
@@ -207,13 +207,12 @@ msgstr "Altezza in metri"
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_type__height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
-"L'altezza è obbligatoria per confezioni configurate con questo tipo "
-"stoccaggio."
+"L'altezza è obbligatoria per colli configurati con questo tipo stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_type__height_required
 msgid "Height required for packages"
-msgstr "Altezza richiesta per le confezioni"
+msgstr "Altezza richiesta per i colli"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
@@ -302,7 +301,7 @@ msgstr "L'ubicazione conterrà lotto"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_will_contain_product_ids
 msgid "Location Will Contain Product"
-msgstr "L'ubicazine conterrà prodotto"
+msgstr "L'ubicazione conterrà prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__max_height_in_m
@@ -359,20 +358,20 @@ msgstr "Peso pacco in Kg"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__package_type_id
 msgid "Package Type"
-msgstr "Tipo pacco"
+msgstr "Tipo collo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_product__package_type_id
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_template__package_type_id
 msgid "Package type"
-msgstr "Tipo pacco"
+msgstr "Tipo collo"
 
 #. module: stock_storage_type
 #. odoo-python
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid "Package type {storage} is not allowed into Location {location}"
-msgstr "Il tipo pacco {storage} non è consentito nell'ubicazione {location}"
+msgstr "Il tipo collo {storage} non è consentito nell'ubicazione {location}"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -384,8 +383,8 @@ msgid ""
 "\n"
 "{fails}"
 msgstr ""
-"Il pacco {package} non è accettatto dall'ubicazione {location}, perché non "
-"c'è capactà di stoccaggio che accetti il tipo pacco {type}:\n"
+"Il collo {package} non è accettatto dall'ubicazione {location}, perché non "
+"c'è capactà di stoccaggio che accetti il tipo collo {type}:\n"
 "\n"
 "{fails}"
 
@@ -446,7 +445,7 @@ msgstr "Sequenza"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence
 msgid "Sequence of locations to put-away the package storage type"
-msgstr "Sequenza ubicazioni per deposito del tipo stoccaggio confezione"
+msgstr "Sequenza ubicazioni per deposito del tipo stoccaggio collo"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
@@ -456,7 +455,7 @@ msgstr "Visualizza ubicazioni"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_level
 msgid "Stock Package Level"
-msgstr "Livello confezione magazzino"
+msgstr "Livello collo magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence_cond
@@ -471,7 +470,7 @@ msgstr "Sequenza condizioni ubicazione stoccaggio magazzino"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_type
 msgid "Stock package type"
-msgstr "Tipo pacco magazzino"
+msgstr "Tipo collo magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model.constraint,message:stock_storage_type.constraint_stock_storage_location_sequence_cond_name
@@ -532,7 +531,7 @@ msgid ""
 "package is bigger: {height}."
 msgstr ""
 "La categoria stoccaggio {storage_category} ha una altezza massima di {max_h} "
-"ma il pacco è più grande: {height}."
+"ma il collo è più grande: {height}."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -543,7 +542,7 @@ msgid ""
 "package is heavier: {weight_kg}."
 msgstr ""
 "La categoria stoccaggio {storage_category} ha un peso massimo di {max_w} ma "
-"il pacco è più pesante: {weight_kg}."
+"il collo è più pesante: {weight_kg}."
 
 #. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.stock_storage_location_sequence_cond_menu
@@ -586,7 +585,7 @@ msgstr ""
 #: code:addons/stock_storage_type/models/stock_quant_package.py:0
 #, python-format
 msgid "The height is mandatory on package {}."
-msgstr "L'altezza è obbligatria per la confezione {}."
+msgstr "L'altezza è obbligatria per il collo {}."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height
@@ -605,14 +604,13 @@ msgid ""
 "will be searched in its children locations according to the restrictions "
 "defined on their respective location storage types."
 msgstr ""
-"Questo definisce la strategia di stoccaggio in base al tipo di imballo da "
-"utilizzare quanto un prodotto o un imballo è depositato in questa "
-"ubicazione.\n"
+"Questo definisce la strategia di stoccaggio in base al tipo di collo da "
+"utilizzare quanto un prodotto o un collo è depositato in questa ubicazione.\n"
 "Nessuna: quanto movimentato in questa ubicazione, non verrà movimentato "
 "ulteriormente.\n"
 "Ordinamento per ubicazioni figlie: quanto movimentato in questa ubicazione, "
-"verrà cercata una ubicazine idonea nelle ubicazioni figlie in accordo con le "
-"restrizioni definite nei rispettivi tipi stoccaggio ubicazione."
+"verrà cercata una ubicazione idonea nelle ubicazioni figlie in accordo con "
+"le restrizioni definite nei rispettivi tipi stoccaggio ubicazione."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__computed_storage_category_id
@@ -655,12 +653,12 @@ msgid ""
 "children of the destination location after the (product or category) put-"
 "away is applied."
 msgstr ""
-"Quando i pacchi con tipo stoccaggio {name} sono depositati, la strategia "
-"cerca una ubicazione disponibile nelle segenti ubicazoni: <br/><br/"
-">{message} <br/><br/><b>Nota</b>: questo accade finché queste ubicazioni "
-"<u>sono figlie della ubicazione destinazione del movimento di magazzino</u> "
-"o finché queste ubicazioni sono figlie dell'ubicazione di destinazione dopo "
-"che è stato eseguito il deposito (prodotto o categoria)."
+"Quando i colli con tipo stoccaggio {name} sono depositati, la strategia "
+"cerca una ubicazione disponibile nelle segenti ubicazoni: <br/><br/>{message}"
+" <br/><br/><b>Nota</b>: questo accade finché queste ubicazioni <u>sono "
+"figlie della ubicazione destinazione del movimento di magazzino</u> o finché "
+"queste ubicazioni sono figlie dell'ubicazione di destinazione dopo che è "
+"stato eseguito il deposito (prodotto o categoria)."
 
 #. module: stock_storage_type
 #. odoo-python
