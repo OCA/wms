@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 16:38+0000\n"
+"PO-Revision-Date: 2023-10-18 12:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 " * <span style=\"color: orange;\">%s (ATTENZIONE: ci sono restrizioni attive "
 "nei tipi stoccaggio ubicazione corrispondenti a questo tipo stoccaggio "
-"pacco)</span>"
+"collo)</span>"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence.py:0
@@ -45,7 +45,7 @@ msgid ""
 "order to put away packages using this package storage type (%s).</span>"
 msgstr ""
 "<span style=\"color: red;\">La \"Sequenza deposito\" deve essere definita "
-"per depositare i pacchi utilizzando questo tipo stoccaggio pacco (%s).</span>"
+"per depositare i colli utilizzando questo tipo stoccaggio collo (%s).</span>"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__active
@@ -72,7 +72,7 @@ msgstr "Tipi stoccaggio ubicazione consentito"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__package_storage_type_ids
 msgid "Allowed packages storage types"
-msgstr "Tipi stoccaggio pacchi consentito"
+msgstr "Tipi stoccaggio colli consentito"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
