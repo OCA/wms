@@ -23,25 +23,26 @@ class TestExportFile(WmsConnectorCommon):
             [("product_id", "=", self.demo_product.id)]
         ).wms_export_date = False
         self.cron_export.method_direct_trigger()
-        self.assertNewAttachmentQueues(1)
+        self.assertNewAttachmentQueue()
 
-    # def test_export_error(self):
-    #     self.setAllExported()
-    #     self.demo_product.wms_export_date = False
-    #     # with mock.patch(FN_EXPORT_VALS) as mocked:
-    #     #     # mocked.
-    #     #     mocked.side_effect = derp
-    #     self.cron_export.method_direct_trigger()
-    #     wms_product = self.env["wms.product.sync"].search(
-    #         [("product_id", "=", self.demo_product.id)]
-    #     )
-    #     # self.assertIn(wms_product.wms_export_error, "ValueError")
+    def test_export_error(self):
+        self.warehouse.refresh_wms_products()
+        self.setAllExported()
+        self.env["wms.product.sync"].search(
+            [("product_id", "=", self.demo_product.id)]
+        ).wms_export_date = False
+        self.demo_product.name = "".rjust(110, "X")
+        self.cron_export.method_direct_trigger()
+        wms_product = self.env["wms.product.sync"].search(
+            [("product_id", "=", self.demo_product.id)]
+        )
+        self.assertIn("Boom", wms_product.wms_export_error)
 
     def test_export_repeat(self):
         self.warehouse.refresh_wms_products()
         self.cron_export.method_direct_trigger()
         n_products = len(self.env["wms.product.sync"].search([]).ids)
         n_pickings = len(self.env["stock.picking"].search([]).ids)
-        self.assertNewAttachmentQueues(n_pickings + n_products)
+        self.assertNewAttachmentQueue(n_pickings + n_products)
         self.cron_export.method_direct_trigger()
-        self.assertNewAttachmentQueues(n_pickings + n_products)
+        self.assertNewAttachmentQueue(n_pickings + n_products)

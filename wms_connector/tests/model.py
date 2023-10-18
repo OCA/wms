@@ -10,13 +10,17 @@ class WmsProductSync(models.Model):
     _inherit = ["wms.product.sync"]
 
     def _prepare_export_data(self):
-        return [
-            {"name": rec.product_id.name, "reference": rec.product_id.default_code}
-            for rec in self
-        ]
+        res = []
+        for rec in self:
+            res += [
+                {"name": rec.product_id.name, "reference": rec.product_id.default_code}
+            ]
+            if len(rec.product_id.name) > 100:
+                raise ValueError("Boom")
+        return res
 
     def _get_export_name(self):
-        return str(uuid.uuid4())
+        return self.name
 
 
 class StockPicking(models.Model):
@@ -31,4 +35,4 @@ class StockPicking(models.Model):
         ]
 
     def _get_export_name(self):
-        return str(uuid.uuid4())
+        return self.name

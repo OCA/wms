@@ -5,5 +5,5 @@ from odoo import _, api, fields, models
 
 
 class StockPicking(models.Model):
-    _inherit = ["stock.picking", "synchronize.exportable.mixin"]
+    _inherit = [ "synchronize.exportable.mixin", "stock.picking"]
     _name = "stock.picking"

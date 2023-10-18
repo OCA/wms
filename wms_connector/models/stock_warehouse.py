@@ -3,10 +3,11 @@
 
 from odoo import fields, models
 
-MAPPINGS_FILTERS = [
-    ("wms_export_product_filter_id", "wms.product.sync"),
-    ("wms_export_picking_in_filter_id", "stock.picking"),
-    ("wms_export_picking_out_filter_id", "stock.picking"),
+FILTER_FIELDNAMES = [
+    "wms_export_product_filter_id",
+    "wms_product_sync_filter_id",
+    "wms_export_picking_in_filter_id",
+    "wms_export_picking_out_filter_id",
 ]
 MAPPINGS = {
     "export": {
@@ -15,7 +16,7 @@ MAPPINGS = {
         "filetype": "export",
         "name_fragment": "exports (products, awaiting receptions, preparation orders",
         "code": "wh = env['stock.warehouse'].browse({0})\n"
-        'wh.{1}.scheduler_export("wms.product.sync", wh["wms_export_product_filter_id"]._get_eval_domain())\n'
+        'wh.{1}.scheduler_export("wms.product.sync", wh["wms_product_sync_filter_id"]._get_eval_domain())\n'
         'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_in_filter_id"]._get_eval_domain())\n'
         'wh.{1}.scheduler_export("stock.picking", wh["wms_export_picking_out_filter_id"]._get_eval_domain())',
     },
@@ -97,7 +98,7 @@ class StockWarehouse(models.Model):
                     rec[cron_field_name] = self.env["ir.cron"].create(
                         rec._prepare_wms_cron_vals(code, mappings["name_fragment"])
                     )
-            for field in [fieldname for fieldname, _ in MAPPINGS_FILTERS]:
+            for field in FILTER_FIELDNAMES:
                 if not getattr(rec, field):
                     rec[field] = self.env.ref(
                         "wms_connector.default_{}".format(field[:-3])
@@ -139,8 +140,8 @@ class StockWarehouse(models.Model):
         for rec in self:
             rec.wms_product_sync_ids.unlink()
             for prd in self.env["product.product"].search(
-                rec.wms_product_sync_filter_id
-                and rec.wms_product_sync_filter_id._get_eval_domain()
+                rec.wms_export_product_filter_id
+                and rec.wms_export_product_filter_id._get_eval_domain()
                 or []
             ):
                 self.env["wms.product.sync"].create(
