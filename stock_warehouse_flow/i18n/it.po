@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-13 10:40+0000\n"
-"Last-Translator: Francesco Foresti <francesco.foresti@ooops404.com>\n"
+"PO-Revision-Date: 2023-10-18 13:38+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -116,7 +116,7 @@ msgstr "Da ubicazione dest."
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__from_location_src_id
 msgid "From Location Src"
-msgstr "Da ubicazine sor."
+msgstr "Da ubicazione sorgente"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__from_picking_type_id
