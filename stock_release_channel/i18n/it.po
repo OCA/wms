@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-09 07:59+0000\n"
+"PO-Revision-Date: 2023-10-18 08:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -290,7 +290,7 @@ msgstr "È consentito lo sblocco dell'azione"
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_wake_up_allowed
 msgid "Is Action Wake Up Allowed"
-msgstr "È consentito la riattivazione dell'azione"
+msgstr "È consentita la riattivazione dell'azione"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_release_allowed
@@ -356,7 +356,7 @@ msgstr "Righe"
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Lock"
-msgstr "Blocco"
+msgstr "Blocca"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__locked
@@ -483,7 +483,7 @@ msgstr "Riassegna canale rilascio"
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Related Done Total"
-msgstr "Totale eseguiti relativi"
+msgstr "Totale relativi eseguiti"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
