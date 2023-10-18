@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-18 12:37+0000\n"
+"PO-Revision-Date: 2023-10-18 12:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -153,7 +153,7 @@ msgid ""
 "'Pick and pack at the same time' is incompatible with 'Unload package at "
 "destination'."
 msgstr ""
-"'Preleva e imballa contemporaneamente' non è compatibile cn 'Scarica pacco "
+"'Preleva e imballa contemporaneamente' non è compatibile cn 'Scarica collo "
 "alla destinazione'."
 
 #. module: shopfloor
@@ -165,7 +165,7 @@ msgstr "Una applicazione di reparto"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
-msgstr "È richiesto un pacco destinazione."
+msgstr "È richiesto un collo destinazione."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
@@ -187,7 +187,7 @@ msgstr "Aggiunge campi priorità/rinvio reparto"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "All packages processed."
-msgstr "Tuii i pacchi elaborati."
+msgstr "Tutti i colli elaborati."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_is_possible
@@ -197,7 +197,7 @@ msgstr "Consente possibilità destinazione alternativa"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package_is_possible
 msgid "Allow Alternative Destination Package Is Possible"
-msgstr "Consente possibilità pacco destinazione alternativo"
+msgstr "Consente possibilità collo destinazione alternativo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation_is_possible
