@@ -21,7 +21,6 @@ class WmsConnectorCommon(SyncCommon):
         cls.backend.directory_path = str(uuid.uuid1()) + "/"
         cls.aq_before = cls.env["attachment.queue"].search([])
         cls.warehouse = cls.env.ref("stock.warehouse0")
-        cls.setUpComponent()
 
     def assertNewAttachmentQueue(self, n=1):
         aq_after = self.env["attachment.queue"].search([])
@@ -47,6 +46,7 @@ class WmsConnectorCase(WmsConnectorCommon):
                 StockPicking,
             )
         )
+        cls.setUpComponent()
 
     @classmethod
     def tearDownClass(cls):
