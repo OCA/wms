@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-18 12:37+0000\n"
+"PO-Revision-Date: 2023-10-18 12:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -130,7 +130,7 @@ msgstr "Riga movimento attuale"
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_line_package_stored
 msgid "Current Move Line Package Stored"
-msgstr "Riga movimento attuale confezione depositata"
+msgstr "Riga movimento attuale collo depositato"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__reception_screen_current_step
