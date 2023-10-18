@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-18 08:37+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__pick_pack_same_time
@@ -25,6 +27,16 @@ msgid ""
 "* if a package is scanned, the package is validated against the carrier\n"
 "* in both cases, if the picking has no carrier the operation fails.\",\n"
 msgstr ""
+"\n"
+"Se si seleziona questa opzione, nel prelievo di merce da una ubicazione\n"
+"(es: prelievo area) l'impostazione della destinazione lavora in questo modo:"
+"\n"
+"\n"
+"* se viene scansionata una ubicazione, viene creato un nuovo pacco consegna;"
+"\n"
+"* se viene scansionato un pacco, il pacco è validato per il trasportatore\n"
+"* in entrambi i casi, se il prelievo non ha trasportatore l'operzine "
+"fallisce.\",\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__no_prefill_qty
@@ -35,6 +47,12 @@ msgid ""
 "by scanning a product or product packaging EAN to increase the quantity\n"
 "(i.e. +1 Unit or +1 Box)\n"
 msgstr ""
+"\n"
+"Si presume che chi preleva preleverà la quantità suggerita.\n"
+"Con questa opzione, l'operatore dovrà inserire manualmente la qantità o\n"
+"scansionando un prodotto o un codice EAN imballo prodotto per aumentare la "
+"quantità\n"
+"(es-. +1 Unità o +1 Box)\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_return
@@ -45,6 +63,12 @@ msgid ""
 "A new move will be added as a return of the delivery,\n"
 "decreasing the delivered quantity of the related SO line.\n"
 msgstr ""
+"\n"
+"Qando abilitata, si possono ricevere prodotti non pianificati che vengono "
+"resi\n"
+"da una consegna esistente nell'origine (nome ordine vendita).\n"
+"Un nuovo movimento verrà aggiunto come reso alla consegna,\n"
+"diminuendo la qantità consegnata della relativa riga ordine vendita.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
@@ -55,6 +79,11 @@ msgid ""
 "If enabled, they will also be allowed\n"
 "to scan a destination package.\n"
 msgstr ""
+"\n"
+"Movimentanto un intero pacco, l'utente normalmente scansina\n"
+"l'ubicazine di destinazione.\n"
+"Se abilitata, sarà anche abilitato\n"
+"a scansinare un pacco destinazione.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
@@ -64,6 +93,10 @@ msgid ""
 "allow to set a destination package that was already used for the other "
 "lines.\n"
 msgstr ""
+"\n"
+"Nel prelievo di un movimento,\n"
+"consente di impostare un pacco destinazione che è già stato utilizzato per "
+"altre righe.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__auto_post_line
@@ -73,6 +106,10 @@ msgid ""
 "automatically post the corresponding line\n"
 "if this option is checked.\n"
 msgstr ""
+"\n"
+"Nell'impostare il pacco e la destinazione risultanti,\n"
+"se questa opzione è selezionata viene inviata la\n"
+"riga corrispndente.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__unload_package_at_destination
@@ -88,6 +125,16 @@ msgid ""
 "\n"
 "Incompatible with: \"Pick and pack at the same time\"\n"
 msgstr ""
+"\n"
+"Con questa opzione, le righe elaborate con l'inserimento in un pacco nel \n"
+"processo di prelievo verranno inserite come prodotti derivati nella "
+"ubicazine della destinazion finale.\n"
+"\n"
+"Questo è utile se il sispositivo di prelievo è disponibile nell'ubicazine "
+"destinazione o\n"
+"se si vuole fornire un prodotto derivato all'operazione successiva.\n"
+"\n"
+"Incompatibile con: \"Preleva e imballa contemporaneamente\"\n"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -96,6 +143,8 @@ msgid ""
 "'Pick and pack at the same time' is incompatible with 'Multiple moves same "
 "destination package'."
 msgstr ""
+"'Preleva e imballa contemporaneamente' non è compatibile cn 'Movimenti "
+"multipli medesimo pacco destinazione'."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
@@ -104,176 +153,178 @@ msgid ""
 "'Pick and pack at the same time' is incompatible with 'Unload package at "
 "destination'."
 msgstr ""
+"'Preleva e imballa contemporaneamente' non è compatibile cn 'Scarica pacco "
+"alla destinazione'."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una applicazione di reparto"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
-msgstr ""
+msgstr "È richiesto un pacco destinazione."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "A draft inventory has been created for control."
-msgstr ""
+msgstr "Per cntrollo è stato creato una bozza inventario."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
-msgstr ""
+msgstr "Attiva zero controlli"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
 msgid "Adds shopfloor priority/postpone fields"
-msgstr ""
+msgstr "Aggiunge campi priorità/rinvio reparto"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "All packages processed."
-msgstr ""
+msgstr "Tuii i pacchi elaborati."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_is_possible
 msgid "Allow Alternative Destination Is Possible"
-msgstr ""
+msgstr "Consente possibilità destinazione alternativa"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package_is_possible
 msgid "Allow Alternative Destination Package Is Possible"
-msgstr ""
+msgstr "Consente possibilità pacco destinazione alternativo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation_is_possible
 msgid "Allow Force Reservation Is Possible"
-msgstr ""
+msgstr "Consente possibilità forza prenotazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work_is_possible
 msgid "Allow Get Work Is Possible"
-msgstr ""
+msgstr "Consente possibilità ottenere lavoro"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
-msgstr ""
+msgstr "Consente creazione movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return_is_possible
 msgid "Allow Return Is Possible"
-msgstr ""
+msgstr "Consente possibilità reso"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
 msgid "Allow create returns"
-msgstr ""
+msgstr "CNsente crea resi"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
 msgid "Allow to change the destination package"
-msgstr ""
+msgstr "Consente la modifica del pacco destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr ""
+msgstr "Consente l'elaborazine di qantità prenotate"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination
 msgid "Allow to scan alternative destination locations"
-msgstr ""
+msgstr "Consente la scansione di ubicazioni destinazine alternative"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Are you sure?"
-msgstr ""
+msgstr "Si è sicuri?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line_is_possible
 msgid "Auto Post Line Is Possible"
-msgstr ""
+msgstr "È possibile invio automatico riga"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line
 msgid "Automatically post line"
-msgstr ""
+msgstr "Invia riga automaticamente"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode does not match with {}."
-msgstr ""
+msgstr "Il codice a barre non corrisponde con []."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode not found"
-msgstr ""
+msgstr "Codice a barre non trovato"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking_batch
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Trasferimento raggruppato"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer complete"
-msgstr ""
+msgstr "Trasferimento raggruppato completo"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer line done"
-msgstr ""
+msgstr "Riga trasferimento raggruppato eseguita"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Bin %s doesn't exist"
-msgstr ""
+msgstr "Non esiste BIN %s"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__bulk_line_count
 msgid "Bulk Line Count"
-msgstr ""
+msgstr "Conteggio righe sfuse"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Canceled, you can scan a new pack."
-msgstr ""
+msgstr "Annullato, si può scansionare un altro pacco."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Cannot change to lot {} which is entirely picked."
-msgstr ""
+msgstr "Non si può cambiate a lotto [] perché completamente prelevato."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__category
 msgid "Category"
-msgstr ""
+msgstr "Categoria"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
 #: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
 msgid "Checkout"
-msgstr ""
+msgstr "Check-out"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_cluster_picking
 #: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
-msgstr ""
+msgstr "Prlievo aggregato"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack
