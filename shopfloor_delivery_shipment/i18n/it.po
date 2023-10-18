@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-18 12:38+0000\n"
+"PO-Revision-Date: 2023-10-18 15:36+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -139,13 +139,13 @@ msgstr "Scansionare i lotti {} dove è presente il prodotto."
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "Please scan package(s) {} where this lot is."
-msgstr "Scansionare i pacchi {} dove è presente il lotto."
+msgstr "Scansionare i colli {} dove è presente il lotto."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
 #, python-format
 msgid "Please scan package(s) {} where this product is."
-msgstr "Scansionare i pacchi {} dove è presente il prodotto."
+msgstr "Scansionare i colli {} dove è presente il prodotto."
 
 #. module: shopfloor_delivery_shipment
 #: code:addons/shopfloor_delivery_shipment/actions/message.py:0
@@ -183,7 +183,7 @@ msgid ""
 "package is scanned and no shipment advice already exists. "
 msgstr ""
 "Alcuni scenari possono creare avvisi di spedizione automaticamente qando un "
-"prodotto o un pacco vengono scansionati e non esiste già un avviso di "
+"prodotto o un collo vengono scansionati e non esiste già un avviso di "
 "spedizione. "
 
 #. module: shopfloor_delivery_shipment
