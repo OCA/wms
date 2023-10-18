@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 13:37+0000\n"
+"PO-Revision-Date: 2023-10-18 12:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -66,8 +66,7 @@ msgstr "Ubicazioni destinazione consentite"
 #. module: stock_reception_screen
 #: model:ir.model.fields,help:stock_reception_screen.field_stock_reception_screen__allowed_location_dest_ids
 msgid "Allowed destination locations based on the package storage type."
-msgstr ""
-"Ubicazioni destinazione consentite in base al tipo stoccaggio confezione."
+msgstr "Ubicazioni destinazione consentite in base al tipo stoccaggio collo."
 
 #. module: stock_reception_screen
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
