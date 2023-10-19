@@ -6,18 +6,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-29 08:26+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message_other_locations
 msgid "... and"
-msgstr ""
+msgstr "... e"
 
 #. module: stock_storage_type_buffer
 #: code:addons/stock_storage_type_buffer/models/stock_location_storage_buffer.py:0
@@ -26,32 +28,35 @@ msgid ""
 "<p>Select buffer locations and locations blocked for putaways when the "
 "buffer locations already contain goods or have move lines reaching them.</p>"
 msgstr ""
+"<p>Selezionare le ubicazioni buffer e le ubicazioni bloccate per il deposito "
+"quando le ubicazioni buffer contengono già merce o righe di moviment che le "
+"raggiungono.</p>"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message
 msgid "<span>The buffer locations</span>"
-msgstr ""
+msgstr "<span>Ubicazione del buffer</span>"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__active
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.location_storage_buffer_form_view
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.location_storage_buffer_search_view
 msgid "Archived"
-msgstr ""
+msgstr "In archivio"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__buffer_location_ids
 msgid "Buffer Location"
-msgstr ""
+msgstr "Ubicazione buffer"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.location_storage_buffer_form_view
 msgid "Buffer Locations"
-msgstr ""
+msgstr "Ubicazini buffer"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,help:stock_storage_type_buffer.field_stock_location_storage_buffer__buffer_location_ids
@@ -60,16 +65,19 @@ msgid ""
 " goods or will receive goods, the destination locations are not available "
 "for putaway."
 msgstr ""
+"Buffer dove la merce è depositata temporaneamente. Quando tutte queste "
+"ubicazioni contengono merce o devono ricevere merce, le ubicazioni "
+"destinazione non sono disponibili per il deposito."
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,help:stock_storage_type_buffer.field_stock_location_storage_buffer__location_ids
@@ -77,72 +85,74 @@ msgid ""
 "Destination locations (including sublocations) that will be unreachable for "
 "putaway if the buffers are full."
 msgstr ""
+"Ubicazioni destinazione (include le sotto ubicazioni) che non saranno "
+"raggiungibili per il deposito se il buffer è pieno."
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__help_message
 msgid "Help Message"
-msgstr ""
+msgstr "Messaggio di aiuto"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model,name:stock_storage_type_buffer.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location__is_in_storage_buffer
 msgid "Is In Storage Buffer"
-msgstr ""
+msgstr "È nel buffer deposito"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location_storage_buffer__location_ids
 msgid "Location"
-msgstr ""
+msgstr "Ubicazione"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model,name:stock_storage_type_buffer.model_stock_location_storage_buffer
 msgid "Location Storage Buffer"
-msgstr ""
+msgstr "Buffer ubicazione deposito"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.location_storage_buffer_form_view
 msgid "Locations"
-msgstr ""
+msgstr "Ubicazioni"
 
 #. module: stock_storage_type_buffer
 #: model:ir.model.fields,field_description:stock_storage_type_buffer.field_stock_location__storage_buffer_ids
 msgid "Storage Buffer"
-msgstr ""
+msgstr "Buffer deposito"
 
 #. module: stock_storage_type_buffer
 #: model:ir.actions.act_window,name:stock_storage_type_buffer.location_storage_buffer_action
 #: model:ir.ui.menu,name:stock_storage_type_buffer.stock_location_storage_buffer_menu
 msgid "Storage Buffers"
-msgstr ""
+msgstr "Buffer deposito"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message
@@ -150,6 +160,9 @@ msgid ""
 "The buffers have no capacity because they all contain\n"
 "            goods or will contain goods due to move lines reaching them."
 msgstr ""
+"I buffer non hanno capacità perché contengono tutti\n"
+"            merce o conterranno merce per le righe di movimento che le "
+"raggiungono."
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message
@@ -158,6 +171,9 @@ msgid ""
 "            so the following locations\n"
 "            <strong>can receive putaways</strong>:"
 msgstr ""
+"attualmente <strong>ha capacità</strong>,\n"
+"            quindi le seguenti ubicazioni\n"
+"            <strong>possono ricevere depositi</strong>:"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message
@@ -166,8 +182,11 @@ msgid ""
 "            so the following locations\n"
 "            <strong>cannot receive putaways</strong>:"
 msgstr ""
+"attualmente <strong>non c'è capacità</strong>,\n"
+"            quindi le segunti ubicazioni\n"
+"            <strong>non possono ricevere depositi</strong>:"
 
 #. module: stock_storage_type_buffer
 #: model_terms:ir.ui.view,arch_db:stock_storage_type_buffer.storage_buffer_help_message_other_locations
 msgid "other locations."
-msgstr ""
+msgstr "altre ubicazioni."
