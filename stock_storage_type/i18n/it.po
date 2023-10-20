@@ -6,124 +6,126 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-29 08:30+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__allowed_location_ids
 msgid "Allowed Location"
-msgstr ""
+msgstr "Ubicazione consentita"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__allowed_stock_location_storage_type_ids
 msgid "Allowed Stock Location Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione magazzino consentito"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__create_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__write_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__location_ids
 msgid "Location"
-msgstr ""
+msgstr "Ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.location_storage_type_action
 #: model:ir.ui.menu,name:stock_storage_type.menu_location_storage_type_action
 msgid "Location Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__name
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.package_storage_type_action
 #: model:ir.ui.menu,name:stock_storage_type.menu_package_storage_type_action
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
 msgid "Package Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio collo"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_product_packaging
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__product_packaging_ids
 msgid "Product Packaging"
-msgstr ""
+msgstr "Imballaggio prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__stock_location_storage_type_ids
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__stock_location_storage_type_ids
 msgid "Stock Location Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging__stock_package_storage_type_id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__stock_package_storage_type_ids
 msgid "Stock Package Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio collo magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_location_storage_type
 msgid "Stock location storage type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_storage_type
 msgid "Stock package storage type"
-msgstr ""
+msgstr "Tipo stoccaggio collo magazzino"
 
 #. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.storage_type_menu
 msgid "Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio"
