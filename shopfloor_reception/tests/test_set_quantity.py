@@ -661,15 +661,14 @@ class TestSetQuantity(CommonCase):
 
         # Creating the picking, selecting the move line.
         picking = self._create_picking()
+        move = picking.move_lines.filtered(lambda l: l.product_id == self.product_a)
         service_user_1 = self.service
         service_user_1.dispatch("scan_document", params={"barcode": picking.name})
         service_user_1.dispatch(
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
-        move_line_user_1 = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
+        move_line_user_1 = move.move_line_ids
         # The only move line should have qty_done = 1
         self.assertEqual(move_line_user_1.qty_done, 1.0)
         self.assertEqual(move_line_user_1.product_uom_qty, 10.0)
@@ -732,15 +731,14 @@ class TestSetQuantity(CommonCase):
         # After move_line is posted, its state is done, and its qty_done is 1.0
         self.assertEqual(move_line_user_1.state, "done")
 
-        # The remaining one is still assigned
-        self.assertEqual(move_line_user_2.state, "assigned")
+        # The remaining one is still to be done
+        self.assertEqual(move_line_user_2.state, "confirmed")
         # As well as the new one
         self.assertEqual(len(lines_after), 1)
-
-        # And the total remaining qty to be done is 9.0 (10.0 - 1.0)
-        self.assertEqual(
-            lines_after.product_uom_qty + move_line_user_2.product_uom_qty, 9.0
-        )
+        # The total remaining qty to be done on line is always zero
+        # Because it is computed in the frontend
+        self.assertEqual(lines_after.product_uom_qty, 0)
+        self.assertEqual(move_line_user_2.product_uom_qty, 0)
 
     def test_move_states(self):
         # as only assigned moves can be posted, we need to ensure that

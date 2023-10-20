@@ -145,11 +145,10 @@ class TestSetDestination(CommonCase):
         self.assertEqual(selected_move_line.picking_id.state, "done")
 
         # The line that remained in the original picking
-        # for that product has a product_uom_qty of 7
-        # and a qty_done of 0.
         line_in_picking = picking.move_line_ids.filtered(
             lambda l: l.product_id == selected_move_line.product_id
         )
-        self.assertEqual(line_in_picking.product_uom_qty, 7)
+        # New created line always quantity to do at zero
+        self.assertEqual(line_in_picking.product_uom_qty, 0)
         self.assertEqual(line_in_picking.qty_done, 0)
         self.assertEqual(picking.state, "assigned")

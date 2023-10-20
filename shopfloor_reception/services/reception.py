@@ -758,9 +758,6 @@ class Reception(Component):
         # remaining_todo = move.product_uom_qty - move.quantity_done
         # line.product_uom_qty = line.qty_done + remaining_todo
 
-        # However, if the overall qty_done is > to the move's product_uom_qty,
-        # then we're not updating the line's product_uom_qty.
-
         # TODO, do we need to check move's state?
         # If move is already done, do not update lines qties
         # if move.state in ("done", "cancel"):
@@ -769,7 +766,7 @@ class Reception(Component):
         qty_todo = move.product_uom_qty
         other_lines_qty_done = 0.0
         move_uom = move.product_uom
-        for move_line in (move.move_line_ids - line):
+        for move_line in move.move_line_ids - line:
             # Use move's uom
             line_uom = move_line.product_uom_id
             other_lines_qty_done += line_uom._compute_quantity(
@@ -780,9 +777,10 @@ class Reception(Component):
         line_todo = line.product_uom_id._compute_quantity(
             remaining_todo, move_uom, round=False
         )
-        response["data"]["set_quantity"]["selected_move_line"][0][
-            "quantity"
-        ] = line_todo
+        # If more has been done keep the quantity to zero
+        response["data"]["set_quantity"]["selected_move_line"][0]["quantity"] = max(
+            line_todo, 0
+        )
         return response
 
     def _before_state__set_quantity(self, picking, line, message=None):
@@ -1270,8 +1268,16 @@ class Reception(Component):
         # then selected_line is the only one related to this move.
         # In such case, we must ensure there's another move with the remaining
         # quantity to do, so selected_line is extracted in a new move as expected.
-        if selected_line.product_uom_qty:
-            selected_line.product_uom_qty = 0
+
+        # Always keep the quantity todo at zero, the same is done
+        # in Odoo when move lines are created manually (setting)
+        lines_with_qty_todo = selected_line.move_id.move_line_ids.filtered(
+            lambda line: line.state not in ("cancel", "done")
+            and line.product_uom_qty > 0
+        )
+        if lines_with_qty_todo:
+            lines_with_qty_todo.product_uom_qty = 0
+
         move = selected_line.move_id
         move_quantity = move.product_uom._compute_quantity(
             move.product_uom_qty, selected_line.product_uom_id
