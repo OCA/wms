@@ -43,3 +43,23 @@ class TestActivateSync(SavepointCase):
             1,
             len(self.env["wms.product.sync"].search([])),
         )
+
+    def test_wms_product_sync_updates(self):
+        self.warehouse.active_wms_sync = True
+        match_unlink, match_keep, nomatch_match = self.env["product.product"].search(
+            [], limit=3
+        )
+        self.warehouse.wms_export_product_filter_id.domain = (
+            '[("id", "in", {})]'.format((match_unlink + match_keep).ids)
+        )
+        self.warehouse.refresh_wms_products()
+        self.assertEqual(
+            self.warehouse.wms_product_sync_ids.product_id, (match_unlink + match_keep)
+        )
+        self.warehouse.wms_export_product_filter_id.domain = (
+            '[("id", "in", {})]'.format((match_keep + nomatch_match).ids)
+        )
+        self.warehouse.refresh_wms_products()
+        self.assertEqual(
+            self.warehouse.wms_product_sync_ids.product_id, match_keep + nomatch_match
+        )

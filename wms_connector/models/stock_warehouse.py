@@ -143,12 +143,20 @@ class StockWarehouse(models.Model):
 
     def refresh_wms_products(self):
         for rec in self:
-            rec.wms_product_sync_ids.unlink()
-            for prd in self.env["product.product"].search(
+            prd_with_sync = self.wms_product_sync_ids.product_id
+            prd_matching = self.env["product.product"].search(
                 rec.wms_export_product_filter_id
                 and rec.wms_export_product_filter_id._get_eval_domain()
                 or []
-            ):
+            )
+            to_create = prd_matching - prd_with_sync
+            for prd in to_create:
                 self.env["wms.product.sync"].create(
                     {"product_id": prd.id, "warehouse_id": rec.id}
                 )
+            self.env["wms.product.sync"].search(
+                [
+                    ("warehouse_id", "=", rec.id),
+                    ("product_id", "in", (prd_with_sync - prd_matching).ids),
+                ]
+            ).unlink()
