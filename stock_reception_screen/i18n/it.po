@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-18 15:36+0000\n"
+"PO-Revision-Date: 2023-10-29 08:27+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -43,13 +43,13 @@ msgstr ""
 "prodotti.\n"
 "(a) La politica di spedizione è \"Il prima possibile\": non è stato "
 "possibile riservare alcun prodotto.\n"
-"(b) La politica di spedizione \"Quando tutti i prodotti sono pronti\": non è "
-"stato possibile riservare tutti i prodotti.\n"
+"(b) La politica di spedizione è \"Quando tutti i prodotti sono pronti\": non "
+"è stato possibile riservare tutti i prodotti.\n"
 " * Pronto: il trasferimento è pronto per essere completato.\n"
 "(a) La politica di spedizione è \"Il prima possibile\": almeno un prodotto è "
 "stato riservato.\n"
-"(b) La politica di spedizione \"Quando tutti i prodotti sono pronti\": tutti "
-"i prodotti sono stati riservati.\n"
+"(b) La politica di spedizione è \"Quando tutti i prodotti sono pronti\": "
+"tutti i prodotti sono stati riservati.\n"
 " * Fatto: il trasferimento è stato completato.\n"
 " * Annullato: il trasferimento è stato annullato."
 
@@ -189,7 +189,7 @@ msgstr "Nome visualizzato"
 #: code:addons/stock_reception_screen/models/stock_reception_screen.py:0
 #, python-format
 msgid "Done"
-msgstr "Evasa"
+msgstr "Completata"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move_line__lot_expiration_date
@@ -231,7 +231,7 @@ msgstr ""
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__package_storage_type_height_required
 msgid "Height required for packages"
-msgstr "Altezza richiesta per li colli"
+msgstr "Altezza richiesta per i colli"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__id
@@ -344,7 +344,7 @@ msgstr "Prodotto '{}' non trovato."
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr "Movimenti prodotto (riga movimento magazzino)"
+msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_packaging_ids
@@ -411,7 +411,7 @@ msgstr "Ricezione"
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_picking__reception_screen_id
 msgid "Reception Screen"
-msgstr "Schermo ricezione"
+msgstr "Schermata ricezione"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__name
@@ -505,7 +505,7 @@ msgstr "Movimenti di magazzino"
 #. module: stock_reception_screen
 #: model:ir.model,name:stock_reception_screen.model_stock_reception_screen
 msgid "Stock Reception Screen"
-msgstr "Schermo ricezione magazzino"
+msgstr "Schermata ricezione magazzino"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_product_packaging__storage_type_name
