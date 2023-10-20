@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-29 08:26+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence.py:0
@@ -21,6 +23,9 @@ msgid ""
 " * <span style=\"color: orange;\">%s (WARNING: restrictions are active on "
 "location storage types matching this package storage type)</span>"
 msgstr ""
+" * <span style=\"color: orange;\">%s (ATTENZIONE: ci sono restrizioni attive "
+"nei tipi stoccaggio ubicazione corrispondenti a questo tipo stoccaggio "
+"collo)</span>"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_storage_location_sequence.py:0
@@ -29,6 +34,8 @@ msgid ""
 " * <span style=\"color: red;\">%s (WARNING: no suitable location matching "
 "storage type)</span>"
 msgstr ""
+" * <span style=\"color: red;\">%s (ATTENZIONE: nessuna ubicazione "
+"disponibile corrispondente al tipo stoccaggio)</span>"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_package_storage_type.py:0
@@ -37,32 +44,34 @@ msgid ""
 "<span style=\"color: red;\">The \"Put-Away sequence\" must be defined in "
 "order to put away packages using this package storage type (%s).</span>"
 msgstr ""
+"<span style=\"color: red;\">La \"Sequenza deposito\" deve essere definita "
+"per depositare i colli utilizzando questo tipo stoccaggio collo (%s).</span>"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__active
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__active
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_level__allowed_location_dest_domain
 msgid "Allowed Destinations Domain"
-msgstr ""
+msgstr "Ubicazioni destinazione consentite"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__allowed_location_storage_type_ids
 msgid "Allowed Location Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione consentito"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__location_storage_type_ids
 msgid "Allowed locations storage types"
-msgstr ""
+msgstr "Tipi stoccaggio ubicazione consentito"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__package_storage_type_ids
 msgid "Allowed packages storage types"
-msgstr ""
+msgstr "Tipi stoccaggio colli consentito"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
@@ -70,17 +79,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_location_storage_type_search_view
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_package_storage_type_search_view
 msgid "Archived"
-msgstr ""
+msgstr "In archivio"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__barcode
 msgid "Barcode"
-msgstr ""
+msgstr "Codice a barre"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
 msgid "Content restrictions"
-msgstr ""
+msgstr "Restrizioni contenuto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__create_uid
@@ -88,7 +97,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__create_date
@@ -96,7 +105,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__create_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_product_product__product_package_storage_type_id
@@ -105,6 +114,8 @@ msgid ""
 "Defines a 'default' package storage type for this product to be applied on "
 "packages without product packagings for put-away computations."
 msgstr ""
+"Definisce un tipo stoccaggio collo 'predefinito' per questo prodotto da "
+"applicare ai colli senza imballaggio prodotto per i calcoli di stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__display_name
@@ -112,34 +123,35 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__display_name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_lots
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__do_not_mix_lots
 msgid "Do Not Mix Lots"
-msgstr ""
+msgstr "Non mescolare lotti"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__do_not_mix_products
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__do_not_mix_products
 msgid "Do Not Mix Products"
-msgstr ""
+msgstr "Non mescolare prodotti"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__has_restrictions
 msgid "Has Restrictions"
-msgstr ""
+msgstr "Ha restrizioni"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_storage_type__height_required
 msgid "Height is mandatory for packages configured with this storage type."
 msgstr ""
+"L'altezza è obbligatoria per colli configurati con questo tipo stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__height_required
 msgid "Height required for packages"
-msgstr ""
+msgstr "Altezza richiesta per i colli"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__id
@@ -147,7 +159,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__do_not_mix_lots
@@ -155,6 +167,8 @@ msgid ""
 "If checked, moves to the destination location will only be allowed if the "
 "location contains product of the same lot."
 msgstr ""
+"Se selezionata, i movimenti verso l'ubicazione di destinazione saranno "
+"consentiti solo se l'ubicazione contiene prodotto dello stesso lotto."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__do_not_mix_products
@@ -162,6 +176,8 @@ msgid ""
 "If checked, moves to the destination location will only be allowed if the "
 "location contains the same product."
 msgstr ""
+"Se selezionata, i movimenti verso l' ubicazione di destinazione saranno "
+"consentiti solo se l'ubicazione contiene lo stesso prodotto."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__only_empty
@@ -169,6 +185,9 @@ msgid ""
 "If checked, moves to the destination location will only be allowed if there "
 "are not any existing quant nor planned move on this location"
 msgstr ""
+"Se selezionata, i movimenti verso le ubicazioni destinazione saranno "
+"consentiti solo se non ci sono quanti esistenti nè movimenti pianificati in "
+"questa ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__max_height
@@ -176,6 +195,8 @@ msgid ""
 "If defined, moves to the destination location will only be allowed if the "
 "packaging height is lower than this maximum."
 msgstr ""
+"Se definita, i movimenti verso l'ubicazione destinazione saranno consentiti "
+"solo se l'altezza imaballaggio è inferiore a questo massimo."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__max_weight
@@ -183,21 +204,23 @@ msgid ""
 "If defined, moves to the destination location will only be allowed if the "
 "packaging wight is lower than this maximum."
 msgstr ""
+"Se definita, i movimenti verso l'ubicazione destinazione saranno consentiti "
+"solo se il peso dell'imaballaggio è inferiore a questo massimo."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__in_move_ids
 msgid "In Move"
-msgstr ""
+msgstr "Nel movimento"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__in_move_line_ids
 msgid "In Move Line"
-msgstr ""
+msgstr "Nella riga movimento"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel____last_update
@@ -205,7 +228,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type____last_update
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__write_uid
@@ -213,7 +236,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_uid
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__write_date
@@ -221,60 +244,60 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__write_date
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_child_location_ids
 msgid "Leaf Child Location"
-msgstr ""
+msgstr "Ubicazione figlia terminale"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__leaf_location_ids
 msgid "Leaf Location"
-msgstr ""
+msgstr "Ubicazione terminale"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__location_ids
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_id
 msgid "Location"
-msgstr ""
+msgstr "Ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_is_empty
 msgid "Location Is Empty"
-msgstr ""
+msgstr "Ubicazione vuota"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_location_package_storage_type_rel
 msgid "Location Package storage type relation"
-msgstr ""
+msgstr "Relazione ubicazione tipo stoccaggio collo"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_storage_type_ids
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_package_storage_type_rel__location_storage_type_id
 msgid "Location Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.location_storage_type_action
 #: model:ir.ui.menu,name:stock_storage_type.menu_location_storage_type_action
 msgid "Location Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_will_contain_lot_ids
 msgid "Location Will Contain Lot"
-msgstr ""
+msgstr "L'ubicazione conterrà lotto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_will_contain_product_ids
 msgid "Location Will Contain Product"
-msgstr ""
+msgstr "L'ubicazione conterrà prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_location_storage_type
 msgid "Location storage type"
-msgstr ""
+msgstr "Tipo stoccaggio ubicazione"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -283,6 +306,8 @@ msgid ""
 "Location storage type %s defines max height of %s but the package is bigger:"
 " %s."
 msgstr ""
+"Il tipo sotoccaggio ubicazione %s definisce una altezza massima di %s ma il "
+"collo è più grande: %s."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -291,6 +316,8 @@ msgid ""
 "Location storage type %s defines max weight of %s but the package is "
 "heavier: %s."
 msgstr ""
+"Il tipo sotoccaggio ubicazione %s definisce un peso massimo di %s ma il "
+"collo è più pesante: %s."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -299,6 +326,8 @@ msgid ""
 "Location storage type %s is flagged 'do not mix lots' but there are other "
 "lots in location."
 msgstr ""
+"Il tipo stoccaggio ubicazione %s è impostato 'non mescolare lotti' ma ci "
+"sono altri lotti nell'ubicazione."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -307,6 +336,8 @@ msgid ""
 "Location storage type %s is flagged 'do not mix products' but there are "
 "other products in location."
 msgstr ""
+"Il tipo stoccaggio ubicazione %s è impostato 'non mescolare prodotti' ma ci "
+"sono altri prodotti nell'ubicazione."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -315,6 +346,8 @@ msgid ""
 "Location storage type %s is flagged 'only empty' with other quants in "
 "location."
 msgstr ""
+"Il tipo stoccaggio ubicazione %s è impostato 'solo vuoti' con altri quanti "
+"nell'ubicazione."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_storage_type_ids
@@ -322,16 +355,20 @@ msgid ""
 "Location storage types defined here will be applied on all the children "
 "locations that do not define their own location storage types."
 msgstr ""
+"I tipo stoccaggio ubicazione definiti qui verranno applicati a tutte le "
+"ubicazioni figlie che non definiscono i loro propri tipi stoccaggio "
+"ubicazione."
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
 msgid "Locations"
-msgstr ""
+msgstr "Ubicazioni"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_storage_type__location_storage_type_ids
 msgid "Locations storage types that can accept such a package storage type."
 msgstr ""
+"Tipi stoccaggio ubicazione che possono accettare tale tipo stoccaggio collo."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__allowed_location_storage_type_ids
@@ -340,49 +377,52 @@ msgid ""
 "storage types are defined on this specific location, the location storage "
 "types of the parent location are applied)."
 msgstr ""
+"Tipi stoccaggio ubicazione che può accettare questa ubicazione. (Se non sono "
+"definiti i tipi stoccaggio ubicazione in questa specifica ubicazione, "
+"vengono applicati i tipi stoccaggio ubicazione dell'ubicazione padre)."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__max_height
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_height
 msgid "Max height (mm)"
-msgstr ""
+msgstr "Altezza massima (mm)"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__max_weight
 msgid "Max weight (kg)"
-msgstr ""
+msgstr "Peso massimo (kg)"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__name
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__name
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #. module: stock_storage_type
 #: model:ir.model.fields.selection,name:stock_storage_type.selection__stock_location__pack_putaway_strategy__none
 msgid "None"
-msgstr ""
+msgstr "Nessuna"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__only_empty
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location_storage_type__only_empty
 msgid "Only Empty"
-msgstr ""
+msgstr "Solo vuote"
 
 #. module: stock_storage_type
 #: model:ir.model.fields.selection,name:stock_storage_type.selection__stock_location__pack_putaway_strategy__ordered_locations
 msgid "Ordered Children Locations"
-msgstr ""
+msgstr "Ubicazioni figlie ordinate"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__out_move_line_ids
 msgid "Out Move Line"
-msgstr ""
+msgstr "Riga movimento uscita"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__pack_putaway_sequence
 msgid "Pack Putaway Sequence"
-msgstr ""
+msgstr "Sequenza deposito pacco"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
@@ -392,6 +432,10 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
+"Il collo %s non è consentita nell'ubicazione %s, perché non c'è un tipo "
+"stoccaggio ubicazione che accetta il tipo stoccaggio collo %s:\n"
+"\n"
+"%s"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_packaging__package_storage_type_id
@@ -399,26 +443,26 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_quant_package__package_storage_type_id
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__package_storage_type_id
 msgid "Package Storage Type"
-msgstr ""
+msgstr "Tipo stoccaggio collo"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.package_storage_type_action
 #: model:ir.ui.menu,name:stock_storage_type.menu_package_storage_type_action
 msgid "Package Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio collo"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_product__product_package_storage_type_id
 #: model:ir.model.fields,field_description:stock_storage_type.field_product_template__product_package_storage_type_id
 msgid "Package storage type"
-msgstr ""
+msgstr "Tipo stoccaggio collo"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant.py:0
 #, python-format
 msgid "Package storage type %s is not allowed into Location %s"
-msgstr ""
+msgstr "Il tipo stoccaggio collo %s non è consentito nell'ubicazione %s"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_quant_package__package_storage_type_id
@@ -427,6 +471,9 @@ msgid ""
 "the packaging if set, or from the product ifthe package contains only a "
 "single product."
 msgstr ""
+"Tipo stoccaggio collo per il calcolo deposito. Ottiene il valore "
+"automaticamente dall'imballaggio se impostato, o dal prodotto se il collo "
+"contiene solo un singolo prodotto."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location_storage_type__package_storage_type_ids
@@ -434,117 +481,120 @@ msgid ""
 "Package storage types that are allowed on locations where this location "
 "storage type is defined."
 msgstr ""
+"Tipi stoccaggio collo che sono consentiti nelle ubicazioni dove questo tipo "
+"stoccaggio ubicazione è definito."
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_quant_package
 msgid "Packages"
-msgstr ""
+msgstr "Colli"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__pack_putaway_strategy
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_putaway_strategy
 msgid "Packs Put-Away Strategy"
-msgstr ""
+msgstr "Strategia inoltro pacchi"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_product_packaging
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__product_packaging_ids
 msgid "Product Packaging"
-msgstr ""
+msgstr "Imballaggio prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_product_template
 msgid "Product Template"
-msgstr ""
+msgstr "Modello prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__storage_location_sequence_ids
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_type_form_view
 msgid "Put-Away sequence"
-msgstr ""
+msgstr "Sequenza deposito"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_package_storage_type.py:0
 #, python-format
 msgid "Put-away sequence"
-msgstr ""
+msgstr "Sequenza deposito"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_quant
 msgid "Quants"
-msgstr ""
+msgstr "Quanti"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_level_tree_view_picking_inherit
 msgid "Recompute Putaway"
-msgstr ""
+msgstr "Ricalcola deposito"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__sequence
 msgid "Sequence"
-msgstr ""
+msgstr "Sequenza"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence
 msgid "Sequence of locations to put-away the package storage type"
-msgstr ""
+msgstr "Sequenza ubicazioni per deposito del tipo stoccaggio collo"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
 msgid "Show locations"
-msgstr ""
+msgstr "Visualizza ubicazioni"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.location_storage_type_form_view
 msgid "Size restrictions"
-msgstr ""
+msgstr "Restrizioni dimensione"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_package_level
 msgid "Stock Package Level"
-msgstr ""
+msgstr "Livello collo magazzino"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_storage_type__storage_type_message
 msgid "Storage Type Message"
-msgstr ""
+msgstr "Messaggio tipo stoccaggio"
 
 #. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.storage_type_menu
 msgid "Storage Types"
-msgstr ""
+msgstr "Tipi stoccaggio"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.location_package_storage_type_rel_action
 #: model:ir.ui.menu,name:stock_storage_type.menu_storage_type_mapping_action
 msgid "Storage Types Mapping"
-msgstr ""
+msgstr "Mappa tipi stoccaggio"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
 msgid "Storage locations"
-msgstr ""
+msgstr "Ubicazioni stoccaggio"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__storage_location_sequence_ids
 msgid "Storage locations sequences"
-msgstr ""
+msgstr "Seqenze ubicazioni stoccaggio"
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_quant_package.py:0
 #, python-format
 msgid "The height is mandatory on package {}."
-msgstr ""
+msgstr "L'altezza è obbligatria per il collo {}."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__max_height
 msgid "The max height supported among allowed location storage types."
 msgstr ""
+"L'altezza massima supportata tra i tipi stoccaggio ubicazione consentiti."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_product_packaging__package_storage_type_id
@@ -552,6 +602,8 @@ msgid ""
 "The package storage type will be set on stock packages using this product "
 "packaging, in order to compute its putaway."
 msgstr ""
+"Il tipo stoccaggio collo verrà impostato nei colli magazzino utilizzando "
+"questo imballo prodotto, per il calcolo del deposito."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__pack_putaway_strategy
@@ -561,6 +613,14 @@ msgid ""
 "None: when a pack is moved to this location, it will not be put away any further.\n"
 "Ordered Children Locations: when a pack is moved to this location, a suitable location will be searched in its children locations according to the restrictions defined on their respective location storage types."
 msgstr ""
+"Questo definisce la strategia di stoccaggio da utilizzare quanto un pacco è "
+"depositato in questa ubicazione.\n"
+"Nessuna: quanto un pacco è movimentato in questa ubicazione, non verrà "
+"movimentato ulteriormente.\n"
+"Ordinamento per ubicazioni figlie: quanto un pacco è movimentato in questa "
+"ubicazione, verrà cercata una ubicazione idonea nelle ubicazioni figlie in "
+"accordo con le restrizioni definite nei rispettivi tipi stoccaggio "
+"ubicazione."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_package_storage_type.py:0
@@ -573,6 +633,12 @@ msgid ""
 "locations are children of the destination location after the (product or "
 "category) put-away is applied."
 msgstr ""
+"Quando i colli con tipo stoccaggio %s sono depositati, la strategia cerca "
+"una ubicazione disponibile nelle segenti ubicazoni: <br/><br/>%s <br/><br/"
+"><b>Nota</b>: questo accade finché queste ubicazioni <u>sono figlie della "
+"ubicazione destinazione del movimento di magazzino</u> o finché queste "
+"ubicazioni sono figlie dell'ubicazione di destinazione dopo che è stato "
+"eseguito il deposito (prodotto o categoria)."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_location_storage_type.py:0
@@ -581,6 +647,8 @@ msgid ""
 "You cannot set 'Do not mix lots' or 'Do not mix products' with 'Only empty' "
 "constraint."
 msgstr ""
+"Non si può impostare 'Non mescolare lotti' o 'Non mescolare prodotti' con il "
+"vincolo 'Solo vuote'."
 
 #. module: stock_storage_type
 #: code:addons/stock_storage_type/models/stock_location_storage_type.py:0
@@ -589,6 +657,8 @@ msgid ""
 "You cannot set 'Do not mix lots' without setting 'Do not mix products' "
 "constraint."
 msgstr ""
+"Non si può impostare 'Non mescolare lotti' senza impostare il vincolo 'Non "
+"mescolare prodotti'."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_is_empty
@@ -597,16 +667,20 @@ msgid ""
 "incoming products in the location.  Computed only if the location needs to "
 "check for emptiness (has an \"only empty\" location storage type)."
 msgstr ""
+"campo tecnico: vero se l'ubicazione è vuta e non ci sono in sospeso ingressi "
+"di prodotti nell'ubicazIone. Calcolato solo se l'ubicazione deve essere "
+"controllata per rienpimento (ha un tipo stoccaggio ubicazione \"solo vuota\""
+")."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
 msgid "technical field: all the leaves locations"
-msgstr ""
+msgstr "campo tecnico: tutte le ubicazioni terminali"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_child_location_ids
 msgid "technical field: all the leaves sub-locations"
-msgstr ""
+msgstr "campo tecnico: tutte le sotto ubicazioni terminali"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_will_contain_product_ids
@@ -614,6 +688,8 @@ msgid ""
 "technical field: list of products in the location, either now or in pending "
 "operations"
 msgstr ""
+"campo tecnico: elencodei prdotti nell'ubicazione, sia operazioni attuali che "
+"in attesa"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_will_contain_lot_ids
@@ -621,18 +697,21 @@ msgid ""
 "technical field: list of stock.production.lots in the location, either now "
 "or in pending operations"
 msgstr ""
+"campo tecnico: elenco di stock.production.lots nell'ubicazione, sia ora che "
+"nelle operazioni in sospeso"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__in_move_line_ids
 msgid "technical field: the pending incoming stock.move.lines in the location"
 msgstr ""
+"campo tecnico: le stock.move.lines in attesa in ingresso nell'ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__in_move_ids
 msgid "technical field: the pending incoming stock.moves in the location"
-msgstr ""
+msgstr "campo tecnico: i stock.moves in attesa nell'ubicazione"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__out_move_line_ids
 msgid "technical field: the pending outgoing stock.move.lines in the location"
-msgstr ""
+msgstr "campo tecnico: le stock.move.lines in uscita in atesa nell'ubicazione"
