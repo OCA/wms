@@ -155,28 +155,39 @@ class StockMove(models.Model):
             GROUP BY move.id;
         """
 
+    def _previous_promised_qty_sql_moves_before_matches(self):
+        return "COALESCE(m.need_release, False) = COALESCE(move.need_release, False)"
+
     def _previous_promised_qty_sql_moves_before(self):
         sql = """
-            m.priority > move.priority
-            OR
-            (
-                m.priority = move.priority
-                AND m.date_priority < move.date_priority
+            {moves_matches}
+            AND (
+                m.priority > move.priority
+                OR
+                (
+                    m.priority = move.priority
+                    AND m.date_priority < move.date_priority
+                )
+                OR (
+                    m.priority = move.priority
+                    AND m.date_priority = move.date_priority
+                    AND m.picking_type_id = move.picking_type_id
+                    AND m.id < move.id
+                )
+                OR (
+                    m.priority = move.priority
+                    AND m.date_priority = move.date_priority
+                    AND m.picking_type_id != move.picking_type_id
+                    AND m.id > move.id
+                )
             )
-            OR (
-                m.priority = move.priority
-                AND m.date_priority = move.date_priority
-                AND m.picking_type_id = move.picking_type_id
-                AND m.id < move.id
-            )
-            OR (
-                m.priority = move.priority
-                AND m.date_priority = move.date_priority
-                AND m.picking_type_id != move.picking_type_id
-                AND m.id > move.id
-            )
-        """
+        """.format(
+            moves_matches=self._previous_promised_qty_sql_moves_before_matches()
+        )
         return sql
+
+    def _previous_promised_qty_sql_moves_no_release(self):
+        return "m.need_release IS false OR m.need_release IS null"
 
     def _previous_promised_qty_sql_lateral_where(self):
         locations = self._ordered_available_to_promise_locations()
@@ -186,20 +197,18 @@ class StockMove(models.Model):
                 AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                    COALESCE(m.need_release, False) = COALESCE(move.need_release, False)
-                    AND (
-                        {moves_before}
-                    )
+                    {moves_before}
                     OR (
                         move.need_release IS true
-                        AND (m.need_release IS false OR m.need_release IS null)
+                        AND ({moves_no_release})
                     )
                 )
                 AND m.state IN (
                     'waiting', 'confirmed', 'partially_available', 'assigned'
                 )
         """.format(
-            moves_before=self._previous_promised_qty_sql_moves_before()
+            moves_before=self._previous_promised_qty_sql_moves_before(),
+            moves_no_release=self._previous_promised_qty_sql_moves_no_release(),
         )
         params = {
             "location_paths": [
