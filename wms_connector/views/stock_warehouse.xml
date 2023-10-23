@@ -11,6 +11,31 @@
             <field name="code" position="after">
                 <field name="active_wms_sync" />
             </field>
+
+            <div class="oe_button_box" position="inside">
+                <button
+                    name="button_open_wms_sync_ids"
+                    string="WMS sync'd products"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
+                <button
+                    name="button_open_wms_pickings_in"
+                    string="View pickings in"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
+                <button
+                    name="button_open_wms_pickings_out"
+                    string="View pickings out"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
+            </div>
+
             <xpath expr="//notebook" position="inside">
                 <page
                     name="wms_sync"
@@ -39,25 +64,9 @@
                             type="object"
                             string="Refresh WMS products"
                         />
-                        <field name="wms_product_sync_ids">
-                            <tree>
-                                <field name="name" />
-                                <field name="product_id" />
-                            </tree>
-                        </field>
                     </group>
                 </page>
             </xpath>
-
-            <div class="oe_button_box" position="inside">
-                <button
-                    name="action_open_flows"
-                    string="View flows"
-                    icon="fa-refresh"
-                    class="oe_stat_button"
-                    type="object"
-                />
-            </div>
 
         </field>
     </record>

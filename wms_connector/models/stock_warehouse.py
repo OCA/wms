@@ -17,13 +17,13 @@ MAPPINGS = {
         "name_fragment": "exports (products, awaiting receptions, preparation orders",
         "code": "wh = env['stock.warehouse'].browse({0})\n"
         "wh.{1}.scheduler_export("
-        '"wms.product.sync", wh["wms_product_sync_filter_id"]._get_eval_domain()'
+        '"wms.product.sync", wh._wms_domain_for("wms_product_sync")'
         ")\n"
         "wh.{1}.scheduler_export("
-        '"stock.picking", wh["wms_export_picking_in_filter_id"]._get_eval_domain()'
+        '"stock.picking", wh._wms_domain_for("pickings_in")'
         ")\n"
         "wh.{1}.scheduler_export("
-        '"stock.picking", wh["wms_export_picking_out_filter_id"]._get_eval_domain()'
+        '"stock.picking", wh._wms_domain_for("pickings_out")'
         ")",
     },
     "reception": {
@@ -72,6 +72,15 @@ class StockWarehouse(models.Model):
         "ir.filters",
     )
     wms_product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
+
+    def _wms_domain_for(self, model_domain):
+        domains = {
+            "wms_product_sync": [("warehouse_id", "=", self.id)]
+            + self.wms_product_sync_filter_id._get_eval_domain(),
+            "pickings_in": self.wms_export_picking_in_filter_id._get_eval_domain(),
+            "pickings_out": self.wms_export_picking_out_filter_id._get_eval_domain(),
+        }
+        return domains[model_domain]
 
     def _inverse_active_wms_sync(self):
         for rec in self:
@@ -138,9 +147,6 @@ class StockWarehouse(models.Model):
                 rec[mappings["fieldname_task"]].active = False
                 rec[mappings["fieldname_cron"]].active = False
 
-    def action_open_flows(self):
-        return {"type": "ir.action"}
-
     def refresh_wms_products(self):
         for rec in self:
             prd_with_sync = self.wms_product_sync_ids.product_id
@@ -160,3 +166,45 @@ class StockWarehouse(models.Model):
                     ("product_id", "in", (prd_with_sync - prd_matching).ids),
                 ]
             ).unlink()
+
+    def button_open_wms_sync_ids(self):
+        return {
+            "name": "WMS synchronized products",
+            "view_mode": "tree,form",
+            "views": [
+                (self.env.ref("wms_connector.wms_product_sync_tree_view").id, "tree"),
+                (self.env.ref("wms_connector.wms_product_sync_form_view").id, "form"),
+            ],
+            "res_model": "wms.product.sync",
+            "type": "ir.actions.act_window",
+            "target": "current",
+            "domain": self._wms_domain_for("wms_product_sync"),
+        }
+
+    def button_open_wms_pickings_in(self):
+        return {
+            "name": "WMS synchronized transfers",
+            "view_mode": "tree,form",
+            "views": [
+                (False, "tree"),
+                (False, "form"),
+            ],
+            "res_model": "stock.picking",
+            "type": "ir.actions.act_window",
+            "target": "current",
+            "domain": self._wms_domain_for("pickings_in"),
+        }
+
+    def button_open_wms_pickings_out(self):
+        return {
+            "name": "WMS synchronized transfers",
+            "view_mode": "tree,form",
+            "views": [
+                (False, "tree"),
+                (False, "form"),
+            ],
+            "res_model": "stock.picking",
+            "type": "ir.actions.act_window",
+            "target": "current",
+            "domain": self._wms_domain_for("pickings_out"),
+        }

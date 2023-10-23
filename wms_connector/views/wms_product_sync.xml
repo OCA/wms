@@ -26,29 +26,20 @@
         </field>
     </record>
 
-<!--    <record model="ir.ui.view" id="wms_product_sync_search_view">-->
-<!--        <field name="name">wms.product.sync.search (in wms_connector)</field>-->
-<!--        <field name="model">wms.product.sync</field>-->
-<!--        <field name="arch" type="xml">-->
-<!--            <search>-->
-<!--                &lt;!&ndash; TODO &ndash;&gt;-->
-<!--            </search>-->
-<!--        </field>-->
-<!--    </record>-->
-
-<!--    <record model="ir.ui.view" id="wms_product_sync_tree_view">-->
-<!--        <field name="name">wms.product.sync.tree (in wms_connector)</field>-->
-<!--        <field name="model">wms.product.sync</field>-->
-<!--        <field name="arch" type="xml">-->
-<!--            <tree>-->
-<!--                &lt;!&ndash; TODO &ndash;&gt;-->
-<!--                <field name="name"/>-->
-<!--            </tree>-->
-<!--        </field>-->
-<!--    </record>-->
+    <record model="ir.ui.view" id="wms_product_sync_tree_view">
+        <field name="name">wms.product.sync.tree (in wms_connector)</field>
+        <field name="model">wms.product.sync</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="product_id" />
+                <field name="warehouse_id" />
+            </tree>
+        </field>
+    </record>
 
     <record model="ir.actions.act_window" id="wms_product_sync_act_window">
-        <field name="name">Wms Product Sync</field> <!-- TODO -->
+        <field name="name">Wms Product Sync</field>
         <field name="res_model">wms.product.sync</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
@@ -57,7 +48,7 @@
 
     <record model="ir.ui.menu" id="wms_product_sync_menu">
         <field name="name">Wms Product Sync</field>
-        <field name="parent_id" ref="stock.menu_stock_root" /> <!-- TODO -->
+        <field name="parent_id" ref="stock.menu_stock_root" />
         <field name="action" ref="wms_product_sync_act_window" />
         <field name="sequence" eval="16" />
     </record>

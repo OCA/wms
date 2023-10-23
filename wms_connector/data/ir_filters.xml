@@ -21,7 +21,7 @@
         ]</field>
     </record>
     <record model="ir.filters" id="default_wms_export_picking_out_filter">
-        <field name="name">WMS: Default filter picking out</field>
+        <field name="name">WMS: Default filter for picking out</field>
         <field name="model_id">stock.picking</field>
         <field name="domain">[
             ("wms_export_date", "=", False),
