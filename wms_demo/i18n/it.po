@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-10-29 08:30+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_202001508
@@ -21,6 +23,8 @@ msgid ""
 "Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block "
 "(MN1604/6LF22/ST10)"
 msgstr ""
+"Batterie Industrial Duracell 9V Block (MN1604/6LF22/ST10)V Block (MN1604/"
+"6LF22/ST10)"
 
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_312004805
@@ -50,7 +54,7 @@ msgstr ""
 #. module: wms_demo
 #: model:stock.picking.type,name:wms_demo.sch_delivery_out
 msgid "Delivery Orders"
-msgstr ""
+msgstr "Ordini di consegna"
 
 #. module: wms_demo
 #: model:product.product,name:wms_demo.product_232509793
