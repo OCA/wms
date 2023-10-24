@@ -15,21 +15,21 @@
             <div class="oe_button_box" position="inside">
                 <button
                     name="button_open_wms_sync_ids"
-                    string="WMS sync'd products"
+                    string="WMS sync products"
                     icon="fa-refresh"
                     class="oe_stat_button"
                     type="object"
                 />
                 <button
                     name="button_open_wms_pickings_in"
-                    string="View pickings in"
+                    string="WMS sync pickings in"
                     icon="fa-refresh"
                     class="oe_stat_button"
                     type="object"
                 />
                 <button
                     name="button_open_wms_pickings_out"
-                    string="View pickings out"
+                    string="WMS sync pickings out"
                     icon="fa-refresh"
                     class="oe_stat_button"
                     type="object"
@@ -55,7 +55,6 @@
                         <field name="wms_import_confirm_reception_cron_id" />
                     </group>
                     <group>
-                        <field name="wms_product_sync_filter_id" />
                         <field name="wms_export_product_filter_id" />
                         <field name="wms_export_picking_in_filter_id" />
                         <field name="wms_export_picking_out_filter_id" />

@@ -48,3 +48,30 @@ class TestExportFile(WmsConnectorCase):
         self.assertNewAttachmentQueue(n_products)
         self.cron_export_product.method_direct_trigger()
         self.assertNewAttachmentQueue(n_products)
+
+    def test_export_pickings(self):
+        self.env["stock.picking"].search([]).state = "assigned"
+        self.cron_export_picking_in.method_direct_trigger()
+        aq_in = len(
+            self.env["stock.picking"]
+            .search(
+                [
+                    ("wms_export_date", "!=", False),
+                    ("picking_type_id", "=", self.warehouse.in_type_id.id),
+                ]
+            )
+            .ids
+        )
+        self.assertNewAttachmentQueue(aq_in)
+        self.cron_export_picking_out.method_direct_trigger()
+        aq_out = len(
+            self.env["stock.picking"]
+            .search(
+                [
+                    ("wms_export_date", "!=", False),
+                    ("picking_type_id", "=", self.warehouse.out_type_id.id),
+                ]
+            )
+            .ids
+        )
+        self.assertNewAttachmentQueue(aq_in + aq_out)

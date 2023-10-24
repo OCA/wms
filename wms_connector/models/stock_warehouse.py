@@ -20,9 +20,9 @@ FILTER_VALS = {
 FILTER_DOMAINS = {
     "wms_export_product_filter_id": "[]",
     "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned")]',
+    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
     "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned")]',
+    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
 }
 
 MAPPINGS = {
@@ -89,9 +89,6 @@ class StockWarehouse(models.Model):
     wms_export_picking_out_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
-    wms_product_sync_filter_id = fields.Many2one(
-        "ir.filters",
-    )
     wms_export_product_filter_id = fields.Many2one(
         "ir.filters",
     )
