@@ -3,9 +3,12 @@
 
 from datetime import datetime
 
+from odoo.tests import tagged
+
 from .common import PromiseReleaseCommonCase
 
 
+@tagged("post_install", "-at_install")
 class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
     @classmethod
     def setUpClass(cls):
