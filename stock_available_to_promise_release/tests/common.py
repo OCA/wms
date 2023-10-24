@@ -2,10 +2,9 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields
-from odoo.tests import common, tagged
+from odoo.tests import common
 
 
-@tagged("post_install", "-at_install")
 class PromiseReleaseCommonCase(common.SavepointCase):
     @classmethod
     def setUpClass(cls):
