@@ -112,6 +112,7 @@
                     name="scan_location_or_pack_first"
                     attrs="{'invisible': [('scan_location_or_pack_first_is_possible', '=', False)]}"
                 >
+                  <field name="scenario_key" invisible="1" />
                   <field name="scan_location_or_pack_first_is_possible" invisible="1" />
                   <field name="scan_location_or_pack_first" />
                   <div
