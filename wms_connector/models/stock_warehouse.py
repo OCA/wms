@@ -3,12 +3,28 @@
 
 from odoo import fields, models
 
-FILTER_FIELDNAMES = [
-    "wms_export_product_filter_id",
-    "wms_product_sync_filter_id",
-    "wms_export_picking_in_filter_id",
-    "wms_export_picking_out_filter_id",
-]
+FILTER_VALS = {
+    "wms_export_product_filter_id": {
+        "name": "WMS: Default filter for product sync",
+        "model_id": "wms.product.sync",
+    },
+    "wms_export_picking_in_filter_id": {
+        "name": "WMS: Default filter for picking in",
+        "model_id": "stock.picking",
+    },
+    "wms_export_picking_out_filter_id": {
+        "name": "WMS: Default filter for picking out",
+        "model_id": "stock.picking",
+    },
+}
+FILTER_DOMAINS = {
+    "wms_export_product_filter_id": "[]",
+    "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
+    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned")]',
+    "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
+    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned)]',
+}
+
 MAPPINGS = {
     "export": {
         "fieldname_task": "wms_export_task_id",
@@ -91,33 +107,78 @@ class StockWarehouse(models.Model):
 
     def _activate_crons_tasks(self):
         for rec in self:
-            for mappings in MAPPINGS.values():
-                task_field_name = mappings["fieldname_task"]
-                task = rec[task_field_name]
-                if task:
-                    task.active = True
-                else:
-                    rec[task_field_name] = self.env[
-                        "attachment.synchronize.task"
-                    ].create(
-                        rec._prepare_wms_task_vals(
-                            mappings["filetype"], mappings["name_fragment"]
-                        )
+            rec._activate_tasks()
+            rec._activate_crons()
+            rec._activate_filters()
+            # for mappings in MAPPINGS.values():
+            #     task_field_name = mappings["fieldname_task"]
+            #     task = rec[task_field_name]
+            #     if task:
+            #         task.active = True
+            #     else:
+            #         rec[task_field_name] = self.env[
+            #             "attachment.synchronize.task"
+            #         ].create(
+            #             rec._prepare_wms_task_vals(
+            #                 mappings["filetype"], mappings["name_fragment"]
+            #             )
+            #         )
+            #     cron_field_name = mappings["fieldname_cron"]
+            #     cron = rec[cron_field_name]
+            #     if cron:
+            #         cron.active = True
+            #     else:
+            #         code = mappings["code"].format(self.id, task_field_name)
+            #         rec[cron_field_name] = self.env["ir.cron"].create(
+            #             rec._prepare_wms_cron_vals(code, mappings["name_fragment"])
+            #         )
+            # for field in FILTER_FIELDNAMES:
+            #     if not getattr(rec, field):
+            #         rec[field] = self.env.ref(
+            #             "wms_connector.default_{}".format(field[:-3])
+            #         )
+
+    def _activate_tasks(self):
+        for mappings in MAPPINGS.values():
+            task_field_name = mappings["fieldname_task"]
+            task = self[task_field_name]
+            if task:
+                task.active = True
+            else:
+                self[task_field_name] = self.env["attachment.synchronize.task"].create(
+                    self._prepare_wms_task_vals(
+                        mappings["filetype"], mappings["name_fragment"]
                     )
-                cron_field_name = mappings["fieldname_cron"]
-                cron = rec[cron_field_name]
-                if cron:
-                    cron.active = True
-                else:
-                    code = mappings["code"].format(self.id, task_field_name)
-                    rec[cron_field_name] = self.env["ir.cron"].create(
-                        rec._prepare_wms_cron_vals(code, mappings["name_fragment"])
-                    )
-            for field in FILTER_FIELDNAMES:
-                if not getattr(rec, field):
-                    rec[field] = self.env.ref(
-                        "wms_connector.default_{}".format(field[:-3])
-                    )
+                )
+
+    def _activate_crons(self):
+        for mappings in MAPPINGS.values():
+            cron_field_name = mappings["fieldname_cron"]
+            cron = self[cron_field_name]
+            if cron:
+                cron.active = True
+            else:
+                code = mappings["code"].format(self.id, mappings["fieldname_task"])
+                self[cron_field_name] = self.env["ir.cron"].create(
+                    self._prepare_wms_cron_vals(code, mappings["name_fragment"])
+                )
+
+    def _activate_filters(self):
+        for filter_fieldname, vals in FILTER_VALS.items():
+            ir_filter = self[filter_fieldname]
+            if ir_filter:
+                ir_filter.active = True
+            else:
+                self[filter_fieldname] = self.env["ir.filters"].create(vals)
+        self.wms_export_product_filter_id.domain = FILTER_DOMAINS[
+            "wms_export_product_filter_id"
+        ]
+        self.wms_export_picking_in_filter_id.domain = FILTER_DOMAINS[
+            "wms_export_picking_in_filter_id"
+        ].format(self.in_type_id.id)
+        self.wms_export_picking_out_filter_id.domain = FILTER_DOMAINS[
+            "wms_export_picking_out_filter_id"
+        ].format(self.out_type_id.id)
 
     def _prepare_wms_task_vals(self, filetype, name_fragment=""):
         return {

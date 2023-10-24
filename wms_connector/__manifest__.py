@@ -13,7 +13,6 @@
     "data": [
         "security/wms_product_sync.xml",
         "data/cron.xml",
-        "data/ir_filters.xml",
         "views/wms_product_sync.xml",
         "views/stock_picking.xml",
         "views/stock_warehouse.xml",

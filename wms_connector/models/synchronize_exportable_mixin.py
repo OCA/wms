@@ -103,3 +103,21 @@ class SynchronizeExportableMixin(models.AbstractModel):
 
     def _get_export_name(self):
         raise NotImplementedError
+
+    # def scheduler_export(self, warehouse, domain=False):
+    #     if not domain:
+    #         recs = self.search([])
+    #     else:
+    #         recs = self.search(domain)
+    #     if not recs:
+    #         return
+    #     recs.with_context(warehouse=warehouse).synchronize_export()
+
+    def _schedule_export(self, warehouse, domain=False):
+        if not domain:
+            recs = self.search([])
+        else:
+            recs = self.search(domain)
+        if not recs:
+            return
+        recs.with_context(warehouse=warehouse).synchronize_export()
