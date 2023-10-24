@@ -12,16 +12,20 @@ class TestExportFile(WmsConnectorCase):
     def setUp(self):
         super().setUp()
         self.warehouse.active_wms_sync = True
-        self.cron_export = self.warehouse.wms_export_cron_id
+        self.cron_export_product = self.warehouse.wms_export_product_cron_id
+        self.cron_export_picking_in = self.warehouse.wms_export_picking_in_cron_id
+        self.cron_export_picking_out = self.warehouse.wms_export_picking_out_cron_id
         self.demo_product = self.env.ref("product.product_product_1")
 
     def test_export_filter(self):
         self.warehouse.refresh_wms_products()
         self.setAllExported()
-        self.env["wms.product.sync"].search(
+        prd = self.env["wms.product.sync"].search(
             [("product_id", "=", self.demo_product.id)]
-        ).wms_export_date = False
-        self.cron_export.method_direct_trigger()
+        )
+        prd.wms_export_date = False
+        self.cron_export_product.method_direct_trigger()
+        self.assertTrue(prd.wms_export_date)
         self.assertNewAttachmentQueue()
 
     def test_export_error(self):
@@ -31,7 +35,7 @@ class TestExportFile(WmsConnectorCase):
             [("product_id", "=", self.demo_product.id)]
         ).wms_export_date = False
         self.demo_product.name = "".rjust(110, "X")
-        self.cron_export.method_direct_trigger()
+        self.cron_export_product.method_direct_trigger()
         wms_product = self.env["wms.product.sync"].search(
             [("product_id", "=", self.demo_product.id)]
         )
@@ -39,9 +43,8 @@ class TestExportFile(WmsConnectorCase):
 
     def test_export_repeat(self):
         self.warehouse.refresh_wms_products()
-        self.cron_export.method_direct_trigger()
+        self.cron_export_product.method_direct_trigger()
         n_products = len(self.env["wms.product.sync"].search([]).ids)
-        n_pickings = len(self.env["stock.picking"].search([]).ids)
-        self.assertNewAttachmentQueue(n_pickings + n_products)
-        self.cron_export.method_direct_trigger()
-        self.assertNewAttachmentQueue(n_pickings + n_products)
+        self.assertNewAttachmentQueue(n_products)
+        self.cron_export_product.method_direct_trigger()
+        self.assertNewAttachmentQueue(n_products)

@@ -22,25 +22,37 @@ FILTER_DOMAINS = {
     "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
     ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned")]',
     "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned)]',
+    ' ("picking_type_id", "=", "{}"), ("state", "=", "assigned")]',
 }
 
 MAPPINGS = {
-    "export": {
+    "export_products": {
         "fieldname_task": "wms_export_task_id",
-        "fieldname_cron": "wms_export_cron_id",
+        "fieldname_cron": "wms_export_product_cron_id",
         "filetype": "export",
-        "name_fragment": "exports (products, awaiting receptions, preparation orders",
-        "code": "wh = env['stock.warehouse'].browse({0})\n"
-        "wh.{1}.scheduler_export("
-        '"wms.product.sync", wh._wms_domain_for("wms_product_sync")'
-        ")\n"
-        "wh.{1}.scheduler_export("
-        '"stock.picking", wh._wms_domain_for("pickings_in")'
-        ")\n"
-        "wh.{1}.scheduler_export("
-        '"stock.picking", wh._wms_domain_for("pickings_out")'
-        ")",
+        "name_fragment": "export products",
+        "code": "wh = env['stock.warehouse'].browse({})\n"
+        "wh.refresh_wms_products()\n"
+        "env['wms.product.sync'].with_context(attachment_task=wh.{})."
+        "_schedule_export(wh, domain=wh._wms_domain_for('product'))",
+    },
+    "export_pickings_in": {
+        "fieldname_task": "wms_export_task_id",
+        "fieldname_cron": "wms_export_picking_in_cron_id",
+        "filetype": "export",
+        "name_fragment": "export pickings in",
+        "code": "wh = env['stock.warehouse'].browse({})\n"
+        "env['stock.picking'].with_context(attachment_task=wh.{})._schedule_export(wh,"
+        "domain=wh._wms_domain_for('pickings_in')),",
+    },
+    "export_pickings_out": {
+        "fieldname_task": "wms_export_task_id",
+        "fieldname_cron": "wms_export_picking_out_cron_id",
+        "filetype": "export",
+        "name_fragment": "export pickings out",
+        "code": "wh = env['stock.warehouse'].browse({})\n"
+        "env['stock.picking'].with_context(attachment_task=wh.{})._schedule_export(wh,"
+        "domain=wh._wms_domain_for('pickings_out')),",
     },
     "reception": {
         "fieldname_task": "wms_import_confirm_reception_task_id",
@@ -72,7 +84,9 @@ class StockWarehouse(models.Model):
     wms_import_confirm_delivery_task_id = fields.Many2one(
         "attachment.synchronize.task", readonly=True
     )
-    wms_export_cron_id = fields.Many2one("ir.cron", readonly=True)
+    wms_export_product_cron_id = fields.Many2one("ir.cron", readonly=True)
+    wms_export_picking_in_cron_id = fields.Many2one("ir.cron", readonly=True)
+    wms_export_picking_out_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_product_sync_filter_id = fields.Many2one(
@@ -91,8 +105,10 @@ class StockWarehouse(models.Model):
 
     def _wms_domain_for(self, model_domain):
         domains = {
-            "wms_product_sync": [("warehouse_id", "=", self.id)]
-            + self.wms_product_sync_filter_id._get_eval_domain(),
+            "product": [
+                ("warehouse_id", "=", self.id),
+                ("wms_export_date", "=", False),
+            ],
             "pickings_in": self.wms_export_picking_in_filter_id._get_eval_domain(),
             "pickings_out": self.wms_export_picking_out_filter_id._get_eval_domain(),
         }
@@ -110,33 +126,6 @@ class StockWarehouse(models.Model):
             rec._activate_tasks()
             rec._activate_crons()
             rec._activate_filters()
-            # for mappings in MAPPINGS.values():
-            #     task_field_name = mappings["fieldname_task"]
-            #     task = rec[task_field_name]
-            #     if task:
-            #         task.active = True
-            #     else:
-            #         rec[task_field_name] = self.env[
-            #             "attachment.synchronize.task"
-            #         ].create(
-            #             rec._prepare_wms_task_vals(
-            #                 mappings["filetype"], mappings["name_fragment"]
-            #             )
-            #         )
-            #     cron_field_name = mappings["fieldname_cron"]
-            #     cron = rec[cron_field_name]
-            #     if cron:
-            #         cron.active = True
-            #     else:
-            #         code = mappings["code"].format(self.id, task_field_name)
-            #         rec[cron_field_name] = self.env["ir.cron"].create(
-            #             rec._prepare_wms_cron_vals(code, mappings["name_fragment"])
-            #         )
-            # for field in FILTER_FIELDNAMES:
-            #     if not getattr(rec, field):
-            #         rec[field] = self.env.ref(
-            #             "wms_connector.default_{}".format(field[:-3])
-            #         )
 
     def _activate_tasks(self):
         for mappings in MAPPINGS.values():

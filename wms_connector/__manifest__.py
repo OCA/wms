@@ -12,7 +12,6 @@
     "depends": ["stock", "sale", "attachment_synchronize"],
     "data": [
         "security/wms_product_sync.xml",
-        "data/cron.xml",
         "views/wms_product_sync.xml",
         "views/stock_picking.xml",
         "views/stock_warehouse.xml",

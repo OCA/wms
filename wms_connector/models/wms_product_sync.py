@@ -13,6 +13,6 @@ class WmsProductSync(models.Model):
     product_id = fields.Many2one("product.product", required=True)
     warehouse_id = fields.Many2one("stock.warehouse", required=True)
 
-    def _schedule_export(self, warehouse):
+    def _schedule_export(self, warehouse, domain=False):
         warehouse.refresh_wms_products()
-        return super()._schedule_export(warehouse)
+        return super()._schedule_export(warehouse, domain)

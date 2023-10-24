@@ -7,8 +7,7 @@ import datetime
 from io import StringIO
 
 from odoo import fields, models
-
-DEBUGMODE = False
+from odoo.tools import config
 
 
 class SynchronizeExportableMixin(models.AbstractModel):
@@ -25,53 +24,33 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def button_trigger_export(self):
         self.synchronize_export()
 
-    def synchronize_export(self):
-        if self.file_creation_mode == "per_record":
-            res = self.env["attachment.queue"]
-            if DEBUGMODE:
-                for rec in self:
-                    rec.wms_export_error = ""
-                    data = rec._prepare_export_data()
-                    if not data:
-                        continue
-                    attachment = rec._format_to_exportfile(data)
-                    rec.track_export(attachment)
-                    res += attachment
-                return res
-            else:
-                for rec in self:
-                    try:
-                        rec.wms_export_error = ""
-                        data = rec._prepare_export_data()
-                        if not data:
-                            continue
-                        attachment = rec._format_to_exportfile(data)
-                        rec.track_export(attachment)
-                        res += attachment
-                    except Exception as e:
-                        rec.wms_export_error = str(e)
-                return res
-
-        if self.file_creation_mode == "per_recordset":
-            data = []
-            for rec in self:
-                try:
-                    rec.wms_export_error = ""
-                    data += rec._prepare_export_data()
-                    if not data:
-                        continue
-                except Exception as e:
-                    self.wms_export_error = "Error during data preparation:\n{}".format(
-                        str(e)
-                    )
+    def _get_export_data(self):
+        data = []
+        for rec in self.sorted("id"):
             try:
-                attachment = self._format_to_exportfile(data)
-                self.track_export(attachment)
-                return attachment
+                data += rec._prepare_export_data()
             except Exception as e:
-                self.wms_export_error = "Error during file formatting:\n{}".format(
-                    str(e)
-                )
+                if "pdb" in config.get("dev_mode"):
+                    raise
+                rec.wms_export_error = str(e)
+                continue
+            if self.file_creation_mode == "per_record":
+                yield data
+                data = []
+        if self.file_creation_mode == "per_recordset":
+            yield data
+
+    def synchronize_export(self):
+        data = self._get_export_data()
+        res = self.env["attachment.queue"]
+        if self.file_creation_mode == "per_record":
+            for el, rec in zip(data, self.sorted("id")):
+                attachment = rec._format_to_exportfile(el)
+                rec.track_export(attachment)
+                res += attachment
+        if self.file_creation_mode == "per_recordset":
+            res = self._format_to_exportfile(data)
+            self.track_export(res)
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
@@ -104,20 +83,10 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def _get_export_name(self):
         raise NotImplementedError
 
-    # def scheduler_export(self, warehouse, domain=False):
-    #     if not domain:
-    #         recs = self.search([])
-    #     else:
-    #         recs = self.search(domain)
-    #     if not recs:
-    #         return
-    #     recs.with_context(warehouse=warehouse).synchronize_export()
-
     def _schedule_export(self, warehouse, domain=False):
         if not domain:
-            recs = self.search([])
-        else:
-            recs = self.search(domain)
+            domain = []
+        recs = self.search(domain)
         if not recs:
             return
         recs.with_context(warehouse=warehouse).synchronize_export()
