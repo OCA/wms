@@ -224,7 +224,7 @@ class StockWarehouse(models.Model):
             "res_model": "wms.product.sync",
             "type": "ir.actions.act_window",
             "target": "current",
-            "domain": self._wms_domain_for("wms_product_sync"),
+            "domain": self._wms_domain_for("product"),
         }
 
     def button_open_wms_pickings_in(self):

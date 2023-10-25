@@ -48,7 +48,7 @@
 
     <record model="ir.ui.menu" id="wms_product_sync_menu">
         <field name="name">Wms Product Sync</field>
-        <field name="parent_id" ref="stock.menu_stock_root" />
+        <field name="parent_id" ref="stock.menu_product_in_config_stock" />
         <field name="action" ref="wms_product_sync_act_window" />
         <field name="sequence" eval="16" />
     </record>
