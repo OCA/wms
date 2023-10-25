@@ -1,19 +1,21 @@
 # Copyright 2023 Akretion
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from copy import deepcopy
+
 from odoo import fields, models
 
 FILTER_VALS = {
     "wms_export_product_filter_id": {
-        "name": "WMS: Default filter for product sync",
+        "name": "WMS: {} filter for product sync",
         "model_id": "wms.product.sync",
     },
     "wms_export_picking_in_filter_id": {
-        "name": "WMS: Default filter for picking in",
+        "name": "WMS: {} filter for picking in",
         "model_id": "stock.picking",
     },
     "wms_export_picking_out_filter_id": {
-        "name": "WMS: Default filter for picking out",
+        "name": "WMS: {} filter for picking out",
         "model_id": "stock.picking",
     },
 }
@@ -155,7 +157,9 @@ class StockWarehouse(models.Model):
             if ir_filter:
                 ir_filter.active = True
             else:
-                self[filter_fieldname] = self.env["ir.filters"].create(vals)
+                vals_fmt = deepcopy(vals)
+                vals_fmt["name"] = vals["name"].format(self.name)
+                self[filter_fieldname] = self.env["ir.filters"].create(vals_fmt)
         self.wms_export_product_filter_id.domain = FILTER_DOMAINS[
             "wms_export_product_filter_id"
         ]
