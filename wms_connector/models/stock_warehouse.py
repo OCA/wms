@@ -8,7 +8,7 @@ from odoo import fields, models
 FILTER_VALS = {
     "wms_export_product_filter_id": {
         "name": "WMS: {} filter for product sync",
-        "model_id": "wms.product.sync",
+        "model_id": "product.product",
     },
     "wms_export_picking_in_filter_id": {
         "name": "WMS: {} filter for picking in",
@@ -211,7 +211,7 @@ class StockWarehouse(models.Model):
             self.env["wms.product.sync"].create(
                 [{"product_id": prd.id, "warehouse_id": rec.id} for prd in to_create]
             )
-            to_unlink.unlink()
+            to_unlink.wms_sync_ids.filtered(lambda s: s.warehouse_id == rec).unlink()
 
     def button_open_wms_sync_ids(self):
         return {

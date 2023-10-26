@@ -26,9 +26,13 @@ class SynchronizeExportableMixin(models.AbstractModel):
 
     def _get_export_data(self):
         data = []
-        for rec in self.sorted("id"):
+        for idx, rec in enumerate(self.sorted("id")):
+            if self.file_creation_mode == "per_record":
+                sequence = 0
+            else:
+                sequence = idx
             try:
-                data += rec._prepare_export_data()
+                data += rec._prepare_export_data(sequence)
             except Exception as e:
                 if "pdb" in config.get("dev_mode"):
                     raise
@@ -56,7 +60,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
         self.wms_export_date = datetime.datetime.now()
         self.wms_export_attachment = attachment
 
-    def _prepare_export_data(self) -> list:
+    def _prepare_export_data(self, idx) -> list:
         raise NotImplementedError
 
     def _format_to_exportfile(self, data):
