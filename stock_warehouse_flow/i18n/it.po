@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-18 13:38+0000\n"
+"PO-Revision-Date: 2023-10-29 17:41+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -270,7 +270,7 @@ msgstr "Impostare il campo UdM in aggiunta al campo quantità"
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__qty
 msgid "Qty"
-msgstr "Qta."
+msgstr "Q.tà"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__flow_id
