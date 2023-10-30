@@ -175,7 +175,7 @@ msgstr "Trasferimenti disponibili"
 #: code:addons/stock_release_channel/models/stock_release_channel.py:0
 #, python-format
 msgid "Channel %s has no validated transfer yet."
-msgstr "Il canale %(name)s non ha ancora un trasferimento validato."
+msgstr "Il canale %s non ha ancora un trasferimento validato."
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__color

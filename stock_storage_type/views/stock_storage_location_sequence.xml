@@ -4,7 +4,7 @@
         <field name="name">package.storage.location.tree.view</field>
         <field name="model">stock.storage.location.sequence</field>
         <field name="arch" type="xml">
-            <tree string="Storage locations" editable="bottom">
+            <tree name="storage-locations" editable="bottom">
                 <field name="sequence" widget="handle" />
                 <field
                     name="package_storage_type_id"
