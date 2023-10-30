@@ -6,7 +6,7 @@
     "maintainers": ["jbaudoux"],
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.1.1",
     "license": "AGPL-3",
     "depends": ["stock", "stock_helper"],
     "demo": [
