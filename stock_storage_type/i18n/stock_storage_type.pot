@@ -642,11 +642,6 @@ msgid "Storage Types Mapping"
 msgstr ""
 
 #. module: stock_storage_type
-#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
-msgid "Storage locations"
-msgstr ""
-
-#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__storage_location_sequence_ids
 msgid "Storage locations sequences"
 msgstr ""
