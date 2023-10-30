@@ -43,15 +43,18 @@ def catch_errors(response_error):
 
     def _catch_errors(fn):
         @wraps(fn)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
+            savepoint = self._actions_for("savepoint").new()
             try:
-                res = fn(*args, **kwargs)
+                res = fn(self, *args, **kwargs)
             except ValidationError as ex:
+                savepoint.rollback()
                 message = {
                     "message_type": "error",
                     "body": ex.name,
                 }
-                return response_error(*args, **kwargs, message=message)
+                return response_error(self, *args, **kwargs, message=message)
+            savepoint.release()
             return res
 
         return wrapper
