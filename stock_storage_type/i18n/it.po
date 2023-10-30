@@ -695,11 +695,6 @@ msgid "Storage Types Mapping"
 msgstr "Mappa tipi stoccaggio"
 
 #. module: stock_storage_type
-#: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
-msgid "Storage locations"
-msgstr "Ubicazioni stoccaggio"
-
-#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__storage_location_sequence_ids
 msgid "Storage locations sequences"
 msgstr "Seqenze ubicazioni stoccaggio"
@@ -845,8 +840,8 @@ msgid ""
 msgstr ""
 "campo tecnico: vero se l'ubicazione è vuta e non ci sono in sospeso ingressi "
 "di prodotti nell'ubicazIone. Calcolato solo se l'ubicazione deve essere "
-"controllata per rienpimento (ha un tipo stoccaggio ubicazione \"solo vuota\""
-")."
+"controllata per rienpimento (ha un tipo stoccaggio ubicazione \"solo vuota"
+"\")."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
@@ -891,3 +886,6 @@ msgstr "campo tecnico: i stock.moves in attesa nell'ubicazione"
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__out_move_line_ids
 msgid "technical field: the pending outgoing stock.move.lines in the location"
 msgstr "campo tecnico: le stock.move.lines in uscita in atesa nell'ubicazione"
+
+#~ msgid "Storage locations"
+#~ msgstr "Ubicazioni stoccaggio"
