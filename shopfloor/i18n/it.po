@@ -538,7 +538,7 @@ msgstr "Ultima modifica il"
 #, python-format
 msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
 msgstr ""
-"Ultima operazione del trasferimento {}. L'operazone sccessiva (}) è pronta a "
+"Ultima operazione del trasferimento {}. L'operazone sccessiva ({}) è pronta a "
 "procedere."
 
 #. module: shopfloor
@@ -980,7 +980,7 @@ msgstr "Il collo {} non è nel trasferimento attuale."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package {} not found in location {}"
-msgstr "Il collo } non è stato trovato nell'ubicazione {}"
+msgstr "Il collo {} non è stato trovato nell'ubicazione {}"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
