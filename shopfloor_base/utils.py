@@ -5,7 +5,7 @@ import logging
 import os
 from functools import wraps
 
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.modules.module import load_information_from_description_file
 from odoo.tools.config import config as odoo_config
 
@@ -34,12 +34,15 @@ def ensure_model(model_name):
     return _ensure_model
 
 
-def catch_errors(response_error):
+def catch_errors(response_error, exceptions_to_catch=None):
     """Decorator for service endpoints to gracefully handle some exceptions.
 
     The decorator is passed a function with the same arguments than the function
     handlling the endpoint, plus a keyword argument called `message`.
     """
+
+    if exceptions_to_catch is None:
+        exceptions_to_catch = (ValidationError, UserError)
 
     def _catch_errors(fn):
         @wraps(fn)
@@ -47,11 +50,11 @@ def catch_errors(response_error):
             savepoint = self._actions_for("savepoint").new()
             try:
                 res = fn(self, *args, **kwargs)
-            except ValidationError as ex:
+            except exceptions_to_catch as ex:
                 savepoint.rollback()
                 message = {
                     "message_type": "error",
-                    "body": ex.name,
+                    "body": str(ex),
                 }
                 return response_error(self, *args, **kwargs, message=message)
             savepoint.release()
