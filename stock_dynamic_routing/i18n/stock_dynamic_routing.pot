@@ -100,7 +100,6 @@ msgstr ""
 #: model:ir.ui.menu,name:stock_dynamic_routing.menu_stock_routing
 #: model_terms:ir.ui.view,arch_db:stock_dynamic_routing.view_stock_routing_form
 #: model_terms:ir.ui.view,arch_db:stock_dynamic_routing.view_stock_routing_search
-#: model_terms:ir.ui.view,arch_db:stock_dynamic_routing.view_stock_routing_tree
 msgid "Dynamic Routing"
 msgstr ""
 
