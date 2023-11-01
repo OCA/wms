@@ -22,7 +22,7 @@ class StockReleaseChannel(models.Model):
     def _compute_cutoff_warning(self):
         now = fields.Datetime.now()
         for rec in self:
-            if rec.cutoff_time:
+            if rec.cutoff_time and rec.process_end_date:
                 hours = float_to_time(
                     rec.cutoff_time,
                     tz=rec.env.user.tz or "UTC",
