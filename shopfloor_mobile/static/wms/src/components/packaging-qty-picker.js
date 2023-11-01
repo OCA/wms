@@ -281,8 +281,8 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                         <span class="qty-todo">/ {{ qty_todo_by_pkg[pkg.id] }}</span>
                     </v-col>
                     <v-col>
-                        <div class="pkg-name"> {{ pkg[pkgNameKey] }}</div>
-                        <div v-if="contained_packaging[pkg.id]" class="pkg-qty">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
+                        <div :class="qty_by_pkg[pkg.id] > 0 ? 'pkg-name font-weight-bold' : 'pkg-name'"> {{ pkg[pkgNameKey] }}</div>
+                        <div v-if="contained_packaging[pkg.id]" :class="qty_by_pkg[pkg.id] > 0 ? 'pkg-qty font-weight-bold' : 'pkg-qty'">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
                     </v-col>
                 </v-row>
             </v-expansion-panel-content>
