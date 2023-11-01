@@ -214,15 +214,15 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
         this.$root.trigger("qty_edit", this.qty);
     },
     computed: {
-        qty_color: function () {
+        qty_color_class: function () {
             if (this.qty == this.qtyTodo) {
                 if (this.readonly) return "";
-                return "background-color: rgb(143, 191, 68)";
+                return "qty-color-green";
             }
             if (this.qty > this.qtyTodo) {
-                return "background-color: orangered";
+                return "qty-color-orangered";
             }
-            return "background-color: pink";
+            return "qty-color-pink";
         },
         qty_todo_by_pkg: function () {
             // Used to calculate the qty needed of each package type
@@ -247,7 +247,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
             <v-expansion-panel-header expand-icon="mdi-menu-down">
                 <v-row dense align="center">
                     <v-col cols="5" md="3">
-                        <input type="number" v-model="qty" class="qty-done" :style="qty_color"
+                        <input type="number" v-model="qty" class="qty-done"
                             v-on:click.stop
                             :readonly="readonly"
                         />
@@ -268,7 +268,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                     :class="(readonly && !qty_by_pkg[pkg.id]) ? 'd-none' : ''"
                 >
                     <v-col cols="4" md="2">
-                        <input type="text" inputmode="decimal" class="qty-done"
+                        <input type="text" inputmode="decimal" :class="['qty-done', qty_by_pkg[pkg.id] > 0 ? qty_color_class : '']"
                             v-model.lazy="qty_by_pkg[pkg.id]"
                             :data-origvalue="qty_by_pkg[pkg.id]"
                             :data-pkg="JSON.stringify(pkg)"
