@@ -38,6 +38,7 @@
                 <field name="warehouse_id" />
                 <field name="wms_export_date" />
                 <field name="wms_export_error" />
+                <field name="to_export" />
             </tree>
         </field>
     </record>

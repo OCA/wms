@@ -106,7 +106,7 @@ class StockWarehouse(models.Model):
         domains = {
             "product": [
                 ("warehouse_id", "=", self.id),
-                ("wms_export_date", "=", False),
+                ("to_export", "=", True),
             ],
             "pickings_in": self.wms_export_picking_in_filter_id._get_eval_domain(),
             "pickings_out": self.wms_export_picking_out_filter_id._get_eval_domain(),
@@ -233,7 +233,7 @@ class StockWarehouse(models.Model):
             "res_model": "wms.product.sync",
             "type": "ir.actions.act_window",
             "target": "current",
-            "domain": self._wms_domain_for("product"),
+            "domain": [("warehouse_id", "=", self.id)],
         }
 
     def button_open_wms_pickings_in(self):

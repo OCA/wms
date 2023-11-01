@@ -13,9 +13,12 @@ from odoo.tools import config
 class SynchronizeExportableMixin(models.AbstractModel):
     _name = "synchronize.exportable.mixin"
     _description = "Synchronizable export mixin"
-    wms_export_date = fields.Date()
-    wms_export_attachment = fields.Many2one("attachment.queue", index=True)
-    wms_export_error = fields.Char()
+
+    wms_export_date = fields.Datetime(readonly=True)
+    wms_export_attachment = fields.Many2one(
+        "attachment.queue", index=True, readonly=True
+    )
+    wms_export_error = fields.Char(readonly=True)
 
     @property
     def record_per_file(self):
@@ -29,9 +32,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
         records = self.browse()
         sequence = 0
         for rec in self:
-            records |= rec
             try:
                 data += rec._prepare_export_data(sequence)
+                records |= rec
                 rec.wms_export_error = ""
                 sequence += 1
             except Exception as e:
@@ -49,8 +52,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
 
     def synchronize_export(self):
         for records, data in self._get_export_data():
-            attachments = records._format_to_exportfile(data)
-            records.track_export(attachments)
+            vals = self._format_to_exportfile(data)
+            attachment = self.env["attachment.queue"].create(vals)
+            records.track_export(attachment)
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
@@ -59,6 +63,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def _prepare_export_data(self, idx) -> list:
         raise NotImplementedError
 
+    # TODO cleanup this code
     def _format_to_exportfile(self, name, data):
         return self._format_to_exportfile_csv(name, data)
 
@@ -72,13 +77,12 @@ class SynchronizeExportableMixin(models.AbstractModel):
             writer.writerow(row)
         csv_file.seek(0)
         ast = self.env.context.get("attachment_task")
-        vals = {
+        return {
             "name": self._get_export_name(),
             "datas": base64.b64encode(csv_file.getvalue().encode("utf-8")),
             "task_id": ast.id,
             "file_type": ast.file_type,
         }
-        return self.env["attachment.queue"].create(vals)
 
     def _get_export_name(self):
         raise NotImplementedError
