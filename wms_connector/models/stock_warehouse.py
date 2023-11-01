@@ -200,18 +200,27 @@ class StockWarehouse(models.Model):
 
     def refresh_wms_products(self):
         for rec in self:
-            existing_prd = self.wms_product_sync_ids.product_id
             prd_matching = self.env["product.product"].search(
                 rec.wms_export_product_filter_id
                 and rec.wms_export_product_filter_id._get_eval_domain()
                 or []
             )
-            to_create = prd_matching - existing_prd
-            to_unlink = existing_prd - prd_matching
+
+            # Inactive / Active binding
+            to_inactive = to_active = self.env["wms.product.sync"]
+            for record in self.with_context(active_test=False).wms_product_sync_ids:
+                if record.active and record.product_id not in prd_matching:
+                    to_inactive |= record
+                elif not record.active and record.product_id in prd_matching:
+                    to_active |= record
+            to_inactive.active = False
+            to_active.active = True
+
+            # Create missing one
+            to_create = prd_matching - self.wms_product_sync_ids.product_id
             self.env["wms.product.sync"].create(
                 [{"product_id": prd.id, "warehouse_id": rec.id} for prd in to_create]
             )
-            to_unlink.wms_sync_ids.filtered(lambda s: s.warehouse_id == rec).unlink()
 
     def button_open_wms_sync_ids(self):
         return {

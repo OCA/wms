@@ -18,43 +18,39 @@ class SynchronizeExportableMixin(models.AbstractModel):
     wms_export_error = fields.Char()
 
     @property
-    def file_creation_mode(self):
-        return "per_record"
+    def record_per_file(self):
+        return 1
 
     def button_trigger_export(self):
         self.synchronize_export()
 
     def _get_export_data(self):
         data = []
-        for idx, rec in enumerate(self.sorted("id")):
-            if self.file_creation_mode == "per_record":
-                sequence = 0
-            else:
-                sequence = idx
+        records = self.browse()
+        sequence = 0
+        for rec in self:
+            records |= rec
             try:
                 data += rec._prepare_export_data(sequence)
+                rec.wms_export_error = ""
+                sequence += 1
             except Exception as e:
                 if "pdb" in config.get("dev_mode"):
                     raise
                 rec.wms_export_error = str(e)
                 continue
-            if self.file_creation_mode == "per_record":
-                yield data
+            if len(records) >= self.record_per_file:
+                yield records, data
                 data = []
-        if self.file_creation_mode == "per_recordset":
-            yield data
+                records = self.browse()
+                sequence = 0
+        if len(records):
+            yield records, data
 
     def synchronize_export(self):
-        data = self._get_export_data()
-        res = self.env["attachment.queue"]
-        if self.file_creation_mode == "per_record":
-            for el, rec in zip(data, self.sorted("id")):
-                attachment = rec._format_to_exportfile(el)
-                rec.track_export(attachment)
-                res += attachment
-        if self.file_creation_mode == "per_recordset":
-            res = self._format_to_exportfile(data)
-            self.track_export(res)
+        for records, data in self._get_export_data():
+            attachments = records._format_to_exportfile(data)
+            records.track_export(attachments)
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
@@ -63,8 +59,8 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def _prepare_export_data(self, idx) -> list:
         raise NotImplementedError
 
-    def _format_to_exportfile(self, data):
-        return self._format_to_exportfile_csv(data)
+    def _format_to_exportfile(self, name, data):
+        return self._format_to_exportfile_csv(name, data)
 
     def _format_to_exportfile_csv(self, data):
         csv_file = StringIO()
