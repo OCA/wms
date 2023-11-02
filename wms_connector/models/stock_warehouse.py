@@ -107,6 +107,7 @@ class StockWarehouse(models.Model):
             "product": [
                 ("warehouse_id", "=", self.id),
                 ("to_export", "=", True),
+                ("wms_export_error", "=", False),
             ],
             "pickings_in": self.wms_export_picking_in_filter_id._get_eval_domain(),
             "pickings_out": self.wms_export_picking_out_filter_id._get_eval_domain(),

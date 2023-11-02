@@ -18,7 +18,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
     wms_export_attachment = fields.Many2one(
         "attachment.queue", index=True, readonly=True
     )
-    wms_export_error = fields.Char(readonly=True)
+    wms_export_error = fields.Char(readonly=True, index=True)
 
     @property
     def record_per_file(self):
@@ -33,10 +33,11 @@ class SynchronizeExportableMixin(models.AbstractModel):
         sequence = 0
         for rec in self:
             try:
-                data += rec._prepare_export_data(sequence)
-                records |= rec
-                rec.wms_export_error = ""
-                sequence += 1
+                with self._cr.savepoint():
+                    data += rec._prepare_export_data(sequence)
+                    records |= rec
+                    rec.wms_export_error = None
+                    sequence += 1
             except Exception as e:
                 if "pdb" in config.get("dev_mode"):
                     raise
