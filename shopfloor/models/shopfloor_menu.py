@@ -53,6 +53,11 @@ If enabled, they will also be allowed
 to scan a destination package.
 """
 
+ASK_FOR_LEAF_DESTINATION_LOCATION_HELP = """
+When enabled, the destination location must be a leaf (location with no children)
+location, if it is not, ask for scanning a child location of the destination.
+"""
+
 
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
@@ -225,6 +230,14 @@ class ShopfloorMenu(models.Model):
     )
     allow_alternative_destination_package_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_package_is_possible"
+    )
+    ask_for_leaf_destination_location = fields.Boolean(
+        string="Ask for leaf destination location",
+        default=False,
+        help=ASK_FOR_LEAF_DESTINATION_LOCATION_HELP,
+    )
+    ask_for_leaf_destination_location_is_possible = fields.Boolean(
+        compute="_compute_ask_for_leaf_destination_location_is_possible"
     )
 
     @api.onchange("unload_package_at_destination")
@@ -454,4 +467,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.allow_alternative_destination_package_is_possible = (
                 menu.scenario_id.has_option("allow_alternative_destination_package")
+            )
+
+    @api.depends("scenario_id")
+    def _compute_ask_for_leaf_destination_location_is_possible(self):
+        for menu in self:
+            menu.ask_for_leaf_destination_location_is_possible = (
+                menu.scenario_id.has_option("ask_for_leaf_destination_location")
             )

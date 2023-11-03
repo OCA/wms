@@ -1405,13 +1405,14 @@ class Checkout(Component):
                 )
         lines_done = self._lines_checkout_done(picking)
         dest_location = picking.location_dest_id
-        child_locations = self.env["stock.location"].search(
-            [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
-        )
-        if len(child_locations) > 0 and child_locations != dest_location:
-            return self._response_for_select_child_location(
-                picking,
+        if self.work.menu.ask_for_leaf_destination_location:
+            child_locations = self.env["stock.location"].search(
+                [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
             )
+            if len(child_locations) > 0 and child_locations != dest_location:
+                return self._response_for_select_child_location(
+                    picking,
+                )
         stock = self._actions_for("stock")
         stock.validate_moves(lines_done.move_id)
         return self._response_for_select_document(

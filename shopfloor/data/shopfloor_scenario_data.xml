@@ -45,7 +45,8 @@
     "no_prefill_qty": true,
     "show_oneline_package_content": true,
     "auto_post_line": true,
-    "scan_location_or_pack_first": true
+    "scan_location_or_pack_first": true,
+    "ask_for_leaf_destination_location" : true
 }
         </field>
     </record>

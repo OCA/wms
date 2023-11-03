@@ -60,7 +60,24 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
         )
 
     def test_done_partial_confirm(self):
+        """Check confirm partially done no check for leaf location."""
         # lines are done
+        response = self.service.dispatch(
+            "done", params={"picking_id": self.picking.id, "confirmation": True}
+        )
+
+        self.assertRecordValues(self.picking, [{"state": "done"}])
+
+        self.assert_response(
+            response,
+            next_state="select_document",
+            message=self.service.msg_store.transfer_done_success(self.picking),
+            data={"restrict_scan_first": False},
+        )
+
+    def test_done_partial_confirm_ask_leaf_location(self):
+        """Check confirm partially done with force leaf location option on."""
+        self.menu.sudo().ask_for_leaf_destination_location = True
         response = self.service.dispatch(
             "done", params={"picking_id": self.picking.id, "confirmation": True}
         )

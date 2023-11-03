@@ -168,6 +168,16 @@
                     />
                     <field name="allow_alternative_destination_package" />
                 </group>
+              <group
+                    name="ask_for_leaf_destination_location"
+                    attrs="{'invisible': [('ask_for_leaf_destination_location_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="ask_for_leaf_destination_location_is_possible"
+                        invisible="1"
+                    />
+                  <field name="ask_for_leaf_destination_location" />
+              </group>
             </group>
         </field>
     </record>
