@@ -67,7 +67,7 @@ class TestScanLocation(CommonCase):
 
     def test_scan_location_stock_packages(self):
         location = self.location_src
-        package = self.env["stock.quant.package"].sudo().create({})
+        package = self._create_empty_package()
         for quant in location.quant_ids:
             quant.sudo().package_id = package
 
@@ -87,7 +87,7 @@ class TestScanLocation(CommonCase):
 
     def test_scan_location_only_lines_with_package(self):
         location = self.location_src
-        package = self.env["stock.quant.package"].sudo().create({})
+        package = self._create_empty_package()
         for line in location.source_move_line_ids:
             # There are no lines without a package in this location.
             line.package_id = package

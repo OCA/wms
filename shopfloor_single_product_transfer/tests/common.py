@@ -140,3 +140,8 @@ class CommonCase(BaseCommonCase):
     @classmethod
     def get_new_move(cls):
         return cls.env["stock.move"].search([("id", "not in", cls.existing_move_ids)])
+
+    @classmethod
+    def _create_empty_package(cls, name=None):
+        name = name or "test-package"
+        return cls.env["stock.quant.package"].sudo().create({"name": name})
