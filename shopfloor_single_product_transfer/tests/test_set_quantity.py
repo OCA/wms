@@ -720,6 +720,7 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(picking.move_line_ids.product_uom_qty, 4.0)
         self.assertEqual(picking.move_line_ids.qty_done, 0.0)
         self.assertEqual(picking.move_line_ids.state, "assigned")
+        self.assertFalse(picking.move_line_ids.result_package_id)
 
     def test_set_quantity_scan_location_allow_move_create(self):
         self.menu.sudo().allow_move_create = True
@@ -732,6 +733,7 @@ class TestSetQuantity(CommonCase):
         )
         # Change the destination on the move_line and take less than the total amount required.
         move_line = picking.move_line_ids
+
         self.service.dispatch(
             "set_quantity",
             params={
@@ -752,9 +754,7 @@ class TestSetQuantity(CommonCase):
     def test_set_quantity_scan_package_not_empty(self):
         # We scan a package that's not empty
         # and its location is selected.
-        package = (
-            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
-        )
+        package = self._create_empty_package()
         self.env["stock.quant"].sudo().create(
             {
                 "package_id": package.id,
@@ -793,9 +793,7 @@ class TestSetQuantity(CommonCase):
     def test_set_quantity_scan_package_empty(self):
         # We scan an empty package
         # and are redirected to set_location.
-        package = (
-            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
-        )
+        package = self._create_empty_package()
         picking = self._setup_picking()
         move_line = picking.move_line_ids
         response = self.service.dispatch(

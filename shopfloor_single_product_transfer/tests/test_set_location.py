@@ -21,11 +21,12 @@ class TestSetLocation(CommonCase):
         return cls._create_picking(lines=[(cls.product, 10)])
 
     def test_set_location_ok(self):
-        package = (
-            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
-        )
+        package = self._create_empty_package()
         picking = self._setup_picking()
         move_line = picking.move_line_ids
+        # _set_quantity__by_package sets the result_package_id
+        # ensure that the package is still set after set_location
+        move_line.result_package_id = package
         location = self.dispatch_location
         response = self.service.dispatch(
             "set_location",
@@ -35,6 +36,7 @@ class TestSetLocation(CommonCase):
                 "barcode": location.name,
             },
         )
+        self.assertEqual(move_line.result_package_id, package)
         expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
         completion_info = self.service._actions_for("completion.info")
         expected_popup = completion_info.popup(move_line)
@@ -48,9 +50,7 @@ class TestSetLocation(CommonCase):
         )
 
     def test_set_location_barcode_not_found(self):
-        package = (
-            self.env["stock.quant.package"].sudo().create({"name": "test-package"})
-        )
+        package = self._create_empty_package()
         picking = self._setup_picking()
         move_line = picking.move_line_ids
         response = self.service.dispatch(

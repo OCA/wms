@@ -1,4 +1,5 @@
 # Copyright 2023 Camptocamp SA
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from odoo.exceptions import UserError
@@ -10,9 +11,11 @@ class ShopfloorSingleProductTransfer(Component):
     _inherit = "shopfloor.single.product.transfer"
 
     def _set_quantity__check_location(
-        self, move_line, location=False, confirmation=False
+        self, move_line, location=False, package=False, confirmation=False
     ):
-        res = super()._set_quantity__check_location(move_line, location, confirmation)
+        res = super()._set_quantity__check_location(
+            move_line, location, package=package, confirmation=confirmation
+        )
         # Could also be asking for confirmation with a warning
         if res and res.get("message", {}).get("message_type", "") == "error":
             return res
