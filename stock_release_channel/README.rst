@@ -114,6 +114,7 @@ Contributors
 * Sébastien Alix <sebastien.alix@camptocamp.com>
 * Jacques-Etienne Baudoux <je@bcim.be>
 * Laurent Mignon <laurent.mignon@acsone.eu>
+* Michael Tietz (MT Software) <mtietz@mt-software.de>
 
 Design
 ~~~~~~
@@ -145,10 +146,13 @@ promote its widespread use.
 .. |maintainer-sebalix| image:: https://github.com/sebalix.png?size=40px
     :target: https://github.com/sebalix
     :alt: sebalix
+.. |maintainer-mt-software-de| image:: https://github.com/mt-software-de.png?size=40px
+    :target: https://github.com/mt-software-de
+    :alt: mt-software-de
 
-Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
+Current `maintainers <https://odoo-community.org/page/maintainer-role>`__:
 
-|maintainer-sebalix| 
+|maintainer-sebalix| |maintainer-mt-software-de| 
 
 This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/16.0/stock_release_channel>`_ project on GitHub.
 
