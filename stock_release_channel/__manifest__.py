@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 {
@@ -7,8 +8,8 @@
     "version": "14.0.2.1.1",
     "development_status": "Beta",
     "license": "AGPL-3",
-    "author": "Camptocamp, ACSONE SA/NV,Odoo Community Association (OCA)",
-    "maintainers": ["sebalix"],
+    "author": "Camptocamp, ACSONE SA/NV, Odoo Community Association (OCA)",
+    "maintainers": ["sebalix", "mt-software-de"],
     "website": "https://github.com/OCA/wms",
     "depends": [
         "sale_stock",
