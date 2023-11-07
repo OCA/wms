@@ -36,6 +36,8 @@ setuptools.setup(
         'odoo14-addon-shopfloor_purchase_base',
         'odoo14-addon-shopfloor_reception',
         'odoo14-addon-shopfloor_reception_mobile',
+        'odoo14-addon-shopfloor_reception_packaging_dimension',
+        'odoo14-addon-shopfloor_reception_packaging_dimension_mobile',
         'odoo14-addon-shopfloor_reception_purchase_partner_ref',
         'odoo14-addon-shopfloor_reception_purchase_partner_ref_mobile',
         'odoo14-addon-shopfloor_rest_log',
