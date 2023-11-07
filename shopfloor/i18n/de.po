@@ -946,6 +946,12 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Packaging {} dimension updated."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."

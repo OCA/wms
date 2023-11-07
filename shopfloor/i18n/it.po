@@ -32,8 +32,8 @@ msgstr ""
 "(es: prelievo per area) l'impostazione della destinazione lavora in questo "
 "modo:\n"
 "\n"
-"* se viene scansionata una ubicazione, viene creato un nuovo collo consegna;"
-"\n"
+"* se viene scansionata una ubicazione, viene creato un nuovo collo "
+"consegna;\n"
 "* se viene scansionato un collo, il collo è validato per il trasportatore\n"
 "* in entrambi i casi, se il prelievo non ha trasportatore l'operzione "
 "fallisce.\",\n"
@@ -538,8 +538,8 @@ msgstr "Ultima modifica il"
 #, python-format
 msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
 msgstr ""
-"Ultima operazione del trasferimento {}. L'operazone sccessiva ({}) è pronta a "
-"procedere."
+"Ultima operazione del trasferimento {}. L'operazone sccessiva ({}) è pronta "
+"a procedere."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -1019,6 +1019,12 @@ msgstr "Imballo non trovato nel trasferimento attuale."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Packaging {} dimension updated."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
@@ -1466,7 +1472,8 @@ msgstr "Campo tecnico. Indica il numero di righe movimento incluse."
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__bulk_line_count
 msgid ""
 "Technical field. Indicates number of move lines without package included."
-msgstr "Campo tecnico. Indica il numero di righe movimento senza colli inclusi."
+msgstr ""
+"Campo tecnico. Indica il numero di righe movimento senza colli inclusi."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__package_level_count
@@ -1510,8 +1517,8 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
 "\">%s</a> has been created."
 msgstr ""
-"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock.picking\""
-" data-oe-id=\"%d\">%s</a> ."
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock.picking"
+"\" data-oe-id=\"%d\">%s</a> ."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
