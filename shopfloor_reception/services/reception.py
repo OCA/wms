@@ -245,14 +245,30 @@ class Reception(Component):
         )
 
     def _scan_line__find_or_create_line(self, picking, move, qty_done=1):
-        line = fields.first(
-            move.move_line_ids.filtered(
-                lambda l: (
-                    not l.result_package_id
-                    and l.shopfloor_user_id.id in [False, self.env.uid]
-                )
-            )
-        )
+        """Find or create a line  on a move for the user to work on.
+
+        First try to find a line already assigned to the user.
+        Then a line that is not yet assigned to any users (locking the line
+        to avoid concurent access.)
+        If none are found create a new line.
+
+        """
+        line = None
+        unassigned_lines = self.env["stock.move.line"]
+        for move_line in move.move_line_ids:
+            if move_line.result_package_id:
+                continue
+            if move_line.shopfloor_user_id.id == self.env.uid:
+                line = move_line
+                break
+            elif not move_line.shopfloor_user_id:
+                unassigned_lines |= move_line
+        if not line and unassigned_lines:
+            lock = self._actions_for("lock")
+            for move_line in unassigned_lines:
+                if lock.for_update(move_line, skip_locked=True):
+                    line = move_line
+                    break
         if not line:
             values = move._prepare_move_line_vals()
             line = self.env["stock.move.line"].create(values)
