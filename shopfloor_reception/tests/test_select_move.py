@@ -176,18 +176,6 @@ class TestSelectLine(CommonCase):
             message={"message_type": "warning", "body": error_msg},
         )
 
-    def test_assign_user_to_picking(self):
-        picking = self._create_picking()
-        self.assertEqual(picking.user_id.id, False)
-        self.service.dispatch(
-            "scan_line",
-            params={
-                "picking_id": picking.id,
-                "barcode": self.product_a.barcode,
-            },
-        )
-        self.assertEqual(picking.user_id.id, self.env.uid)
-
     def test_assign_shopfloor_user_to_line(self):
         picking = self._create_picking()
         for line in picking.move_line_ids:

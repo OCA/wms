@@ -137,12 +137,10 @@ class Reception(Component):
         return self._response_for_select_move(picking)
 
     def _response_for_select_move(self, picking, message=None):
-        self._assign_user_to_picking(picking)
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="select_move", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
-        self._assign_user_to_picking(picking)
         data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="confirm_done", data=data, message=message)
 
@@ -161,7 +159,6 @@ class Reception(Component):
     def _select_document_from_move_lines(self, move_lines, msg_func):
         pickings = move_lines.move_id.picking_id
         if len(pickings) == 1:
-            self._assign_user_to_picking(pickings)
             if (
                 move_lines.product_id.tracking not in ("lot", "serial")
                 or move_lines.lot_id
@@ -263,7 +260,6 @@ class Reception(Component):
 
     def _scan_line__assign_user(self, picking, line, qty_done):
         product = line.product_id
-        self._assign_user_to_picking(picking)
         self._assign_user_to_line(line)
         line.qty_done += qty_done
         if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
@@ -328,7 +324,6 @@ class Reception(Component):
                 < today_end
             )
             if len(picking_filter_result_due_today) == 1:
-                self._assign_user_to_picking(picking_filter_result_due_today)
                 return self._select_picking(picking_filter_result_due_today)
             if len(picking_filter_result) > 1:
                 return self._response_for_select_document(
@@ -681,9 +676,6 @@ class Reception(Component):
             response = handler(*args, **kwargs)
             if response:
                 return response
-
-    def _assign_user_to_picking(self, picking):
-        picking.user_id = self.env.user
 
     def _assign_user_to_line(self, line):
         line.shopfloor_user_id = self.env.user
@@ -1404,7 +1396,6 @@ class Reception(Component):
                 return response
             return self._response_for_select_move(picking)
         message = self.msg_store.create_new_pack_ask_confirmation(barcode)
-        self._assign_user_to_picking(picking)
         return self._response_for_confirm_new_package(
             picking, selected_line, new_package_name=barcode, message=message
         )
