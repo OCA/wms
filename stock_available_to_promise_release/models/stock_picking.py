@@ -31,6 +31,15 @@ class StockPicking(models.Model):
     city = fields.Char(related="partner_id.city", store=True)
     last_release_date = fields.Datetime()
 
+    set_printed_at_release = fields.Boolean(compute="_compute_set_printed_at_release")
+
+    @api.depends("move_lines")
+    def _compute_set_printed_at_release(self):
+        for picking in self:
+            picking.set_printed_at_release = not (
+                any(picking.move_lines.mapped("rule_id.no_backorder_at_release"))
+            )
+
     @api.depends("move_lines.need_release")
     def _compute_need_release(self):
         data = self.env["stock.move"].read_group(

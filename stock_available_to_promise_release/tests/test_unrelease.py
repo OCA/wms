@@ -5,11 +5,17 @@ from contextlib import contextmanager
 from datetime import datetime
 
 from odoo.exceptions import UserError
+from odoo.tests import tagged
 
 from .common import PromiseReleaseCommonCase
 
 
+@tagged("post_install", "-at_install")
 class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
+
+    at_install = False
+    post_install = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
