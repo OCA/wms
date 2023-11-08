@@ -6,6 +6,10 @@ from odoo.tests import common
 
 
 class PromiseReleaseCommonCase(common.SavepointCase):
+
+    at_install = False
+    post_install = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

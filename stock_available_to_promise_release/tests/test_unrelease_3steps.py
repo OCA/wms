@@ -10,6 +10,10 @@ from .common import PromiseReleaseCommonCase
 
 @tagged("post_install", "-at_install")
 class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
+
+    at_install = False
+    post_install = True
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

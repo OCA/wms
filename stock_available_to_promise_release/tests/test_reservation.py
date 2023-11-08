@@ -14,6 +14,10 @@ from .common import PromiseReleaseCommonCase
 
 @tagged("post_install", "-at_install")
 class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
+
+    at_install = False
+    post_install = True
+
     def test_horizon_date(self):
         move = self.env["stock.move"].create(
             {
