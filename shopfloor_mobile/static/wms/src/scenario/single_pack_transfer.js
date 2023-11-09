@@ -60,6 +60,8 @@ export var SinglePackStatesMixin = {
     },
 };
 
+// TODO: consider replacing the dynamic "autofocus" in the searchbar by an event.
+// At the moment, we need autofocus to be disabled if there's a user popup.
 const SinglePackTransfer = {
     mixins: [ScenarioBaseMixin, SinglePackStatesMixin],
     template: `
@@ -67,8 +69,19 @@ const SinglePackTransfer = {
             <template v-slot:header>
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
-            <searchbar v-if="state_is(initial_state_key)" v-on:found="on_scan" :input_placeholder="search_input_placeholder"></searchbar>
-            <searchbar v-if="state_is('scan_location')" v-on:found="on_scan" :input_placeholder="search_input_placeholder" :input_data_type="'location'"></searchbar>
+            <searchbar
+                v-if="state_is(initial_state_key)"
+                v-on:found="on_scan"
+                :autofocus="!screen_info.user_popup"
+                :input_placeholder="search_input_placeholder"
+            ></searchbar>
+            <searchbar
+                v-if="state_is('scan_location')"
+                v-on:found="on_scan"
+                :autofocus="!screen_info.user_popup"
+                :input_placeholder="search_input_placeholder"
+                :input_data_type="'location'"
+            ></searchbar>
             <div v-if="state.key != 'show_completion_info' && _.result(state, 'data.picking')">
                 <item-detail-card
                     :key="make_state_component_key(['package', state.data.id])"
