@@ -418,20 +418,22 @@ class Reception(Component):
             return self._scan_line__find_or_create_line(picking, return_move)
 
     def _scan_line__by_product(self, picking, product):
-        move = picking.move_lines.filtered(lambda m: m.product_id == product)
+        moves = picking.move_lines.filtered(lambda m: m.product_id == product)
         # Only create a return if don't already have a maching reception move
-        if not move and self.work.menu.allow_return:
+        if not moves and self.work.menu.allow_return:
             response = self._scan_line__by_product__return(picking, product)
             if response:
                 return response
         # Otherwise, the picking isn't a return, and should be a regular reception
-        message = self._check_move_available(move, "product")
-        if message:
-            return self._response_for_select_move(
-                picking,
-                message=message,
-            )
-        return self._scan_line__find_or_create_line(picking, move)
+        message = not moves and self._check_move_available(moves, "product")
+        for move in moves:
+            message = self._check_move_available(move, "product")
+            if not message:
+                return self._scan_line__find_or_create_line(picking, move)
+        return self._response_for_select_move(
+            picking,
+            message=message,
+        )
 
     def _scan_line__by_packaging__return(self, picking, packaging):
         search = self._actions_for("search")
