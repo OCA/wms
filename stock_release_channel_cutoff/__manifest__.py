@@ -3,7 +3,7 @@
 {
     "name": "Stock Release Channels Cutoff",
     "summary": "Add the cutoff time to the release channel",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.1",
     "license": "AGPL-3",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux"],
