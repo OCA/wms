@@ -13,7 +13,10 @@ class StockMove(models.Model):
         # as we may release only partially, the channel may
         # change
         res = super().release_available_to_promise()
-        self.picking_id.assign_release_channel()
+        # As moves can be merged (and then unlinked), we should ensure
+        # they still exist.
+        moves = self.exists()
+        moves.picking_id.assign_release_channel()
         return res
 
     def _action_confirm(self, merge=True, merge_into=False):
