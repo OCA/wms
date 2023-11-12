@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-29 08:27+0000\n"
+"PO-Revision-Date: 2023-11-12 17:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1020,7 +1020,7 @@ msgstr "Imballo non trovato nel trasferimento attuale."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging {} dimension updated."
-msgstr ""
+msgstr "Dimensione imballo {} aggiornata."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
