@@ -208,6 +208,7 @@ class StockReleaseChannel(models.Model):
         column1="channel_id",
         column2="partner_id",
         string="Partners",
+        context={"active_test": False},
     )
 
     @api.depends("state")
