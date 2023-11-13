@@ -1137,7 +1137,10 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        selected_lines.write(
+        selected_lines_with_qty_done = selected_lines.filtered(
+            lambda line: line.qty_done > 0
+        )
+        selected_lines_with_qty_done.write(
             {"shopfloor_checkout_done": True, "result_package_id": False}
         )
         response = self._check_allowed_qty_done(picking, selected_lines)
