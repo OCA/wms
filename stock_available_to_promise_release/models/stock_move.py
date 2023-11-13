@@ -471,10 +471,10 @@ class StockMove(models.Model):
             )
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        released_moves._after_release_assign_moves()
-        released_moves._after_release_update_chain()
+        assigned_moves = released_moves._after_release_assign_moves()
+        assigned_moves._after_release_update_chain()
 
-        return released_moves
+        return assigned_moves
 
     def _before_release(self):
         """Hook that aims to be overridden."""
@@ -495,8 +495,12 @@ class StockMove(models.Model):
     def _after_release_assign_moves(self):
         move_ids = []
         for origin_moves in self._get_chained_moves_iterator("move_orig_ids"):
-            move_ids += origin_moves.ids
-        self.env["stock.move"].browse(move_ids)._action_assign()
+            move_ids += origin_moves.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            ).ids
+        moves = self.browse(move_ids)
+        moves._action_assign()
+        return moves
 
     def _release_split(self, remaining_qty):
         """Split move and put remaining_qty to a backorder move."""
@@ -584,6 +588,8 @@ class StockMove(models.Model):
         """
         self.ensure_one()
         qty = self.product_qty
+        # Unreserve goods before the split
+        origins._do_unreserve()
         rounding = self.product_uom.rounding
         new_origin_moves = self.env["stock.move"]
         while float_compare(qty, 0, precision_rounding=rounding) > 0 and origins:
@@ -596,6 +602,9 @@ class StockMove(models.Model):
                 new_origin_moves |= self.create(new_move_vals)
                 break
             origins -= origin
+        # And then do the reservation again
+        origins._action_assign()
+        new_origin_moves._action_assign()
         return new_origin_moves
 
     def _search_picking_for_assignation_domain(self):
