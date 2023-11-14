@@ -126,6 +126,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 "no_package_enabled": not self.service.options.get(
                     "checkout__disable_no_package"
                 ),
+                "package_allowed": True,
             },
             message=self.service.msg_store.no_delivery_packaging_available(),
         )

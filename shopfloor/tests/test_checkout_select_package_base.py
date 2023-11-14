@@ -10,6 +10,7 @@ class CheckoutSelectPackageMixin:
         message=None,
         packing_info="",
         no_package_enabled=True,
+        package_allowed=True,
     ):
         picking = selected_lines.mapped("picking_id")
         self.assert_response(
@@ -22,6 +23,7 @@ class CheckoutSelectPackageMixin:
                 "picking": self._picking_summary_data(picking),
                 "packing_info": packing_info,
                 "no_package_enabled": no_package_enabled,
+                "package_allowed": package_allowed,
             },
             message=message,
         )
