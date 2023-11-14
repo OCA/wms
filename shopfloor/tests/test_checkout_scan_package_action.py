@@ -176,6 +176,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
                 "no_package_enabled": not self.service.options.get(
                     "checkout__disable_no_package"
                 ),
+                "package_allowed": True,
             },
             message=self.service.msg_store.dest_package_not_valid(pack1),
         )

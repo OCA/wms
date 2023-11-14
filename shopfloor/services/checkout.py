@@ -94,17 +94,20 @@ class Checkout(Component):
         data = {"pickings": self.data.pickings(pickings)}
         return self._response(next_state="manual_selection", data=data, message=message)
 
+    def _data_response_for_select_package(self, picking, lines):
+        return {
+            "selected_move_lines": self._data_for_move_lines(lines.sorted()),
+            "picking": self.data.picking(picking),
+            "packing_info": self._data_for_packing_info(picking),
+            "no_package_enabled": not self.options.get("checkout__disable_no_package"),
+            # Used by inheriting module
+            "package_allowed": True,
+        }
+
     def _response_for_select_package(self, picking, lines, message=None):
         return self._response(
             next_state="select_package",
-            data={
-                "selected_move_lines": self._data_for_move_lines(lines.sorted()),
-                "picking": self.data.picking(picking),
-                "packing_info": self._data_for_packing_info(picking),
-                "no_package_enabled": not self.options.get(
-                    "checkout__disable_no_package"
-                ),
-            },
+            data=self._data_response_for_select_package(picking, lines),
             message=message,
         )
 
@@ -960,6 +963,13 @@ class Checkout(Component):
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         search_result = self._scan_package_find(picking, barcode)
+        message = self._check_scan_package_find(picking, search_result)
+        if message:
+            return self._response_for_select_package(
+                picking,
+                selected_lines,
+                message=message,
+            )
         result_handler = getattr(
             self, "_scan_package_action_from_" + search_result.type
         )
@@ -983,6 +993,10 @@ class Checkout(Component):
                 serial=dict(products=picking.move_lines.product_id),
             ),
         )
+
+    def _check_scan_package_find(self, picking, search_result):
+        # Used by inheriting modules
+        return False
 
     def _find_line_to_increment(self, product_lines):
         """Find which line should have its qty incremented.
@@ -1675,6 +1689,11 @@ class ShopfloorCheckoutValidatorResponse(Component):
                 self._schema_selected_lines,
                 packing_info={"type": "string", "nullable": True},
                 no_package_enabled={
+                    "type": "boolean",
+                    "nullable": True,
+                    "required": False,
+                },
+                package_allowed={
                     "type": "boolean",
                     "nullable": True,
                     "required": False,
