@@ -1283,10 +1283,12 @@ class Reception(Component):
             lambda line: line.state not in ("cancel", "done")
             and line.product_uom_qty > 0
         )
+        move = selected_line.move_id
+        lock = self._actions_for("lock")
+        lock.for_update(move)
         if lines_with_qty_todo:
             lines_with_qty_todo.product_uom_qty = 0
 
-        move = selected_line.move_id
         move_quantity = move.product_uom._compute_quantity(
             move.product_uom_qty, selected_line.product_uom_id
         )
@@ -1299,8 +1301,6 @@ class Reception(Component):
         new_move._action_confirm(merge=False)
         new_move._recompute_state()
         new_move._action_assign()
-        lock = self._actions_for("lock")
-        lock.for_update(move)
         move._recompute_state()
         new_move.extract_and_action_done()
 
