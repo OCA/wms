@@ -1301,6 +1301,17 @@ class Reception(Component):
         new_move._action_confirm(merge=False)
         new_move._recompute_state()
         new_move._action_assign()
+        # Set back the quantity to do on one of the lines
+        line = fields.first(
+            move.move_line_ids.filtered(
+                lambda line: line.state not in ("cancel", "done")
+            )
+        )
+        if line:
+            move_quantity = move.product_uom._compute_quantity(
+                move.product_uom_qty, line[0].product_uom_id
+            )
+            line.product_uom_qty = move_quantity
         move._recompute_state()
         new_move.extract_and_action_done()
 

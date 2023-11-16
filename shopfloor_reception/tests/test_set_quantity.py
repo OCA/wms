@@ -730,15 +730,13 @@ class TestSetQuantity(CommonCase):
         )
         # After move_line is posted, its state is done, and its qty_done is 1.0
         self.assertEqual(move_line_user_1.state, "done")
-
         # The remaining one is still to be done
-        self.assertEqual(move_line_user_2.state, "confirmed")
+        self.assertEqual(move_line_user_2.state, "assigned")
         # As well as the new one
         self.assertEqual(len(lines_after), 1)
-        # The total remaining qty to be done on line is always zero
-        # Because it is computed in the frontend
+        # The quantity to do is set on 1 of the lines
         self.assertEqual(lines_after.product_uom_qty, 0)
-        self.assertEqual(move_line_user_2.product_uom_qty, 0)
+        self.assertEqual(move_line_user_2.product_uom_qty, 9)
 
     def test_move_states(self):
         # as only assigned moves can be posted, we need to ensure that
