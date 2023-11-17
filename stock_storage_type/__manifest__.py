@@ -9,6 +9,7 @@
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux", "rousseldenis"],
     "license": "AGPL-3",
     "application": False,
     "installable": True,

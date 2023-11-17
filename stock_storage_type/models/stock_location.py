@@ -369,13 +369,14 @@ class StockLocation(models.Model):
         package_type = self._get_package_type(package, product)
         # exclude_sml_ids are passed into the context during the get_putaway_strategy
         # call.
-        stock_move_line_ids = self.env.context.get("exclude_sml_ids", [])
-        stock_move_lines = self.env["stock.move.line"].browse(stock_move_line_ids)
-        quants = (
-            package.quant_ids
-            if package
-            else stock_move_lines.mapped("reserved_quant_id")
-        )
+        if package:
+            quants = package.quant_ids
+        else:
+            stock_move_line_ids = self.env.context.get("exclude_sml_ids", [])
+            stock_move_lines = self.env["stock.move.line"].browse(stock_move_line_ids)
+            quants = stock_move_lines.mapped("reserved_quant_id").filtered(
+                lambda q: q.product_id == product
+            )
         if not package_type:
             # Fallback on standard one
             return putaway_location
