@@ -34,7 +34,7 @@ addon | version | maintainers | summary
 [stock_release_channel_propagate_channel_picking](stock_release_channel_propagate_channel_picking/) | 16.0.1.0.0 |  | Allows to propagate the channel to every picking that is created from the original one.
 [stock_release_channel_shipment_advice](stock_release_channel_shipment_advice/) | 16.0.1.0.0 | [![jbaudoux](https://github.com/jbaudoux.png?size=30px)](https://github.com/jbaudoux) | Plan shipment advices for ready and released pickings
 [stock_release_channel_shipment_lead_time](stock_release_channel_shipment_lead_time/) | 16.0.1.0.0 | [![jbaudoux](https://github.com/jbaudoux.png?size=30px)](https://github.com/jbaudoux) | Release channel with shipment lead time
-[stock_storage_type](stock_storage_type/) | 16.0.1.0.4 |  | Manage packages and locations storage types
+[stock_storage_type](stock_storage_type/) | 16.0.1.0.5 | [![jbaudoux](https://github.com/jbaudoux.png?size=30px)](https://github.com/jbaudoux) [![rousseldenis](https://github.com/rousseldenis.png?size=30px)](https://github.com/rousseldenis) | Manage packages and locations storage types
 [stock_storage_type_putaway_abc](stock_storage_type_putaway_abc/) | 16.0.1.0.0 |  | Advanced storage strategy ABC for WMS
 [stock_warehouse_flow](stock_warehouse_flow/) | 16.0.1.0.0 |  | Configure routing flow for stock moves
 
