@@ -293,7 +293,20 @@ const Checkout = {
                         {path: "origin"},
                         {path: "carrier.name", label: "Carrier"},
                         {path: "move_line_count", label: "Lines"},
-                        {path: "priority", label: "Priority"},
+                        {
+                            path: "priority",
+                            render_component: "priority-widget",
+                            render_options: function (record) {
+                                const priority = parseInt(record.priority);
+                                // We need to pass the label to the component as an option instead of using "display_no_value"
+                                // because pickings with no priority will still have a string value of "0"
+                                // and the label would always be displayed.
+                                return {
+                                    priority,
+                                    label: priority ? "Priority: " : null,
+                                };
+                            },
+                        },
                     ],
                 },
             };
