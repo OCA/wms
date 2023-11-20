@@ -60,6 +60,8 @@ MAPPINGS = {
         "fieldname_task": "wms_import_confirm_reception_task_id",
         "fieldname_cron": "wms_import_confirm_reception_cron_id",
         "filetype": "wms_reception_confirmed",
+        "method_type": "import",
+        "filepath": "OUT/",
         "name_fragment": "reception confirmation",
         "code": "env['stock.warehouse'].browse({}).{}.run_import()",
     },
@@ -67,6 +69,8 @@ MAPPINGS = {
         "fieldname_task": "wms_import_confirm_delivery_task_id",
         "fieldname_cron": "wms_import_confirm_delivery_cron_id",
         "filetype": "wms_delivery_confirmed",
+        "method_type": "import",
+        "filepath": "OUT/",
         "name_fragment": "delivery confirmation",
         "code": "env['stock.warehouse'].browse({}).{}.run_import()",
     },
@@ -136,7 +140,10 @@ class StockWarehouse(models.Model):
             else:
                 self[task_field_name] = self.env["attachment.synchronize.task"].create(
                     self._prepare_wms_task_vals(
-                        mappings["filetype"], mappings["name_fragment"]
+                        mappings["filetype"],
+                        mappings["name_fragment"],
+                        mappings["method_type"],
+                        mappings["filepath"],
                     )
                 )
 
@@ -171,11 +178,13 @@ class StockWarehouse(models.Model):
             "wms_export_picking_out_filter_id"
         ].format(self.out_type_id.id)
 
-    def _prepare_wms_task_vals(self, filetype, name_fragment=""):
+    def _prepare_wms_task_vals(
+        self, filetype, name_fragment="", method_type="export", filepath="IN/"
+    ):
         return {
             "name": "WMS task for {} {}".format(self.name, name_fragment),
-            "method_type": "export",
-            "filepath": "IN/",
+            "method_type": method_type,
+            "filepath": filepath,
             "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
             "file_type": filetype,
         }
