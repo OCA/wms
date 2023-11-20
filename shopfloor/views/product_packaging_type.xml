@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_product_packaging_type_form" model="ir.ui.view">
+        <field name="name">shopfloor.product.packaging.type.form</field>
+        <field name="model">product.packaging.type</field>
+        <field
+            name="inherit_id"
+            ref="product_packaging_type.view_product_packaging_type_form"
+        />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <div>
+                    <field name="icon" widget="image" width="90" />
+                </div>
+            </field>
+        </field>
+    </record>
+</odoo>
