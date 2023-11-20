@@ -59,14 +59,14 @@ MAPPINGS = {
     "reception": {
         "fieldname_task": "wms_import_confirm_reception_task_id",
         "fieldname_cron": "wms_import_confirm_reception_cron_id",
-        "filetype": "reception_confirmed",
+        "filetype": "wms_reception_confirmed",
         "name_fragment": "reception confirmation",
         "code": "env['stock.warehouse'].browse({}).{}.run_import()",
     },
     "delivery": {
         "fieldname_task": "wms_import_confirm_delivery_task_id",
         "fieldname_cron": "wms_import_confirm_delivery_cron_id",
-        "filetype": "delivery_confirmed",
+        "filetype": "wms_delivery_confirmed",
         "name_fragment": "delivery confirmation",
         "code": "env['stock.warehouse'].browse({}).{}.run_import()",
     },

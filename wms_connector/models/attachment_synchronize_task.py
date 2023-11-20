@@ -10,7 +10,7 @@ class AttachmentSynchronizeTask(models.Model):
     file_type = fields.Selection(
         selection_add=[
             ("export", "Export"),
-            ("reception_confirmed", "Reception confirmed"),
-            ("delivery_confirmed", "Delivery confirmed"),
+            ("wms_reception_confirmed", "Reception confirmed"),
+            ("wms_delivery_confirmed", "Delivery confirmed"),
         ]
     )
