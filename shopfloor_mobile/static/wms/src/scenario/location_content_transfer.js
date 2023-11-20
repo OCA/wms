@@ -7,6 +7,8 @@
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
+// TODO: consider replacing the dynamic "autofocus" in the searchbar by an event.
+// At the moment, we need autofocus to be disabled if there's a user popup.
 const LocationContentTransfer = {
     mixins: [ScenarioBaseMixin],
     template: `
@@ -18,6 +20,7 @@ const LocationContentTransfer = {
                 v-if="state.on_scan"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
+                :autofocus="!screen_info.user_popup"
                 />
             <template v-if="state_in(['scan_location']) && state.data.location">
                 <item-detail-card
