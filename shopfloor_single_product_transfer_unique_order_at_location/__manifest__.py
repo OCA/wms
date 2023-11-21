@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Single Product Transfer Unique Order Per Location",
     "summary": "Prevent to mix sales order on same consolidation location.",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.2.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
