@@ -142,8 +142,10 @@ class StockWarehouse(models.Model):
                     self._prepare_wms_task_vals(
                         mappings["filetype"],
                         mappings["name_fragment"],
-                        mappings["method_type"],
-                        mappings["filepath"],
+                        mappings["method_type"]
+                        if "method_type" in mappings
+                        else "export",
+                        mappings["filepath"] if "filepath" in mappings else None,
                     )
                 )
 
