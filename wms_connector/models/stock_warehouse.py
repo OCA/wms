@@ -106,6 +106,13 @@ class StockWarehouse(models.Model):
     )
     wms_product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
 
+    def _default_storage_backend(self):
+        return self.env.ref("storage_backend.default_storage_backend").id
+
+    storage_backend_id = fields.Many2one(
+        "storage.backend", default=_default_storage_backend
+    )
+
     def _wms_domain_for(self, model_domain):
         domains = {
             "product": [
@@ -187,7 +194,7 @@ class StockWarehouse(models.Model):
             "name": "WMS task for {} {}".format(self.name, name_fragment),
             "method_type": method_type,
             "filepath": filepath,
-            "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
+            "backend_id": self.storage_backend_id.id,
             "file_type": filetype,
         }
 
