@@ -355,16 +355,11 @@ class DataAction(Component):
         lines = self.env["stock.move.line"].search(domain)
         # operations_to_do = number of total operations that are pending for this location.
         # operations_done = number of operations already done.
-        # A line with an assigned package counts as 1 operation.
         operations_to_do = 0
         operations_done = 0
         for line in lines:
-            is_done = line.qty_done == line.product_uom_qty
-            package_qty_done = 1 if is_done else 0
-            operations_done += (
-                line.qty_done if not line.package_id else package_qty_done
-            )
-            operations_to_do += line.product_uom_qty if not line.package_id else 1
+            operations_done += line.qty_done
+            operations_to_do += line.product_uom_qty - line.qty_done
         return {
             "done": operations_done,
             "to_do": operations_to_do,
