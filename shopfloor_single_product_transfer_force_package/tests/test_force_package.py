@@ -40,8 +40,7 @@ class TestForcePackage(CommonCase):
     def test_force_package_mandatory_with_package(self):
         picking = self._setup_picking()
         move_line = picking.move_line_ids
-        package = self.env["stock.quant.package"].sudo().create({})
-        move_line.result_package_id = package
+        package = self._create_empty_package()
         self.dispatch_location.sudo().package_restriction = "singlepackage"
         response = self.service.dispatch(
             "set_quantity",
