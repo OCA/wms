@@ -16,6 +16,7 @@ setuptools.setup(
         'odoo-addon-stock_release_channel_auto_release>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_batch_mode_commercial_partner>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_cutoff>=16.0dev,<16.1dev',
+        'odoo-addon-stock_release_channel_partner_delivery_window>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_partner_public_holidays>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_process_end_time>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_propagate_channel_picking>=16.0dev,<16.1dev',
