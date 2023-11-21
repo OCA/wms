@@ -1404,11 +1404,8 @@ class Checkout(Component):
                     },
                 )
         lines_done = self._lines_checkout_done(picking)
-        dest_location = picking.location_dest_id
-        child_locations = self.env["stock.location"].search(
-            [("id", "child_of", dest_location.id), ("usage", "!=", "view")]
-        )
-        if len(child_locations) > 0 and child_locations != dest_location:
+        dest_location = lines_done.move_id.location_dest_id
+        if len(dest_location) != 1 or dest_location.usage == "view":
             return self._response_for_select_child_location(
                 picking,
             )
