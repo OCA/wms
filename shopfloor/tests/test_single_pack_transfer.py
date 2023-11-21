@@ -787,8 +787,10 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             [{"location_dest_id": self.shelf2.id, "state": "done"}],
         )
 
-    def test_cancel(self):
+    def test_cancel_transfer_not_created_by_user(self):
         """Test the happy path for single pack transfer /cancel endpoint
+
+        The transfer was not created by the shopfloor user.
 
         The pre-conditions:
 
@@ -798,6 +800,49 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         * The package level has is_done to False
         """
+        # setup the picking as we need, like if the move line
+        # was already started by the first step (start operation)
+        package_level = self._simulate_started(self.pack_a)
+        self.menu.sudo().allow_move_create = True
+        self.env.user = self.shopfloor_manager
+        self.assertTrue(package_level.is_done)
+
+        # keep references for later checks
+        move = package_level.move_line_ids.move_id
+        picking = move.picking_id
+
+        # now, call the service to cancel
+        response = self.service.dispatch(
+            "cancel", params={"package_level_id": package_level.id}
+        )
+        self.assertRecordValues(move, [{"state": "assigned"}])
+        self.assertRecordValues(picking, [{"state": "assigned"}])
+        self.assertTrue(move.move_line_ids.exists())
+        self.assertFalse(move.move_line_ids.shopfloor_user_id)
+        self.assert_response(
+            response,
+            next_state="start",
+            message={
+                "message_type": "success",
+                "body": "Canceled, you can scan a new pack.",
+            },
+        )
+
+    def test_cancel_transfer_created_by_user(self):
+        """Test the happy path for single pack transfer /cancel endpoint
+
+        The transfer was created by the shopfloor user.
+
+        The pre-conditions:
+
+        * /start has been called
+
+        Expected result:
+
+        * The package level has is_done to False
+        * The move and picking are canceled.
+        """
+        self.menu.sudo().allow_move_create = True
         # setup the picking as we need, like if the move line
         # was already started by the first step (start operation)
         package_level = self._simulate_started(self.pack_a)
@@ -811,8 +856,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         response = self.service.dispatch(
             "cancel", params={"package_level_id": package_level.id}
         )
-        self.assertRecordValues(move, [{"state": "assigned"}])
-        self.assertRecordValues(picking, [{"state": "assigned"}])
+        self.assertRecordValues(move, [{"state": "cancel"}])
+        self.assertRecordValues(picking, [{"state": "cancel"}])
         self.assertRecordValues(package_level, [{"is_done": False}])
 
         self.assert_response(

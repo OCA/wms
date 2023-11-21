@@ -283,6 +283,17 @@ class SinglePackTransfer(Component):
             return self._response_for_start(message=self.msg_store.already_done())
 
         package_level.is_done = False
+        if (
+            self.is_allow_move_create()
+            and package_level.picking_id.create_uid == self.env.user
+        ):
+            # Cancel the transfer when it has been created by the shopfloor user
+            moves.picking_id.action_cancel()
+        else:
+            # Not owned only unassign the user
+            stock = self._actions_for("stock")
+            stock.unmark_move_line_as_picked(moves.move_line_ids)
+
         return self._response_for_start(
             message=self.msg_store.confirm_canceled_scan_next_pack()
         )
