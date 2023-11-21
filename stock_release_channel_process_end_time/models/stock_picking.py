@@ -73,7 +73,8 @@ class StockPicking(models.Model):
             # Check if a channel has been assigned to the picking and write
             # scheduled_date if different to avoid unnecessary write
             if (
-                rec.release_channel_id
+                rec.state not in ("done", "cancel")
+                and rec.release_channel_id
                 and rec.release_channel_id.process_end_date
                 and rec.scheduled_date != rec.release_channel_id.process_end_date
                 and enabled_update_scheduled_date
