@@ -13,7 +13,7 @@ class DataAction(Component):
     def location(self, record, **kw):
         parser = self._location_parser
         data = self._jsonify(record.with_context(location=record.id), parser, **kw)
-        if "with_operation_progress" in kw:
+        if kw.get("with_operation_progress"):
             lines_blacklist = (
                 kw.get("progress_lines_blacklist")
                 or self.env["stock.move.line"].browse()
@@ -46,7 +46,7 @@ class DataAction(Component):
         # and it may reduce performance significatively
         # when dealing with a large number of pickings.
         # Thus, we make it optional.
-        if "with_progress" in kw:
+        if kw.get("with_progress"):
             parser.append("progress")
         return parser
 
@@ -72,6 +72,7 @@ class DataAction(Component):
             "bulk_line_count",
             "total_weight:weight",
             "scheduled_date",
+            "priority",
         ]
 
     @ensure_model("stock.quant.package")
