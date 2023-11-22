@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Reception Packaging Dimension",
     "summary": "Collect Packaging Dimension from the Reception scenario",
-    "version": "14.0.1.1.0",
+    "version": "14.0.1.2.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
