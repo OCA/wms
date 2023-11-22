@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-12 17:37+0000\n"
+"PO-Revision-Date: 2023-11-22 09:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -128,9 +128,9 @@ msgstr ""
 "\n"
 "Con questa opzione, le righe elaborate con l'inserimento in un collo nel \n"
 "processo di prelievo verranno inserite come prodotti derivati nella "
-"ubicazine della destinazion finale.\n"
+"ubicazione della destinazion finale.\n"
 "\n"
-"Questo è utile se il sispositivo di prelievo è disponibile nell'ubicazine "
+"Questo è utile se il sispositivo di prelievo è disponibile nell'ubicazione "
 "destinazione o\n"
 "se si vuole fornire un prodotto derivato all'operazione successiva.\n"
 "\n"
@@ -435,7 +435,7 @@ msgid ""
 msgstr ""
 "Per lo scenario di reparto che lo usa (Prelievo aggregato, prelievo per "
 "area, prelievo ordine separato), il passo controllo Zero verrà attivato "
-"quando una ubicazine si svuota dopo un movimento."
+"quando una ubicazione si svuota dopo un movimento."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation
@@ -1149,7 +1149,7 @@ msgstr "Il prodotto {} appartiene a un prelievo senza uno stato valido."
 #, python-format
 msgid "Product {} found in multiple locations. Scan your location first."
 msgstr ""
-"Prodotto {} trovato in ubicazini multiple. Scansionare prima l'ubicazione."
+"Prodotto {} trovato in ubicazioni multiple. Scansionare prima l'ubicazione."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1614,7 +1614,7 @@ msgstr "L'ordine sddiviso {} è stato creato."
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
 msgid "The stock operation where the packing has been made"
-msgstr "L'operazine di magazzino del collo è stata eseguita"
+msgstr "L'operazione di magazzino del collo è stata eseguita"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
@@ -1764,7 +1764,7 @@ msgid ""
 "instead."
 msgstr ""
 "Il trasferimento ad un collo differente non è consentito, scansionare invece "
-"un'ubicazine."
+"un'ubicazione."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
