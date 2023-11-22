@@ -43,7 +43,7 @@ class TestScanLineReturn(CommonCaseReturn):
             response,
             next_state="set_quantity",
             data={
-                "confirmation_required": False,
+                "confirmation_required": None,
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
@@ -94,7 +94,7 @@ class TestScanLineReturn(CommonCaseReturn):
             response,
             next_state="set_quantity",
             data={
-                "confirmation_required": False,
+                "confirmation_required": None,
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },

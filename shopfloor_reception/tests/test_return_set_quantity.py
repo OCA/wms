@@ -39,7 +39,7 @@ class TestSetQuantityReturn(CommonCaseReturn):
 
     def _get_data(self):
         return {
-            "confirmation_required": False,
+            "confirmation_required": None,
             "picking": self.data.picking(self.return_picking),
             "selected_move_line": self.data.move_lines(self.selected_move_line),
         }

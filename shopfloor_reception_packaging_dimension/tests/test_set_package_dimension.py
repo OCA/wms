@@ -153,7 +153,7 @@ class TestSetPackDimension(CommonCase):
             data={
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": self.data.move_lines(line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
             message=self.msg_store.packaging_dimension_updated(
                 self.product_c_packaging_2

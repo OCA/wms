@@ -789,7 +789,7 @@ class Reception(Component):
         return self._response_for_set_quantity(picking, line, message=message)
 
     def _response_for_set_quantity(
-        self, picking, line, message=None, asking_confirmation=False
+        self, picking, line, message=None, asking_confirmation=None
     ):
         self._align_product_uom_qties(line.move_id)
         return self._response(
@@ -1068,7 +1068,7 @@ class Reception(Component):
         }
 
     def _set_quantity__by_barcode(
-        self, picking, selected_line, barcode, confirmation=False
+        self, picking, selected_line, barcode, confirmation=None
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
         search = self._actions_for("search")
@@ -1078,12 +1078,12 @@ class Reception(Component):
             return handler(picking, selected_line, search_result.record)
         # Nothing found, ask user if we should create a new pack for the scanned
         # barcode
-        if not confirmation:
+        if confirmation != barcode:
             return self._response_for_set_quantity(
                 picking,
                 selected_line,
                 message=self.msg_store.create_new_pack_ask_confirmation(barcode),
-                asking_confirmation=True,
+                asking_confirmation=barcode,
             )
         package = self.env["stock.quant.package"].create({"name": barcode})
         selected_line.result_package_id = package
@@ -1108,7 +1108,7 @@ class Reception(Component):
         selected_line_id,
         quantity=None,
         barcode=None,
-        confirmation=False,
+        confirmation=None,
     ):
         """Set the quantity done
 
@@ -1414,7 +1414,7 @@ class ShopfloorReceptionValidator(Component):
             },
             "quantity": {"type": "float"},
             "barcode": {"type": "string"},
-            "confirmation": {"type": "boolean"},
+            "confirmation": {"type": "string", "nullable": True},
         }
 
     def process_with_existing_pack(self):
@@ -1622,7 +1622,7 @@ class ShopfloorReceptionValidatorResponse(Component):
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
