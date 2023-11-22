@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-22 09:35+0000\n"
+"PO-Revision-Date: 2023-11-22 15:33+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1263,8 +1263,8 @@ msgstr ""
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__date_planned
 msgid "Scheduled date until move is done, then date of actual move processing"
 msgstr ""
-"Data schedulata fino a esecuzione movimento, quindi data attuale "
-"elaborazione movimento"
+"Data schedulata fino a esecuzione movimento, quindi data elaborazione "
+"movimento attuale"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
