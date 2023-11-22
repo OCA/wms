@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-10 11:39+0000\n"
+"PO-Revision-Date: 2023-11-22 09:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -386,7 +386,7 @@ msgstr "A"
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_picking_type_id
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
 msgid "To operation type"
-msgstr "A tipo operazine"
+msgstr "A tipo operazione"
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_output_stock_loc_id
