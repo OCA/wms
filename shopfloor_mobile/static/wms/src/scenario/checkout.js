@@ -293,6 +293,7 @@ const Checkout = {
                         {path: "origin"},
                         {path: "carrier.name", label: "Carrier"},
                         {path: "move_line_count", label: "Lines"},
+                        {path: "priority", label: "Priority"},
                     ],
                 },
             };
