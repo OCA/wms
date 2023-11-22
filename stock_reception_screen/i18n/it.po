@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-29 17:38+0000\n"
+"PO-Revision-Date: 2023-11-22 15:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -461,7 +461,7 @@ msgstr "Imposta quantità"
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_origin
 msgid "Source Document"
-msgstr "Documento sorgente"
+msgstr "Documento di origine"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__picking_state
