@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-29 08:26+0000\n"
+"PO-Revision-Date: 2023-11-22 09:34+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -209,7 +209,7 @@ msgid ""
 msgstr ""
 "Per lo scenario di reparto che lo usa (Prelievo aggregato, prelievo per "
 "area, prelievo ordine separato), il passo controllo Zero verrà attivato "
-"quando una ubicazine si svuota dopo un movimento."
+"quando una ubicazione si svuota dopo un movimento."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
@@ -1082,7 +1082,7 @@ msgstr "Il record su cui si stava lavorando non esiste più."
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
 msgid "The stock operation where the packing has been made"
-msgstr "L'operazine di magazzino del collo è stata eseguita"
+msgstr "L'operazione di magazzino del collo è stata eseguita"
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
