@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 12:38+0000\n"
+"PO-Revision-Date: 2023-11-23 10:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -65,7 +65,7 @@ msgstr "Canale rilascio"
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_form_view
 #, python-format
 msgid "Shipment Advice"
-msgstr "Avvisi spedizione"
+msgstr "Avviso spedizione"
 
 #. module: stock_release_channel_shipment_advice
 #: model:ir.model,name:stock_release_channel_shipment_advice.model_shipment_advice_planner
