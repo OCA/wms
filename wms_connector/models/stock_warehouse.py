@@ -32,6 +32,8 @@ MAPPINGS = {
         "fieldname_task": "wms_export_task_id",
         "fieldname_cron": "wms_export_product_cron_id",
         "filetype": "export",
+        "method_type": "export",
+        "filepath": "IN/",
         "name_fragment": "export products",
         "code": "wh = env['stock.warehouse'].browse({})\n"
         "wh.refresh_wms_products()\n"
@@ -42,6 +44,8 @@ MAPPINGS = {
         "fieldname_task": "wms_export_task_id",
         "fieldname_cron": "wms_export_picking_in_cron_id",
         "filetype": "export",
+        "method_type": "export",
+        "filepath": "IN/",
         "name_fragment": "export pickings in",
         "code": "wh = env['stock.warehouse'].browse({})\n"
         "env['stock.picking'].with_context(attachment_task=wh.{})._schedule_export(wh,"
@@ -51,6 +55,8 @@ MAPPINGS = {
         "fieldname_task": "wms_export_task_id",
         "fieldname_cron": "wms_export_picking_out_cron_id",
         "filetype": "export",
+        "method_type": "export",
+        "filepath": "IN/",
         "name_fragment": "export pickings out",
         "code": "wh = env['stock.warehouse'].browse({})\n"
         "env['stock.picking'].with_context(attachment_task=wh.{})._schedule_export(wh,"
@@ -95,23 +101,10 @@ class StockWarehouse(models.Model):
     wms_export_picking_out_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
-    wms_export_product_filter_id = fields.Many2one(
-        "ir.filters",
-    )
-    wms_export_picking_in_filter_id = fields.Many2one(
-        "ir.filters",
-    )
-    wms_export_picking_out_filter_id = fields.Many2one(
-        "ir.filters",
-    )
+    wms_export_product_filter_id = fields.Many2one("ir.filters")
+    wms_export_picking_in_filter_id = fields.Many2one("ir.filters")
+    wms_export_picking_out_filter_id = fields.Many2one("ir.filters")
     wms_product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
-
-    def _default_storage_backend(self):
-        return self.env.ref("storage_backend.default_storage_backend").id
-
-    storage_backend_id = fields.Many2one(
-        "storage.backend", default=_default_storage_backend
-    )
 
     def _wms_domain_for(self, model_domain):
         domains = {
@@ -149,10 +142,8 @@ class StockWarehouse(models.Model):
                     self._prepare_wms_task_vals(
                         mappings["filetype"],
                         mappings["name_fragment"],
-                        mappings["method_type"]
-                        if "method_type" in mappings
-                        else "export",
-                        mappings["filepath"] if "filepath" in mappings else None,
+                        mappings["method_type"],
+                        mappings["filepath"],
                     )
                 )
 
@@ -194,7 +185,7 @@ class StockWarehouse(models.Model):
             "name": "WMS task for {} {}".format(self.name, name_fragment),
             "method_type": method_type,
             "filepath": filepath,
-            "backend_id": self.storage_backend_id.id,
+            "backend_id": self.env.ref("storage_backend.default_storage_backend").id,
             "file_type": filetype,
         }
 
