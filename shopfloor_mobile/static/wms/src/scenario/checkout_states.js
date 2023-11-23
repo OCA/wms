@@ -64,6 +64,7 @@ export const checkout_states = function ($instance) {
                         picking_id: $instance.state.data.picking.id,
                         barcode: scanned.text,
                         confirm_pack_all: $instance.state.data.need_confirm_pack_all,
+                        confirm_lot: $instance.state.data.need_confirm_lot,
                     })
                 );
             },
