@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 12:38+0000\n"
+"PO-Revision-Date: 2023-11-24 16:36+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -28,7 +28,7 @@ msgstr ""
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model,name:stock_release_channel_propagate_channel_picking.model_stock_picking_type
 msgid "Picking Type"
-msgstr "Tipo prelievo"
+msgstr "Tipologia prelievo"
 
 #. module: stock_release_channel_propagate_channel_picking
 #: model:ir.model.fields,field_description:stock_release_channel_propagate_channel_picking.field_stock_picking_type__propagate_to_pickings_chain
