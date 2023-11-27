@@ -31,8 +31,9 @@ manual_selection -> select_line: **/select**(picking_id)
 == /scan_document ==
 select_document -> select_line: **/scan_document**(barcode, picking_id=None) \n(scan a picking a product or ???)
 
-== /select_line ==
+== /select_line or /scan_line ==
 select_line -> select_package: **/select_line**(picking_id, package_id, move_line_ids)
+scan_line -> summary: **/scan_line**(picking_id, barcode, confirm_pack_all)
 
 == /list_delivery_packaging ==
 select_package -> select_delivery_packaging: **/list_delivery_packaging**(picking_id, selected_line_ids)

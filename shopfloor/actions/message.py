@@ -696,6 +696,12 @@ class MessageAction(Component):
             "body": _("No lines to process."),
         }
 
+    def no_lines_to_process_set_quantities(self):
+        return {
+            "message_type": "info",
+            "body": _("No lines to process, set quantities on some"),
+        }
+
     def location_empty(self, location):
         return {
             "message_type": "error",

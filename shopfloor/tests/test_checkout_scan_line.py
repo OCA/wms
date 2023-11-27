@@ -365,7 +365,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             params={
                 "picking_id": picking.id,
                 "barcode": self.delivery_packaging.barcode,
-                "confirm_pack_all": True,
+                "confirm_pack_all": self.delivery_packaging.barcode,
             },
         )
         # move to summary as all lines are done

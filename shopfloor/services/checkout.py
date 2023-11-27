@@ -41,7 +41,7 @@ class Checkout(Component):
     _description = __doc__
 
     def _response_for_select_line(
-        self, picking, message=None, need_confirm_pack_all=False
+        self, picking, message=None, need_confirm_pack_all=""
     ):
         if all(line.shopfloor_checkout_done for line in picking.move_line_ids):
             return self._response_for_summary(picking, message=message)
@@ -53,7 +53,7 @@ class Checkout(Component):
             message=message,
         )
 
-    def _data_for_select_line(self, picking, need_confirm_pack_all=False):
+    def _data_for_select_line(self, picking, need_confirm_pack_all=""):
         return {
             "picking": self._data_for_stock_picking(picking),
             "group_lines_by_location": True,
@@ -420,7 +420,7 @@ class Checkout(Component):
             {"qty_done": 0, "shopfloor_user_id": False}
         )
 
-    def scan_line(self, picking_id, barcode, confirm_pack_all=False):
+    def scan_line(self, picking_id, barcode, confirm_pack_all=None):
         """Scan move lines of the stock picking
 
         It allows to select move lines of the stock picking for the next
@@ -449,6 +449,7 @@ class Checkout(Component):
         if not selection_lines:
             return self._response_for_summary(picking)
 
+        # Search of the destination package
         search_result = self._scan_line_find(picking, barcode)
         result_handler = getattr(self, "_select_lines_from_" + search_result.type)
         kw = {"confirm_pack_all": confirm_pack_all}
@@ -598,18 +599,20 @@ class Checkout(Component):
         # Search for serial number is actually the same as searching for lot (as of v14...)
         return self._select_lines_from_lot(picking, selection_lines, lot, **kw)
 
+    # Handling of the destination package scanned
     def _select_lines_from_delivery_packaging(
-        self, picking, selection_lines, packaging, confirm_pack_all=False, **kw
+        self, picking, selection_lines, packaging, confirm_pack_all=None, **kw
     ):
         """Handle delivery packaging.
 
-
-        If a delivery pkg has been scanned:
+        A delivery pkg has been scanned:
 
             1. validate it
-            2. ask for confirmation to place all lines left into the same package
-            3. if scanned twice for confirmation,
-               assign new package and skip `select_package` state
+            2. no lines to process (no quantities set to done)
+                2.a Option no prefill qty, ask to set some quantities
+                2.b Otherwise ask confirmation to pack everything if not yet done
+            3. if confirmation to pack everything set all quantities.
+            4. assign new package and skip `select_package` state
 
         """
         carrier = self._get_carrier(picking)
@@ -625,16 +628,29 @@ class Checkout(Component):
                     packaging, carrier
                 ),
             )
-        if confirm_pack_all:
-            # Select all lines and pack them all w/o passing for select_package state
+        message = None
+        need_confirm_pack_all = ""
+        has_lines_to_pack = any(
+            self._filter_lines_to_pack(ml) for ml in selection_lines
+        )
+        if not has_lines_to_pack:
+            if self.work.menu.no_prefill_qty:
+                message = self.msg_store.no_lines_to_process_set_quantities()
+            elif confirm_pack_all != packaging.barcode:
+                need_confirm_pack_all = packaging.barcode
+                message = self.msg_store.confirm_put_all_goods_in_delivery_package(
+                    packaging
+                )
+            if message:
+                return self._response_for_select_line(
+                    picking,
+                    message=message,
+                    need_confirm_pack_all=need_confirm_pack_all,
+                )
+        if confirm_pack_all == packaging.barcode:
             self._select_lines(selection_lines)
-            return self._create_and_assign_new_packaging(
-                picking, selection_lines, packaging=packaging
-            )
-        return self._response_for_select_line(
-            picking,
-            message=self.msg_store.confirm_put_all_goods_in_delivery_package(packaging),
-            need_confirm_pack_all=True,
+        return self._create_and_assign_new_packaging(
+            picking, selection_lines, packaging=packaging
         )
 
     def _select_line_package(self, picking, selection_lines, package):
@@ -1475,7 +1491,7 @@ class ShopfloorCheckoutValidator(Component):
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
             "confirm_pack_all": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
@@ -1700,7 +1716,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             self._schema_stock_picking(),
             group_lines_by_location={"type": "boolean"},
             show_oneline_package_content={"type": "boolean"},
-            need_confirm_pack_all={"type": "boolean"},
+            need_confirm_pack_all={"type": "string"},
         )
 
     @property
