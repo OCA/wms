@@ -61,7 +61,6 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": quantity_done,
-                "confirmation": True,
             },
         )
         self.assertEqual(move_line.qty_done, previous_qty_done)
@@ -90,7 +89,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.product_uom_qty,
-                "confirmation": True,
+                "confirmation": self.packing_location.barcode,
             },
         )
         # Check response
@@ -126,7 +125,6 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": quantity_done,
-                "confirmation": True,
             },
         )
         self.assert_response_set_line_destination(
@@ -156,7 +154,6 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": quantity_done,
-                "confirmation": False,
             },
         )
         self.assert_response_set_line_destination(
@@ -186,7 +183,6 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.product_uom_qty,
-                "confirmation": True,
             },
         )
         # Check picking data

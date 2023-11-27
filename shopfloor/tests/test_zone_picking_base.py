@@ -306,7 +306,7 @@ class ZonePickingCommonCase(CommonCase):
         move_lines,
         message=None,
         popup=None,
-        confirmation_required=False,
+        confirmation_required=None,
         product=None,
         sublocation=None,
         location_first=None,
@@ -349,7 +349,7 @@ class ZonePickingCommonCase(CommonCase):
         move_lines,
         message=None,
         popup=None,
-        confirmation_required=False,
+        confirmation_required=None,
         product=None,
         sublocation=None,
         location_first=False,
@@ -378,7 +378,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
         qty_done=None,
         handle_complete_mix_pack=False,
     ):
@@ -409,7 +409,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
         qty_done=None,
         handle_complete_mix_pack=False,
     ):
@@ -508,7 +508,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         self.assert_response(
             response,
@@ -529,7 +529,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         self._assert_response_unload_set_destination(
             "unload_set_destination",
@@ -549,7 +549,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_lines,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         self.assert_response(
             response,
@@ -570,7 +570,7 @@ class ZonePickingCommonCase(CommonCase):
         picking_type,
         move_lines,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         self._assert_response_unload_all(
             "unload_all",

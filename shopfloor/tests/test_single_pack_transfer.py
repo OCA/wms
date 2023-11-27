@@ -122,7 +122,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             next_state="scan_location",
             data=dict(
                 self._response_package_level_data(package_level),
-                confirmation_required=False,
+                confirmation_required=None,
             ),
         )
 
@@ -199,7 +199,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             ),
             "picking": self.data.picking(package_level.picking_id),
             "products": self.data.products(self.product_a),
-            "confirmation_required": False,
+            "confirmation_required": None,
         }
 
         self.assert_response(response, next_state="scan_location", data=expected_data)
@@ -408,7 +408,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             },
             data=dict(
                 self._response_package_level_data(package_level),
-                confirmation_required=True,
+                confirmation_required=barcode,
             ),
         )
 
@@ -730,7 +730,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             message=message,
             data=dict(
                 self._response_package_level_data(package_level),
-                confirmation_required=True,
+                confirmation_required=sub_shelf2.barcode,
             ),
         )
 
@@ -765,7 +765,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 "package_level_id": package_level.id,
                 "location_barcode": self.shelf2.barcode,
                 # acknowledge the change of destination
-                "confirmation": True,
+                "confirmation": self.shelf2.barcode,
             },
         )
 
@@ -1043,7 +1043,7 @@ class SinglePackTransferSpecialCase(SinglePackTransferCommonBase):
             next_state="scan_location",
             data=dict(
                 self.service._data_after_package_scanned(new_package_level),
-                confirmation_required=False,
+                confirmation_required=None,
             ),
         )
         self.assertRecordValues(

@@ -350,7 +350,7 @@ const ClusterPicking = {
                         title: this.$t("cluster_picking.unload_all.title"),
                         scan_placeholder: this.$t("scan_placeholder_translation"),
                     },
-                    on_scan: (scanned, confirmation = false) => {
+                    on_scan: (scanned, confirmation = "") => {
                         this.state_set_data({location_barcode: scanned.text});
                         this.wait_call(
                             this.odoo.call("set_destination_all", {
@@ -366,23 +366,12 @@ const ClusterPicking = {
                         title: this.$t("cluster_picking.confirm_unload_all.title"),
                         scan_placeholder: this.$t("scan_placeholder_translation"),
                     },
-                    on_user_confirm: (answer) => {
-                        // TODO: check if this used
-                        // -> no flag is set to enable the confirmation dialog,
-                        // we only display a message, unlike `confirm_start`
-                        if (answer == "yes") {
-                            // Reuse data from unload_all
-                            const scan_data = this.state_get_data("unload_all");
-                            this.state.on_scan(scan_data.location_barcode, true);
-                        } else {
-                            this.state_to("scan_destination");
-                        }
-                    },
                     on_scan: (scanned, confirmation = true) => {
                         this.on_state_exit();
                         // FIXME: use state_load or traverse the state
                         // this.current_state_key = "unload_all";
                         // this.state.on_scan(scanned, confirmation);
+                        confirmation = this.state.data.confirmation || "";
                         this.states.unload_all.on_scan(scanned, confirmation);
                     },
                 },
@@ -429,7 +418,7 @@ const ClusterPicking = {
                                 picking_batch_id: this.current_batch().id,
                                 package_id: null, // FIXME: where does it come from? backend data?
                                 barcode: scanned.text,
-                                confirmation: true,
+                                confirmation: this.state.data.confirmation || "",
                             })
                         );
                     },

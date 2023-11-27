@@ -140,20 +140,21 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
 
     def test_set_destination_package_dest_location_to_confirm(self):
         """Scanned destination location valid, but need a confirmation."""
+        barcode = self.env.ref("stock.stock_location_14").barcode
         package_level = self.picking1.package_level_ids[0]
         response = self.service.dispatch(
             "set_destination_package",
             params={
                 "location_id": self.content_loc.id,
                 "package_level_id": package_level.id,
-                "barcode": self.env.ref("stock.stock_location_14").barcode,
+                "barcode": barcode,
             },
         )
         self.assert_response_scan_destination(
             response,
             package_level,
             message=self.service.msg_store.need_confirmation(),
-            confirmation_required=True,
+            confirmation_required=barcode,
         )
 
     def test_set_destination_package_dest_location_ok(self):
@@ -324,6 +325,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
 
     def test_set_destination_line_dest_location_to_confirm(self):
         """Scanned destination location valid, but need a confirmation."""
+        barcode = self.env.ref("stock.stock_location_14").barcode
         move_line = self.picking2.move_line_ids[0]
         response = self.service.dispatch(
             "set_destination_line",
@@ -331,14 +333,14 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
                 "quantity": move_line.product_uom_qty,
-                "barcode": self.env.ref("stock.stock_location_14").barcode,
+                "barcode": barcode,
             },
         )
         self.assert_response_scan_destination(
             response,
             move_line,
             message=self.service.msg_store.need_confirmation(),
-            confirmation_required=True,
+            confirmation_required=barcode,
         )
 
     def test_set_destination_line_dest_location_ok(self):

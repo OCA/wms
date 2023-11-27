@@ -26,6 +26,7 @@ class CommonCase(BaseCommonCase):
         cls.input_location = cls.env.ref("stock.stock_location_company")
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
+        cls.shelf3 = cls.shelf2.sudo().copy({"barcode": "26019853"})
 
     @classmethod
     def _shopfloor_user_values(cls):

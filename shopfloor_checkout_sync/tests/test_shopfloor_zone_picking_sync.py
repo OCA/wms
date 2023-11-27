@@ -64,7 +64,7 @@ class ZonePickingUnloadSetDestinationSync(ZonePickingCommonCase, SyncMixin):
             params={
                 "package_id": self.free_package.id,
                 "barcode": self.packing_sublocation.barcode,
-                "confirmation": True,
+                "confirmation": self.packing_sublocation.barcode,
             },
         )
         # check data
