@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Single Product Transfer",
     "summary": "Move an item from one location to another.",
-    "version": "14.0.2.3.0",
+    "version": "14.0.2.3.1",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
