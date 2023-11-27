@@ -160,7 +160,7 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             data={
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
 
@@ -199,6 +199,6 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             data={
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": False,
+                "confirmation_required": None,
             },
         )
