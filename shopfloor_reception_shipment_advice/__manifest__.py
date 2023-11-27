@@ -1,6 +1,6 @@
 {
-    "name": "Shopfloor Reception Shimpment Advice",
-    "summary": "Allows to recieve goods based on shipment adive",
+    "name": "Shopfloor Reception Shipment Advice",
+    "summary": "Allows to recieve goods based on shipment advice",
     "version": "14.0.1.0.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
