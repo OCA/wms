@@ -45,6 +45,20 @@ class Reception(Component):
             return self.work.current_shipment_advice
         return self.env["shipment.advice"]
 
+    def _domain_shipment_advice(self, dock, today_only=False):
+        domain = [
+            ("state", "in", ["in_progress", "confirmed"]),
+            ("warehouse_id", "in", self.picking_types.warehouse_id.ids),
+            ("shipment_type", "=", "incoming"),
+        ]
+        if dock:
+            domain.append(("dock_id", "=", dock.id))
+        if today_only:
+            today_start, today_end = self._get_today_start_end_datetime()
+            domain.append(("arrival_date", ">=", today_start))
+            domain.append(("arrival_date", "<=", today_end))
+        return domain
+
     def _scan_document__by_dock(self, dock, barcode):
         if not dock:
             return
@@ -91,11 +105,8 @@ class Reception(Component):
 
     def _response_for_manual_selection_shipment(self, dock):
         shipments = self.env["shipment.advice"].search(
-            [
-                ("dock_id", "=", dock.id),
-                ("state", "in", ["in_progress", "confirmed"]),
-                ("warehouse_id", "in", self.picking_types.warehouse_id.ids),
-            ]
+            self._domain_shipment_advice(dock=dock, today_only=True),
+            order="arrival_date desc",
         )
         data = {
             "dock": self.data.dock(dock),

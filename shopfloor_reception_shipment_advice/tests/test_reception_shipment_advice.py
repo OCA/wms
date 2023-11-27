@@ -63,9 +63,8 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
 
     def test_scan_shipment_error_outgoing(self):
         """Check scanning an outgoing shipment is refused."""
-        shipment = self.shipment_out
         response = self.service.dispatch(
-            "scan_document", params={"barcode": shipment.name}
+            "scan_document", params={"barcode": self.shipment_out.name}
         )
         self.assert_response(
             response,
@@ -73,7 +72,7 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             data={
                 "pickings": self.service._data_for_stock_pickings(
                     self._get_today_picking(), with_lines=False
-                )
+                ),
             },
             message=self.service.msg_store.shipment_incoming_type_only(),
         )
@@ -90,7 +89,7 @@ class ShopfloorReceptionShipmentAdvice(CommonCase, Common):
             data={
                 "pickings": self.service._data_for_stock_pickings(
                     self._get_today_picking(), with_lines=False
-                )
+                ),
             },
             message=self.service.msg_store.shipment_nothing_to_unload(shipment),
         )
