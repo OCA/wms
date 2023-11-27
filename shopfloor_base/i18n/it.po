@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-09 09:09+0000\n"
+"PO-Revision-Date: 2023-11-27 11:02+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -378,8 +378,8 @@ msgid ""
 "Registry out of sync. Likely the record has been modified but not sync'ed "
 "with the routing registry."
 msgstr ""
-"Registrofuri sinc. Probabilmente il record è statomodificto ma non "
-"siincronizzato con il registro di instradamento."
+"Registro fuori sinc. Probabilmente il record è stato modificto ma non "
+"sincronizzato con il registro di instradamento."
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_scenario
@@ -483,7 +483,7 @@ msgid ""
 "with edits and creates."
 msgstr ""
 "Utilizzare l'azione \"Sincronizza registro\" per rendere effettive le "
-"modificHe una volta completate le mdifiche e le creazioni."
+"modifiche una volta completate le modifiche e le creazioni."
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
