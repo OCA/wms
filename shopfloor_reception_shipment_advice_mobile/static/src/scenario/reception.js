@@ -85,7 +85,7 @@ const ReceptionShipmentAdvice = process_registry.extend("reception", {
     },
     "methods.manual_select_shipment_options": function () {
         return {
-            group_title_default: "Available shipments",
+            group_title_default: "Today's shipments on " + this.state.data.dock.name,
             group_color: this.utils.colors.color_for("screen_step_todo"),
             showActions: false,
             list_item_options: {
