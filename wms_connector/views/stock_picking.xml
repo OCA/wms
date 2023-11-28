@@ -9,15 +9,45 @@
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
             <header position="inside">
+                <field name="wms_connector_exported" invisible="True"/>
+                <field name="is_wms_exportable" invisible="True"/>
                 <button
                     name="button_trigger_export"
                     type="object"
-                    string="Trigger export"
+                    string="Export to WMS"
+                    attrs="{'invisible': ['|', ('wms_connector_exported', '=', True), ('is_wms_exportable', '=', False)]}"
                 />
             </header>
+    </record>
+
+    <record model="ir.ui.view" id="stock_picking_search">
+        <field name="name">stock.picking.search (in wms_connector)</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <filter name="starred" position="after">
+                <field name="wms_connector_exported" invisible="True"/>
+                <filter
+                    string="Not WMS exported"
+                    name="not_wms_exported"
+                    domain="[('wms_connector_exported', '=', False)]"
+                    />
+            </filter>
         </field>
     </record>
 
+    <record model="ir.ui.view" id="stock_picking_tree_view">
+        <field name="name">stock.picking.tree (in wms_connector)</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="wms_connector_exported" invisible="True"/>
+                <field name="is_wms_exportable" invisible="True"/>
+                <field name="wms_connector_exported" optional="True"/>
+            </field>
+        </field>
+    </record>
 
 
 </odoo>
