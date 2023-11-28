@@ -9,8 +9,8 @@
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
             <header position="inside">
-                <field name="wms_connector_exported" invisible="True"/>
-                <field name="is_wms_exportable" invisible="True"/>
+                <field name="wms_connector_exported" invisible="True" />
+                <field name="is_wms_exportable" invisible="True" />
                 <button
                     name="button_trigger_export"
                     type="object"
@@ -18,6 +18,21 @@
                     attrs="{'invisible': ['|', ('wms_connector_exported', '=', True), ('is_wms_exportable', '=', False)]}"
                 />
             </header>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="action_show_export"
+                    attrs="{'invisible': [('wms_connector_exported', '=', False)]}"
+                    class="oe_stat_button"
+                    type="object"
+                    icon="fa-list"
+                    help="View export attachment"
+                >
+                    <div class="o_form_field o_stat_info">
+                        <span class="oe_stat_text">WMS export</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
     </record>
 
     <record model="ir.ui.view" id="stock_picking_search">
@@ -26,12 +41,12 @@
         <field name="inherit_id" ref="stock.view_picking_internal_search" />
         <field name="arch" type="xml">
             <filter name="starred" position="after">
-                <field name="wms_connector_exported" invisible="True"/>
+                <field name="wms_connector_exported" invisible="True" />
                 <filter
                     string="Not WMS exported"
                     name="not_wms_exported"
                     domain="[('wms_connector_exported', '=', False)]"
-                    />
+                />
             </filter>
         </field>
     </record>
@@ -42,9 +57,9 @@
         <field name="inherit_id" ref="stock.vpicktree" />
         <field name="arch" type="xml">
             <field name="state" position="after">
-                <field name="wms_connector_exported" invisible="True"/>
-                <field name="is_wms_exportable" invisible="True"/>
-                <field name="wms_connector_exported" optional="True"/>
+                <field name="wms_connector_exported" invisible="True" />
+                <field name="is_wms_exportable" invisible="True" />
+                <field name="wms_connector_exported" optional="True" />
             </field>
         </field>
     </record>
