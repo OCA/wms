@@ -15,7 +15,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
     _description = "Synchronizable export mixin"
 
     wms_export_date = fields.Datetime(readonly=True)
-    wms_export_attachment = fields.Many2one(
+    wms_export_attachment_id = fields.Many2one(
         "attachment.queue", index=True, readonly=True
     )
     wms_export_error = fields.Char(readonly=True, index=True)
@@ -59,7 +59,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
-        self.wms_export_attachment = attachment
+        self.wms_export_attachment_id = attachment
 
     def _prepare_export_data(self, idx) -> list:
         raise NotImplementedError
