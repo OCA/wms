@@ -4,62 +4,73 @@
 <odoo>
 
     <record model="ir.ui.view" id="stock_picking_form_view">
-        <field name="name">stock.picking.form (in wms_connector)</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
             <header position="inside">
-                <field name="wms_connector_exported" invisible="True" />
                 <field name="is_wms_exportable" invisible="True" />
                 <button
                     name="button_trigger_export"
                     type="object"
                     string="Export to WMS"
-                    attrs="{'invisible': ['|', ('wms_connector_exported', '=', True), ('is_wms_exportable', '=', False)]}"
+                    attrs="{'invisible': [
+                        '|',
+                        '|',
+                        ('wms_export_date', '!=', False),
+                        ('is_wms_exportable', '=', False),
+                        ('state', 'in', ('cancel', 'done', 'draft')),
+                    ]}"
+                />
+                <button
+                    name="action_force_cancel_wms"
+                    type="object"
+                    string="Force Cancel"
+                    groups="stock.group_stock_manager"
+                    attrs="{'invisible': [
+                        '|',
+                        ('wms_export_date', '=', False),
+                        ('state', '=', 'cancel'),
+                    ]}"
+                    confirm="Before cancelling, ensure that your have cancelled the picking in the
+                             external WMS"
                 />
             </header>
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button
-                    name="action_show_export"
-                    attrs="{'invisible': [('wms_connector_exported', '=', False)]}"
-                    class="oe_stat_button"
-                    type="object"
-                    icon="fa-list"
-                    help="View export attachment"
-                >
-                    <div class="o_form_field o_stat_info">
-                        <span class="oe_stat_text">WMS export</span>
-                    </div>
-                </button>
-            </xpath>
+            <field name="date_done" position="before">
+                <field
+                    name="wms_export_date"
+                    attrs="{'invisible': [('is_wms_exportable', '=', False)]}"
+                />
+            </field>
+            <field name="group_id" position="after">
+                <field
+                    name="wms_export_attachment_id"
+                    attrs="{'invisible': [('wms_export_attachment_id', '=', False)]}"
+                />
+            </field>
         </field>
     </record>
 
     <record model="ir.ui.view" id="stock_picking_search">
-        <field name="name">stock.picking.search (in wms_connector)</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_internal_search" />
         <field name="arch" type="xml">
             <filter name="starred" position="after">
-                <field name="wms_connector_exported" invisible="True" />
+                <separator />
                 <filter
-                    string="Not WMS exported"
+                    string="To export"
                     name="not_wms_exported"
-                    domain="[('wms_connector_exported', '=', False)]"
+                    domain="[('wms_export_date', '=', False)]"
                 />
             </filter>
         </field>
     </record>
 
     <record model="ir.ui.view" id="stock_picking_tree_view">
-        <field name="name">stock.picking.tree (in wms_connector)</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.vpicktree" />
         <field name="arch" type="xml">
-            <field name="state" position="after">
-                <field name="wms_connector_exported" invisible="True" />
-                <field name="is_wms_exportable" invisible="True" />
-                <field name="wms_connector_exported" optional="True" />
+            <field name="date_deadline" position="after">
+                <field name="wms_export_date" string="Exported at" optional="True" />
             </field>
         </field>
     </record>
