@@ -110,6 +110,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         )
 
     def test_scan_line_product_lot_ok(self):
+        """Check scanning a lot and there is only one lot for that product."""
         picking = self._create_picking(
             lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
         )
@@ -120,6 +121,30 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         lot = first_line.lot_id
         related_lines = picking.move_line_ids - first_line
         self._test_scan_line_ok(lot.name, first_line, related_lines)
+
+    def test_scan_line_product_lot_ok_multiple_lot(self):
+        """Check scanning a lot and there is two different lot for that product."""
+        picking = self._create_picking(
+            lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
+        )
+        # For product A, lets have two lines with different lot
+        lot_1 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_1
+        )
+        lot_2 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_2
+        )
+        self._fill_stock_for_moves(picking.move_lines[1], in_lot=True)
+        picking.action_assign()
+        line_with_lot_1 = picking.move_line_ids.filtered(lambda l: l.lot_id == lot_1)
+        related_lines = picking.move_line_ids - line_with_lot_1
+        self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
 
     def test_scan_line_product_in_one_package_all_package_lines_ok(self):
         picking = self._create_picking(

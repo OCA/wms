@@ -581,18 +581,18 @@ class Checkout(Component):
         elif packages:
             # Select all the lines of the package when we scan a lot in a
             # package and we have only one.
+
             return self._select_lines_from_package(
                 picking, selection_lines, packages, prefill_qty=prefill_qty, **kw
             )
-
-        first_allowed_line = fields.first(lines)
-        return self._select_lines_from_product(
-            picking,
-            selection_lines,
-            first_allowed_line.product_id,
-            prefill_qty=prefill_qty,
-            check_lot=False,
+        # Not in a package. related lines are all other lines not in a package
+        related_lines = selection_lines.filtered(
+            lambda l: not l.package_id and l.lot_id != lot
         )
+        lines = self._select_lines(
+            lines, prefill_qty=prefill_qty, related_lines=related_lines
+        )
+        return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_serial(self, picking, selection_lines, lot, **kw):
         # Search for serial number is actually the same as searching for lot (as of v14...)
