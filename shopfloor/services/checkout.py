@@ -588,10 +588,13 @@ class Checkout(Component):
             related_lines = selection_lines.filtered(
                 lambda l: not l.package_id and l.lot_id != lot
             )
-        # FIXME if multiple lines - only one should have its qty-done changed.
-        #       this is realted to the option no-prefill-qty not enabled
+        # Only one line selected should have its quantity done updated
+        line_to_update = fields.first(lines)
+        if len(lines) > 1:
+            related_lines |= lines - line_to_update
+
         lines = self._select_lines(
-            lines, prefill_qty=prefill_qty, related_lines=related_lines
+            line_to_update, prefill_qty=prefill_qty, related_lines=related_lines
         )
         return self._response_for_select_package(picking, lines)
 

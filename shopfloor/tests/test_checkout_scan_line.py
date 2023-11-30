@@ -173,6 +173,38 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         related_lines = picking.move_line_ids - line_with_lot_1
         self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
 
+    def test_scan_line_product_lot_on_multiple_line_ok(self):
+        """Check scanning a lot set on multiple lines of the transfer."""
+        picking = self._create_picking(
+            lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
+        )
+        sub_location = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "location_id": picking.location_id.id,
+                    "name": "sub location to have lot on multiple lines",
+                }
+            )
+        )
+        # For product A, lets have two lines with the same lot
+        # For that update the stock on two different location
+        lot_1 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_1
+        )
+        self._update_qty_in_location(sub_location, self.product_a, 1, None, lot_1)
+        self._fill_stock_for_moves(picking.move_lines[1], in_package=False, in_lot=True)
+        picking.action_assign()
+        self.assertTrue(len(picking.move_line_ids), 3)
+        # Only the first line with the lot should be updated
+        line_with_lot_1 = picking.move_line_ids.filtered(lambda l: l.lot_id == lot_1)[0]
+        related_lines = picking.move_line_ids - line_with_lot_1
+        self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
+
     def test_scan_line_product_in_one_package_all_package_lines_ok(self):
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
