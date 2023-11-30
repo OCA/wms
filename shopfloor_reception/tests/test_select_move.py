@@ -17,6 +17,8 @@ class TestSelectLine(CommonCase):
         response = self.service.dispatch(
             "scan_line", params={"picking_id": picking.id, "barcode": "NOPE"}
         )
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
         self.assert_response(
             response,
             next_state="select_move",
@@ -149,6 +151,8 @@ class TestSelectLine(CommonCase):
             params={"picking_id": picking.id, "barcode": self.product_c.barcode},
         )
         error_msg = "Product not found in the current transfer or already in a package."
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
         self.assert_response(
             response,
             next_state="select_move",
@@ -169,6 +173,8 @@ class TestSelectLine(CommonCase):
         error_msg = (
             "Packaging not found in the current transfer or already in a package."
         )
+        data = self.data.picking(picking, with_progress=True)
+        data.update({"moves": self._data_for_moves(picking.move_lines)})
         self.assert_response(
             response,
             next_state="select_move",

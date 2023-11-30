@@ -81,7 +81,7 @@ class CommonCase(BaseCommonCase):
         return res
 
     def _data_for_move(self, move):
-        return self.data.move(move)
+        return self.data.move(move, auto_post_enabled=self.menu.auto_post_line)
 
     def _data_for_moves(self, moves):
         res = []
