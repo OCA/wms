@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-22 15:33+0000\n"
+"PO-Revision-Date: 2023-12-01 17:33+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -724,7 +724,7 @@ msgstr "Nessuna riga da confezionare trovata."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No lines to process, set quantities on some"
-msgstr ""
+msgstr "Nessuna riga da elaborare, inserire alcune quantità"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
