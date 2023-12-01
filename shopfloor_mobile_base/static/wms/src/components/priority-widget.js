@@ -18,6 +18,7 @@ export var PriorityWidget = Vue.component("priority-widget", {
     },
     template: `
 <div :class="[$options._componentTag, opts.mode ? 'mode-' + opts.mode: '', 'd-inline']">
+    <span v-if="opts.label">{{ opts.label }}</span>
     <span v-for="n in _.range(1, opts.priority + 1)" v-if="opts.priority" :class="['priority-' + n]">
         <v-icon color="amber accent-2">mdi-star</v-icon>
     </span>

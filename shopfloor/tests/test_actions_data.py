@@ -155,6 +155,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
             "ship_carrier": None,
+            "priority": "0",
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
@@ -179,6 +180,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "carrier": {"id": carrier.id, "name": carrier.name},
             "ship_carrier": None,
             "progress": 0.0,
+            "priority": "0",
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
         self.assertDictEqual(data, expected)
