@@ -390,13 +390,15 @@ const ClusterPicking = {
                 unload_single: {
                     display_info: {
                         title: this.$t("cluster_picking.unload_single.title"),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t(
+                            "cluster_picking.scan_destination.scan_placeholder"
+                        ),
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
                             this.odoo.call("unload_scan_pack", {
                                 picking_batch_id: this.current_batch().id,
-                                package_id: null, // FIXME: where does it come from? backend data?
+                                package_id: this.state.data.package.id,
                                 barcode: scanned.text,
                             })
                         );
@@ -411,7 +413,7 @@ const ClusterPicking = {
                         this.wait_call(
                             this.odoo.call("unload_scan_destination", {
                                 picking_batch_id: this.current_batch().id,
-                                package_id: null, // FIXME: where does it come from? backend data?
+                                package_id: this.state.data.package.id,
                                 barcode: scanned.text,
                             })
                         );
