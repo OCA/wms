@@ -485,13 +485,14 @@ class StockReleaseChannel(models.Model):
         for channel in picking._find_release_channel_possible_candidate():
             current = picking
             domain = channel._prepare_domain()
-            if not domain and not channel.code:
+            code = channel.sudo().code
+            if not domain and not code:
                 current.release_channel_id = channel
             if domain:
                 current = picking.filtered_domain(domain)
             if not current:
                 continue
-            if channel.code:
+            if code:
                 current = channel._eval_code(current)
             if not current:
                 continue
@@ -536,7 +537,8 @@ class StockReleaseChannel(models.Model):
         return eval_context
 
     def _eval_code(self, pickings):
-        expr = self.code.strip()
+        code = self.sudo().code
+        expr = code.strip()
         eval_context = self._eval_context(pickings)
         try:
             safe_eval(expr, eval_context, mode="exec", nocopy=True)
