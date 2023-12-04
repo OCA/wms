@@ -58,7 +58,13 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def _assert_response_scan_destination_all(
-        self, state, response, pickings, message=None, confirmation_required=None
+        self,
+        state,
+        response,
+        pickings,
+        message=None,
+        confirmation_required=None,
+        package=None,
     ):
         # this code is repeated from the implementation, not great, but we
         # mostly want to ensure the selection of pickings is right, and the
@@ -67,20 +73,28 @@ class LocationContentTransferCommonCase(CommonCase):
         lines = move_lines.filtered(lambda line: not line.package_level_id)
         package_levels = pickings.package_level_ids
         location = move_lines.location_id
+        data = {
+            "move_lines": self.data.move_lines(lines),
+            "package_levels": self.data.package_levels(package_levels),
+            "location": self.data.location(location),
+            "confirmation_required": confirmation_required,
+        }
+        if package:
+            data["package"] = self.data.package(package)
         self.assert_response(
             response,
             next_state=state,
-            data={
-                "move_lines": self.data.move_lines(lines),
-                "package_levels": self.data.package_levels(package_levels),
-                "location": self.data.location(location),
-                "confirmation_required": confirmation_required,
-            },
+            data=data,
             message=message,
         )
 
     def assert_response_scan_destination_all(
-        self, response, pickings, message=None, confirmation_required=None
+        self,
+        response,
+        pickings,
+        message=None,
+        confirmation_required=None,
+        package=None,
     ):
         self._assert_response_scan_destination_all(
             "scan_destination_all",
@@ -88,6 +102,7 @@ class LocationContentTransferCommonCase(CommonCase):
             pickings,
             message=message,
             confirmation_required=confirmation_required,
+            package=package,
         )
 
     def assert_response_start_single(
@@ -105,10 +120,18 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def _assert_response_scan_destination(
-        self, state, response, next_content, message=None, confirmation_required=None
+        self,
+        state,
+        response,
+        next_content,
+        message=None,
+        confirmation_required=None,
+        package=None,
     ):
         location = next_content.location_id
         data = self.service._data_content_line_for_location(location, next_content)
+        if package:
+            data["package"] = self.data.package(package)
         data["confirmation_required"] = confirmation_required
         self.assert_response(
             response,
@@ -118,7 +141,12 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def assert_response_scan_destination(
-        self, response, next_content, message=None, confirmation_required=None
+        self,
+        response,
+        next_content,
+        message=None,
+        confirmation_required=None,
+        package=None,
     ):
         self._assert_response_scan_destination(
             "scan_destination",
@@ -126,4 +154,5 @@ class LocationContentTransferCommonCase(CommonCase):
             next_content,
             message=message,
             confirmation_required=confirmation_required,
+            package=package,
         )
