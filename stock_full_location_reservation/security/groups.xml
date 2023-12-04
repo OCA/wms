@@ -1,0 +1,6 @@
+<odoo>
+    <record model="res.groups" id="group_user">
+        <field name="name">Full location reservation</field>
+        <field name="category_id" ref="base.module_category_hidden" />
+    </record>
+</odoo>
