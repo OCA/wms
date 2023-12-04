@@ -454,6 +454,10 @@ class TestSetQuantity(CommonCase):
         )
         self.assertEqual(len(selected_move_line), 1)
         self.assertEqual(selected_move_line.qty_done, 1.0)
+        self.assertEqual(
+            selected_move_line.product_uom_qty,
+            selected_move_line.move_id.product_uom_qty,
+        )
 
         # Let's make the first user work a little bit, and pick a total of 4 units
         for __ in range(4):
@@ -477,10 +481,13 @@ class TestSetQuantity(CommonCase):
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
         )
+        # The whole move's product_uom_qty has been assigned to the first created line.
+        # The new one gets 0.0
         new_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
             and l.shopfloor_user_id == manager_user
         )
+        self.assertEqual(new_line.product_uom_qty, 0.0)
 
         move_lines = selected_move_line | new_line
         line_service_mapping = [
@@ -494,10 +501,6 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(lines_qty_done, 6.0)
         # should be equal to the moves quantity_done
         self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
-        # And also, the remaining qty is 4.0, then for each move line,
-        # product_uom_qty = line.qty_done + move's remaining_qty
-        for line in move_lines:
-            self.assertEqual(line.product_uom_qty, line.qty_done + 4.0)
 
         # Now, let the new user finish its work
         for __ in range(4):
@@ -516,10 +519,12 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(lines_qty_done, 10.0)
         self.assertEqual(lines_qty_done, move_lines.move_id.quantity_done)
 
-        # And also, the product_uom_qty should be == qty_done == 5.0
-        for line in move_lines:
-            self.assertEqual(line.product_uom_qty, 5.0)
-            self.assertEqual(line.product_uom_qty, line.qty_done)
+        # However, product_uom_qty hasn't changed
+        self.assertEqual(selected_move_line.product_uom_qty, 10.0)
+        self.assertEqual(new_line.product_uom_qty, 0.0)
+        # And what's important is that the sum of lines's product_uom_qty is
+        # always == move's product_uom_qty
+        self.assertEqual(sum(move_lines.mapped("product_uom_qty")), 10.0)
 
         # However, if we pick more than move's product_uom_qty, then lines
         # product_uom_qty isn't updated, in order to be able to display an error
@@ -547,7 +552,9 @@ class TestSetQuantity(CommonCase):
             "body": "You cannot process that much units.",
         }
         picking_data = self.data.picking(picking)
+        quantity_done_by_user = 1
         for line, service in line_service_mapping:
+            quantity_done_by_user += 2
             response = service.dispatch(
                 "process_with_new_pack",
                 params={
@@ -556,13 +563,15 @@ class TestSetQuantity(CommonCase):
                     "quantity": line.qty_done,
                 },
             )
+            line_data = self.data.move_lines(line)
+            line_data[0]["quantity"] = quantity_done_by_user
             self.assert_response(
                 response,
                 next_state="set_quantity",
                 data={
                     "picking": picking_data,
-                    "selected_move_line": self.data.move_lines(line),
                     "confirmation_required": None,
+                    "selected_move_line": line_data,
                 },
                 message=error_msg,
             )
@@ -582,10 +591,11 @@ class TestSetQuantity(CommonCase):
         )
 
         self.assertEqual(selected_move_line.qty_done, 3.0)
-        self.assertEqual(selected_move_line.product_uom_qty, 3.0)
-
         self.assertEqual(new_line.qty_done, 7.0)
-        self.assertEqual(new_line.product_uom_qty, 7.0)
+
+        self.assertEqual(selected_move_line.product_uom_qty, 10.0)
+        self.assertEqual(new_line.product_uom_qty, 0.0)
+        self.assertEqual(sum(move_lines.mapped("product_uom_qty")), 10.0)
 
         # And everything's fine on the move
         move = move_lines.move_id
@@ -636,3 +646,195 @@ class TestSetQuantity(CommonCase):
             lambda l: l.product_id == self.product_a
         )
         self.assertEqual(len(move_lines), 3)
+
+    def test_concurrent_update_2(self):
+        self.menu.sudo().auto_post_line = True
+        self.input_location.sudo().active = True
+        # Test related to picking being set to "ready" once the first user posts
+        # its move line, hence the picking being not available in shopfloor afterwards.
+
+        # The reason for that is that `_post_line` calls `_recompute_state`.
+        # If at this point there's more or less reserved qty than what's been ordered
+        # then state isn't computed as assigned.
+
+        # This test ensure that this isn't the case anymore.
+
+        # Creating the picking, selecting the move line.
+        picking = self._create_picking()
+        move = picking.move_lines.filtered(lambda l: l.product_id == self.product_a)
+        service_user_1 = self.service
+        service_user_1.dispatch("scan_document", params={"barcode": picking.name})
+        service_user_1.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": self.product_a.barcode},
+        )
+        move_line_user_1 = move.move_line_ids
+        # The only move line should have qty_done = 1
+        self.assertEqual(move_line_user_1.qty_done, 1.0)
+        self.assertEqual(move_line_user_1.product_uom_qty, 10.0)
+
+        # Now, concurrently pick products with another user for the same move
+        manager_user = self.shopfloor_manager
+        service_user_2 = self._get_service_for_user(manager_user)
+        service_user_2.dispatch("scan_document", params={"barcode": picking.name})
+        service_user_2.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": self.product_a.barcode},
+        )
+        # The whole move's product_uom_qty has been assigned to the first created line.
+        # The new one gets 0.0
+        move_line_user_2 = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+            and l.shopfloor_user_id == manager_user
+        )
+        self.assertEqual(move_line_user_2.product_uom_qty, 0.0)
+        self.assertEqual(move_line_user_2.qty_done, 1.0)
+
+        # At this point, both lines are referencing the same move
+        self.assertEqual(move_line_user_2.move_id, move_line_user_1.move_id)
+
+        # A new move / picking will be created after it is posted.
+        # store the list of pickings to find it out after it is posted
+        # moves before
+        lines_before = self.env["stock.move.line"].search([])
+
+        # Now, post user_1 move line
+        response = service_user_1.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_1.id,
+                "quantity": move_line_user_1.qty_done,
+            },
+        )
+        picking_data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_destination",
+            data={
+                "picking": picking_data,
+                "selected_move_line": self.data.move_lines(move_line_user_1),
+            },
+        )
+
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_1.id,
+                "location_name": self.input_location.name,
+            },
+        )
+        lines_after = self.env["stock.move.line"].search(
+            [("id", "not in", lines_before.ids)]
+        )
+        # After move_line is posted, its state is done, and its qty_done is 1.0
+        self.assertEqual(move_line_user_1.state, "done")
+        # The remaining one is still to be done
+        self.assertEqual(move_line_user_2.state, "assigned")
+        # As well as the new one
+        self.assertEqual(len(lines_after), 1)
+        # The quantity to do is set on 1 of the lines
+        self.assertEqual(lines_after.product_uom_qty, 0)
+        self.assertEqual(move_line_user_2.product_uom_qty, 9)
+
+    def test_move_states(self):
+        # as only assigned moves can be posted, we need to ensure that
+        # we got the right states in any case, especially when users are working
+        # concurrently
+        picking = self._create_picking()
+        move_product_a = picking.move_lines.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        # user1 processes 10 units
+        move_line_user_1 = move_product_a.move_line_ids
+        service_user_1 = self.service
+        service_user_1.dispatch("scan_document", params={"barcode": picking.name})
+        service_user_1.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": self.product_a.barcode},
+        )
+        response = service_user_1.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_1.id,
+                "quantity": move_product_a.product_qty - 1,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        # user2 selects the same picking
+        user2 = self.shopfloor_manager
+        service_user_2 = self._get_service_for_user(user2)
+        response = service_user_2.dispatch(
+            "scan_document", params={"barcode": picking.name}
+        )
+        # And the same line
+        service_user_2.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": self.product_a.barcode},
+        )
+        move_line_user_2 = move_product_a.move_line_ids - move_line_user_1
+        # user1 shouldn't be able to process his move, since
+        # move qty_done  > move product_qty
+        response = service_user_1.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_1.id,
+                "quantity": 10.0,
+            },
+        )
+        #
+        expected_message = {
+            "body": "You cannot process that much units.",
+            "message_type": "error",
+        }
+        self.assertMessage(response, expected_message)
+        # user1 cancels the operation
+        service_user_1.dispatch(
+            "set_quantity__cancel_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_1.id,
+            },
+        )
+        self.assertFalse(move_line_user_1.shopfloor_user_id)
+        self.assertEqual(move_line_user_1.qty_done, 0)
+        # User2 should be able to process 1 unit
+        response = service_user_2.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_2.id,
+                "quantity": 1.0,
+            },
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_destination",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(move_line_user_2),
+            },
+        )
+        self.assertEqual(move_product_a.quantity_done, 1.0)
+        response = service_user_2.dispatch(
+            "set_destination",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line_user_2.id,
+                "location_name": self.dispatch_location.name,
+            },
+        )
+        # When posted, the move line product_uom_qty has been set to qty_done
+        self.assertEqual(move_line_user_2.qty_done, move_line_user_2.product_qty)
+        self.assert_response(
+            response, next_state="select_move", data=self._data_for_select_move(picking)
+        )
+        # Now, user1 can start working on this again
+        service_user_1.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": self.product_a.barcode},
+        )

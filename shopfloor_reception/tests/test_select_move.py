@@ -176,18 +176,6 @@ class TestSelectLine(CommonCase):
             message={"message_type": "warning", "body": error_msg},
         )
 
-    def test_assign_user_to_picking(self):
-        picking = self._create_picking()
-        self.assertEqual(picking.user_id.id, False)
-        self.service.dispatch(
-            "scan_line",
-            params={
-                "picking_id": picking.id,
-                "barcode": self.product_a.barcode,
-            },
-        )
-        self.assertEqual(picking.user_id.id, self.env.uid)
-
     def test_assign_shopfloor_user_to_line(self):
         picking = self._create_picking()
         for line in picking.move_line_ids:
@@ -209,9 +197,20 @@ class TestSelectLine(CommonCase):
         self.assertEqual(other_move_line.shopfloor_user_id.id, False)
 
     def test_create_new_line_none_available(self):
-        # If all lines for a product are already assigned to a different user
-        # and there's still qty todo remaining
-        # a new line will be created for that qty todo.
+        # If there's already a move line for a given incoming move,
+        # we assigned the whole move's product_uom_qty to it.
+        # The reason for that is that when recomputing states for a given move
+        # if sum(move.move_line_ids.product_uom_qty) != move.product_uom_qty,
+        # then it's state won't be assigned.
+        # For instance:
+        #   - user 1 selects line1
+        #   - user 2 selected line1 too
+        #   - user 1 posts 20/40 goods
+        #   - user 2 tries to process any qty, and it fails, because posting
+        #     a move triggers the recompute of move's state
+        # To avoid that, the first created line gets
+        # product_uom_qty = move.product_uom_qty
+        # The next ones are getting 0.
         picking = self._create_picking()
         self.assertEqual(len(picking.move_line_ids), 2)
         selected_move_line = picking.move_line_ids.filtered(
@@ -233,9 +232,11 @@ class TestSelectLine(CommonCase):
                 "barcode": self.product_a.barcode,
             },
         )
+        # A new line has been created
         self.assertEqual(len(picking.move_line_ids), 3)
         created_line = picking.move_line_ids[2]
-        self.assertEqual(created_line.product_uom_qty, 7)
+        # And its product_uom_qty is 0
+        self.assertEqual(created_line.product_uom_qty, 0.0)
         self.assertEqual(created_line.shopfloor_user_id.id, self.env.uid)
 
     def test_done_action(self):
