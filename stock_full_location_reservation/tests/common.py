@@ -68,7 +68,7 @@ class TestStockFullLocationReservationCommon(TestStockCommon):
         return picking
 
     def _check_move_line_len(self, pick, length, filter_func=None):
-        moves = pick.move_lines
+        moves = pick.move_ids
         if filter_func:
             moves = moves.filtered(filter_func)
 

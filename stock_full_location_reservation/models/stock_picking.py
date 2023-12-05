@@ -16,17 +16,17 @@ class StockPicking(models.Model):
         compute="_compute_has_full_location_reservations",
     )
 
-    @api.depends("move_lines.is_full_location_reservation")
+    @api.depends("move_ids.is_full_location_reservation")
     def _compute_has_full_location_reservations(self):
         for rec in self:
             rec.has_full_location_reservations = (
-                rec.move_lines.filtered(lambda m: m.is_full_location_reservation)
+                rec.move_ids.filtered(lambda m: m.is_full_location_reservation)
                 and True
                 or False
             )
 
     def do_full_location_reservation(self):
-        self.move_lines._full_location_reservation()
+        self.move_ids._full_location_reservation()
 
     def undo_full_location_reservation(self):
-        self.move_lines.undo_full_location_reservation()
+        self.move_ids.undo_full_location_reservation()
