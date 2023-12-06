@@ -77,6 +77,7 @@ new Vue({
             global_state_key: "",
             loading: false,
             loading_msg_custom: "",
+            loadingMenu: false,
             appconfig: null,
         };
         _.merge(data, config_registry.generare_data_keys());
@@ -121,6 +122,9 @@ new Vue({
             self.loadMenu(true);
         });
         event_hub.$emit("app:mounted", self, false);
+    },
+    beforeUpdate: function () {
+        this.loadMenu(true);
     },
     computed: {
         ...config_registry.generate_computed_properties(),
@@ -231,9 +235,20 @@ new Vue({
                     "SERVICE-CTX-PROFILE-ID": this.profile.id,
                 },
             });
-            return odoo.call("menu").then(function (result) {
-                self.appmenu = result.data;
-            });
+            if (!this.loadingMenu) {
+                // TODO: this is added to make sure to always have
+                // up-to-date counter in the navigation drawer items.
+                // It is not an ideal solution though, as it will be called
+                // whenever the component is updated (there's no easy way
+                // to refresh the counters only when needed,
+                // as each scenario has a different implementation).
+                // That being said, this call is very small so it's not that costly.
+                this.loadingMenu = true;
+                return odoo.call("menu").then((result) => {
+                    self.appmenu = result.data;
+                    this.loadingMenu = false;
+                });
+            }
         },
         login: function (evt, data) {
             evt.preventDefault();
