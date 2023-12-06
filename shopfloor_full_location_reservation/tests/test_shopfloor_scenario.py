@@ -4,6 +4,7 @@
 from odoo.addons.shopfloor_base.tests.common import CommonCase
 
 
+# pylint: disable=missing-return
 class TestShopfloorScenario(CommonCase):
     @classmethod
     def setUpClassUsers(cls):
