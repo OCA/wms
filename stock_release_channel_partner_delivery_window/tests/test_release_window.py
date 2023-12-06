@@ -87,6 +87,7 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         # Window
         today = fields.Date.today()
         self.picking.partner_id = self.customer_time_window
+        self.channel.process_end_date = today  # Friday
         self._assign_picking(self.picking)
         self.assertNotEqual(self.channel, self.picking.release_channel_id)
         self.channel.process_end_date = today + timedelta(
