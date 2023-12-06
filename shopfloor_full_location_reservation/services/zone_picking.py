@@ -37,5 +37,5 @@ class ZonePicking(Component):
                 ]
             ).result_package_id = package
         return super()._set_destination_location(
-            self, move_line, package, quantity, confirmation, location, barcode
+            move_line, package, quantity, confirmation, location, barcode
         )

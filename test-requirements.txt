@@ -1,2 +1,5 @@
 vcrpy-unittest
 odoo_test_helper
+odoo-addon-stock-full-location-reservation @ git+https://github.com/OCA/wms.git@refs/pull/794/head#subdirectory=setup/stock_full_location_reservation
+odoo-addon-shopfloor-base @ git+https://github.com/OCA/wms.git@refs/pull/899/head#subdirectory=setup/shopfloor_base
+odoo-addon-shopfloor @ git+https://github.com/OCA/wms.git@refs/pull/899/head#subdirectory=setup/shopfloor
