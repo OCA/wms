@@ -10,6 +10,7 @@ from ..utils import float_to_time, next_datetime
 class StockReleaseChannel(models.Model):
 
     _inherit = "stock.release.channel"
+    _order = "process_end_date, sequence, id"
 
     process_end_time = fields.Float(
         help="Fill in this to indicates when this channel release process would "
