@@ -31,24 +31,6 @@ msgid "Delivery Method"
 msgstr "Método de Entrega"
 
 #. module: delivery_carrier_warehouse
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_sale_order__display_name
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_stock_warehouse__display_name
-msgid "Display Name"
-msgstr "Mostrar Nombre"
-
-#. module: delivery_carrier_warehouse
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_sale_order__id
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_stock_warehouse__id
-msgid "ID"
-msgstr "ID"
-
-#. module: delivery_carrier_warehouse
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_sale_order____last_update
-#: model:ir.model.fields,field_description:delivery_carrier_warehouse.field_stock_warehouse____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
-
-#. module: delivery_carrier_warehouse
 #: model:ir.model,name:delivery_carrier_warehouse.model_sale_order
 msgid "Sales Order"
 msgstr "Pedido de Venta"
@@ -57,3 +39,12 @@ msgstr "Pedido de Venta"
 #: model:ir.model,name:delivery_carrier_warehouse.model_stock_warehouse
 msgid "Warehouse"
 msgstr "Almacén"
+
+#~ msgid "Display Name"
+#~ msgstr "Mostrar Nombre"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
