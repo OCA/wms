@@ -21,6 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
+[delivery_carrier_warehouse](delivery_carrier_warehouse/) | 16.0.1.0.0 |  | Get delivery method used in sales orders from warehouse
 [stock_available_to_promise_release](stock_available_to_promise_release/) | 16.0.2.3.0 |  | Release Operations based on available to promise
 [stock_dynamic_routing](stock_dynamic_routing/) | 16.0.1.0.2 |  | Dynamic routing of stock moves
 [stock_picking_completion_info](stock_picking_completion_info/) | 16.0.1.0.1 |  | Display on current document completion information according to next operations
