@@ -12,7 +12,7 @@ class TestSaleDeliveryCarrierPreference(SavepointCase):
         cls.partner = ref("base.res_partner_12")
         cls.product = ref("product.product_product_20")
         cls.free_delivery_carrier = ref("delivery.free_delivery_carrier")
-        cls.normal_delivery_carrier = ref("delivery.normal_delivery_carrier")
+        cls.delivery_local_delivery = ref("delivery.delivery_local_delivery")
         cls.warehouse = ref("stock.warehouse0")
         cls.warehouse.delivery_carrier_id = cls.free_delivery_carrier
 
@@ -28,11 +28,11 @@ class TestSaleDeliveryCarrierPreference(SavepointCase):
     def test_warehouse_carrier(self):
         order = self._create_sale_order()
         self.assertEqual(
-            self.partner.property_delivery_carrier_id, self.normal_delivery_carrier
+            self.partner.property_delivery_carrier_id, self.delivery_local_delivery
         )
         action = order.action_open_delivery_wizard()
         default_carrier_id = action["context"]["default_carrier_id"]
-        self.assertEqual(default_carrier_id, self.normal_delivery_carrier.id)
+        self.assertEqual(default_carrier_id, self.delivery_local_delivery.id)
         self.partner.property_delivery_carrier_id = False
         action = order.action_open_delivery_wizard()
         default_carrier_id = action["context"]["default_carrier_id"]
