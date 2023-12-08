@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Checkout Put In Pack Restriction",
     "summary": "",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
