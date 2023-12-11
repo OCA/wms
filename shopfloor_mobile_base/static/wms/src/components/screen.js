@@ -5,6 +5,7 @@
  */
 
 import event_hub from "../services/event_hub.js";
+import {actions_registry} from "../services/actions_registry.js";
 
 /* eslint-disable strict */
 Vue.component("Screen", {
@@ -333,11 +334,34 @@ Vue.component("nav-items-extra", {
 Vue.component("app-bar-actions", {
     template: `
     <div :class="$options._componentTag">
+        <component
+            v-for="action in actions()"
+            :is="action.render_component"
+            :options="action.render_options ? action.render_options() : {}"
+            :key="make_component_key([action.render_component])"
+            />
+    </div>
+    `,
+    methods: {
+        actions: function () {
+            return actions_registry.by_tag("app-bar-actions");
+        },
+    },
+});
+
+// Scan anything action component
+Vue.component("app-bar-action-scan-anything", {
+    template: `
         <v-btn icon @click="$router.push({'name': 'scan_anything'})" :disabled="this.$route.name=='scan_anything'">
             <v-icon >mdi-magnify</v-icon>
         </v-btn>
-    </div>
     `,
+});
+// Scan anything action registry add
+actions_registry.add("app-bar-action-scan-anything", {
+    render_component: "app-bar-action-scan-anything",
+    tag: "app-bar-actions",
+    sequence: 100,
 });
 
 Vue.component("app-version-footer", {
