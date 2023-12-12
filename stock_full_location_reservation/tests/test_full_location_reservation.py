@@ -108,3 +108,38 @@ class TestFullLocationReservation(TestStockFullLocationReservationCommon):
         self._check_move_line_len(picking, 3)
         self.assertEqual(picking.move_line_ids.package_id, package)
         self.assertEqual(sum(picking.move_line_ids.mapped("reserved_qty")), 11)
+
+    def test_full_location_reservation_merge(self):
+        """
+        Activate the merge for new quantity move.
+        Create a picking and confirm it (quantity: 5).
+        Set product A in rack location (qauntity : 10).
+        Confirm the picking.
+        Do the full reservation.
+        The whole quantity should be assigned in one move.
+
+        """
+        self.picking_type.merge_move_for_full_location_reservation = True
+        picking = self._create_picking(
+            self.location_rack,
+            self.customer_location,
+            self.picking_type,
+            [[self.productA, 5]],
+        )
+
+        picking.action_confirm()
+        self._check_move_line_len(picking, 1)
+
+        self._create_quants(
+            [
+                (self.productA, self.location_rack_child, 10.0),
+            ]
+        )
+
+        picking.action_assign()
+
+        picking.do_full_location_reservation()
+
+        self._check_move_line_len(picking, 1)
+        self.assertEqual(10.0, picking.move_ids.product_uom_qty)
+        self.assertEqual(10.0, picking.move_ids.reserved_availability)

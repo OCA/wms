@@ -11,3 +11,9 @@ class StockPickingType(models.Model):
         "Is full location reservation visible",
         help="""If this is checked, the full reservation of a the picking is visible""",
     )
+    merge_move_for_full_location_reservation = fields.Boolean(
+        help="""If this is checked, the full reservation of a the picking will be done
+            resulting of only one move (original one + full reservation one).
+            WARNING: If checked, it will be impossible to get the original move back.
+        """,
+    )
