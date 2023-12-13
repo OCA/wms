@@ -67,16 +67,18 @@ class StockMove(models.Model):
     def _full_location_reservation_create_move(
         self, product, qty, location, package=None
     ):
-        new_move = self.create(
-            self._full_location_reservation_prepare_move_vals(
+        new_move = self.copy(
+            default=self._full_location_reservation_prepare_move_vals(
                 product, qty, location, package
             )
         )
         if self.picking_type_id.merge_move_for_full_location_reservation:
             # To be able to be merged, the new move should use the same source location as
             # the original one.
-            new_move._action_confirm()
             new_move.location_id = self.location_id
+            self._do_unreserve()
+            # Don't merge at confirm
+            new_move._action_confirm(merge=False)
             new_move = (
                 (new_move | self)
                 .with_context(skip_undo_full_location_reservation=True)

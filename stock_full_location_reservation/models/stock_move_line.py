@@ -46,17 +46,20 @@ class StockMoveLine(models.Model):
         reservable_qties = self._get_full_location_reservable_qties(package_only)
         moves_to_assign_ids = []
         for line in self:
-            qties = reservable_qties.get(line.location_id, {}).get(line.package_id, {})
+            # Copy location and package as move line could be deleted if merge occurs
+            location = line.location_id
+            package = line.package_id
+            qties = reservable_qties.get(location, {}).get(package, {})
             if not qties:
                 continue
             for product, qty in qties.items():
                 moves_to_assign_ids.append(
                     line.move_id._full_location_reservation_create_move(
-                        product, qty, line.location_id, line.package_id
+                        product, qty, location, package
                     ).id
                 )
-            reservable_qties[line.location_id].pop(line.package_id)
-        moves_to_assign = self.move_id.browse(moves_to_assign_ids)
+            reservable_qties[location].pop(package)
+        moves_to_assign = self.env["stock.move"].browse(moves_to_assign_ids)
         if moves_to_assign:
             moves_to_assign._action_confirm()
             moves_to_assign._action_assign()
