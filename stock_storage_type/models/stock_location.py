@@ -7,9 +7,12 @@ from psycopg2 import sql
 
 from odoo import api, fields, models
 from odoo.fields import Command
-from odoo.tools import float_compare
+from odoo.tools import float_compare, index_exists
 
 _logger = logging.getLogger(__name__)
+OUT_MOVE_LINE_DOMAIN = [
+    ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
+]
 
 
 class StockLocation(models.Model):
@@ -87,9 +90,7 @@ class StockLocation(models.Model):
     out_move_line_ids = fields.One2many(
         "stock.move.line",
         "location_id",
-        domain=[
-            ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
-        ],
+        domain=OUT_MOVE_LINE_DOMAIN,
         help="technical field: the pending outgoing "
         "stock.move.lines in the location",
     )
@@ -140,6 +141,19 @@ class StockLocation(models.Model):
     only_empty = fields.Boolean(
         compute="_compute_only_empty", store=True, recursive=True
     )
+
+    def init(self):  # pylint: disable=missing-return
+        super().init()
+        if not index_exists(self._cr, "stock_move_line_location_state_index"):
+            self._cr.execute(
+                """
+                CREATE INDEX stock_move_line_location_state_index
+                ON
+                    stock_move_line (location_id, state)
+                WHERE
+                    (state IS NULL OR state NOT IN ('cancel', 'done'))
+                """
+            )
 
     @api.depends(
         "usage",
@@ -301,22 +315,38 @@ class StockLocation(models.Model):
         "only_empty",
     )
     def _compute_location_is_empty(self):
-        for rec in self:
-            # No restriction should apply on customer/supplier/...
-            # locations and we don't need to compute is empty
-            # if there is no limit on the location
-            if not rec._should_compute_location_is_empty():
-                # avoid write if not required
-                if not rec.location_is_empty:
-                    rec.location_is_empty = True
-                continue
+        # No restriction should apply on customer/supplier/...
+        # locations and we don't need to compute is empty
+        # if there is no limit on the location
+        only_empty_locations = self.filtered(
+            lambda l: not l._should_compute_location_is_empty()
+        )
+        only_empty_locations.update({"location_is_empty": True})
+        records = self - only_empty_locations
+        if not records:
+            return
+        location_domain = [("location_id", "in", records.ids)]
+        out_qty_by_location = {}
+        qty_by_location = {}
+        for group in self.env["stock.move.line"].read_group(
+            OUT_MOVE_LINE_DOMAIN + location_domain,
+            fields=["qty_done:sum"],
+            groupby=["location_id"],
+        ):
+            location_id = group["location_id"][0]
+            out_qty_by_location[location_id] = group["qty_done"]
+        for group in self.env["stock.quant"].read_group(
+            location_domain, fields=["quantity:sum"], groupby=["location_id"]
+        ):
+            location_id = group["location_id"][0]
+            qty_by_location[location_id] = group["quantity"]
+        for rec in records:
             # we do want to keep a write here even if the value is the same
             # to enforce concurrent transaction safety: 2 moves taking
             # quantities in a location have to be executed sequentially
             # or the location could remain "not empty"
             if (
-                sum(rec.quant_ids.mapped("quantity"))
-                - sum(rec.out_move_line_ids.mapped("qty_done"))
+                qty_by_location.get(rec.id, 0.0) - out_qty_by_location.get(rec.id, 0.0)
                 > 0
                 or rec.in_move_ids
                 or rec.in_move_line_ids
