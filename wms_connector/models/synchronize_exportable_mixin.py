@@ -52,10 +52,13 @@ class SynchronizeExportableMixin(models.AbstractModel):
             yield records, data
 
     def synchronize_export(self):
+        attachments = self.env["attachment.queue"]
         for records, data in self._get_export_data():
             vals = self._format_to_exportfile(data)
             attachment = self.env["attachment.queue"].create(vals)
             records.track_export(attachment)
+            attachments |= attachment
+        return attachments
 
     def track_export(self, attachment):
         self.wms_export_date = datetime.datetime.now()
