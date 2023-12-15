@@ -16,6 +16,9 @@ class StockPicking(models.Model):
         compute="_compute_wms_sync_cancel_supported"
     )
 
+    def _get_wms_export_task(self):
+        return self.picking_type_id.warehouse_id.wms_export_task_id
+
     def _compute_wms_sync_cancel_supported(self):
         self.wms_sync_cancel_supported = False
 

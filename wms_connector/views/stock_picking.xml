@@ -47,6 +47,16 @@
                     attrs="{'invisible': [('wms_export_attachment_id', '=', False)]}"
                 />
             </field>
+            <header position="after">
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                    attrs="{'invisible': [('wms_export_error', '=', False)]}"
+                >
+                    <p>Erreur de Synchronisation avec Reflex</p>
+                    <field name="wms_export_error" />
+                </div>
+            </header>
         </field>
     </record>
 

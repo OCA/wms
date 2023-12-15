@@ -25,9 +25,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
         return 1
 
     def button_trigger_export(self):
-        self.synchronize_export()
+        self.synchronize_export(raise_error=True)
 
-    def _get_export_data(self):
+    def _get_export_data(self, raise_error=False):
         data = []
         records = self.browse()
         sequence = 0
@@ -39,6 +39,8 @@ class SynchronizeExportableMixin(models.AbstractModel):
                     rec.wms_export_error = None
                     sequence += 1
             except Exception as e:
+                if raise_error:
+                    raise
                 if "pdb" in config.get("dev_mode"):
                     raise
                 rec.wms_export_error = str(e)
@@ -51,9 +53,9 @@ class SynchronizeExportableMixin(models.AbstractModel):
         if len(records):
             yield records, data
 
-    def synchronize_export(self):
+    def synchronize_export(self, raise_error=False):
         attachments = self.env["attachment.queue"]
-        for records, data in self._get_export_data():
+        for records, data in self._get_export_data(raise_error=raise_error):
             vals = self._format_to_exportfile(data)
             attachment = self.env["attachment.queue"].create(vals)
             records.track_export(attachment)
@@ -67,7 +69,12 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def _prepare_export_data(self, idx) -> list:
         raise NotImplementedError
 
+    def _get_wms_export_task(self):
+        raise NotImplementedError
+
     # TODO cleanup this code
+    # We should just have a method that return the data
+    # and a generic one that return the vals
     def _format_to_exportfile(self, name, data):
         return self._format_to_exportfile_csv(name, data)
 
@@ -80,12 +87,12 @@ class SynchronizeExportableMixin(models.AbstractModel):
         for row in data:
             writer.writerow(row)
         csv_file.seek(0)
-        ast = self.env.context.get("attachment_task")
+        task = self._get_wms_export_task()
         return {
             "name": self._get_export_name(),
             "datas": base64.b64encode(csv_file.getvalue().encode("utf-8")),
-            "task_id": ast.id,
-            "file_type": ast.file_type,
+            "task_id": task.id,
+            "file_type": task.file_type,
         }
 
     def _get_export_name(self):
