@@ -32,4 +32,4 @@ class WmsProductSync(models.Model):
         self.to_export = False
 
     def _get_wms_export_task(self):
-        return self.warehouse_id.wms_export_task_id
+        return self.warehouse_id.sudo().wms_export_task_id
