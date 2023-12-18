@@ -280,9 +280,16 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                     <v-col cols="2" md="2" v-if="!readonly">
                         <span class="qty-todo">/ {{ qty_todo_by_pkg[pkg.id] }}</span>
                     </v-col>
-                    <v-col>
+                    <v-col cols="4">
                         <div :class="qty_by_pkg[pkg.id] > 0 ? 'pkg-name font-weight-bold' : 'pkg-name'"> {{ pkg[pkgNameKey] }}</div>
                         <div v-if="contained_packaging[pkg.id]" :class="qty_by_pkg[pkg.id] > 0 ? 'pkg-qty font-weight-bold' : 'pkg-qty'">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
+                    </v-col>
+                    <v-col cols="2" v-if="_.result(contained_packaging[pkg.id], 'pkg.shopfloor_icon.url', '')">
+                        <img
+                            class="qty-picker-packaging-icon"
+                            :src="_.result(contained_packaging[pkg.id], 'pkg.shopfloor_icon.url', '')"
+                            :alt="_.result(contained_packaging[pkg.id], 'pkg.shopfloor_icon.alt_text', '')"
+                        />
                     </v-col>
                 </v-row>
             </v-expansion-panel-content>

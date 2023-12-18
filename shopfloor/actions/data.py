@@ -153,6 +153,7 @@ class DataAction(Component):
             "id",
             ("packaging_type_id:name", lambda rec, fname: rec.packaging_type_id.name),
             ("packaging_type_id:code", lambda rec, fname: rec.packaging_type_id.code),
+            ("packaging_type_id:shopfloor_icon", self._packaging_icon_data),
             "qty",
         ]
 
@@ -315,6 +316,17 @@ class DataAction(Component):
             self._packaging_parser,
             multi=True,
         )
+
+    def _packaging_icon_data(self, rec, field):
+        icon_data = {"alt_text": rec.packaging_type_id.name}
+        if not rec.packaging_type_id.shopfloor_icon:
+            return icon_data
+        icon_data[
+            "url"
+        ] = "/web/image/product.packaging.type/{}/shopfloor_icon/30x30".format(
+            rec.packaging_type_id.id
+        )
+        return icon_data
 
     def _product_supplier_code(self, rec, field):
         supplier_info = fields.first(

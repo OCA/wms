@@ -10,7 +10,7 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                 <div>
-                    <field name="icon" widget="image" width="90" />
+                    <field name="shopfloor_icon" widget="image" width="90" />
                 </div>
             </field>
         </field>

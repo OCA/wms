@@ -80,3 +80,8 @@ I tested only w/ checkout/select_package for now
     top: 5px;
     right: 5px;
 }
+
+.qty-picker-packaging-icon {
+    width: 30px;
+    height: 30px;
+}
