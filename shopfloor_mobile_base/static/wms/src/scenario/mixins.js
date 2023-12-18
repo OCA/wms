@@ -357,6 +357,9 @@ export var ScenarioBaseMixin = {
                 // Move to new state, data will be refreshed right after.
                 this.state_to(state_key);
             }
+            // Make sure the counters and all the data from the navigation drawer menu
+            // is up to date after new data from the backend is received.
+            event_hub.$emit("menu_drawer:update");
         },
         on_call_error: function (result) {
             alert(result.status + " " + result.error);
