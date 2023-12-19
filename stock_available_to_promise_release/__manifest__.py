@@ -8,7 +8,15 @@
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
-    "depends": ["stock"],
+    "depends": [
+        "stock",
+        # OCA/stock-logistics-workflow
+        # This module is not needed per se. But when it is installed it will conflict
+        # on the `_action_cancel` of the stock.move model, if executed first.
+        # As the module prevent breaking a chain of moves, It is a logical dependency
+        # to have.
+        "stock_picking_restrict_cancel_with_orig_move",
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/product_product_views.xml",
