@@ -38,7 +38,7 @@ class StockPicking(models.Model):
         return self.with_context(skip_wms_cancel_check=True).action_cancel()
 
     def action_cancel(self):
-        for record in self:
+        for record in self.filtered(lambda p: p.state != "cancel"):
             if (
                 not self._context.get("skip_wms_cancel_check")
                 and record.wms_export_date
