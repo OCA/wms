@@ -502,12 +502,13 @@ class StockReleaseChannel(models.Model):
             break
 
         if not picking.release_channel_id:
-            message = (
-                f"Transfer {picking.name} could not be assigned to a "
+            # by this point, the picking should have been assigned
+            message_template = (
+                "Transfer %(picking_name)s could not be assigned to a "
                 "channel, you should add a final catch-all rule"
             )
-            # by this point, the picking should have been assigned
-            _logger.warning(message)
+            _logger.warning(message_template, {"picking_name": picking.name})
+            message = _(message_template, picking_name=picking.name)
         return message
 
     def _assign_release_channel_additional_filter(self, pickings):
