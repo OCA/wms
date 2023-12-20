@@ -1,9 +1,9 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests.common import Form, SavepointCase
+from odoo.tests.common import Form, TransactionCase
 
 
-class TestSaleDeliveryCarrierPreference(SavepointCase):
+class TestSaleDeliveryCarrierPreference(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
