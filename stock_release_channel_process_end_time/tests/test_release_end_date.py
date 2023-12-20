@@ -91,7 +91,7 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         self.assertFalse(self.channel._get_pickings_to_release())
         self._update_qty_in_location(self.loc_bin1, self.product1, 100.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 100.0)
-        pickings.refresh()
+        pickings.env.invalidate_all()
         # the pickings are now ready to be released
         self.assertEqual(pickings, self.channel._get_pickings_to_release())
         # if the scheduled date of one picking is changed to be after the
