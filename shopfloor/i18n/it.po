@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 13.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-22 09:34+0000\n"
+"PO-Revision-Date: 2023-12-20 15:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -74,7 +74,7 @@ msgstr "Consente creazione movimento"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr "Consente l'elaborazione di qantità prenotate"
+msgstr "Consente l'elaborazione di quantità prenotate"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -505,7 +505,7 @@ msgid ""
 "Not allowed to pack more than the quantity, the value has been changed to "
 "the maximum."
 msgstr ""
-"Con cnsentito imballarepiù della qantità, il valore è stato modificato al "
+"Non consentito imballare più della quantità, il valore è stato modificato al "
 "massimo."
 
 #. module: shopfloor
