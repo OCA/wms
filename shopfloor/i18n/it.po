@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-12-01 17:33+0000\n"
+"PO-Revision-Date: 2023-12-20 15:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -49,7 +49,7 @@ msgid ""
 msgstr ""
 "\n"
 "Si presume che chi preleva preleverà la quantità suggerita.\n"
-"Con questa opzione, l'operatore dovrà inserire manualmente la qantità o\n"
+"Con questa opzione, l'operatore dovrà inserire manualmente la quantità o\n"
 "scansionando un prodotto o un codice EAN imballo prodotto per aumentare la "
 "quantità\n"
 "(es-. +1 Unità o +1 Box)\n"
@@ -64,11 +64,11 @@ msgid ""
 "decreasing the delivered quantity of the related SO line.\n"
 msgstr ""
 "\n"
-"Qando abilitata, si possono ricevere prodotti non pianificati che vengono "
+"Quando abilitata, si possono ricevere prodotti non pianificati che vengono "
 "resi\n"
 "da una consegna esistente nell'origine (nome ordine vendita).\n"
 "Un nuovo movimento verrà aggiunto come reso alla consegna,\n"
-"diminuendo la qantità consegnata della relativa riga ordine vendita.\n"
+"diminuendo la quantità consegnata della relativa riga ordine vendita.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
@@ -232,7 +232,7 @@ msgstr "Consente la modifica del collo destinazione"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr "Consente l'elaborazione di qantità prenotate"
+msgstr "Consente l'elaborazione di quantità prenotate"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination
@@ -424,7 +424,7 @@ msgstr "Vsualizza il contenuto di un collo se contiene solo una riga"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty
 msgid "Do not pre-fill quantity to pick"
-msgstr "Non precompilare la qantità da prelevare"
+msgstr "Non precompilare la quantità da prelevare"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -440,7 +440,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation
 msgid "Force stock reservation"
-msgstr "Forza prenotazione qantità"
+msgstr "Forza prenotazione quantità"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
@@ -1097,7 +1097,7 @@ msgstr "Riga movimento pianificata"
 #, python-format
 msgid ""
 "Please note that the scanned quantity is higher than the maximum allowed."
-msgstr "Notare che la qantità scansionata è superore alla massima consentita."
+msgstr "Notare che la quantità scansionata è superore alla massima consentita."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
