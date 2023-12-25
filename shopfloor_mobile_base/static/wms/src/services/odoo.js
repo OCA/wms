@@ -63,8 +63,12 @@ export class OdooMixin {
                 if (_.isUndefined(handler)) {
                     handler = this._handle_error;
                 }
-                return response.json().then((json) => {
-                    return {error: handler.call(this, response, json)};
+                return response.text().then((text) => {
+                    return {
+                        error: handler.call(this, response, {
+                            description: $(text).slice(-1),
+                        }),
+                    };
                 });
             }
             return response.json();
@@ -78,6 +82,7 @@ export class OdooMixin {
             error: response.statusText,
             status: response.status,
             response: response,
+            name: response.statusText,
         });
     }
     _handle_404(response, json) {
