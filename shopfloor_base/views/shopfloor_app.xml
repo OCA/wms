@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_app_tree_view" model="ir.ui.view">
+        <field name="name">shopfloor app tree</field>
+        <field name="model">shopfloor.app</field>
+        <field name="arch" type="xml">
+            <tree
+                decoration-muted="(not active)"
+                decoration-warning="(not registry_sync)"
+            >
+                <field name="name" />
+                <field name="tech_name" />
+                <field name="active" />
+                <field name="registry_sync" />
+            </tree>
+        </field>
+    </record>
+    <record id="shopfloor_app_form_view" model="ir.ui.view">
+        <field name="name">shopfloor app form</field>
+        <field name="model">shopfloor.app</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            type="object"
+                            name="action_open_app"
+                            string="Open app"
+                            icon="fa-arrow-right"
+                        />
+                        <button
+                            type="object"
+                            name="action_open_app_docs"
+                            string="View api docs"
+                            icon="fa-book"
+                        />
+                    </div>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <label for="name" class="oe_edit_only" />
+                    <h1>
+                        <field name="name" />
+                    </h1>
+                    <field name="registry_sync" invisible="1" />
+                    <div
+                        class="alert alert-warning"
+                        role="alert"
+                        attrs="{'invisible': ['|', ('registry_sync', '=', True), ('id', '=', False)]}"
+                    >
+                        <p>
+                            Registry out of sync. Likely the record has been modified but not sync'ed with the routing registry.
+                        </p>
+                        <p>
+                            Use the action "Sync registry" to make changes effective once you are done with edits and creates.
+                        </p>
+                    </div>
+                    <notebook>
+                        <page name="main" string="Main">
+                            <group name="one">
+                                <group name="main">
+                                    <field name="category" />
+                                    <field name="tech_name" />
+                                    <field name="short_name" />
+                                </group>
+                                <group name="auth" string="Auth">
+                                    <field name="auth_type" />
+                                </group>
+                            </group>
+                            <group name="two">
+                                <group name="lang" string="Language">
+                                    <field name="lang_id" options="{'no_create': 1}" />
+                                    <field name="lang_ids" widget="many2many_tags" />
+                                </group>
+                            </group>
+                            <group name="profiles" string="Profiles and menu items">
+                                <field name="profile_ids" widget="many2many_tags" />
+                                <button
+                                    type="object"
+                                    name="action_view_menu_items"
+                                    string="View menu items"
+                                    class="btn btn-link"
+                                />
+                            </group>
+                        </page>
+                        <page name="dev" string="Developer" groups="base.group_no_one">
+                            <group name="dev_main">
+                                <field name="registered_routes" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="shopfloor_app_search_view" model="ir.ui.view">
+        <field name="name">shopfloor app search</field>
+        <field name="model">shopfloor.app</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="tech_name" />
+                <field name="category" />
+                <field name="registry_sync" />
+                <separator />
+                <group string="Group By">
+                    <filter
+                        name="group_by_category"
+                        string="Category"
+                        domain="[]"
+                        context="{'group_by':'category'}"
+                    />
+                </group>
+                <separator />
+                <filter
+                    string="All"
+                    name="all"
+                    domain="['|', ('active', '=', False), ('active', '=', True)]"
+                />
+                <filter
+                    string="To sync"
+                    name="sync"
+                    domain="[('registry_sync', '=', False), ('active', 'in', (True, False))]"
+                />
+            </search>
+        </field>
+    </record>
+    <record id="action_shopfloor_app" model="ir.actions.act_window">
+        <field name="name">Shopfloor apps</field>
+        <field name="res_model">shopfloor.app</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

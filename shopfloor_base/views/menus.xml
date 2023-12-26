@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <menuitem
+        id="menu_shopfloor_root"
+        name="Shopfloor"
+        sequence="300"
+        web_icon="shopfloor_base,static/description/icon.png"
+    />
+    <menuitem
+        action="action_shopfloor_app"
+        id="menu_action_shopfloor_app"
+        parent="menu_shopfloor_root"
+        sequence="10"
+    />
+    <menuitem
+        action="action_shopfloor_menu"
+        id="menu_action_shopfloor_menu"
+        parent="menu_shopfloor_root"
+        sequence="20"
+    />
+    <menuitem
+        action="action_shopfloor_profile"
+        id="menu_action_shopfloor_profile"
+        parent="menu_shopfloor_root"
+        sequence="30"
+    />
+    <menuitem
+        action="action_shopfloor_scenario"
+        id="menu_action_shopfloor_scenario"
+        parent="menu_shopfloor_root"
+        sequence="40"
+    />
+
+</odoo>
