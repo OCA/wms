@@ -76,15 +76,28 @@ const SinglePackTransfer = {
                     :card_color="utils.colors.color_for('screen_step_done')"
                 >
                     <template v-slot:after_details>
-                        <v-card-subtitle>
+                        <v-card-subtitle class="pb-0">
                             <span class="font-weight-bold">Weight:</span>
                             <span>
                                 {{ _get_pack_weight() }}
                             </span>
                         </v-card-subtitle>
                         <v-card-text class="details pt-0">
-                            <div v-for="product in state.data.products" class="field-detail">
-                                {{ product.display_name}}
+                            <div v-for="product in state.data.products" class="field-detail pt-2">
+                                <div>
+                                    <span class="font-weight-bold">Product:</span>
+                                        <span>
+                                            {{ product.display_name }}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class='ml-2'>
+                                    <span class="font-weight-bold">Vendor code:</span>
+                                        <span>
+                                            {{ product.supplier_code }}
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
                         </v-card-text>
                     </template>
