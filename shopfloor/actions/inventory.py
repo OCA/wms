@@ -1,6 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _
+from odoo import _, fields
 
 from odoo.addons.component.core import Component
 
@@ -39,7 +39,7 @@ class InventoryAction(Component):
             domain.append(("lot_id", "=", lot.id))
         return self.inventory_model.search_count(domain)
 
-    def _get_existing_quant(self, location, product, package=None, lot=None):
+    def _get_existing_quant(self, location, product, package=None, lot=None, limit=1):
         domain = [("location_id", "=", location.id), ("product_id", "=", product.id)]
         if package is not None:
             domain.append(("package_id", "=", package.id))
@@ -49,21 +49,43 @@ class InventoryAction(Component):
             domain.append(("lot_id", "=", lot.id))
         else:
             domain.append(("lot_id", "=", False))
-        return self.inventory_model.search(domain, limit=1)
+        return self.inventory_model.search(domain, limit=limit)
 
-    def _create_draft_inventory(self, location, product):
-        return self.inventory_model.sudo().create(
-            {"location_id": location.id, "product_id": product.id}
-        )
+    def _create_draft_inventory(self, location, product, lot=None):
+        quants = self._get_existing_quant(location, product, lot=lot, limit=None)
+        if quants:
+            for quant in quants:
+                if quant.inventory_quantity_set:
+                    continue
+                quants.write(
+                    {
+                        # Set an inventory quantity to prevent the zero quant cleanup
+                        "inventory_quantity": quant.inventory_quantity + 1,
+                        "inventory_date": fields.Date.today(),
+                    }
+                )
+            return quants
+        else:
+            return self.inventory_model.sudo().create(
+                {
+                    "location_id": location.id,
+                    "product_id": product.id,
+                    "lot_id": lot.id,
+                    "inventory_quantity": 1,
+                    "inventory_date": fields.Date.today(),
+                }
+            )
 
-    def create_control_stock(self, location, product, package, lot, name=None):
+    def create_control_stock(
+        self, location, product, package=None, lot=None, name=None
+    ):
         """Create a draft inventory so a user has to check a location
 
         If a draft or in progress inventory already exists for the same
         combination of product/package/lot, no inventory is created.
         """
-        if not self._inventory_exists(location, product):
-            self._create_draft_inventory(location, product)
+        if not self._inventory_exists(location, product, lot=lot):
+            self._create_draft_inventory(location, product, lot=lot)
 
     def create_stock_issue(self, move, location, package, lot):
         """Create an inventory for a stock issue
