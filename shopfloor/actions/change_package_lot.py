@@ -1,9 +1,15 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, exceptions
+from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
 
 from odoo.addons.component.core import Component
+
+
+class InventoryError(UserError):
+    pass
 
 
 class ChangePackageLot(Component):
@@ -58,116 +64,55 @@ class ChangePackageLot(Component):
     def _change_pack_lot_change_lot(
         self, move_line, lot, response_ok_func, response_error_func
     ):
-        def is_lesser(value, other, rounding):
-            return float_compare(value, other, precision_rounding=rounding) == -1
+        previous_lot = move_line.lot_id
+        previous_reserved_uom_qty = move_line.reserved_uom_qty
 
         inventory = self._actions_for("inventory")
-        product = move_line.product_id
-        if lot.product_id != product:
-            return response_error_func(
-                move_line, message=self.msg_store.lot_on_wrong_product(lot.name)
+
+        try:
+            with self.env.cr.savepoint():
+                move_line.write(
+                    {
+                        "lot_id": lot.id,
+                        "package_id": False,
+                        "result_package_id": False,
+                    }
+                )
+                rounding = move_line.product_id.uom_id.rounding
+                if float_is_zero(
+                    move_line.reserved_uom_qty, precision_rounding=rounding
+                ):
+                    # The lot is not found at all, but the user scanned it, which means
+                    # it's an error in the stock data!
+                    raise InventoryError("Lot not available")
+        except InventoryError:
+            inventory.create_control_stock(
+                move_line.location_id,
+                move_line.product_id,
+                lot=move_line.lot_id,
+                name=_("Pick: stock issue on lot: {} found in {}").format(
+                    lot.name, move_line.location_id.name
+                ),
             )
-        previous_lot = move_line.lot_id
-        # Changing the lot on the move line updates the reservation on the quants
-
-        message_parts = []
-
-        values = {"lot_id": lot.id}
-
-        available_quantity = self.env["stock.quant"]._get_available_quantity(
-            product, move_line.location_id, lot_id=lot, strict=True
-        )
-
-        if move_line.package_id:
-            move_line.package_level_id.explode_package()
-            values["package_id"] = False
-
-        to_assign_moves = self.env["stock.move"]
-        if float_is_zero(
-            available_quantity, precision_rounding=product.uom_id.rounding
-        ):
-            quants = self.env["stock.quant"]._gather(
-                product, move_line.location_id, lot_id=lot, strict=True
-            )
-            if quants:
-                # we have quants but they are all reserved by other lines:
-                # unreserve the other lines and reserve them again after
-                unreservable_lines = self.env["stock.move.line"].search(
-                    [
-                        ("lot_id", "=", lot.id),
-                        ("product_id", "=", product.id),
-                        ("location_id", "=", move_line.location_id.id),
-                        ("qty_done", "=", 0),
-                    ]
-                )
-                if not unreservable_lines:
-                    return response_error_func(
-                        move_line,
-                        message=self.msg_store.cannot_change_lot_already_picked(lot),
-                    )
-                available_quantity = sum(unreservable_lines.mapped("reserved_qty"))
-                to_assign_moves = unreservable_lines.move_id
-                # if we leave the package level, it will try to reserve the same
-                # one again
-                unreservable_lines.package_level_id.explode_package()
-                # unreserve qties of other lines
-                unreservable_lines.unlink()
-            else:
-                # * we have *no* quant:
-                # The lot is not found at all, but the user scanned it, which means
-                # it's an error in the stock data! To allow the user to continue,
-                # we post an inventory to add the missing quantity, and a second
-                # draft inventory to check later
-                inventory.create_stock_correction(
-                    move_line.move_id,
-                    move_line.location_id,
-                    self.env["stock.quant.package"].browse(),
-                    lot,
-                    move_line.reserved_qty,
-                )
-                inventory.create_control_stock(
-                    move_line.location_id,
-                    move_line.product_id,
-                    move_line.package_id,
-                    move_line.lot_id,
-                    _("Pick: stock issue on lot: {} found in {}").format(
-                        lot.name, move_line.location_id.name
-                    ),
-                )
-                message_parts.append(
-                    _("A draft inventory has been created for control.")
-                )
-
-        # re-evaluate float_is_zero because we may have changed available_quantity
-        if not float_is_zero(
-            available_quantity, precision_rounding=product.uom_id.rounding
-        ) and is_lesser(
-            available_quantity, move_line.reserved_qty, product.uom_id.rounding
-        ):
-            new_uom_qty = product.uom_id._compute_quantity(
-                available_quantity, move_line.product_uom_id, rounding_method="HALF-UP"
-            )
-            values["reserved_uom_qty"] = new_uom_qty
-
-        move_line.write(values)
-
-        if "reserved_uom_qty" in values:
-            # when we change the quantity of the move, the state
-            # will still be "assigned" and be skipped by "_action_assign",
-            # recompute the state to be "partially_available"
-            move_line.move_id._recompute_state()
-
-        # if the new package has less quantities, assign will create new move
-        # lines
-        move_line.move_id._action_assign()
-
-        # Find other available goods for the lines which were using the
-        # lot before...
-        to_assign_moves._action_assign()
+            message = self.msg_store.cannot_change_lot_already_picked(lot)
+            return response_error_func(move_line, message=message)
+        except UserError as e:
+            message = {
+                "message_type": "error",
+                "body": str(e),
+            }
+            return response_error_func(move_line, message=message)
 
         message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
-        if message_parts:
-            message["body"] = "{} {}".format(message["body"], " ".join(message_parts))
+        if (
+            float_compare(
+                move_line.reserved_uom_qty,
+                previous_reserved_uom_qty,
+                precision_rounding=rounding,
+            )
+            < 0
+        ):
+            message["body"] += " " + _("The quantity to do has changed!")
         return response_ok_func(move_line, message=message)
 
     def _package_content_replacement_allowed(self, package, move_line):
