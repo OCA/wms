@@ -53,6 +53,9 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
         self.assertEqual(self.pack1.state, "cancel")
         self.assertTrue(self.ship1.need_release)
         self.assertFalse(self.ship2.need_release)
+        self.assertTrue(
+            all(m.procure_method == "make_to_order" for m in self.ship1.move_ids)
+        )
         # Check pick has one move cancel and one still assign
         move_active = self.pick1.move_ids.filtered(lambda l: l.state == "assigned")
         move_cancel = self.pick1.move_ids.filtered(lambda l: l.state == "cancel")
