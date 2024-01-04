@@ -25,6 +25,7 @@
         "stock_helper",
         "stock_picking_completion_info",
         #  OCA / stock-logistics-workflow
+        "stock_move_line_change_lot",
         "stock_quant_package_dimension",
         "stock_quant_package_product_packaging",
         "stock_picking_progress",

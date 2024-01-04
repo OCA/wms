@@ -95,13 +95,13 @@ class TestActionsChangePackageLot(CommonCase):
         new_lot = self._create_lot(self.product_a)
         # ensure we have our new package in the same location
         self._update_qty_in_location(source_location, line.product_id, 8, lot=new_lot)
+        expected_message = self.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
+        expected_message["body"] += " The quantity to do has changed!"
         self.change_package_lot.change_lot(
             line,
             new_lot,
             # success callback
-            lambda move_line, message=None: self.assertEqual(
-                message, self.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
-            ),
+            lambda move_line, message=None: self.assertEqual(message, expected_message),
             # failure callback
             self.unreachable_func,
         )
@@ -114,12 +114,10 @@ class TestActionsChangePackageLot(CommonCase):
         self.assert_quant_reserved_qty(line, lambda: 2, lot=initial_lot)
         self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=new_lot)
 
-    def test_change_lot_zero_quant_ok(self):
+    def test_change_lot_zero_quant_error(self):
         """No quant in the location for the scanned lot
 
         As the user scanned it, it's an inventory error.
-        We expect a new posted inventory that updates the quantity.
-        And another control one.
         """
         initial_lot = self._create_lot(self.product_a)
         self._update_qty_in_location(self.shelf1, self.product_a, 10, lot=initial_lot)
@@ -127,21 +125,20 @@ class TestActionsChangePackageLot(CommonCase):
         picking.action_assign()
         line = picking.move_line_ids
         new_lot = self._create_lot(self.product_a)
-        expected_message = self.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
-        expected_message["body"] += " A draft inventory has been created for control."
+        expected_message = self.msg_store.cannot_change_lot_already_picked(new_lot)
         self.change_package_lot.change_lot(
             line,
             new_lot,
             # success callback
-            lambda move_line, message=None: self.assertEqual(message, expected_message),
-            # failure callback
             self.unreachable_func,
+            # failure callback
+            lambda move_line, message=None: self.assertEqual(message, expected_message),
         )
 
-        self.assertRecordValues(line, [{"lot_id": new_lot.id, "reserved_qty": 10}])
-        # check that reservations have been updated
-        self.assert_quant_reserved_qty(line, lambda: 0, lot=initial_lot)
-        self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=new_lot)
+        self.assertRecordValues(line, [{"lot_id": initial_lot.id, "reserved_qty": 10}])
+        # check that reservations have not been updated
+        self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=initial_lot)
+        self.assert_quant_reserved_qty(line, lambda: 0, lot=new_lot)
 
     def test_change_lot_package_explode_ok(self):
         """Scan a lot on units replacing a package"""
@@ -247,6 +244,7 @@ class TestActionsChangePackageLot(CommonCase):
         self.assertEqual(line2.lot_id, new_lot)
 
         expected_message = self.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
+        expected_message["body"] += " The quantity to do has changed!"
         self.change_package_lot.change_lot(
             line,
             new_lot,
@@ -312,7 +310,8 @@ class TestActionsChangePackageLot(CommonCase):
         self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=initial_lot)
         self.assert_quant_reserved_qty(line2, lambda: line2.reserved_qty, lot=new_lot)
 
-    def test_change_lot_different_location_ok(self):
+    def test_change_lot_different_location_error(self):
+        "If the scanned lot is in a different location, we cannot process it"
         self.product_a.tracking = "lot"
         initial_lot = self._create_lot(self.product_a)
         self._update_qty_in_location(self.shelf1, self.product_a, 10, lot=initial_lot)
@@ -320,23 +319,22 @@ class TestActionsChangePackageLot(CommonCase):
         picking.action_assign()
         line = picking.move_line_ids
         new_lot = self._create_lot(self.product_a)
-        # ensure we have our new package in a different location
+        # ensure we have our new lot in a different location
         self._update_qty_in_location(self.shelf2, line.product_id, 10, lot=new_lot)
-        expected_message = self.msg_store.lot_replaced_by_lot(initial_lot, new_lot)
-        expected_message["body"] += " A draft inventory has been created for control."
+        expected_message = self.msg_store.cannot_change_lot_already_picked(new_lot)
         self.change_package_lot.change_lot(
             line,
             new_lot,
             # success callback
-            lambda move_line, message=None: self.assertEqual(message, expected_message),
-            # failure callback
             self.unreachable_func,
+            # failure callback
+            lambda move_line, message=None: self.assertEqual(message, expected_message),
         )
 
-        self.assertRecordValues(line, [{"lot_id": new_lot.id}])
-        # check that reservations have been updated
-        self.assert_quant_reserved_qty(line, lambda: 0, lot=initial_lot)
-        self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=new_lot)
+        self.assertRecordValues(line, [{"lot_id": initial_lot.id}])
+        # check that reservations have not been updated
+        self.assert_quant_reserved_qty(line, lambda: line.reserved_qty, lot=initial_lot)
+        self.assert_quant_reserved_qty(line, lambda: 0, lot=new_lot)
 
     def test_change_lot_in_several_packages_error(self):
         self.product_a.tracking = "lot"
@@ -588,6 +586,7 @@ class TestActionsChangePackageLot(CommonCase):
         picking = self._create_picking(lines=[(self.product_a, 10)])
         picking.action_assign()
         line = picking.move_line_ids
+        self.assertEqual(line.package_id, initial_package)
         # when the operator wants to pick the initial package, in shelf1, the new
         # package is in front of the other so they want to change the package
         self.change_package_lot.change_package(
