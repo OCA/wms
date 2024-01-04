@@ -89,7 +89,7 @@ class ChangePackageLot(Component):
             inventory.create_control_stock(
                 move_line.location_id,
                 move_line.product_id,
-                lot=move_line.lot_id,
+                lot=lot,
                 name=_("Pick: stock issue on lot: {} found in {}").format(
                     lot.name, move_line.location_id.name
                 ),
@@ -110,7 +110,7 @@ class ChangePackageLot(Component):
                 previous_reserved_uom_qty,
                 precision_rounding=rounding,
             )
-            < 0
+            != 0
         ):
             message["body"] += " " + _("The quantity to do has changed!")
         return response_ok_func(move_line, message=message)
