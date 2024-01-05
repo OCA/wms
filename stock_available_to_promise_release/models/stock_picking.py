@@ -156,7 +156,7 @@ class StockPicking(models.Model):
         new_expected_date = fields.Datetime.add(
             fields.Datetime.now(), minutes=prep_time
         )
-        move_to_update = self.move_lines.filtered(
+        move_to_update = self.move_ids.filtered(
             lambda m: m.state in ["assigned", "confirmed", "partially_available"]
         )
         move_to_update_ids = move_to_update.ids
