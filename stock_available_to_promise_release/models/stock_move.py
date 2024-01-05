@@ -438,7 +438,7 @@ class StockMove(models.Model):
         # This behavior can be disabled by setting the flag
         # no_backorder_at_release on the stock.route of the move.
         released_pickings = released_moves.picking_id
-        unreleased_moves = released_pickings.move_lines - released_moves
+        unreleased_moves = released_pickings.move_ids - released_moves
         unreleased_moves_to_bo = unreleased_moves.filtered(
             lambda m: m.state not in ("done", "cancel")
             and not m.rule_id.no_backorder_at_release
