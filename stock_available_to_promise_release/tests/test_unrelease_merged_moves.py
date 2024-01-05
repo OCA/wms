@@ -41,14 +41,14 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
     @classmethod
     def _prev_picking(cls, picking):
-        return picking.move_lines.move_orig_ids.picking_id
+        return picking.move_ids.move_orig_ids.picking_id
 
     def test_unrelease_merged_move(self):
         self.assertEqual(self.picking1, self.picking2)
-        moves = self.picking1.move_lines.filtered(lambda m: m.state == "assigned")
+        moves = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
         self.assertEqual(sum(moves.mapped("product_uom_qty")), 5.0)
         self.shipping2.unrelease()
-        move = self.picking1.move_lines.filtered(lambda m: m.state == "assigned")
+        move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
         line = move.move_line_ids
         self.assertEqual(move.product_uom_qty, 2.0)
         self.assertEqual(line.product_uom_qty, 2.0)
