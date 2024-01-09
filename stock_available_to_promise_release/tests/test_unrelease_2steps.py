@@ -48,6 +48,9 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         move_cancel = self.picking1.move_ids.filtered(lambda m: m.state == "cancel")
         self.assertEqual(move_cancel.product_uom_qty, 2)
         self.assertTrue(self.shipping1.need_release)
+        self.assertTrue(
+            all(m.procure_method == "make_to_order" for m in self.shipping1.move_ids)
+        )
 
     # def test_unrelease_picking_is_done(self):
     #     # the pick moves for delivery 1 and 2 are merged
@@ -71,3 +74,6 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertEqual(move_active.product_uom_qty, 3.0)
         self.assertEqual(move_cancel.product_uom_qty, 2.0)
         self.assertEqual(move_active.move_dest_ids, self.shipping2.move_ids)
+        self.assertTrue(
+            all(m.procure_method == "make_to_order" for m in self.shipping2.move_ids)
+        )
