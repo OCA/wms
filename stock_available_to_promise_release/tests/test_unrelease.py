@@ -67,7 +67,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(new_picking)
         self.assertEqual(new_picking.state, "assigned")
         self.assertTrue(
-            all(m.procure_method == "make_to_order" for m in self.shipping.move_ids)
+            all(m.procure_method == "make_to_order" for m in self.shipping.move_lines)
         )
 
     def test_unrelease_partially_processed_move(self):
@@ -132,7 +132,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             )
         )
         self.assertTrue(
-            all(m.procure_method == "make_to_order" for m in backorder_ship.move_ids)
+            all(m.procure_method == "make_to_order" for m in backorder_ship.move_lines)
         )
 
     def test_unrelease_picking_wizard(self):
