@@ -614,6 +614,8 @@ class StockMove(models.Model):
         if self.env.context.get("release_available_to_promise"):
             force_new_picking = not self.rule_id.no_backorder_at_release
             if force_new_picking:
+                # We want a newer picking, search with '>' to prevent to select
+                # any old available picking
                 domain = expression.AND([domain, [("id", ">", self.picking_id.id)]])
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
