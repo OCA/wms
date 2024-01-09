@@ -380,11 +380,15 @@ class StockMove(models.Model):
 
     def _prepare_move_split_vals(self, qty):
         vals = super()._prepare_move_split_vals(qty)
+
         # The method set procure_method as 'make_to_stock' by default on split,
-        # but we want to keep 'make_to_order' for chained moves when we split
-        # a partially available move in _run_stock_rule().
+        # but we want to keep 'make_to_order' for chained moves.
+        # Note this has been fixed in v15.0
+        # https://github.com/odoo/odoo/commit/4180afb95112dbb1119fd68b7bd3f2f5e1160422
+        vals.update({"procure_method": self.procure_method})
+
         if self.env.context.get("release_available_to_promise"):
-            vals.update({"procure_method": self.procure_method, "need_release": True})
+            vals.update({"need_release": True})
         return vals
 
     def _get_release_decimal_precision(self):
