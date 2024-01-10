@@ -380,11 +380,15 @@ class StockMove(models.Model):
 
     def _prepare_move_split_vals(self, qty):
         vals = super()._prepare_move_split_vals(qty)
+
         # The method set procure_method as 'make_to_stock' by default on split,
-        # but we want to keep 'make_to_order' for chained moves when we split
-        # a partially available move in _run_stock_rule().
+        # but we want to keep 'make_to_order' for chained moves.
+        # Note this has been fixed in v15.0
+        # https://github.com/odoo/odoo/commit/4180afb95112dbb1119fd68b7bd3f2f5e1160422
+        vals.update({"procure_method": self.procure_method})
+
         if self.env.context.get("release_available_to_promise"):
-            vals.update({"procure_method": self.procure_method, "need_release": True})
+            vals.update({"need_release": True})
         return vals
 
     def _get_release_decimal_precision(self):
@@ -556,6 +560,9 @@ class StockMove(models.Model):
         for move in moves_to_unrelease:
             iterator = move._get_chained_moves_iterator("move_orig_ids")
             moves_to_cancel = self.env["stock.move"]
+            # backup procure_method as when you don't propagate cancel, the
+            # destination move is forced to make_to_stock
+            procure_method = move.procure_method
             next(iterator)  # skip the current move
             for origin_moves in iterator:
                 origin_moves = origin_moves.filtered(
@@ -569,6 +576,8 @@ class StockMove(models.Model):
                     # origin_moves._action_cancel()
                     moves_to_cancel |= origin_moves
             moves_to_cancel._action_cancel()
+            # restore the procure_method overwritten by _action_cancel()
+            move.procure_method = procure_method
         moves_to_unrelease.write({"need_release": True})
         for picking, moves in itertools.groupby(
             moves_to_unrelease, lambda m: m.picking_id
