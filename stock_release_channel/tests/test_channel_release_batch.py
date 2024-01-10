@@ -55,7 +55,7 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
         )
 
     def test_release_auto_max_no_next_batch(self):
-        self.pickings.need_release = False  # cheat for getting the right condition
+        action = self.channel.release_next_batch()
         action = self.channel.release_next_batch()
         self._assert_action_nothing_in_the_queue(action)
 
@@ -69,7 +69,10 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
 
     def test_release_auto_group_commercial_partner_no_next_batch(self):
         self.channel.auto_release = "group_commercial_partner"
-        self.pickings.need_release = False  # cheat for getting the right condition
+        pickings = self.channel.picking_ids.filtered(lambda p: p.release_ready)
+        for _i in range(0, len(pickings.partner_id.commercial_partner_id)):
+            action = self.channel.release_next_batch()
+            self.assertEqual(action, None)
         action = self.channel.release_next_batch()
         self._assert_action_nothing_in_the_queue(action)
 
