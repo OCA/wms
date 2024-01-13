@@ -623,7 +623,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     def test_defer_multi_move_unreleased_in_backorder(self):
         """Unreleased moves are put in a backorder"""
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
-        self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
+        self._update_qty_in_location(self.loc_bin1, self.product1, 15.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 10.0)
         pickings = self._create_picking_chain(
             self.wh,
@@ -648,7 +648,6 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             ],
         )
 
-        cust_picking = pickings
         cust_picking.release_available_to_promise()
         backorder = cust_picking.backorder_ids
         self.assertRecordValues(
@@ -665,12 +664,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertRecordValues(
             backorder.move_ids,
             [
-                # remaining 10 on product 1 because it was partially available
-                {"product_qty": 10.0, "product_id": self.product1.id},
                 # these 2 moves were not released, so they are moved to a
                 # backorder
                 {"product_qty": 20.0, "product_id": self.product3.id},
                 {"product_qty": 10.0, "product_id": self.product4.id},
+                # remaining 5 on product 1 because it was partially available
+                {"product_qty": 5.0, "product_id": self.product1.id},
             ],
         )
 
@@ -690,7 +689,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertRecordValues(
             out_picking.move_ids,
             [
-                {"product_qty": 10.0, "product_id": self.product1.id},
+                {"product_qty": 15.0, "product_id": self.product1.id},
                 {"product_qty": 10.0, "product_id": self.product2.id},
             ],
         )

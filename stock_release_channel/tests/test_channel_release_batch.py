@@ -55,6 +55,6 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
         )
 
     def test_release_auto_max_no_next_batch(self):
-        self.pickings.need_release = False  # cheat for getting the right condition
+        action = self.channel.release_next_batch()
         action = self.channel.release_next_batch()
         self._assert_action_nothing_in_the_queue(action)

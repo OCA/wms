@@ -1,8 +1,8 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from odoo import _, api, exceptions, fields, models
-from odoo.tools.float_utils import float_compare
 
 
 class StockPicking(models.Model):
@@ -67,33 +67,27 @@ class StockPicking(models.Model):
         self.ensure_one()
         return self.move_type
 
-    @api.depends("move_ids.ordered_available_to_promise_qty")
+    @api.depends(
+        "move_type",
+        "move_lines.ordered_available_to_promise_qty",
+        "move_lines.need_release",
+        "move_lines.state",
+    )
     def _compute_release_ready(self):
         for picking in self:
-            if not picking.need_release:
-                picking.release_ready = False
-                picking.release_ready_count = 0
-                continue
-            move_ids = picking.move_ids.filtered(
-                lambda move: move.state not in ("cancel", "done") and move.need_release
+            move_lines = picking.move_lines.filtered(
+                lambda move: move._is_release_needed()
+            )
+            release_ready = False
+            release_ready_count = sum(
+                1 for move in move_lines if move._is_release_ready()
             )
             if picking._get_shipping_policy() == "one":
-                picking.release_ready_count = sum(
-                    1
-                    for move in move_ids
-                    if float_compare(
-                        move.ordered_available_to_promise_qty,
-                        move.product_qty,
-                        precision_rounding=move.product_id.uom_id.rounding,
-                    )
-                    == 0
-                )
-                picking.release_ready = picking.release_ready_count == len(move_ids)
+                release_ready = release_ready_count == len(move_lines)
             else:
-                picking.release_ready_count = sum(
-                    1 for move in move_ids if move.ordered_available_to_promise_qty > 0
-                )
-                picking.release_ready = bool(picking.release_ready_count)
+                release_ready = bool(release_ready_count)
+            picking.release_ready_count = release_ready_count
+            picking.release_ready = release_ready
 
     def _search_release_ready(self, operator, value):
         if operator != "=":
@@ -156,7 +150,9 @@ class StockPicking(models.Model):
         new_expected_date = fields.Datetime.add(
             fields.Datetime.now(), minutes=prep_time
         )
-        move_to_update = self.move_ids.filtered(lambda m: m.state == "assigned")
+        move_to_update = self.move_ids.filtered(
+            lambda m: m.state in ["assigned", "confirmed", "partially_available"]
+        )
         move_to_update_ids = move_to_update.ids
         for origin_moves in move_to_update._get_chained_moves_iterator("move_dest_ids"):
             move_to_update_ids += origin_moves.ids
