@@ -445,7 +445,7 @@ class StockMove(models.Model):
         procurement_requests = []
         released_moves = self.env["stock.move"]
         # Ensure the release_ready field is correctly computed
-        self.invalidate_cache(["release_ready"])
+        self.invalidate_recordset(["release_ready"])
         for move in self:
             if not move.release_ready:
                 continue
