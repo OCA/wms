@@ -37,6 +37,11 @@ class LocationContentTransferCommonCase(CommonCase):
         self.service = self.get_service(
             "location_content_transfer", menu=self.menu, profile=self.profile
         )
+        self.stock_action = self.service._actions_for("stock")
+
+    def _simulate_selected_move_line(self, move_line):
+        """Mark the move line as picked (as it's done into the scan_location method)"""
+        self.stock_action.mark_move_line_as_picked(move_line)
 
     @classmethod
     def _simulate_pickings_selected(cls, pickings):

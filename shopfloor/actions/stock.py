@@ -178,6 +178,12 @@ class StockAction(Component):
         """
         moves.split_unavailable_qty()
         for picking in moves.picking_id:
+            # the backorder strategy is checked in the 'button_validate' method
+            # on odoo standard. Since we call the sub-method '_action_done' here,
+            # we have to set the context key 'cancel_backorder' as it is done
+            # in the 'button_validate' method according to the backorder strategy.
+            not_to_backorder = picking.picking_type_id.create_backorder == "never"
+            picking = picking.with_context(cancel_backorder=not_to_backorder)
             moves_todo = picking.move_ids & moves
             if self._check_backorder(picking, moves_todo):
                 existing_backorders = picking.backorder_ids

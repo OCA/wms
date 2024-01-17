@@ -764,9 +764,6 @@ class LocationContentTransfer(Component):
         self._lock_lines(move_line)
 
         move_line.qty_done = quantity
-        remaining_move_line = move_line._split_partial_quantity()
-        move_line._extract_in_split_order({"user_id": self.env.uid})
-        remaining_move_line.qty_done = remaining_move_line.reserved_uom_qty
 
         self._write_destination_on_lines(move_line, scanned_location)
         stock = self._actions_for("stock")
