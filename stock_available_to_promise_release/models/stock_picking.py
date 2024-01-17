@@ -85,10 +85,11 @@ class StockPicking(models.Model):
             release_ready_count = sum(
                 1 for move in move_lines if move._is_release_ready()
             )
-            if picking._get_shipping_policy() == "one":
-                release_ready = release_ready_count == len(move_lines)
-            else:
-                release_ready = bool(release_ready_count)
+            if move_lines:
+                if picking._get_shipping_policy() == "one":
+                    release_ready = release_ready_count == len(move_lines)
+                else:
+                    release_ready = bool(release_ready_count)
             picking.release_ready_count = release_ready_count
             picking.release_ready = release_ready
 
