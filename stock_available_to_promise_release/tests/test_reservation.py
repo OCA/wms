@@ -1192,3 +1192,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         new_move = move.copy()
         new_move._assign_picking()
         self.assertNotEqual(picking, new_move.picking_id)
+
+    def test_cancel_release_ready(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        picking = self._create_picking_chain(
+            self.wh, [(self.product1, 5)], move_type="one"
+        )
+        self.assertTrue(picking.release_ready)
+        picking.action_cancel()
+        self.assertFalse(picking.release_ready)
