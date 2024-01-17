@@ -69,21 +69,17 @@ class StockPicking(models.Model):
 
     @api.depends(
         "move_type",
-        "move_lines.ordered_available_to_promise_qty",
-        "move_lines.need_release",
-        "move_lines.state",
+        "move_ids.ordered_available_to_promise_qty",
+        "move_ids.need_release",
+        "move_ids.state",
     )
     def _compute_release_ready(self):
         for picking in self:
-            move_lines = picking.move_lines.filtered(
-                lambda move: move._is_release_needed()
-            )
+            moves = picking.move_ids.filtered(lambda move: move._is_release_needed())
             release_ready = False
-            release_ready_count = sum(
-                1 for move in move_lines if move._is_release_ready()
-            )
+            release_ready_count = sum(1 for move in moves if move._is_release_ready())
             if picking._get_shipping_policy() == "one":
-                release_ready = release_ready_count == len(move_lines)
+                release_ready = release_ready_count == len(moves)
             else:
                 release_ready = bool(release_ready_count)
             picking.release_ready_count = release_ready_count
