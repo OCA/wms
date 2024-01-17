@@ -55,6 +55,12 @@
             <field name="date_done" position="before">
                 <field name="last_release_date" />
             </field>
+            <field name="move_type" position="before">
+                <field
+                    name="release_policy"
+                    attrs="{'invisible': [('need_release', '=', False)]}"
+                />
+            </field>
         </field>
     </record>
     <record id="view_picking_release_tree" model="ir.ui.view">

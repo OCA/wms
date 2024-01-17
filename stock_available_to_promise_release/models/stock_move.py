@@ -283,12 +283,12 @@ class StockMove(models.Model):
         self.ensure_one()
         if not self._is_release_needed() or self.state == "draft":
             return False
-        shipping_policy = self.picking_id._get_shipping_policy()
+        release_policy = self.picking_id.release_policy
         rounding = self.product_id.uom_id.rounding
         # computed field has no depends set, invalidate cache before reading
         self.invalidate_recordset(["ordered_available_to_promise_qty"])
         ordered_available_to_promise_qty = self.ordered_available_to_promise_qty
-        if shipping_policy == "one":
+        if release_policy == "one":
             return (
                 float_compare(
                     ordered_available_to_promise_qty,
@@ -306,7 +306,7 @@ class StockMove(models.Model):
 
     @api.depends(
         "ordered_available_to_promise_qty",
-        "picking_id.move_type",
+        "picking_id.release_policy",
         "picking_id.move_ids",
         "need_release",
         "state",
@@ -314,7 +314,7 @@ class StockMove(models.Model):
     def _compute_release_ready(self):
         for move in self:
             release_ready = move._is_release_ready()
-            if release_ready and move.picking_id._get_shipping_policy() == "one":
+            if release_ready and move.picking_id.release_policy == "one":
                 release_ready = move.picking_id.release_ready
             move.release_ready = release_ready
 
@@ -696,3 +696,8 @@ class StockMove(models.Model):
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
         return domain
+
+    def _get_new_picking_values(self):
+        values = super()._get_new_picking_values()
+        values["release_policy"] = values["move_type"]
+        return values
