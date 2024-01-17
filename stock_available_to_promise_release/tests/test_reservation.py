@@ -1216,3 +1216,24 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(picking.release_ready)
         picking.action_cancel()
         self.assertFalse(picking.release_ready)
+
+    def test_release_policy(self):
+        self.wh.delivery_route_id.write(
+            {"available_to_promise_defer_pull": True, "no_backorder_at_release": True}
+        )
+        picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 10), (self.product2, 10)],
+                date=datetime(2019, 9, 2, 16, 0),
+                move_type="one",
+            )
+        )
+        self.assertEqual(picking.move_type, "one")
+        self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
+        self.assertFalse(picking.release_ready)
+        picking.release_policy = "direct"
+        self.assertTrue(picking.release_ready)
+        picking.release_available_to_promise()
+        new_picking = self._pickings_in_group(picking.group_id) - picking
+        self.assertEqual(new_picking.move_type, "one")
