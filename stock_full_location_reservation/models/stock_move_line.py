@@ -45,7 +45,7 @@ class StockMoveLine(models.Model):
     def _full_location_reservation(self, package_only=None):
         reservable_qties = self._get_full_location_reservable_qties(package_only)
         moves_to_assign_ids = []
-        for line in self:
+        for line in self.exists():  # Move line should have been deleted
             # Copy location and package as move line could be deleted if merge occurs
             location = line.location_id
             package = line.package_id
