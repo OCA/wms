@@ -51,4 +51,4 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
         line = move.move_line_ids
         self.assertEqual(move.product_uom_qty, 2.0)
-        self.assertEqual(line.product_uom_qty, 2.0)
+        self.assertEqual(line.reserved_uom_qty, 2.0)
