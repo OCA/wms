@@ -1,4 +1,5 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
+# Copyright 2024 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from datetime import datetime
@@ -1130,51 +1131,10 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     # TODO: test w/ multiple orders by priority
 
     def test_picking_priority(self):
-        self.pick_type = self.env.ref("stock.picking_type_out")
-        self.loc_output = self.env.ref("stock.stock_location_output")
-        self.route = self.env["stock.route"].create(
-            {
-                "name": "test route",
-                "company_id": self.env.company.id,
-                "sequence": 10,
-            }
-        )
-        self.product1.route_ids = [(6, 0, [self.route.id])]
-        self.rule = self.env["stock.rule"].create(
-            {
-                "name": "pull rule test",
-                "action": "pull",
-                "location_src_id": self.loc_customer.id,
-                "location_dest_id": self.loc_output.id,
-                "route_id": self.route.id,
-                "picking_type_id": self.pick_type.id,
-                "procure_method": "make_to_order",
-            }
-        )
+        self.wh.delivery_steps = "pick_pack_ship"
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
-        self._update_qty_in_location(self.loc_stock, self.product1, 20.0)
-        pick = self.env["stock.picking"].create(
-            {
-                "picking_type_id": self.pick_type.id,
-                "location_id": self.loc_output.id,
-                "location_dest_id": self.loc_customer.id,
-                "move_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "name": self.product1.name,
-                            "product_id": self.product1.id,
-                            "product_uom_qty": 5.0,
-                            "product_uom": self.product1.uom_id.id,
-                            "need_release": True,
-                            "location_id": self.loc_output.id,
-                            "location_dest_id": self.loc_customer.id,
-                        },
-                    )
-                ],
-            }
-        )
+        pick = self._create_picking_chain(self.wh, [(self.product1, 20)])
         pick.priority = "1"
         pick.action_confirm()
         pick.release_available_to_promise()
@@ -1203,3 +1163,32 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(picking.release_ready)
         picking.action_cancel()
         self.assertFalse(picking.release_ready)
+
+    def test_multiple_warehouses(self):
+        wh2 = self.wh.create({"name": "Warehouse2", "code": "wh2"})
+        warehouses = self.wh | wh2
+        warehouses.delivery_route_id.write({"available_to_promise_defer_pull": True})
+
+        self._update_qty_in_location(self.wh.lot_stock_id, self.product1, 2)
+        self._update_qty_in_location(wh2.lot_stock_id, self.product1, 2)
+
+        picking_wh1_1 = self._create_picking_chain(self.wh, [(self.product1, 4)])
+        picking_wh2_1 = self._create_picking_chain(wh2, [(self.product1, 4)])
+
+        self.assertEqual(picking_wh1_1.move_ids.ordered_available_to_promise_qty, 2)
+        self.assertEqual(picking_wh1_1.move_ids.previous_promised_qty, 0)
+        self.assertEqual(picking_wh2_1.move_ids.ordered_available_to_promise_qty, 2)
+        self.assertEqual(picking_wh2_1.move_ids.previous_promised_qty, 0)
+
+        picking_wh1_2 = self._create_picking_chain(self.wh, [(self.product1, 4)])
+        picking_wh2_2 = self._create_picking_chain(wh2, [(self.product1, 4)])
+
+        self.assertEqual(picking_wh1_1.move_ids.ordered_available_to_promise_qty, 2)
+        self.assertEqual(picking_wh1_1.move_ids.previous_promised_qty, 0)
+        self.assertEqual(picking_wh2_1.move_ids.ordered_available_to_promise_qty, 2)
+        self.assertEqual(picking_wh2_1.move_ids.previous_promised_qty, 0)
+
+        self.assertEqual(picking_wh1_2.move_ids.ordered_available_to_promise_qty, 0)
+        self.assertEqual(picking_wh1_2.move_ids.previous_promised_qty, 4)
+        self.assertEqual(picking_wh2_2.move_ids.ordered_available_to_promise_qty, 0)
+        self.assertEqual(picking_wh2_2.move_ids.previous_promised_qty, 4)
