@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record
+        id="job_function_stock_release_channel_action_deliver"
+        model="queue.job.function"
+    >
+        <field
+            name="model_id"
+            ref="stock_release_channel.model_stock_release_channel"
+        />
+        <field name="method">_action_deliver</field>
+        <field name="channel_id" ref="channel_root_background_stock_picking_deliver" />
+    </record>
+
+    <record id="job_function_shipment_advice__auto_process" model="queue.job.function">
+        <field name="model_id" ref="shipment_advice.model_shipment_advice" />
+        <field name="method">_auto_process</field>
+        <field name="channel_id" ref="channel_root_background_stock_picking_deliver" />
+    </record>
+</odoo>
