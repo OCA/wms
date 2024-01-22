@@ -12,5 +12,6 @@ class AttachmentSynchronizeTask(models.Model):
             ("export", "Export"),
             ("wms_reception_confirmed", "Reception confirmed"),
             ("wms_delivery_confirmed", "Delivery confirmed"),
+            ("wms_update_inventory", "Inventory update"),
         ]
     )

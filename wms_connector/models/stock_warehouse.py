@@ -80,6 +80,15 @@ MAPPINGS = {
         "name_fragment": "delivery confirmation",
         "code": "env['stock.warehouse'].browse({}).{}.run_import()",
     },
+    "inventory": {
+        "fieldname_task": "wms_import_update_inventory_task_id",
+        "fieldname_cron": "wms_import_update_inventory_cron_id",
+        "filetype": "wms_update_inventory",
+        "method_type": "import",
+        "filepath": "OUT/",
+        "name_fragment": "Update inventory",
+        "code": "env['stock.warehouse'].browse({}).{}.run_import()",
+    },
 }
 
 
@@ -96,11 +105,15 @@ class StockWarehouse(models.Model):
     wms_import_confirm_delivery_task_id = fields.Many2one(
         "attachment.synchronize.task", readonly=True
     )
+    wms_import_update_inventory_task_id = fields.Many2one(
+        "attachment.synchronize.task", readonly=True
+    )
     wms_export_product_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_export_picking_in_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_export_picking_out_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_reception_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_import_confirm_delivery_cron_id = fields.Many2one("ir.cron", readonly=True)
+    wms_import_update_inventory_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_export_product_filter_id = fields.Many2one("ir.filters")
     wms_export_picking_in_filter_id = fields.Many2one("ir.filters")
     wms_export_picking_out_filter_id = fields.Many2one("ir.filters")
