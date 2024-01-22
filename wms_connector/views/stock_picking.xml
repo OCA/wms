@@ -46,6 +46,10 @@
                     name="wms_export_attachment_id"
                     attrs="{'invisible': [('wms_export_attachment_id', '=', False)]}"
                 />
+                <field
+                    name="wms_import_attachment_id"
+                    attrs="{'invisible': [('wms_import_attachment_id', '=', False)]}"
+                />
             </field>
             <header position="after">
                 <div

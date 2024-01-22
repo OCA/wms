@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="attachment_queue_view_form" model="ir.ui.view">
+        <field name="model">attachment.queue</field>
+        <field name="inherit_id" ref="attachment_queue.view_attachment_queue_form" />
+        <field name="arch" type="xml">
+            <div class="oe_button_box" position="inside">
+                <button
+                    name="button_open_imported_picking"
+                    icon="fa-archive"
+                    class="oe_stat_button"
+                    type="object"
+                >
+                    <field
+                        name="picking_imported_count"
+                        widget="statinfo"
+                        string="Picking"
+                    />
+                </button>
+            </div>
+        </field>
+    </record>
+
+</odoo>

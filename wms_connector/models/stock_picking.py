@@ -15,6 +15,9 @@ class StockPicking(models.Model):
     wms_sync_cancel_supported = fields.Boolean(
         compute="_compute_wms_sync_cancel_supported"
     )
+    wms_import_attachment_id = fields.Many2one(
+        "attachment.queue", index=True, readonly=True
+    )
 
     def _get_wms_export_task(self):
         return self.picking_type_id.warehouse_id.sudo().wms_export_task_id

@@ -15,6 +15,7 @@
         "views/wms_product_sync.xml",
         "views/stock_picking.xml",
         "views/stock_warehouse.xml",
+        "views/attachment_queue_view.xml",
     ],
     "demo": [
         "demo/storage_backend.xml",
