@@ -68,7 +68,13 @@
                         </h1>
                         <field name="active" invisible="1" />
                     </div>
-                    <field name="release_channel_ids" />
+                    <field name="release_channel_ids">
+                        <tree>
+                            <field name="name" />
+                            <field name="state" />
+                            <field name="preparation_weekday_ids" />
+                        </tree>
+                    </field>
                 </sheet>
             </form>
         </field>

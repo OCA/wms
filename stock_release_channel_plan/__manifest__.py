@@ -11,11 +11,15 @@
     "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux"],
     "website": "https://github.com/OCA/wms",
-    "depends": ["stock_release_channel"],
+    "depends": [
+        "base_time_window",
+        "stock_release_channel",
+    ],
     "data": [
         "security/stock_release_channel_preparation_plan.xml",
         "security/stock_release_channel_plan_launch.xml",
         "wizards/launch_plan.xml",
+        "views/res_partner.xml",
         "views/stock_release_channel_preparation_plan.xml",
         "views/stock_release_channel.xml",
     ],

@@ -13,12 +13,11 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="before">
                 <group>
+                    <field name="preparation_weekday_ids" widget="many2many_tags" />
                     <field name="preparation_plan_ids" widget="many2many_tags" />
                 </group>
             </xpath>
         </field>
     </record>
-
-
 
 </odoo>
