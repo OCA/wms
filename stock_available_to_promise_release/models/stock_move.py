@@ -325,6 +325,64 @@ class StockMove(models.Model):
         moves = moves.filtered(lambda m: m.release_ready)
         return [("id", "in", moves.ids)]
 
+    def _get_ordered_available_to_promise_by_warehouse(self, warehouse):
+        res = {}
+        if not warehouse:
+            for move in self:
+                res[move] = {
+                    "ordered_available_to_promise_uom_qty": 0,
+                    "ordered_available_to_promise_qty": 0,
+                }
+            return res
+
+        location_domain = warehouse.view_location_id._get_available_to_promise_domain()
+        domain_quant = expression.AND(
+            [[("product_id", "in", self.product_id.ids)], location_domain]
+        )
+        location_quants = self.env["stock.quant"].read_group(
+            domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
+        )
+        quants_available = {
+            item["product_id"][0]: item["quantity"] for item in location_quants
+        }
+        for move in self:
+            product_uom = move.product_id.uom_id
+            previous_promised_qty = move.previous_promised_qty
+
+            rounding = product_uom.rounding
+            available_qty = float_round(
+                quants_available.get(move.product_id.id, 0.0),
+                precision_rounding=rounding,
+            )
+
+            real_promised = available_qty - previous_promised_qty
+            uom_promised = product_uom._compute_quantity(
+                real_promised,
+                move.product_uom,
+                rounding_method="HALF-UP",
+            )
+            res[move] = {
+                "ordered_available_to_promise_uom_qty": max(
+                    min(uom_promised, move.product_uom_qty), 0.0
+                ),
+                "ordered_available_to_promise_qty": max(
+                    min(real_promised, move.product_qty), 0.0
+                ),
+            }
+        return res
+
+    def _get_ordered_available_to_promise(self):
+        res = {}
+        moves_by_warehouse = self._group_by_warehouse()
+        # Compute On-Hand quantity (equivalent of qty_available) for all "view
+        # locations" of all the warehouses: we may release as soon as we have
+        # the quantity somewhere. Do not use "qty_available" to get a faster
+        # computation.
+        for warehouse, moves in moves_by_warehouse:
+            moves = self.browse().union(*moves)
+            res.update(moves._get_ordered_available_to_promise_by_warehouse(warehouse))
+        return res
+
     @api.depends()
     def _compute_ordered_available_to_promise(self):
         moves = self.filtered(
@@ -336,57 +394,8 @@ class StockMove(models.Model):
                 "ordered_available_to_promise_uom_qty": 0.0,
             }
         )
-        moves_by_warehouse = moves._group_by_warehouse()
-        # Compute On-Hand quantity (equivalent of qty_available) for all "view
-        # locations" of all the warehouses: we may release as soon as we have
-        # the quantity somewhere. Do not use "qty_available" to get a faster
-        # computation.
-        for warehouse, _moves in moves_by_warehouse:
-            _moves = self.browse().union(*_moves)
-            if not warehouse:
-                moves.write(
-                    {
-                        "ordered_available_to_promise_uom_qty": 0,
-                        "ordered_available_to_promise_qty": 0,
-                    }
-                )
-                continue
-
-            location_domain = warehouse.view_location_id._get_available_to_promise_domain()
-            domain_quant = expression.AND(
-                [[("product_id", "in", moves.product_id.ids)], location_domain]
-            )
-            location_quants = self.env["stock.quant"].read_group(
-                domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
-            )
-            quants_available = {
-                item["product_id"][0]: item["quantity"] for item in location_quants
-            }
-            for move in _moves:
-                product_uom = move.product_id.uom_id
-                previous_promised_qty = move.previous_promised_qty
-
-                rounding = product_uom.rounding
-                available_qty = float_round(
-                    quants_available.get(move.product_id.id, 0.0),
-                    precision_rounding=rounding,
-                )
-
-                real_promised = available_qty - previous_promised_qty
-                uom_promised = product_uom._compute_quantity(
-                    real_promised,
-                    move.product_uom,
-                    rounding_method="HALF-UP",
-                )
-
-                move.ordered_available_to_promise_uom_qty = max(
-                    min(uom_promised, move.product_uom_qty),
-                    0.0,
-                )
-                move.ordered_available_to_promise_qty = max(
-                    min(real_promised, move.product_qty),
-                    0.0,
-                )
+        for move, values in moves._get_ordered_available_to_promise().items():
+            move.update(values)
 
     def _search_ordered_available_to_promise_uom_qty(self, operator, value):
         operator_mapping = {
