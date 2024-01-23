@@ -459,6 +459,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertFalse(out_picking)
 
         self._update_qty_in_location(self.loc_bin1, self.product1, 10.0)
+        cust_picking.invalidate_model(["release_ready"])
         self.env["stock.move"].invalidate_model(
             fnames=[
                 "previous_promised_qty",
