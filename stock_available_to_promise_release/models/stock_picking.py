@@ -190,3 +190,7 @@ class StockPicking(models.Model):
         processing has already started will be ignored
         """
         self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
+
+    def action_cancel(self):
+        self.filtered(lambda p: p.state not in ("done", "cancel")).unrelease()
+        return super().action_cancel()
