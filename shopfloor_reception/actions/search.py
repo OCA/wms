@@ -11,4 +11,7 @@ class SearchAction(Component):
     def _get_origin_from_barcode(self, barcode):
         if self.work.menu.scenario_id.key == "reception":
             carriers = self.env["delivery.carrier"].search([])
-            return carriers._get_origin_from_barcode(barcode)
+            res = carriers._get_origin_from_barcode(barcode)
+            if res:
+                return res
+        return super()._get_origin_from_barcode(barcode)
