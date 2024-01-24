@@ -31,6 +31,7 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
 
     def test_release_auto_group_commercial_partner_no_next_batch(self):
         self.channel.batch_mode = "group_commercial_partner"
-        self.pickings.need_release = False  # cheat for getting the right condition
+        # cheat for getting the right condition
+        self.pickings.move_ids.need_release = False
         action = self.channel.release_next_batch()
         self._assert_action_nothing_in_the_queue(action)
