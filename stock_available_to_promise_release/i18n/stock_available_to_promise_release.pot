@@ -16,7 +16,6 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid ""
 "\n"
@@ -26,7 +25,6 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid ""
@@ -355,7 +353,6 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid ""
 "The backorder <a href=# data-oe-model=stock.picking data-oe-"
@@ -364,7 +361,6 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid ""
@@ -437,9 +433,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "Unsupported operator %s"
@@ -447,7 +440,6 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "Unsupported operator: %s"
@@ -488,7 +480,6 @@ msgstr ""
 
 #. module: stock_available_to_promise_release
 #. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid "You are not allowed to unrelease this move %(move_name)s."
