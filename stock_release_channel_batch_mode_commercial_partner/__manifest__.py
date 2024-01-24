@@ -5,7 +5,7 @@
     "name": "Stock Release Channel Batch Mode Commercial Partner",
     "summary": """
         Release pickings into channels by batch of same commercial entity""",
-    "version": "16.0.1.0.1",
+    "version": "16.0.1.0.2",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
