@@ -78,10 +78,11 @@ class StockPicking(models.Model):
             moves = picking.move_ids.filtered(lambda move: move._is_release_needed())
             release_ready = False
             release_ready_count = sum(1 for move in moves if move._is_release_ready())
-            if picking._get_shipping_policy() == "one":
-                release_ready = release_ready_count == len(moves)
-            else:
-                release_ready = bool(release_ready_count)
+            if moves:
+                if picking._get_shipping_policy() == "one":
+                    release_ready = release_ready_count == len(moves)
+                else:
+                    release_ready = bool(release_ready_count)
             picking.release_ready_count = release_ready_count
             picking.release_ready = release_ready
 
