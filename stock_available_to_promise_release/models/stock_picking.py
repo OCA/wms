@@ -30,7 +30,6 @@ class StockPicking(models.Model):
     last_release_date = fields.Datetime()
     release_policy = fields.Selection(
         [("direct", "As soon as possible"), ("one", "When all products are ready")],
-        "Release Policy",
         default="direct",
         required=True,
         help="It specifies how to release a transfer partially or all at once",
