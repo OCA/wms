@@ -337,6 +337,11 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__result_package_id
+msgid "Destination Package"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
 msgid "Disable Full Bin Action Is Possible"
 msgstr ""
@@ -412,6 +417,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant__id
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__id
 msgid "ID"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_stock_move_line__result_package_id
+msgid "If set, the operations are packed into this package"
 msgstr ""
 
 #. module: shopfloor
