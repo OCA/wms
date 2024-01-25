@@ -400,7 +400,7 @@ class Reception(Component):
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
         origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+            picking.origin, extra_domain=origin_move_domain, reception_return=True
         )
         origin_moves_for_product = origin_moves.filtered(
             lambda m: m.product_id == product
@@ -448,7 +448,7 @@ class Reception(Component):
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
         origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+            picking.origin, extra_domain=origin_move_domain, reception_return=True
         )
         origin_moves_for_packaging = origin_moves.filtered(
             lambda m: packaging in m.product_id.packaging_ids

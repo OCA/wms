@@ -8,8 +8,8 @@ class SearchAction(Component):
 
     _inherit = "shopfloor.search.action"
 
-    def _get_origin_from_barcode(self, barcode):
-        if self.work.menu.scenario_id.key == "reception":
+    def _get_origin_from_barcode(self, barcode, **kwargs):
+        if kwargs.get("reception_return"):
             carriers = self.env["delivery.carrier"].search([])
             res = carriers._get_origin_from_barcode(barcode)
             if res:
