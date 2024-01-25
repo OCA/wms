@@ -984,3 +984,92 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         self.assertEqual(move_line.move_id.product_uom_qty, 4)
         self.assertEqual(move_line.reserved_uom_qty, 4)
         self.assertEqual(move_line.qty_done, 4)
+
+
+class LocationContentTransferSetDestinationNextOperationSpecialCase(
+    LocationContentTransferCommonCase
+):
+    """Tests for endpoint used from scan_destination to ensure that in
+    case of partial qty, the next operation is the one for the remaining
+    qty.
+
+    * /set_destination_line
+
+    """
+
+    @classmethod
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        cls.picking = cls._create_picking(
+            lines=[(cls.product_a, 10), (cls.product_b, 10)]
+        )
+        cls._update_qty_in_location(cls.picking.location_id, cls.product_a, 20)
+        cls._update_qty_in_location(cls.picking.location_id, cls.product_b, 20)
+        # Reserve quantities
+        cls.picking.action_assign()
+        cls._simulate_pickings_selected(cls.picking)
+        cls.dest_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Sub Shelf 1",
+                    "barcode": "subshelf1",
+                    "location_id": cls.shelf1.id,
+                }
+            )
+        )
+
+    def test_set_destination_lines_partial_qty_next_line(self):
+        """Scanned destination location with partial qty, the next line to process
+        should be the one for the remaining qty.
+        """
+
+        move_line = self.picking.move_line_ids[0]
+        self._simulate_selected_move_line(move_line)
+        # Scan partial qty (6/10)
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": move_line.reserved_uom_qty - 4,  # Scan 6 qty
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        # the new qty is in a backorder of the backorder where the done qty has bee
+        # processed
+        backorder = self.picking.backorder_ids.backorder_ids
+        self.assertTrue(backorder)
+
+        self.assert_response_start_single(
+            response,
+            backorder,
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
+        )
+        # check that the next operation has the appropriate attributes
+        move_line = backorder.move_line_ids
+        self.assertEqual(move_line.reserved_uom_qty, 4)
+        self.assertEqual(move_line.qty_done, 4)
+        self.assertEqual(move_line.picking_id.user_id, self.env.user)
+        # if we process the quantity of the backorder, the next operation should
+        # be the remaining one of the initial picking
+        self._simulate_selected_move_line(move_line)
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": move_line.reserved_uom_qty,  # Scan 6 qty
+                "barcode": self.dest_location.barcode,
+            },
+        )
+        self.assert_response_start_single(
+            response,
+            self.picking,
+            message=self.service.msg_store.location_content_transfer_item_complete(
+                self.dest_location
+            ),
+        )

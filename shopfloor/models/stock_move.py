@@ -100,7 +100,9 @@ class StockMove(models.Model):
         moves = self.filtered(lambda m: m.state == "assigned")
         if not moves:
             return False
+        new_backorders = self.env["stock.picking"]
         for picking in moves.picking_id:
+            existing_backorders = picking.backorder_ids
             moves_todo = picking.move_ids & moves
             # No need to create a new transfer if we are processing all moves
             if moves_todo == picking.move_ids:
@@ -113,4 +115,5 @@ class StockMove(models.Model):
                 new_picking = moves_todo._extract_in_split_order()
                 assert new_picking.state == "assigned"
             new_picking._action_done()
-        return True
+            new_backorders |= new_picking.backorder_ids - existing_backorders
+        return new_backorders

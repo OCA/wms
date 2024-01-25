@@ -764,11 +764,19 @@ class LocationContentTransfer(Component):
         self._lock_lines(move_line)
 
         move_line.qty_done = quantity
-
         self._write_destination_on_lines(move_line, scanned_location)
+
         stock = self._actions_for("stock")
-        stock.validate_moves(move_line.move_id)
-        move_lines = self._find_transfer_move_lines(location)
+
+        backorders = stock.validate_moves(move_line.move_id)
+        if backorders:
+            for move_line in backorders.mapped("move_line_ids"):
+                move_line.qty_done = move_line.reserved_uom_qty
+            backorders.user_id = self.env.user
+            # process first backorder of current line
+            move_lines = backorders.move_line_ids
+        else:
+            move_lines = self._find_transfer_move_lines(move_line.location_id)
         message = self.msg_store.location_content_transfer_item_complete(
             scanned_location
         )

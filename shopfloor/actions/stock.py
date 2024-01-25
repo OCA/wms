@@ -177,6 +177,7 @@ class StockAction(Component):
             the transfer is validated as usual, creating a backorder.
         """
         moves.split_unavailable_qty()
+        backorders = self.env["stock.picking"]
         for picking in moves.picking_id:
             # the backorder strategy is checked in the 'button_validate' method
             # on odoo standard. Since we call the sub-method '_action_done' here,
@@ -191,8 +192,10 @@ class StockAction(Component):
                 new_backorders = picking.backorder_ids - existing_backorders
                 if new_backorders:
                     new_backorders.write({"user_id": False})
+                backorders |= new_backorders
             else:
-                moves_todo.extract_and_action_done()
+                backorders |= moves_todo.extract_and_action_done()
+        return backorders
 
     def _check_backorder(self, picking, moves):
         """Check if the `picking` has to be validated as usual to create a backorder.
