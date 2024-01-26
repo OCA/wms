@@ -150,6 +150,42 @@ class TestStockLocation(TestStorageTypeCommon):
             self.env["product.product"].browse(),
         )
 
+    def test_will_contain_product_ids_quantity(self):
+        """
+        Put a product quantity in pallet bin 1 location
+        Create a move that will void that location
+        Transfer the quantity
+        Odoo lets a quant with zero quantity
+        The location_will_contain_product_ids should be void
+        """
+        location = self.pallets_bin_1_location
+        location.computed_storage_category_id.allow_new_product = "same"
+
+        self._update_qty_in_location(location, self.product, 10)
+        self.assertEqual(location.location_will_contain_product_ids, self.product)
+        ml_move = self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product.id,
+                "location_id": location.id,
+                "location_dest_id": self.env.ref("stock.stock_location_customers").id,
+                "product_uom": self.product.uom_id.id,
+                "product_uom_qty": 10,
+            }
+        )
+        ml_move._action_confirm()
+        ml_move._action_assign()
+
+        ml_move.quantity_done = 10.0
+        ml_move._action_done()
+        # Odoo lets a zero quantity quant before scheduler do the garbage collector
+        quant = self.env["stock.quant"].search(
+            [("product_id", "=", self.product.id), ("location_id", "=", location.id)]
+        )
+        self.assertTrue(quant)
+        self.assertEqual(0.0, quant.quantity)
+        self.assertFalse(location.location_will_contain_product_ids)
+
     def test_will_contain_lot_ids(self):
         location = self.pallets_bin_1_location
         location.computed_storage_category_id.allow_new_product = "same_lot"
@@ -192,6 +228,45 @@ class TestStockLocation(TestStorageTypeCommon):
             location.location_will_contain_lot_ids,
             self.env["stock.lot"].browse(),
         )
+
+    def test_will_contain_product_lot_ids_quantity(self):
+        """
+        Put a product quantity lot in pallet bin 1 location
+        Create a move that will void that location
+        Transfer the quantity
+        Odoo lets a quant with zero quantity
+        The location_will_contain_product_ids should be void
+        """
+        location = self.pallets_bin_1_location
+        location.computed_storage_category_id.allow_new_product = "same_lot"
+
+        lot_values = {"product_id": self.product.id, "company_id": self.env.company.id}
+        lot1 = self.env["stock.lot"].create(lot_values)
+
+        self._update_qty_in_location(location, self.product, 10, lot=lot1)
+        self.assertEqual(location.location_will_contain_lot_ids, lot1)
+        ml_move = self.env["stock.move"].create(
+            {
+                "name": "test",
+                "product_id": self.product.id,
+                "location_id": location.id,
+                "location_dest_id": self.env.ref("stock.stock_location_customers").id,
+                "product_uom": self.product.uom_id.id,
+                "product_uom_qty": 10,
+            }
+        )
+        ml_move._action_confirm()
+        ml_move._action_assign()
+
+        ml_move.quantity_done = 10.0
+        ml_move._action_done()
+        # Odoo lets a zero quantity quant before scheduler do the garbage collector
+        quant = self.env["stock.quant"].search(
+            [("product_id", "=", self.product.id), ("location_id", "=", location.id)]
+        )
+        self.assertTrue(quant)
+        self.assertEqual(0.0, quant.quantity)
+        self.assertFalse(location.location_will_contain_lot_ids)
 
     def test_location_is_empty_non_internal(self):
         location = self.env.ref("stock.stock_location_customers")
