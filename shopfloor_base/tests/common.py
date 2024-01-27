@@ -69,9 +69,11 @@ class CommonCase(TransactionCase, RegistryMixin, ComponentMixin):
             **params
         )
 
-    def get_service(self, usage, collection=None, env=None, **kw):
+    def get_service(self, usage, collection=None, env=None, menu=None, **kw):
         with self.work_on_services(collection=collection, env=env, **kw) as work:
             service = work.component(usage=usage)
+            if menu:
+                service.work.menu = menu
             # Thanks to shopfloor.app we don't need controllers
             # but not having a controller means that non decorated methods
             # stay undecorated as they are not fixed at startup by base_rest.
