@@ -28,6 +28,7 @@ class AttachmentQueue(models.Model):
         for record in self:
             record.picking_imported_count = len(record.picking_imported_ids)
 
+    @api.depends("task_id")
     def _compute_warehouse(self):
         for rec in self:
             field = None
@@ -38,10 +39,12 @@ class AttachmentQueue(models.Model):
             elif rec.file_type == "wms_update_inventory":
                 field = "wms_import_update_inventory_task_id"
 
-            if field:
+            if field and rec.task_id:
                 rec.warehouse_id = self.env["stock.warehouse"].search(
                     [(field, "=", rec.task_id.id)]
                 )
+            else:
+                rec.warehouse_id = None
 
     def _run(self):
         for filetype in [el[0] for el in WMS_IMPORT_FILETYPES]:
