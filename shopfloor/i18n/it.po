@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-01-05 10:38+0000\n"
+"PO-Revision-Date: 2024-01-29 17:38+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -392,7 +392,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__result_package_id
 msgid "Destination Package"
-msgstr ""
+msgstr "Collo destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
@@ -478,7 +478,7 @@ msgstr "ID"
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__result_package_id
 msgid "If set, the operations are packed into this package"
-msgstr ""
+msgstr "Se impostata, le operazioni sono raggruppate in questo collo"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
