@@ -1131,10 +1131,13 @@ class ClusterPicking(Component):
             return
         # We set the picking to done only when the last line is
         # unloaded to avoid backorders.
-        if all(line.shopfloor_unloaded for line in picking.move_line_ids):
-            picking._action_done()
-        if self.work.menu.unload_package_at_destination:
+        all_lines_unloaded = all(
+            line.shopfloor_unloaded for line in picking.move_line_ids
+        )
+        if self.work.menu.unload_package_at_destination and all_lines_unloaded:
             picking_lines.result_package_id = False
+        if all_lines_unloaded:
+            picking._action_done()
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Try to close the batch if all transfers are done.
