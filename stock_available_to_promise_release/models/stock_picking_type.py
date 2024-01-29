@@ -10,14 +10,17 @@ class StockPickingType(models.Model):
     count_picking_need_release = fields.Integer(compute="_compute_picking_count")
     unrelease_on_backorder = fields.Boolean(
         string="Unrelease on backorder",
-        help="If checked, when a backorder is created the moves into the "
-        "backorder are unreleased if they come from a route configured "
-        "to manually release moves",
+        help="If checked, when a backorder is created (i.e. at the validation of "
+        "the delivery), the moves into the backorder are unreleased as long as "
+        "they came from a route configured to manually release moves. This means "
+        "that the moves that were not delivered are put back in need for release "
+        "and the unprocessed internal pulled moves are canceled.",
     )
     prevent_new_move_after_release = fields.Boolean(
         string="Prevent new move after release",
-        help="If checked, when a picking is released it's no more possible to "
-        "assign new moves to it.",
+        help="If checked, once a delivery picking has been released, no more "
+        "moves will be added to it. For example, if you add lines in the origin "
+        "sales order, the new moves will be added to a new delivery.",
     )
 
     def _compute_picking_count_need_release_domains(self):
