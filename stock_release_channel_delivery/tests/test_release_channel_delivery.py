@@ -41,3 +41,12 @@ class TestReleaseChannel(ReleaseChannelCase):
         self.channel.carrier_id = self.carrier2
         self.picking.assign_release_channel()
         self.assertFalse(self.picking.release_channel_id)
+
+    def test_03(self):
+        """
+        picking have no carrier but release channel have one
+        """
+        self.picking.carrier_id = False
+        self.channel.carrier_id = self.carrier
+        self.picking.assign_release_channel()
+        self.assertFalse(self.picking.release_channel_id)
