@@ -4,10 +4,10 @@
 {
     "name": "Stock Release Channel Delivery",
     "summary": """
-        Exposes clearly the carrier linked to the release channel """,
+        Add a carrier selection criteria on the release channel """,
     "version": "16.0.1.0.1",
     "license": "AGPL-3",
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
         "stock_release_channel",

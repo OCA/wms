@@ -1,4 +1,8 @@
-This addon adds a field containing the id of the carrier linked to the release
-channel. Though an overlap can be seen on the picking point of view as the
-rule_domain does the job the idea is to easy link the channel with the
-customer.
+This addon adds a selection criteria on the release channel based on the shipping
+method.
+
+When you don't classify your deliveries in different operation types per shipping
+method, then you can use this criteria to filter the selection of valid release
+channels. While you could achieve the same with the domain provided on the base
+release channel module, this criteria provides a more explicit configuration
+and also performs better.
