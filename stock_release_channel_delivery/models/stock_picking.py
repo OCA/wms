@@ -18,4 +18,6 @@ class StockPicking(models.Model):
                     ("carrier_id", "=", self.carrier_id.id),
                 ]
             )
+        else:
+            domain.extend([("carrier_id", "=", False)])
         return domain
