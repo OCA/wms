@@ -229,15 +229,15 @@ class StockWarehouse(models.Model):
                 or []
             )
 
-            # Inactive / Active binding
-            to_inactive = to_active = self.env["wms.product.sync"]
+            # Inactive / Active / Delete binding
             for record in self.with_context(active_test=False).wms_product_sync_ids:
                 if record.active and record.product_id not in prd_matching:
-                    to_inactive |= record
+                    if record.wms_export_date:
+                        record.active = False
+                    else:
+                        record.sudo().unlink()
                 elif not record.active and record.product_id in prd_matching:
-                    to_active |= record
-            to_inactive.active = False
-            to_active.active = True
+                    record.active = True
 
             # Create missing one
             to_create = prd_matching - self.wms_product_sync_ids.product_id
