@@ -10,6 +10,5 @@ class StockReleaseChannel(models.Model):
 
     carrier_id = fields.Many2one(
         comodel_name="delivery.carrier",
-        help="The carrier linked to the release channel.",
-        string="Transporter",
+        string="Shipping Methods",
     )
