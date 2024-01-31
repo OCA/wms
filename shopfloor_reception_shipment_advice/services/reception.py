@@ -116,11 +116,24 @@ class Reception(Component):
         }
         return self._response(next_state="manual_selection_shipment", data=data)
 
+    def _select_move_to_work_on(self, moves, message_code="product"):
+        """Select a move with still some quantity to process.
+
+        When working from shipment advice, there can be multiple moves selected for
+        the same barcode.
+        """
+        message = None
+        for move in moves:
+            message = self._check_move_available(move, message_code)
+            if not message:
+                # Found a move that can be worked on
+                return move, message
+        move = fields.first(moves)
+        return move, self._check_move_available(move, message_code)
+
     def _scan_line_shipment__by_product(self, shipment, product):
         moves = shipment.planned_move_ids.filtered(lambda m: m.product_id == product)
-        # TODO probably should check if still all available...
-        move = fields.first(moves)
-        message = self._check_move_available(move, "product")
+        move, message = self._select_move_to_work_on(moves, "product")
         picking = move.picking_id
         if message:
             return self._response_for_select_move(picking, message=message)
@@ -130,9 +143,7 @@ class Reception(Component):
         moves = shipment.planned_move_ids.filtered(
             lambda m: packaging in m.product_id.packaging_ids
         )
-        # TODO probably should check if still all available...
-        move = fields.first(moves)
-        message = self._check_move_available(move, "product")
+        move, message = self._select_move_to_work_on(moves, "package")
         picking = move.picking_id
         if message:
             return self._response_for_select_move(picking, message=message)
