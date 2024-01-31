@@ -605,6 +605,10 @@ class StockMove(models.Model):
             picking_ids.update(moves.picking_id.ids)
             moves = moves.move_orig_ids
         pickings = self.env["stock.picking"].browse(picking_ids)
+        # Don't take into account pickings that are already done or canceled
+        # This can happen if a move is a reliquat of a picking that has been
+        # already been processed.
+        pickings = pickings.filtered(lambda p: p.state not in ("done", "cancel"))
         pickings._after_release_update_chain()
         # Set the highest priority on all pickings in the chain
         priorities = pickings.mapped("priority")

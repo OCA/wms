@@ -1140,6 +1140,35 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         pick.release_available_to_promise()
         self.assertEqual(pick.move_ids.move_orig_ids.picking_id.priority, "1")
 
+        # from here we simulate a special processing flow where a priority
+        # on a backorder after having been reset to 0 is changed again to 1
+        # on release of available to promise even if the priority is 0
+        # on all the moves to do.
+
+        # partially process the picking
+        pick_pick = pick.move_ids.move_orig_ids.picking_id
+        pick_pick.move_ids.quantity_done = 3.0
+        pick_pick._action_done()
+        # process and validate the picking to create a backorder
+        pick.move_ids.quantity_done = 3.0
+        pick.unrelease()
+        pick._action_done()
+
+        # force priority on the initial picks to simulate an inconsistency
+        # this case should not happen but we observe it in real life without
+        # knowing how it happens
+        pick.priority = "1"
+        pick_pick.priority = "1"
+        backorder = pick.backorder_ids
+        # change the priority on the backorder and release it
+        backorder.priority = "0"
+        backorder.action_confirm()
+        # force need release to True for the test
+        backorder.move_ids.need_release = True
+        backorder.release_available_to_promise()
+        # the backorder should keep the new priority
+        self.assertEqual(backorder.priority, "0")
+
     def test_backorder_creation_after_release(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
