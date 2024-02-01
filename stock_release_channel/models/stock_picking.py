@@ -14,6 +14,7 @@ class StockPicking(models.Model):
         index=True,
         ondelete="restrict",
         copy=False,
+        tracking=True,
     )
 
     def _delay_assign_release_channel(self):
