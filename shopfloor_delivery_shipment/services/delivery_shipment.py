@@ -582,7 +582,7 @@ class DeliveryShipment(Component):
             pickings_partially_loaded = loaded_lines.picking_id
             domain += [("picking_id", "in", pickings_partially_loaded.ids)]
         move_lines = self.env["stock.move.line"].search(domain)
-        return self._prepare_data_for_content(move_lines, False)
+        return self._prepare_data_for_content(move_lines, group_by_sale=False)
 
     def _data_for_content_to_load_from_picking(
         self, shipment_advice, picking=None, location=None
@@ -598,10 +598,10 @@ class DeliveryShipment(Component):
             )
         elif location:
             move_lines = self._find_move_lines_from_location(shipment_advice, location)
-        group_by_sales = bool(location)
-        return self._prepare_data_for_content(move_lines, group_by_sales)
+        group_by_sale = bool(location)
+        return self._prepare_data_for_content(move_lines, group_by_sale=group_by_sale)
 
-    def _prepare_data_for_content(self, move_lines, group_by_sales):
+    def _prepare_data_for_content(self, move_lines, group_by_sale=False):
         """Returns data for package levels and/or move lines.
 
         The data is grouped by source location with a key for package levels and
@@ -625,13 +625,13 @@ class DeliveryShipment(Component):
                 },
             }
         """
-        empty_group_name = " "
+        empty_group_name = "null"
         data = collections.OrderedDict()
         package_level_ids = []
 
         # Sort and group move lines by source location and prepare the data
         sales_started = []
-        if group_by_sales:
+        if group_by_sale:
             sales_started = move_lines.shipment_advice_id.loaded_picking_ids.sale_id
             # Grouping by sales (the packages) sort starting from last position
             #  2 the lines NOT in a sales order whose loading has started.
@@ -653,7 +653,7 @@ class DeliveryShipment(Component):
                 )
                 if move_line.package_level_id.id in package_level_ids:
                     continue
-                if group_by_sales:
+                if group_by_sale:
                     group_name = (
                         move_line.move_id.sale_line_id.order_id.name or empty_group_name
                     )

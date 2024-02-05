@@ -93,7 +93,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         #   'package_levels' key contains the package which has been loaded
         # grouped in a dict
         self.assertEqual(
-            content[location_src]["package_levels"][" "],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(package_level),
         )
 
@@ -144,7 +144,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         #   'package_levels' key contains the package which has been loaded
         # grouped in a dic
         self.assertEqual(
-            content[location_src]["package_levels"][" "],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(package_level),
         )
 
