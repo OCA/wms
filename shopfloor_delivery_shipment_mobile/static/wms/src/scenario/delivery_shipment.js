@@ -73,7 +73,7 @@ const DeliveryShipment = {
                 </v-card>
 
                 <div v-for="(value, name, index) in value.package_levels">
-                    <v-card v-if="Boolean(name.trim())" color="grey lighten-1" class="detail v-card mt-5 main mb-2">
+                    <v-card v-if="name!=='null'" color="grey lighten-1" class="detail v-card mt-5 main mb-2">
                         <v-card-title>{{ name }}</v-card-title>
                     </v-card>
                     <item-detail-card
