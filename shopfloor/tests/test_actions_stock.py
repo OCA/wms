@@ -45,3 +45,8 @@ class TestActionsStock(CommonCase):
         self.assertTrue(self.picking.move_line_ids.shopfloor_user_id)
         self.assertFalse(picking_not_assigned.move_line_ids.shopfloor_user_id)
         self.assertFalse(picking_not_assigned.user_id)
+
+    def test_validate_moves(self):
+        # TODO: add test with a package with 2 products. Each product is
+        # reserved by a move but the moves are in different pickings
+        pass

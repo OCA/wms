@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
+from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
@@ -177,31 +178,50 @@ class StockAction(Component):
             the transfer is validated as usual, creating a backorder.
         """
         moves.split_unavailable_qty()
+        existing_backorder_ids = []
+        pickings_to_validate_ids = []
         for picking in moves.picking_id:
             moves_todo = picking.move_lines & moves
             if self._check_backorder(picking, moves_todo):
-                existing_backorders = picking.backorder_ids
-                picking._action_done()
-                new_backorders = picking.backorder_ids - existing_backorders
-                if new_backorders:
-                    new_backorders.write({"user_id": False})
+                existing_backorder_ids += picking.backorder_ids.ids
+                pickings_to_validate_ids.append(picking.id)
             else:
-                moves_todo.extract_and_action_done()
+                new_picking = moves_todo._extract_in_split_order()
+                if new_picking.state != "assigned":
+                    raise UserError(_("Internal Error. Split order is not available"))
+                pickings_to_validate_ids.append(new_picking.id)
+        if pickings_to_validate_ids:
+            pickings_to_validate = moves.picking_id.browse(pickings_to_validate_ids)
+            pickings_to_validate._action_done()
+            existing_backorders = moves.picking_id.browse(existing_backorder_ids)
+            new_backorders = pickings_to_validate.backorder_ids - existing_backorders
+            if new_backorders:
+                new_backorders.write({"user_id": False})
 
     def _check_backorder(self, picking, moves):
         """Check if the `picking` has to be validated as usual to create a backorder.
 
         We want to create a normal backorder if:
 
-            - the moves are equal to all available moves of the current picking
-              but there are still unavailable moves to process
-            - the moves are not linked to unprocessed ancestor moves
+            - the moves are equal to all reserved moves of the current picking
+            - the unavailable moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_lines.filtered(lambda m: m.state == "assigned")
-        has_ancestors = bool(
-            moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
+        available_moves = picking.move_lines.filtered(
+            lambda m: m.state in ("partially_available", "assigned")
         )
-        return moves == assigned_moves and not has_ancestors
+        if moves != available_moves:
+            return False
+        unavailable_moves = picking.move_lines.filtered(
+            lambda m: m.state in ("waiting", "confirmed", "partially_available")
+        )
+        has_ancestors = bool(
+            unavailable_moves.move_orig_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+        )
+        if has_ancestors:
+            return False
+        return True
 
     def put_package_level_in_move(self, package_level):
         """Ensure to put the package level in its own move.
