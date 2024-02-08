@@ -3,7 +3,7 @@
 
 {
     "name": "Stock Available to Promise Release",
-    "version": "16.0.3.5.0",
+    "version": "16.0.3.6.0",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
