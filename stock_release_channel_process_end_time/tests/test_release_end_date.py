@@ -161,6 +161,45 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
                 "2023-01-27 15:00:00", fields.Datetime.to_string(move.date)
             )
 
+    @freeze_time("2023-01-27 10:00:00")
+    def test_channel_end_date_as_move_date_deadline_on_moves_created_by_release(self):
+        """
+        Check that the process end date is set as the move date deadline on
+        moves created by the release of a shipping (and also on the generated pick
+        itself).
+        """
+        self.env["ir.config_parameter"].sudo().set_param(
+            "stock_release_channel_process_end_time.stock_release_use_channel_end_date",
+            True,
+        )
+        # Remove existing jobs as some already exists to assign pickings to channel
+        jobs_before = self.env["queue.job"].search([])
+        jobs_before.unlink()
+        # Set the end time
+        self.channel.process_end_time = 23.0
+        channel = self.channel.with_context(queue_job__no_delay=True)
+        # Asleep the release channel to void the process end date
+        channel.action_sleep()
+        new_pickings = channel.picking_ids.move_ids.move_orig_ids.picking_id
+        self.assertFalse(new_pickings)
+        channel.invalidate_recordset()
+        channel.action_wake_up()
+        self._update_qty_in_location(self.loc_bin1, self.product1, 100.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 100.0)
+        pickings = channel.picking_ids
+        pickings.env.invalidate_all()
+        # release the pickings
+        pickings.release_available_to_promise()
+        # get the moves created by the release
+        new_pickings = pickings.move_ids.move_orig_ids.picking_id
+        self.assertTrue(new_pickings)
+        # check that the picking schedule date is set to the process end date
+        for picking in new_pickings:
+            self.assertEqual(
+                "2023-01-27 23:00:00",
+                fields.Datetime.to_string(picking.move_ids[0].date_deadline),
+            )
+
     def test_can_edit_time(self):
         user = self.env.ref("base.user_demo")
         group = self.env.ref("stock.group_stock_manager")
