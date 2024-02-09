@@ -399,8 +399,9 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
+        origin = self._get_origin_from_barcode(picking.origin)
         origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain, reception_return=True
+            origin, extra_domain=origin_move_domain
         )
         origin_moves_for_product = origin_moves.filtered(
             lambda m: m.product_id == product
@@ -447,8 +448,9 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
+        origin = self._get_origin_from_barcode(picking.origin)
         origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain, reception_return=True
+            origin, extra_domain=origin_move_domain
         )
         origin_moves_for_packaging = origin_moves.filtered(
             lambda m: packaging in m.product_id.packaging_ids
@@ -696,6 +698,11 @@ class Reception(Component):
 
     def _assign_user_to_line(self, line):
         line.shopfloor_user_id = self.env.user
+
+    def _get_origin_from_barcode(self, barcode):
+        carriers = self.env["delivery.carrier"].search([])
+        res = carriers._get_origin_from_barcode(barcode)
+        return res or [barcode]
 
     # DATA METHODS
 
