@@ -16,6 +16,7 @@ class ReleaseChannelCase(common.TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
+        cls.company2 = cls.env.ref("stock.res_company_1")
         cls.customer_location = cls.env.ref("stock.stock_location_customers")
         cls.default_channel = cls.env.ref(
             "stock_release_channel.stock_release_channel_default"

@@ -115,6 +115,7 @@ class StockPicking(models.Model):
 
     def _get_release_channel_possible_candidate_domain_picking(self):
         return [
+            ("company_id", "=", self.company_id.id),
             "|",
             ("picking_type_ids", "=", False),
             ("picking_type_ids", "in", self.picking_type_id.ids),

@@ -14,4 +14,5 @@ class ResPartner(models.Model):
         column1="partner_id",
         column2="channel_id",
         string="Release Channels",
+        domain="company_id and [('company_id', '=', company_id)] or []",
     )
