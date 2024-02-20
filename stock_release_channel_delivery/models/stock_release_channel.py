@@ -8,7 +8,7 @@ class StockReleaseChannel(models.Model):
 
     _inherit = "stock.release.channel"
 
-    carrier_id = fields.Many2one(
+    carrier_ids = fields.Many2many(
         comodel_name="delivery.carrier",
         string="Shipping Methods",
     )

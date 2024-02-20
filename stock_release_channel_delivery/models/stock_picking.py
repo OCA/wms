@@ -14,10 +14,10 @@ class StockPicking(models.Model):
             domain.extend(
                 [
                     "|",
-                    ("carrier_id", "=", False),
-                    ("carrier_id", "=", self.carrier_id.id),
+                    ("carrier_ids", "=", False),
+                    ("carrier_ids", "in", self.carrier_id.ids),
                 ]
             )
         else:
-            domain.extend([("carrier_id", "=", False)])
+            domain.extend([("carrier_ids", "=", False)])
         return domain
