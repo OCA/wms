@@ -12,7 +12,7 @@
         />
         <field name="arch" type="xml">
             <field name="rule_domain" position="before">
-                <field name="carrier_id" />
+                <field name="carrier_ids" widget="many2many_tags" />
             </field>
         </field>
     </record>

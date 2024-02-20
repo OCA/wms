@@ -20,7 +20,7 @@ class TestReleaseChannel(ReleaseChannelCase):
         picking and release channel have the same carrier
         """
         self.picking.carrier_id = self.carrier
-        self.channel.carrier_id = self.carrier
+        self.channel.carrier_ids = self.carrier
         self.picking.assign_release_channel()
         self.assertEqual(self.picking.release_channel_id, self.channel)
 
@@ -29,7 +29,7 @@ class TestReleaseChannel(ReleaseChannelCase):
         picking have carrier but not the release channel
         """
         self.picking.carrier_id = self.carrier
-        self.channel.carrier_id = False
+        self.channel.carrier_ids = False
         self.picking.assign_release_channel()
         self.assertEqual(self.picking.release_channel_id, self.channel)
 
@@ -38,7 +38,7 @@ class TestReleaseChannel(ReleaseChannelCase):
         picking and release channel have different carrier
         """
         self.picking.carrier_id = self.carrier
-        self.channel.carrier_id = self.carrier2
+        self.channel.carrier_ids = self.carrier2
         self.picking.assign_release_channel()
         self.assertFalse(self.picking.release_channel_id)
 
@@ -47,6 +47,6 @@ class TestReleaseChannel(ReleaseChannelCase):
         picking have no carrier but release channel have one
         """
         self.picking.carrier_id = False
-        self.channel.carrier_id = self.carrier
+        self.channel.carrier_ids = self.carrier
         self.picking.assign_release_channel()
         self.assertFalse(self.picking.release_channel_id)

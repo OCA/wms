@@ -21,11 +21,11 @@ msgid "Stock Release Channels"
 msgstr ""
 
 #. module: stock_release_channel_delivery
-#: model:ir.model.fields,help:stock_release_channel_delivery.field_stock_release_channel__carrier_id
-msgid "The carrier linked to the release channel."
+#: model:ir.model.fields,help:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
+msgid "The shipping methods linked to the release channel."
 msgstr ""
 
 #. module: stock_release_channel_delivery
-#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_id
-msgid "Transporter"
+#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
+msgid "Shipping Methods"
 msgstr ""
