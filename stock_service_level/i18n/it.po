@@ -1,0 +1,100 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_service_level
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-01-15 15:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__code
+msgid "Code"
+msgstr "Codice"
+
+#. module: stock_service_level
+#: model:ir.model.constraint,message:stock_service_level.constraint_stock_service_level_book_format_code_uniq
+msgid "Code must be unique."
+msgstr "Il codice deve essere univoco."
+
+#. module: stock_service_level
+#: model_terms:ir.actions.act_window,help:stock_service_level.action_stock_service_level
+msgid "Create your first service level !"
+msgstr "Crea il primo livello di servizio!"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_move__display_name
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_rule__display_name
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_move__id
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_rule__id
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__id
+msgid "ID"
+msgstr "ID"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_move____last_update
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_rule____last_update
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level____last_update
+msgid "Last Modified on"
+msgstr "Ultima modifica il"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_service_level__name
+msgid "Name"
+msgstr "Nome"
+
+#. module: stock_service_level
+#: model:ir.actions.act_window,name:stock_service_level.action_stock_service_level
+#: model:ir.model.fields,field_description:stock_service_level.field_stock_move__service_level_id
+#: model:ir.ui.menu,name:stock_service_level.menu_action_stock_service_level
+msgid "Service level"
+msgstr "Livello servizio"
+
+#. module: stock_service_level
+#: model:ir.model,name:stock_service_level.model_stock_move
+msgid "Stock Move"
+msgstr "Movimento di magazzino"
+
+#. module: stock_service_level
+#: model:ir.model,name:stock_service_level.model_stock_rule
+msgid "Stock Rule"
+msgstr "Regola di giacenza"
+
+#. module: stock_service_level
+#: model:ir.model,name:stock_service_level.model_stock_service_level
+msgid "Stock Service level"
+msgstr "Livello servizio magazzino"

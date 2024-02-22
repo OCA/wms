@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Foodles (http://www.foodles.co).
+     @author Pierre Verkest <pierreverkest84@gmail.com>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+
+    <record model="ir.ui.view" id="view_stock_service_level_search">
+        <field name="name">stock.service.level.search</field>
+        <field name="model">stock.service.level</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code" />
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_stock_service_level_list">
+        <field name="name">stock.service.level.list</field>
+        <field name="model">stock.service.level</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" optional="show" />
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_stock_service_level_form">
+        <field name="name">stock.service.level.form</field>
+        <field name="model">stock.service.level</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="main">
+                          <field name="code" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stock_service_level" model="ir.actions.act_window">
+        <field name="name">Service level</field>
+        <field name="res_model">stock.service.level</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_stock_service_level_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_nocreate">
+                Create your first service level !
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_action_stock_service_level"
+        parent="stock.menu_warehouse_config"
+        name="Service level"
+        action="action_stock_service_level"
+        sequence="20"
+    />
+</odoo>
