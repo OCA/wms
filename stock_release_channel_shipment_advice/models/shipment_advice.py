@@ -12,4 +12,5 @@ class ShipmentAdvice(models.Model):
         string="Release Channel",
         states={"draft": [("readonly", False)]},
         readonly=True,
+        check_company=True,
     )

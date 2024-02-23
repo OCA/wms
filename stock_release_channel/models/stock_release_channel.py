@@ -37,11 +37,19 @@ class StockReleaseChannel(models.Model):
     release_forbidden = fields.Boolean(string="Forbid to release this channel")
     sequence = fields.Integer(default=lambda self: self._default_sequence())
     color = fields.Integer()
+    company_id = fields.Many2one(
+        string="Company",
+        comodel_name="res.company",
+        required=True,
+        default=lambda s: s.env.company.id,
+        index=True,
+    )
     warehouse_id = fields.Many2one(
         "stock.warehouse",
         string="Warehouse",
         index=True,
         help="Warehouse for which this channel is relevant",
+        check_company=True,
     )
     picking_type_ids = fields.Many2many(
         "stock.picking.type",
@@ -52,6 +60,7 @@ class StockReleaseChannel(models.Model):
         domain="warehouse_id"
         " and [('warehouse_id', '=', warehouse_id), ('code', '=', 'outgoing')]"
         " or [('code', '=', 'outgoing')]",
+        check_company=True,
     )
     rule_domain = fields.Char(
         string="Domain",
@@ -209,6 +218,7 @@ class StockReleaseChannel(models.Model):
         column2="partner_id",
         string="Partners",
         context={"active_test": False},
+        domain="['|', ('company_id', '=', company_id), ('company_id', '=', False)]",
     )
 
     @api.depends("state")

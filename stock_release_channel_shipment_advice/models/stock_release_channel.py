@@ -23,6 +23,7 @@ class StockReleaseChannel(models.Model):
         inverse_name="release_channel_id",
         string="Shipment Advices",
         readonly=True,
+        check_company=True,
     )
     dock_id = fields.Many2one(
         comodel_name="stock.dock", domain='[("warehouse_id", "=", warehouse_id)]'

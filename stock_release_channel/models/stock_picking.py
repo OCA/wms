@@ -84,6 +84,7 @@ class StockPicking(models.Model):
         self.ensure_one()
         return [
             ("state", "!=", "asleep"),
+            ("company_id", "=", self.picking_type_id.company_id.id),
             "|",
             ("picking_type_ids", "=", False),
             ("picking_type_ids", "in", self.picking_type_id.ids),
