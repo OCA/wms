@@ -75,7 +75,7 @@ class StockReleaseChannel(models.Model):
 
     def _field_picking_domains(self):
         res = super()._field_picking_domains()
-        release_ready_domain = res["count_picking_release_ready"]
+        release_ready_domain = res["release_ready"]
         # the initial scheduled_date condition based on datetime.now() must
         # be replaced by a condition based on the process_end_date
         # since the processe_end_date is a field on the release channel
@@ -96,7 +96,7 @@ class StockReleaseChannel(models.Model):
                 )
             else:
                 new_domain.append(criteria)
-        res["count_picking_release_ready"] = new_domain
+        res["release_ready"] = new_domain
         return res
 
     def _get_expected_date(self):
