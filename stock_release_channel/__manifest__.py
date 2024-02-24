@@ -7,8 +7,8 @@
     "version": "16.0.2.9.0",
     "development_status": "Beta",
     "license": "AGPL-3",
-    "author": "Camptocamp, ACSONE SA/NV,Odoo Community Association (OCA)",
-    "maintainers": ["sebalix"],
+    "author": "Camptocamp, BCIM, ACSONE SA/NV, Odoo Community Association (OCA)",
+    "maintainers": ["sebalix", "jbaudoux"],
     "website": "https://github.com/OCA/wms",
     "depends": [
         "web",
@@ -19,6 +19,7 @@
         "views/res_partner.xml",
         "views/stock_release_channel_views.xml",
         "views/stock_picking_views.xml",
+        "views/res_config_settings.xml",
         "data/queue_job_data.xml",
         "data/ir_cron_data.xml",
         "security/stock_release_channel.xml",

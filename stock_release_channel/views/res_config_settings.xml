@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view" model="ir.ui.view">
+        <field name="model">res.config.settings</field>
+        <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.res_config_settings_view_form_stock"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='stock_reservation']" position="inside">
+                <div
+                    class="col-12 col-lg-6 o_setting_box"
+                    id="release_channel_dashboard"
+                >
+                    <div class="o_setting_left_pane">
+                        <field name="release_channel_show_last_picking_done" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="release_channel_show_last_picking_done" />
+                        <div class="text-muted">
+                            Show last delivery done in release channels dashboard
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

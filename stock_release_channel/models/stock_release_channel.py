@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import logging
@@ -210,6 +211,9 @@ class StockReleaseChannel(models.Model):
         string="Partners",
         context={"active_test": False},
     )
+    show_last_picking_done = fields.Boolean(
+        compute="_compute_show_last_picking_done",
+    )
 
     @api.depends("state")
     def _compute_is_action_lock_allowed(self):
@@ -235,6 +239,12 @@ class StockReleaseChannel(models.Model):
     def _compute_is_release_allowed(self):
         for rec in self:
             rec.is_release_allowed = rec.state == "open" and not rec.release_forbidden
+
+    def _compute_show_last_picking_done(self):
+        for rec in self:
+            rec.show_last_picking_done = (
+                self.env.company.release_channel_show_last_picking_done
+            )
 
     @api.model
     def _get_is_release_allowed_domain(self):
