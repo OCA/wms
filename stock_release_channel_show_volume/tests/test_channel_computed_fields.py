@@ -1,4 +1,5 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from datetime import timedelta
@@ -40,10 +41,7 @@ class TestChannelComputedFields(ChannelReleaseCase):
             ),
         )
 
-    def test_computed_fields_counts(self):
-        picking = self.picking
-
-        self.channel.invalidate_cache()
+    def test_computed_fields_counts_not_ready(self):
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume("release_ready", [])
         self.assertVolume("released", [])
@@ -54,10 +52,10 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertVolume("done", [])
         self.assertVolumeFullProgress()
 
+    def test_computed_fields_counts_release_ready(self):
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
         self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
 
-        self.channel.invalidate_cache()
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume(
             "release_ready", [(self.product1, 5 * 3), (self.product2, 5 * 3)]
@@ -70,10 +68,11 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertVolume("done", [])
         self.assertVolumeFullProgress()
 
-        picking.release_available_to_promise()
-        pick_picking = picking.move_lines.move_orig_ids.picking_id
+    def test_computed_fields_counts_released(self):
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
+        self.picking.release_available_to_promise()
 
-        self.channel.invalidate_cache()
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume(
             "release_ready", [(self.product1, 5 * 2), (self.product2, 5 * 2)]
@@ -86,8 +85,15 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertVolume("done", [])
         self.assertVolumeFullProgress()
 
-        picking.scheduled_date = fields.Datetime.now() - timedelta(hours=1)
-        self.channel.invalidate_cache()
+    def test_computed_fields_counts_late(self):
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
+        self.picking.release_available_to_promise()
+        # FIXME late should measure late internal operations, not late deliveries
+        # pick_picking = self.picking.move_ids.move_orig_ids.picking_id
+        # pick_picking.scheduled_date = fields.Datetime.now() - timedelta(hours=1)
+        self.picking.scheduled_date = fields.Datetime.now() - timedelta(hours=1)
+
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume(
             "release_ready", [(self.product1, 5 * 2), (self.product2, 5 * 2)]
@@ -100,9 +106,13 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertVolume("done", [])
         self.assertVolumeFullProgress()
 
+    def test_computed_fields_counts_pick_done(self):
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
+        self.picking.release_available_to_promise()
+        pick_picking = self.picking.move_ids.move_orig_ids.picking_id
         self._action_done_picking(pick_picking)
 
-        self.channel.invalidate_cache()
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume(
             "release_ready", [(self.product1, 5 * 2), (self.product2, 5 * 2)]
@@ -110,14 +120,19 @@ class TestChannelComputedFields(ChannelReleaseCase):
         self.assertVolume("released", [(self.product1, 5), (self.product2, 5)])
         self.assertVolume("assigned", [(self.product1, 5), (self.product2, 5)])
         self.assertVolume("waiting", [])
-        self.assertVolume("late", [(self.product1, 5), (self.product2, 5)])
+        self.assertVolume("late", [])
         self.assertVolume("priority", [])
         self.assertVolume("done", [])
         self.assertVolumeFullProgress()
 
-        self._action_done_picking(picking)
+    def test_computed_fields_counts_ship_done(self):
+        self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
+        self._update_qty_in_location(self.loc_bin1, self.product2, 20.0)
+        self.picking.release_available_to_promise()
+        pick_picking = self.picking.move_ids.move_orig_ids.picking_id
+        self._action_done_picking(pick_picking)
+        self._action_done_picking(self.picking)
 
-        self.channel.invalidate_cache()
         self.assertVolume("all", [(self.product1, 5 * 3), (self.product2, 5 * 3)])
         self.assertVolume(
             "release_ready", [(self.product1, 5 * 2), (self.product2, 5 * 2)]
