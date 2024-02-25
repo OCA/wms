@@ -18,6 +18,7 @@ class StockPicking(models.Model):
     wms_import_attachment_id = fields.Many2one(
         "attachment.queue", index=True, readonly=True
     )
+    wms_export_date = fields.Datetime(tracking=True)
 
     def _get_wms_export_task(self):
         return self.picking_type_id.warehouse_id.sudo().wms_export_task_id
@@ -38,6 +39,8 @@ class StockPicking(models.Model):
 
     def action_force_cancel_wms(self):
         self.env.user.has_group("stock.group_stock_manager")
+        self.wms_export_date = None
+        self.wms_export_attachment_id.unlink()
         return self.with_context(skip_wms_cancel_check=True).action_cancel()
 
     def action_cancel(self):
