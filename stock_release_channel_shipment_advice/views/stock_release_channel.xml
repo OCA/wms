@@ -47,23 +47,24 @@
             ref="stock_release_channel.stock_release_channel_kanban_view"
         />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='count_picking_chain']" position="after">
-                <field name="shipment_planning_method" />
-                <field name="can_plan_shipment" />
-            </xpath>
             <xpath
-                expr="//button[@name='action_picking_all_related']/parent::div/parent::div//div[hasclass('bottom_buttons_left')]"
+                expr="//div[@name='actions dropdown-menu-left-panel']"
                 position="inside"
             >
-                <button
-                    class="btn btn-secondary"
-                    attrs="{'invisible': [('can_plan_shipment', '=', False)]}"
-                    name="button_plan_shipments"
-                    type="object"
-                    groups="stock.group_stock_manager"
-                >
-                    <span>Plan Shipment</span>
-                </button>
+                <field name="can_plan_shipment" invisible="1" />
+                <t t-if="record.can_plan_shipment.raw_value">
+                    <div
+                        role="menuitem"
+                        groups="stock.group_stock_manager"
+                        name="action_plan_shipment"
+                    >
+                        <a
+                            name="button_plan_shipments"
+                            type="object"
+                            icon="fa-truck"
+                        ><span class="ms-2">Plan Shipments</span></a>
+                    </div>
+                </t>
             </xpath>
         </field>
     </record>
