@@ -1,0 +1,1 @@
+odoo-addon-stock_release_channel_block_backorder @ git+https://github.com/OCA/wms.git@refs/pull/847/head#subdirectory=setup/stock_release_channel_block_backorder
