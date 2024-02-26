@@ -1,0 +1,91 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_block_backorder
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-25 14:45+0000\n"
+"PO-Revision-Date: 2024-02-20 09:28+0000\n"
+"Last-Translator: Denis Roussel <denis.roussel@acsone.eu>\n"
+"Language-Team: \n"
+"Language: fr_BE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 3.6.1\n"
+
+#. module: stock_release_channel_block_backorder
+#. odoo-python
+#: code:addons/stock_release_channel_block_backorder/models/stock_picking.py:0
+#, python-format
+msgid "Blocked"
+msgstr "Bloqué"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_picking__blocked_for_channel_assignation
+msgid "Blocked For Channel Assignation"
+msgstr "Bloqué pour l'assignation à un canal de livraison"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_picking__blocked_for_channel_assignation_label
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_block_backorder.view_picking_internal_search
+msgid "Channel Assignation Blocked"
+msgstr "Assignation à un canal bloqué"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_move__delivery_requires_other_lines
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_picking__delivery_requires_other_lines
+msgid "Delivery Requires Other Lines"
+msgstr "La livraison nécessite d'autres produits"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_picking__ignore_release_channel_block
+msgid "Ignore Release Channel Block"
+msgstr "Ignorer le blocage de la livraison"
+
+#. module: stock_release_channel_block_backorder
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_block_backorder.stock_picking_form_view
+msgid "Ignore release channel block"
+msgstr "Ignorer le blocage de la livraison"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model.fields,field_description:stock_release_channel_block_backorder.field_stock_move__product_qty_unavailable
+msgid "Product Qty Unavailable"
+msgstr "Quantité indisponible"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model,name:stock_release_channel_block_backorder.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model,name:stock_release_channel_block_backorder.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr "Canaux de livraison"
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model,name:stock_release_channel_block_backorder.model_stock_rule
+msgid "Stock Rule"
+msgstr "Règle de stock minimum"
+
+#. module: stock_release_channel_block_backorder
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_block_backorder.view_picking_internal_search
+msgid "This picking is blocked and won't be assigned to a release channel."
+msgstr "Ce transfert est bloqué et ne sera pas assigné à un canal de livraison."
+
+#. module: stock_release_channel_block_backorder
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_block_backorder.stock_picking_form_view
+msgid ""
+"This picking is blocked for release channel assignation. Please click on "
+"'Ignore release channel block' to ignore it."
+msgstr ""
+"Ce transfert est bloqué pour le release d'un canal de livraison; Cliquez sur "
+"'Ignorer le blocage du canal de livraison' pour ignorer ce blocage."
+
+#. module: stock_release_channel_block_backorder
+#: model:ir.model,name:stock_release_channel_block_backorder.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"

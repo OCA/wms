@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_picking_form_view" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <header position="after">
+                <field name="blocked_for_channel_assignation" invisible="1" />
+                <div
+                    class="alert alert-danger"
+                    style="margin-bottom:0px;font-weight: bolder;text-align: center;"
+                    role="alert"
+                    attrs="{'invisible': [('blocked_for_channel_assignation', '=', False)]}"
+                >
+                            This picking is blocked for release channel assignation. Please click on 'Ignore release channel block' to ignore it.
+                </div>
+            </header>
+            <header position="inside">
+                <field name="delivery_requires_other_lines" invisible="1" />
+                <field name="ignore_release_channel_block" invisible="1" />
+                <button
+                    name="button_ignore_release_channel_block"
+                    type="object"
+                    string="Ignore release channel block"
+                    attrs="{'invisible': ['|', ('delivery_requires_other_lines', '=', False), ('ignore_release_channel_block', '=', True)]}"
+                />
+            </header>
+        </field>
+    </record>
+    <record id="stock_picking_tree_view" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="blocked_for_channel_assignation" invisible="1" />
+                <field
+                    name="blocked_for_channel_assignation_label"
+                    attrs="{'invisible': [('blocked_for_channel_assignation', '=', False)]}"
+                    widget="badge"
+                    decoration-danger="True"
+                    optional="show"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search" model="ir.ui.view">
+        <field name="name">stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//filter[@name='cancel']/following::separator"
+                position="after"
+            >
+                <filter
+                    name="blocked_for_channel_assignation"
+                    string="Channel Assignation Blocked"
+                    domain="[('blocked_for_channel_assignation', '=', True)]"
+                    help="This picking is blocked and won't be assigned to a release channel."
+                />
+                <separator />
+            </xpath>
+        </field>
+    </record>
+</odoo>
