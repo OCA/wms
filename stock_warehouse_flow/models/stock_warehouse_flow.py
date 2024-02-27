@@ -294,6 +294,7 @@ class StockWarehouseFlow(models.Model):
                         {
                             "name": self.sequence_prefix,
                             "location_id": self.warehouse_id.wh_output_stock_loc_id.id,
+                            "active": True,
                         }
                     )
                 )
@@ -319,6 +320,7 @@ class StockWarehouseFlow(models.Model):
                         {
                             "name": self.sequence_prefix,
                             "location_id": self.warehouse_id.wh_pack_stock_loc_id.id,
+                            "active": True,
                         }
                     )
                 self.pick_type_id.default_location_dest_id = self.pack_stock_loc_id
