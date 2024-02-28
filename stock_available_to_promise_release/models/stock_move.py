@@ -238,6 +238,9 @@ class StockMove(models.Model):
         )
         return query, params
 
+    # As we don't set depends here, we need to invalidate cache before
+    # accessing the computed value.
+    # This also apply to any computed field depending on this one
     @api.depends()
     def _compute_previous_promised_qty(self):
         if not self.ids:
@@ -265,6 +268,8 @@ class StockMove(models.Model):
             return False
         shipping_policy = self.picking_id._get_shipping_policy()
         rounding = self.product_id.uom_id.rounding
+        # computed field has no depends set, invalidate cache before reading
+        self.invalidate_recordset(["ordered_available_to_promise_qty"])
         ordered_available_to_promise_qty = self.ordered_available_to_promise_qty
         if shipping_policy == "one":
             return (
@@ -373,6 +378,8 @@ class StockMove(models.Model):
             raise UserError(_("Unsupported operator %s") % (operator,))
         moves = self.search([("need_release", "=", True)])
         operator_func = operator_mapping[operator]
+        # computed field has no depends set, invalidate cache before reading
+        moves.invalidate_recordset(["ordered_available_to_promise_uom_qty"])
         moves = moves.filtered(
             lambda m: operator_func(m.ordered_available_to_promise_uom_qty, value)
         )
@@ -444,7 +451,8 @@ class StockMove(models.Model):
         """
         procurement_requests = []
         released_moves = self.env["stock.move"]
-        # Ensure the release_ready field is correctly computed
+        # computed field depends on ordered_available_to_promise_qty that has no
+        # depends set, invalidate cache before reading
         self.invalidate_recordset(["release_ready"])
         for move in self:
             if not move.release_ready:

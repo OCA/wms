@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from odoo import _, api, exceptions, fields, models
@@ -67,6 +68,8 @@ class StockPicking(models.Model):
         self.ensure_one()
         return self.move_type
 
+    # move_ids.ordered_available_to_promise_qty has no depends, so we need to
+    # invalidate cache before accessing this release_ready computed value
     @api.depends(
         "move_type",
         "move_ids.ordered_available_to_promise_qty",
@@ -94,6 +97,9 @@ class StockPicking(models.Model):
         moves = self.env["stock.move"].search(
             [("ordered_available_to_promise_uom_qty", ">", 0)]
         )
+        # computed field depends on ordered_available_to_promise_qty that has no
+        # depends set, invalidate cache before reading
+        moves.picking_id.invalidate_recordset(["release_ready"])
         pickings = moves.picking_id.filtered("release_ready")
         return [("id", "in", pickings.ids)]
 
