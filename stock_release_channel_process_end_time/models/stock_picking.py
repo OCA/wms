@@ -30,6 +30,8 @@ class StockPicking(models.Model):
     def _search_schedule_date_prior_to_channel_process_end_date(self, operator, value):
         """Search on not processed pickings where the scheduled date is prior to
         the process end date of available channels.
+
+        As we compare dates, we convert datetimes in the timezone of the warehouse
         """
         # We use a searchable field to be able to use 'inselect' operator in
         # order to avoid a subquery in the search method. This is a workaround
@@ -37,22 +39,34 @@ class StockPicking(models.Model):
         # method but only into search method definition.
         if operator not in ["=", "!="] or not isinstance(value, bool):
             raise UserError(_("Operation not supported"))
+        self.env["stock.picking"].flush_model(
+            ["release_channel_id", "scheduled_date", "state"]
+        )
+        self.env["stock.release.channel"].flush_model(
+            ["process_end_date", "warehouse_id"]
+        )
         query = """
         SELECT
             stock_picking.id
         FROM
             stock_picking
+        JOIN stock_release_channel
+            ON stock_picking.release_channel_id = stock_release_channel.id
+        LEFT JOIN stock_warehouse
+            ON stock_warehouse.id = stock_release_channel.warehouse_id
+        LEFT JOIN res_partner
+            ON stock_warehouse.partner_id = res_partner.id
+        , LATERAL (select COALESCE(res_partner.tz, 'UTC') as tz) wh
         WHERE
             stock_picking.state NOT IN ('done', 'cancel')
-            AND exists (
-                SELECT
-                    TRUE
-                FROM
-                    stock_release_channel
-                WHERE
-                    stock_release_channel.process_end_date is not null
-                    and stock_picking.scheduled_date <= stock_release_channel.process_end_date
-            )
+            AND
+              CASE WHEN stock_release_channel.process_end_date is not null
+              THEN date(stock_picking.scheduled_date at time zone 'UTC' at time zone wh.tz)
+                < date(stock_release_channel.process_end_date
+                       at time zone 'UTC' at time zone wh.tz) + interval '1 day'
+              ELSE date(stock_picking.scheduled_date at time zone 'UTC' at time zone wh.tz)
+                < date(now() at time zone wh.tz) + interval '1 day'
+              END
         """
         if value:
             operator_inselect = "inselect" if operator == "=" else "not inselect"
