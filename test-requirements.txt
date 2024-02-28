@@ -1,0 +1,19 @@
+# wms
+# https://github.com/OCA/wms/pull/508
+odoo-addon-stock-release-channel @ git+https://github.com/OCA/wms.git@refs/pull/508/head#subdirectory=setup/stock_release_channel
+# https://github.com/OCA/wms/pull/560 [16.0][ADD] - stock_release_channel_shipment_advice #560
+odoo-addon-stock-release-channel-shipment-advice @ git+https://github.com/OCA/wms.git@refs/pull/560/head#subdirectory=setup/stock_release_channel_shipment_advice
+
+# stock-logistics-transport
+# https://github.com/OCA/stock-logistics-transport/pull/88
+odoo-addon-shipment-advice-planner @ git+https://github.com/OCA/stock-logistics-transport.git@refs/pull/88/head#subdirectory=setup/shipment_advice_planner
+# https://github.com/OCA/stock-logistics-transport/pull/91
+odoo-addon-shipment-advice-planner-toursolver @ git+https://github.com/OCA/stock-logistics-transport.git@refs/pull/91/head#subdirectory=setup/shipment_advice_planner_toursolver
+
+# OCA/web
+# https://github.com/OCA/web/pull/2412
+odoo-addon-web-notify @ git+https://github.com/OCA/web.git@refs/pull/2412/head#subdirectory=setup/web_notify
+
+# server-tools
+# https://github.com/OCA/server-tools/pull/2559
+odoo-addon-base-time-window @ git+https://github.com/OCA/server-tools.git@refs/pull/2559/head#subdirectory=setup/base_time_window

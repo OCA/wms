@@ -1,0 +1,175 @@
+interactions:
+- request:
+    body: '{"simulationName": "TST/00000014", "countryCode": "US", "beginDate": "2023-02-22",
+      "language": "en_US", "depots": [{"x": 0.0, "y": 0.0, "id": "dep_1"}], "orders":
+      [{"customerId": false, "fixedVisitDuration": "00:03:00", "id": 9, "label": "Wood
+      Corner", "phone": "(623)-853-7197", "type": 0, "x": 0.0, "y": 0.0, "customDataMap":
+      {"address": "Wood Corner\n1839 Arbor Way\n\nTurlock CA 95380\nUnited States"},
+      "timeWindows": [{"beginTime": "08:00", "endTime": "17:00"}]}, {"customerId":
+      false, "fixedVisitDuration": "00:03:00", "id": 31, "label": "Gemini Furniture,
+      Oscar Morgan", "phone": "(561)-239-1744", "type": 0, "x": 0.0, "y": 0.0, "customDataMap":
+      {"address": "Gemini Furniture\n317 Fairchild Dr\n\nFairfield CA 94535\nUnited
+      States"}, "timeWindows": [{"beginTime": "08:00", "endTime": "17:00"}]}], "resources":
+      [{"travelPenalty": 0.0, "workPenalty": 0.0, "workStartTime": "12:40:00", "fixedLoadingDuration":
+      "00:00:00", "id": "D1", "mobileLogin": "d1@email.com", "openStart": false, "loadBeforeDeparture":
+      true, "noReload": true, "globalCapacity": 9999, "useAllCapacities": false, "startX":
+      0.0, "startY": 0.0, "endX": 0.0, "endY": 0.0}, {"travelPenalty": 0.0, "workPenalty":
+      0.0, "workStartTime": "12:40:00", "fixedLoadingDuration": "00:00:00", "id":
+      "D2", "mobileLogin": "d2@email.com", "openStart": false, "loadBeforeDeparture":
+      true, "noReload": true, "globalCapacity": 9999, "useAllCapacities": false, "startX":
+      0.0, "startY": 0.0, "endX": 0.0, "endY": 0.0}], "options": {"maxOptimDuration":
+      "00:00:00", "vehicleCode": "deliveryIntermediateVehicle", "useForbiddenTransitAreas":
+      false}}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1596'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.28.2
+    method: POST
+    uri: https://geoservices.geoconcept.com/ToursolverCloud/api/ts/toursolver/optimize?tsCloudApiKey=fake_api_key
+  response:
+    body:
+      string: '{"message":null,"status":"OK","taskId":"7FFFFE798712E6718ezjI-ehRJaG_Tl68JRX_w"}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Accept,Upgrade-Insecure-Requests,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+      Access-Control-Allow-Methods:
+      - PUT, GET, POST, DELETE, PATCH, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - '*,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization'
+      Access-Control-Max-Age:
+      - '1728000'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Wed, 22 Feb 2023 11:40:50 GMT
+      Set-Cookie:
+      - INGRESSTSPRODCOOKIE=1677066049.544.989.142109|526296c4243d90e279c23661c06665b2;
+        Path=/ToursolverCloud; Secure; HttpOnly; SameSite=None
+      - JSESSIONID=2044873206CFDEC19214C8F337E64D40; Path=/ToursolverCloud; HttpOnly;
+        SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      vary:
+      - origin
+    status:
+      code: 200
+      message: ''
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+    method: GET
+    uri: https://geoservices.geoconcept.com/ToursolverCloud/api/ts/toursolver/status?taskId=7FFFFE798712E6718ezjI-ehRJaG_Tl68JRX_w&tsCloudApiKey=fake_api_key
+  response:
+    body:
+      string: '{"message":null,"status":"OK","optimizeStatus":"TERMINATED","startTime":1677066049923,"initialCost":1,"currentCost":1,"initialDriveDistance":0,"currentDriveDistance":0,"initialDriveTime":0,"currentDriveTime":0,"initialDriveCost":0,"currentDriveCost":0,"initialWorkTime":360,"currentWorkTime":360,"initialWorkCost":1,"currentWorkCost":1,"initialOverWorkTime":0,"currentOverWorkTime":0,"initialOverWorkCost":0,"currentOverWorkCost":0,"initialRestTime":0,"currentRestTime":0,"initialNightsCost":0,"currentNightsCost":0,"initialCourierCost":0,"currentCourierCost":0,"initialDeliveryCost":0,"currentDeliveryCost":0,"initialFixedCost":0,"currentFixedCost":0,"initialPickUpQuantity":0.0,"currentPickUpQuantity":0.0,"initialDeliveredQuantity":0.0,"currentDeliveredQuantity":0.0,"initialUnplannedVisits":0,"currentUnplannedVisits":0,"initialPlannedVisits":0,"currentPlannedVisits":0,"currentVisitsNb":2,"initialLateTime":0,"currentLateTime":0,"initialWaitTime":0,"currentWaitTime":0,"mileageChartRemainingTime":0,"initialCo2":0.0,"currentCo2":0.0,"initialOpenTourNumber":1,"currentOpenTourNumber":1,"subOptimNb":0,"subOptimWaitingNb":0,"subOptimRunningNb":0,"subOptimFinishedNb":0,"subOptimErrorNb":0,"subOptimAbortedNb":0,"simulationId":"7FFFFE798712E6BBmz4AfuOzSfG-VSMVoay9Qg","positionInQueue":0}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Accept,Upgrade-Insecure-Requests,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+      Access-Control-Allow-Methods:
+      - PUT, GET, POST, DELETE, PATCH, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - '*,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization'
+      Access-Control-Max-Age:
+      - '1728000'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Wed, 22 Feb 2023 11:41:35 GMT
+      Set-Cookie:
+      - INGRESSTSPRODCOOKIE=1677066096.688.989.843512|526296c4243d90e279c23661c06665b2;
+        Path=/ToursolverCloud; Secure; HttpOnly; SameSite=None
+      - JSESSIONID=E3F87122918D8E6CA7AFC7AB344594C2; Path=/ToursolverCloud; HttpOnly;
+        SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      vary:
+      - origin
+    status:
+      code: 200
+      message: ''
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.28.2
+    method: GET
+    uri: https://geoservices.geoconcept.com/ToursolverCloud/api/ts/toursolver/result?taskId=7FFFFE798712E6718ezjI-ehRJaG_Tl68JRX_w&tsCloudApiKey=fake_api_key
+  response:
+    body:
+      string: '{"message":null,"status":"OK","plannedOrders":[{"resourceId":"D2","dayId":"1","stopId":"Start","stopPosition":0,"stopY":0.0,"stopX":0.0,"stopType":1,"stopDriveTime":"00:00","stopStartTime":"12:40","stopDuration":"00:00","stopStatus":0,"stopDriveDistance":0,"stopElapsedDistance":0,"placeName":null,"placeAddress":null,"aggregationInfo":null,"walkGoupRootId":null,"stopDriveSpeed":0.0},{"resourceId":"D2","dayId":"1","stopId":"Reload
+        (dep_1)","stopPosition":0,"stopY":0.0,"stopX":0.0,"stopType":4,"stopDriveTime":"00:00","stopStartTime":"12:40","stopDuration":"00:00","stopStatus":0,"stopDriveDistance":0,"stopElapsedDistance":0,"placeName":null,"placeAddress":null,"aggregationInfo":null,"walkGoupRootId":null,"stopDriveSpeed":0.0},{"resourceId":"D2","dayId":"1","stopId":"31","stopPosition":1,"stopY":0.0,"stopX":0.0,"stopType":0,"stopDriveTime":"00:00","stopStartTime":"12:40","stopDuration":"00:03","stopStatus":0,"stopDriveDistance":0,"stopElapsedDistance":0,"placeName":null,"placeAddress":null,"aggregationInfo":null,"walkGoupRootId":null,"stopDriveSpeed":0.0},{"resourceId":"D2","dayId":"1","stopId":"9","stopPosition":2,"stopY":0.0,"stopX":0.0,"stopType":0,"stopDriveTime":"00:00","stopStartTime":"12:43","stopDuration":"00:03","stopStatus":0,"stopDriveDistance":0,"stopElapsedDistance":0,"placeName":null,"placeAddress":null,"aggregationInfo":null,"walkGoupRootId":null,"stopDriveSpeed":0.0},{"resourceId":"D2","dayId":"1","stopId":"End","stopPosition":0,"stopY":0.0,"stopX":0.0,"stopType":2,"stopDriveTime":"00:00","stopStartTime":"12:46","stopDuration":"00:00","stopStatus":0,"stopDriveDistance":0,"stopElapsedDistance":0,"placeName":null,"placeAddress":null,"aggregationInfo":null,"walkGoupRootId":null,"stopDriveSpeed":0.0}],"unplannedOrders":[],"warnings":[{"objectType":"R","id":"D1","constraint":29,"constraintName":"WORKPENALTY","value":"0.0","message":"Journey
+        cost and hourly cost can not be set both to zero: default values will be applied.","messageId":6,"i18nMessageCode":"missingMandatoryPenalties"},{"objectType":"R","id":"D2","constraint":29,"constraintName":"WORKPENALTY","value":"0.0","message":"Journey
+        cost and hourly cost can not be set both to zero: default values will be applied.","messageId":6,"i18nMessageCode":"missingMandatoryPenalties"}],"taskId":"7FFFFE798712E6718ezjI-ehRJaG_Tl68JRX_w","simulationId":"7FFFFE798712E6BBmz4AfuOzSfG-VSMVoay9Qg","inputData":null}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - Accept,Upgrade-Insecure-Requests,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+      Access-Control-Allow-Methods:
+      - PUT, GET, POST, DELETE, PATCH, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - '*,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization'
+      Access-Control-Max-Age:
+      - '1728000'
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=UTF-8
+      Date:
+      - Wed, 22 Feb 2023 11:41:36 GMT
+      Set-Cookie:
+      - INGRESSTSPRODCOOKIE=1677066097.096.987.98129|526296c4243d90e279c23661c06665b2;
+        Path=/ToursolverCloud; Secure; HttpOnly; SameSite=None
+      - JSESSIONID=0C98B9F5A5471A9D457F56A4370F6E1C; Path=/ToursolverCloud; HttpOnly;
+        SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=15724800; includeSubDomains
+      Transfer-Encoding:
+      - chunked
+      vary:
+      - origin
+    status:
+      code: 200
+      message: ''
+version: 1
