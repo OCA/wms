@@ -10,5 +10,10 @@ class ShipmentAdvicePlanner(models.TransientModel):
 
     def _prepare_toursolver_task_vals(self, warehouse, pickings_to_plan):
         vals = super()._prepare_toursolver_task_vals(warehouse, pickings_to_plan)
-        vals.update({"release_channel_id": self.release_channel_id.id})
+        vals.update(
+            {
+                "release_channel_id": self.release_channel_id.id,
+                "name": self.release_channel_id.name,
+            }
+        )
         return vals
