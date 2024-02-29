@@ -93,14 +93,10 @@ class Reception(Component):
         return res
 
     def _response_for_select_move_get_data(self, picking):
+        if not self.shipment_advice:
+            return super()._response_for_select_move_get_data(picking)
         data = {}
-        if picking:
-            data = super()._response_for_select_move_get_data(picking)
-        if self.shipment_advice:
-            data["shipment"] = self.data_detail.shipment_advice_detail(
-                self.shipment_advice
-            )
-            data.pop("picking", None)
+        data["shipment"] = self.data_detail.shipment_advice_detail(self.shipment_advice)
         return data
 
     def _response_for_manual_selection_shipment(self, dock):
