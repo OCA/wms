@@ -531,6 +531,26 @@ class StockMove(models.Model):
 
     def _before_release(self):
         """Hook that aims to be overridden."""
+        self._release_set_expected_date()
+
+    def _release_get_expected_date(self):
+        """Return the new scheduled date of a single delivery move"""
+        prep_time = self.env.company.stock_release_max_prep_time
+        new_expected_date = fields.Datetime.add(
+            fields.Datetime.now(), minutes=prep_time
+        )
+        return new_expected_date
+
+    def _release_set_expected_date(self, new_expected_date=False):
+        """Set scheduled date before releasing delivery moves
+
+        This will be propagated to the chain of moves"""
+        for move in self:
+            if not new_expected_date:
+                new_expected_date = move._release_get_expected_date()
+            if not new_expected_date:
+                continue
+            move.date = new_expected_date
 
     def _after_release_update_chain(self):
         picking_ids = set()

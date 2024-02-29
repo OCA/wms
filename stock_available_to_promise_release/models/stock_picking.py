@@ -143,26 +143,9 @@ class StockPicking(models.Model):
         to the released one.
         """
         self._after_release_set_last_release_date()
-        self._after_release_set_expected_date()
 
     def _after_release_set_last_release_date(self):
         self.last_release_date = fields.Datetime.now()
-
-    def _after_release_set_expected_date(self):
-        prep_time = self.env.company.stock_release_max_prep_time
-        new_expected_date = fields.Datetime.add(
-            fields.Datetime.now(), minutes=prep_time
-        )
-        move_to_update = self.move_ids.filtered(
-            lambda m: m.state in ["assigned", "confirmed", "partially_available"]
-        )
-        move_to_update_ids = move_to_update.ids
-        for origin_moves in move_to_update._get_chained_moves_iterator("move_dest_ids"):
-            move_to_update_ids += origin_moves.ids
-
-        self.env["stock.move"].browse(move_to_update_ids).write(
-            {"date": new_expected_date}
-        )
 
     def action_open_move_need_release(self):
         self.ensure_one()
