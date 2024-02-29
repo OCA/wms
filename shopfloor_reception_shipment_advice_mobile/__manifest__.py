@@ -8,6 +8,7 @@
     "license": "AGPL-3",
     "depends": [
         "shopfloor_reception_mobile",
+        "shopfloor_reception_shipment_advice",
     ],
     "data": ["templates/assets.xml"],
     "auto_install": True,
