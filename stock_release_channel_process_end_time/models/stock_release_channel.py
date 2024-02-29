@@ -73,12 +73,6 @@ class StockReleaseChannel(models.Model):
                 channel.warehouse_id.partner_id.tz or company_tz or "UTC"
             )
 
-    @api.model
-    def assign_release_channel(self, picking):
-        res = super().assign_release_channel(picking)
-        picking._after_release_set_expected_date()
-        return res
-
     def _field_picking_domains(self):
         res = super()._field_picking_domains()
         release_ready_domain = res["count_picking_release_ready"]
@@ -104,3 +98,17 @@ class StockReleaseChannel(models.Model):
                 new_domain.append(criteria)
         res["count_picking_release_ready"] = new_domain
         return res
+
+    def _get_expected_date(self):
+        # Use channel process end date
+        self.ensure_one()
+        enabled_update_scheduled_date = bool(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param(
+                "stock_release_channel_process_end_time.stock_release_use_channel_end_date"
+            )
+        )
+        if enabled_update_scheduled_date:
+            return self.process_end_date
+        return super()._get_expected_date()
