@@ -127,23 +127,23 @@ class Reception(Component):
         move = fields.first(moves)
         return move, self._check_move_available(move, message_code)
 
-    def _scan_line_shipment__by_product(self, shipment, product):
-        moves = shipment.planned_move_ids.filtered(lambda m: m.product_id == product)
-        move, message = self._select_move_to_work_on(moves, "product")
+    def _scan_line_shipment__response(self, move, message):
         picking = move.picking_id
         if message:
             return self._response_for_select_move(picking, message=message)
         return self._scan_line__find_or_create_line(picking, move)
+
+    def _scan_line_shipment__by_product(self, shipment, product):
+        moves = shipment.planned_move_ids.filtered(lambda m: m.product_id == product)
+        move, message = self._select_move_to_work_on(moves, "product")
+        return self._scan_line_shipment__response(move, message)
 
     def _scan_line_shipment__by_packaging(self, shipment, packaging):
         moves = shipment.planned_move_ids.filtered(
             lambda m: packaging in m.product_id.packaging_ids
         )
         move, message = self._select_move_to_work_on(moves, "package")
-        picking = move.picking_id
-        if message:
-            return self._response_for_select_move(picking, message=message)
-        return self._scan_line__find_or_create_line(picking, move)
+        return self._scan_line_shipment__response(move, message)
 
     def _check_shipment_status(self, shipment):
         # TODO check if the shipment is still workable ?
