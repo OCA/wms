@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Mobile - Manual Product Transfer",
     "summary": "Frontend for manual product transfer scenario for Shopfloor",
-    "version": "14.0.1.3.0",
+    "version": "14.0.1.3.1",
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
