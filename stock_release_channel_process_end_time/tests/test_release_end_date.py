@@ -153,19 +153,81 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         self.assertTrue(self.channel.with_user(user).process_end_time_can_edit)
 
     @freeze_time("2023-01-27")
-    def test_channel_end_date_warehouse_timezone(self):
+    def test_channel_end_date_warehouse_timezone_asia(self):
+        # Today is 2023-01-27 06:00 in Asia
+        # Set a warehouse with an adress and a timezone on channel
+        self.channel.warehouse_id = self.env.ref("stock.warehouse0")
+        self.channel.warehouse_id.partner_id.tz = "Etc/GMT-6"
+        # Set the end time - In UTC == 15:00
+        self.channel.process_end_time = 21.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        # Local time is 2023-01-27 21:00
+        self.assertEqual(
+            "2023-01-27 15:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )
+        # Set the end time - In UTC == 21:00
+        self.channel.process_end_time = 3.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        # Local time is 2023-01-28 03:00
+        self.assertEqual(
+            "2023-01-27 21:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )
+
+    @freeze_time("2023-01-27")
+    def test_channel_end_date_warehouse_timezone_america(self):
+        # Now is 2023-01-26 18:00 in America
+        # Set a warehouse with an adress and a timezone on channel
+        self.channel.warehouse_id = self.env.ref("stock.warehouse0")
+        self.channel.warehouse_id.partner_id.tz = "Etc/GMT+6"
+        # Set the end time - In UTC == 3:00 +1d
+        self.channel.process_end_time = 21.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        # Local time is 2023-01-26 21:00
+        self.assertEqual(
+            "2023-01-27 03:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )
+        # Set the end time - In UTC == 9:00
+        self.channel.process_end_time = 3.0
+        # Asleep the release channel to void the process end date
+        self.channel.action_sleep()
+        self.channel.invalidate_recordset()
+        # Wake up the channel to set the process end date
+        self.channel.action_wake_up()
+        # Local time is 2023-01-27 03:00
+        self.assertEqual(
+            "2023-01-27 09:00:00",
+            fields.Datetime.to_string(self.channel.process_end_date),
+        )
+
+    @freeze_time("2023-01-27 11:00:00")
+    def test_channel_end_date_warehouse_timezone_tomorrow(self):
         # Set a warehouse with an adress and a timezone on channel
         self.channel.warehouse_id = self.env.ref("stock.warehouse0")
         self.channel.warehouse_id.partner_id.tz = "Europe/Brussels"
         # Set the end time - In UTC == 22:00
-        self.channel.process_end_time = 23.0
+        self.channel.process_end_time = 10.0
         # Asleep the release channel to void the process end date
         self.channel.action_sleep()
         self.channel.invalidate_recordset()
         # Wake up the channel to set the process end date
         self.channel.action_wake_up()
         self.assertEqual(
-            "2023-01-27 22:00:00",
+            "2023-01-28 09:00:00",
             fields.Datetime.to_string(self.channel.process_end_date),
         )
 
