@@ -116,3 +116,14 @@ class StockPicking(models.Model):
         )
         assigned_moves._action_assign()
         return new_picking.id
+
+    def _put_in_pack(self, move_line_ids, create_package_level=True):
+        """
+        Marks the corresponding move lines as 'shopfloor_checkout_done'
+        when the package is created in the backend.
+
+        """
+        new_package = super()._put_in_pack(move_line_ids, create_package_level)
+        lines = move_line_ids.filtered(lambda p: p.result_package_id == new_package)
+        lines.write({"shopfloor_checkout_done": True})
+        return new_package
