@@ -8,8 +8,8 @@
         propagate it to the concerned pickings""",
     "version": "16.0.1.1.0",
     "license": "AGPL-3",
-    "maintainers": ["rousseldenis"],
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "maintainers": ["rousseldenis", "jbaudoux"],
+    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
         "partner_tz",
