@@ -499,7 +499,8 @@ class StockReleaseChannel(models.Model):
             current = channel._assign_release_channel_additional_filter(current)
             if not current:
                 continue
-            current.release_channel_id = channel
+            if current.release_channel_id != channel:
+                current.release_channel_id = channel
             break
 
         if not picking.release_channel_id:
