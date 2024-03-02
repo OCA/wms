@@ -798,3 +798,8 @@ class StockReleaseChannel(models.Model):
         )
         for pick in pickings:
             pick._delay_assign_release_channel()
+
+    def _get_expected_date(self):
+        """Return the new date to set on move chain"""
+        self.ensure_one()
+        return False
