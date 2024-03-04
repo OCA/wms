@@ -644,3 +644,29 @@ class StockMove(models.Model):
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
         return domain
+
+    def write(self, vals):
+        if self.env.context.get("in_merge_mode") and "product_uom_qty" in vals:
+            # when a move is merged, we need to unrelease it if the quantity
+            # is changed
+            new_qty = vals["product_uom_qty"]
+            to_unrelease = self.filtered(
+                lambda m: float_compare(
+                    m.product_uom_qty,
+                    new_qty,
+                    precision_rounding=m.product_uom.rounding,
+                )
+                != 0
+            )
+            to_unrelease.unrelease()
+        return super().write(vals)
+
+    def _merge_moves(self, merge_into=False):
+        # From here any write on the moves are done in the context of a merge
+        # and we need to unrelease them if the quantity is changed
+        self_ctx = self.with_context(in_merge_mode=True)
+        return (
+            super(StockMove, self_ctx)
+            ._merge_moves(merge_into=merge_into)
+            .with_context(in_merge_mode=False)
+        )
