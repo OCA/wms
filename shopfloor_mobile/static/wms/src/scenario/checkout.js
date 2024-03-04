@@ -76,8 +76,8 @@ const Checkout = {
             </div>
 
             <div v-if="state_is('select_package')">
-                <v-alert type="info" tile v-if="state.data.packing_info" class="packing-info">
-                    <p v-text="state.data.packing_info" />
+                <v-alert type="info" tile v-if="state.data.picking.note" class="packing-info">
+                    <p v-text="state.data.picking.note" />
                 </v-alert>
                 <item-detail-card
                     v-if="state.data.picking.carrier"
