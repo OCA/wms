@@ -68,7 +68,6 @@ class CheckoutCommonCase(CommonCase):
                     self._move_line_data(ml) for ml in picking.move_line_ids.sorted()
                 ],
                 "picking": self._picking_summary_data(picking),
-                "packing_info": "",
                 "no_package_enabled": True,
             },
             message={
