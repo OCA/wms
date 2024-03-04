@@ -21,7 +21,6 @@ class CheckoutSelectPackageMixin:
                     self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
                 "picking": self._picking_summary_data(picking),
-                "packing_info": packing_info,
                 "no_package_enabled": no_package_enabled,
                 "package_allowed": package_allowed,
             },
