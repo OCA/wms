@@ -132,7 +132,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(self.picking1.package_level_ids),
         )
 
@@ -187,7 +187,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         )
         #   'package_levels' key contains the package available from the same delivery
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(self.picking1.package_level_ids),
         )
 

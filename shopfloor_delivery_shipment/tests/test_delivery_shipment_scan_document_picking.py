@@ -70,7 +70,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         )
         #   'package_levels' key contains the packages
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(self.picking1.package_level_ids),
         )
 
@@ -199,7 +199,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         self.assertNotIn("move_lines", content[location_src])
         #   'package_levels' key contains the not planned packages
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(self.picking1.package_level_ids),
         )
 
@@ -261,6 +261,6 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         self.assertNotIn("move_lines", content[location_src])
         #   'package_levels' key contains the already loaded package levels
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(self.picking1.package_level_ids),
         )

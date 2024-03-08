@@ -91,8 +91,9 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
             self.service.data.move_lines(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key contains the package which has been loaded
+        # grouped in a dict
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(package_level),
         )
 
@@ -141,8 +142,9 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
             self.service.data.move_lines(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key contains the package which has been loaded
+        # grouped in a dic
         self.assertEqual(
-            content[location_src]["package_levels"],
+            content[location_src]["package_levels"]["null"],
             self.service.data.package_levels(package_level),
         )
 
