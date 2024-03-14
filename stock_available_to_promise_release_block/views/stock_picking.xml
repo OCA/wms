@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+     Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_picking_form_view" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <header position="after">
+                <div
+                    class="alert alert-danger"
+                    style="margin-bottom:0px;font-weight: bolder;text-align: center;"
+                    role="alert"
+                    attrs="{'invisible': [('release_blocked', '=', False)]}"
+                >
+                    The release of this operation is blocked. Click on the 'Unblock' button to unblock it.
+                </div>
+            </header>
+            <header position="inside">
+                <field name="release_blocked" invisible="1" />
+                <field name="block_release_allowed" invisible="1" />
+                <button
+                    name="action_block_release"
+                    type="object"
+                    string="Block release"
+                    attrs="{'invisible': [('block_release_allowed', '=', False)]}"
+                />
+                <button
+                    name="action_unblock_release"
+                    type="object"
+                    string="Unblock release"
+                    attrs="{'invisible': [('release_blocked', '=', False)]}"
+                />
+            </header>
+        </field>
+    </record>
+    <record id="stock_picking_tree_view" model="ir.ui.view">
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree" />
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="release_blocked" invisible="1" />
+                <field
+                    name="release_blocked_label"
+                    widget="badge"
+                    decoration-danger="True"
+                    optional="show"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search" model="ir.ui.view">
+        <field name="name">stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//filter[@name='cancel']/following::separator"
+                position="after"
+            >
+                <filter
+                    name="release_blocked"
+                    string="Release Blocked"
+                    domain="[('release_blocked', '=', True)]"
+                    help="Release of operations blocked."
+                />
+                <separator />
+            </xpath>
+        </field>
+    </record>
+</odoo>

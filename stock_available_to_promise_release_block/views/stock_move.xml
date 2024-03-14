@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="view_move_release_tree" model="ir.ui.view">
+    <field name="model">stock.move</field>
+    <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.view_move_release_tree"
+        />
+    <field name="arch" type="xml">
+      <field name="company_id" position="after">
+        <field
+                    name="release_blocked_label"
+                    widget="badge"
+                    decoration-danger="True"
+                    optional="show"
+                />
+      </field>
+    </field>
+  </record>
+
+  <record id="action_stock_move_block_release" model="ir.actions.server">
+    <field name="name">Block Release</field>
+    <field name="model_id" ref="stock.model_stock_move" />
+    <field name="binding_model_id" ref="stock.model_stock_move" />
+    <field name="binding_view_types">list</field>
+    <field name="state">code</field>
+    <field name="code">
+    if records:
+        records.action_block_release()
+    </field>
+  </record>
+
+  <record id="action_stock_move_unblock_release" model="ir.actions.server">
+    <field name="name">Unblock Release</field>
+    <field name="model_id" ref="stock.model_stock_move" />
+    <field name="binding_model_id" ref="stock.model_stock_move" />
+    <field name="binding_view_types">list</field>
+    <field name="state">code</field>
+    <field name="code">
+    if records:
+        records.action_unblock_release()
+    </field>
+  </record>
+
+</odoo>
