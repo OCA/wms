@@ -113,3 +113,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.picking1.printed = True
         with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
             self.shipping1.move_ids._action_cancel()
+
+    def test_cancel_pick(self):
+        """
+        if we manually cancel one of picking chain we set the dest moves
+        to need_release so they can be released again
+        """
+        self.assertFalse(self.shipping1.need_release)
+        self.picking1.action_cancel()
+        self.assertTrue(self.shipping1.need_release)

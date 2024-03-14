@@ -482,6 +482,15 @@ class StockMove(models.Model):
     def _action_cancel(self):
         # Unrelease moves that must be, before canceling them.
         self.unrelease()
+        # if we manually cancel one of picking chain we set the dest moves
+        # to need_release so they can be released again
+        if not self.env.context.get("cancel_due_to_unrelease"):
+            for dest_moves in self._get_chained_moves_iterator("move_dest_ids"):
+                need_release_moves = dest_moves.filtered(
+                    lambda m: m.state not in ("draft", "cancel", "done")
+                    and not m.need_release
+                )
+                need_release_moves.need_release = True
         super()._action_cancel()
         self.write({"need_release": False})
         return True
@@ -706,7 +715,7 @@ class StockMove(models.Model):
                     origin_moves.write({"propagate_cancel": False})
                     # origin_moves._action_cancel()
                     moves_to_cancel |= origin_moves
-            moves_to_cancel._action_cancel()
+            moves_to_cancel.with_context(cancel_due_to_unrelease=True)._action_cancel()
             # restore the procure_method overwritten by _action_cancel()
             move.procure_method = procure_method
         moves_to_unrelease.write({"need_release": True})
