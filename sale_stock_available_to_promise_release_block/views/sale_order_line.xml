@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="view_order_line_tree_inherit_sale_stock" model="ir.ui.view">
+    <field name="model">sale.order.line</field>
+    <field name="inherit_id" ref="sale_stock.view_order_line_tree_inherit_sale_stock" />
+    <field name="arch" type="xml">
+      <field name="route_id" position="after">
+        <field
+                    name="release_blocked_label"
+                    widget="badge"
+                    decoration-danger="True"
+                    optional="hide"
+                />
+      </field>
+    </field>
+  </record>
+
+  <record id="view_sales_order_line_filter" model="ir.ui.view">
+    <field name="model">sale.order.line</field>
+    <field name="inherit_id" ref="sale.view_sales_order_line_filter" />
+    <field name="arch" type="xml">
+      <filter name="to_invoice" position="after">
+        <filter
+                    string="Is Release Blocked"
+                    name="is_release_blocked"
+                    domain="[('is_release_blocked', '=', True)]"
+                    help="Sales Order Lines having blocked deliveries"
+                />
+      </filter>
+    </field>
+  </record>
+
+  <record id="action_sale_order_line_unblock_release" model="ir.actions.server">
+    <field name="name">Unblock Release</field>
+    <field name="model_id" ref="sale.model_sale_order_line" />
+    <field name="binding_model_id" ref="sale.model_sale_order_line" />
+    <field name="binding_view_types">list</field>
+    <field name="state">code</field>
+    <field name="code">
+    if records:
+        records.move_ids.action_unblock_release()
+    </field>
+  </record>
+
+  <record id="action_sale_order_line_block_release" model="ir.actions.server">
+    <field name="name">Block Release</field>
+    <field name="model_id" ref="sale.model_sale_order_line" />
+    <field name="binding_model_id" ref="sale.model_sale_order_line" />
+    <field name="binding_view_types">list</field>
+    <field name="state">code</field>
+    <field name="code">
+    if records:
+        records.move_ids.action_block_release()
+    </field>
+  </record>
+
+</odoo>
