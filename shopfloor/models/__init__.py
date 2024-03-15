@@ -1,4 +1,5 @@
 from . import priority_postpone_mixin
+from . import product_packaging_type
 from . import shopfloor_menu
 from . import shopfloor_app
 from . import stock_picking_type
