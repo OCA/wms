@@ -172,7 +172,6 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             data={
                 "picking": self.data.picking(picking),
                 "selected_move_lines": self.data.move_lines(selected_lines),
-                "packing_info": self.service._data_for_packing_info(picking),
                 "no_package_enabled": not self.service.options.get(
                     "checkout__disable_no_package"
                 ),
