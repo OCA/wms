@@ -44,17 +44,20 @@ class TestSaleLineAvailablilityStatus(Common):
         self.assertNotEqual(self.line.availability_status, "on_order")
         self.product.route_ids = [(4, self.mto_route.id, 0)]
         self.assertEqual(self.line.availability_status, "on_order")
+        self.assertEqual(self.line.delayed_qty, 0.0)
 
     def test_available_full(self):
         self._set_stock(self.product, 100)
         self.sale.action_confirm()
         self.assertEqual(self.line.availability_status, "full")
+        self.assertEqual(self.line.delayed_qty, 0.0)
 
     def test_available_partial(self):
         self._set_stock(self.product, 50)
         self.sale.action_confirm()
         self.assertEqual(self.line.availability_status, "partial")
         self.assertEqual(self.line.available_qty, 50.0)
+        self.assertEqual(self.line.delayed_qty, 50.0)
 
     @freeze_time("2021-07-01 12:00:00")
     def test_available_restock(self):
@@ -72,3 +75,5 @@ class TestSaleLineAvailablilityStatus(Common):
         self.assertEqual(
             self.line.with_context(not_available=True).availability_status, "no"
         )
+        self.assertEqual(self.line.available_qty, 0.0)
+        self.assertEqual(self.line.delayed_qty, 0.0)
