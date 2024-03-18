@@ -1,0 +1,4 @@
+odoo-addon-stock-full-location-reservation @ git+https://github.com/OCA/wms.git@refs/pull/794/head#subdirectory=setup/stock_full_location_reservation
+odoo-addon-shopfloor-base @ git+https://github.com/OCA/wms.git@refs/pull/642/head#subdirectory=setup/shopfloor_base
+odoo-addon-shopfloor @ git+https://github.com/OCA/wms.git@refs/pull/679/head#subdirectory=setup/shopfloor
+odoo-addon-stock-picking-progress @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1330/head#subdirectory=setup/stock_picking_progress
