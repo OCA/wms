@@ -11,11 +11,11 @@ class SaleOrder(models.Model):
         string="Moves Need Release", compute="_compute_move_need_release_count"
     )
 
-    @api.depends("picking_ids.move_lines.need_release")
+    @api.depends("picking_ids.move_ids.need_release")
     def _compute_move_need_release_count(self):
         for sale in self:
             sale.move_need_release_count = len(
-                sale.picking_ids.move_lines.filtered("need_release")
+                sale.picking_ids.move_ids.filtered("need_release")
             )
 
     def action_open_move_need_release(self):

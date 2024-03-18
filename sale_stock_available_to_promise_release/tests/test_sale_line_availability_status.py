@@ -19,7 +19,7 @@ class TestSaleLineAvailablilityStatus(Common):
                 "picking_type_id": picking_type_in.id,
                 "location_id": self.suppliers_location.id,
                 "location_dest_id": self.stock_location.id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
