@@ -4,10 +4,6 @@
         <field name="name">sale.order.form.stock.release.manager</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
-        <field
-            name="groups_id"
-            eval="[(4, ref('sales_team.group_sale_manager')), (4, ref('stock.group_stock_manager'))]"
-        />
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_view_invoice']" position="before">
                 <field name="move_need_release_count" invisible="1" />
@@ -17,6 +13,7 @@
                     class="oe_stat_button"
                     icon="fa-cubes"
                     attrs="{'invisible': [('move_need_release_count', '=', 0)]}"
+                    groups="stock.group_stock_manager,sales_team.group_sale_manager"
                 >
                     <field
                         name="move_need_release_count"
@@ -30,7 +27,11 @@
                 expr="//page[@name='order_lines']//tree//field[@name='price_unit']"
                 position="before"
             >
-                <field name="availability_status" optional="hide" />
+                <field
+                    name="availability_status"
+                    optional="hide"
+                    groups="stock.group_stock_manager,sales_team.group_sale_manager"
+                />
             </xpath>
         </field>
     </record>
