@@ -85,7 +85,8 @@ main.v-content > .v-content__wrap > .header .container {
     margin-bottom: 5vh;
 }
 
-.detail .v-card {
+.detail .v-card,
+.manual-select .list-items-separated .v-list-item {
     margin-bottom: 0.5rem;
 }
 .detail .v-card__subtitle,
@@ -196,6 +197,10 @@ main.v-content > .v-content__wrap > .header .container {
     font-size: 1.2rem;
     height: 3.5rem;
     width: 100%;
+}
+.manual-select .v-sheet.v-card.list-items-separated {
+    box-shadow: none;
+    border: 0;
 }
 .manual-select[class*="with-group_color"] .v-card,
 .list[class*="with-group_color"] .v-card {
