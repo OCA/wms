@@ -18,8 +18,8 @@ msgstr ""
 
 #. module: stock_release_channel_shipment_advice
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_kanban_view
-msgid "<span>Plan Shipment</span>"
-msgstr "<span>Planificar el envío</span>"
+msgid "<span class=\"ms-2\">Plan Shipments</span>"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__can_plan_shipment
@@ -114,3 +114,6 @@ msgstr "Almacén"
 #: model:ir.model.fields,help:stock_release_channel_shipment_advice.field_stock_release_channel__warehouse_id
 msgid "Warehouse for which this channel is relevant"
 msgstr "Almacén para el que este canal es relevante"
+
+#~ msgid "<span>Plan Shipment</span>"
+#~ msgstr "<span>Planificar el envío</span>"

@@ -18,8 +18,8 @@ msgstr ""
 
 #. module: stock_release_channel_shipment_advice
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_kanban_view
-msgid "<span>Plan Shipment</span>"
-msgstr "<span>Pianifica spedizione</span>"
+msgid "<span class=\"ms-2\">Plan Shipments</span>"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice.field_stock_release_channel__can_plan_shipment
@@ -59,7 +59,6 @@ msgstr "Canale rilascio"
 
 #. module: stock_release_channel_shipment_advice
 #. odoo-python
-#: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
 #: code:addons/stock_release_channel_shipment_advice/models/stock_release_channel.py:0
 #: model:ir.model,name:stock_release_channel_shipment_advice.model_shipment_advice
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_form_view
@@ -115,3 +114,6 @@ msgstr "Magazzino"
 #: model:ir.model.fields,help:stock_release_channel_shipment_advice.field_stock_release_channel__warehouse_id
 msgid "Warehouse for which this channel is relevant"
 msgstr "Magazzino per il quale è rilevante questo canale"
+
+#~ msgid "<span>Plan Shipment</span>"
+#~ msgstr "<span>Pianifica spedizione</span>"
