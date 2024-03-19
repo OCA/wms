@@ -1,0 +1,109 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_show_volume
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_all
+msgid "All Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_all
+msgid "All Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_assigned
+msgid "Available Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_assigned
+msgid "Available Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_full_progress
+msgid "Full Progress Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_late
+msgid "Late Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_late
+msgid "Late Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_done
+msgid "Moves Done Today (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_priority
+msgid "Priority Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_priority
+msgid "Priority Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_release_ready
+msgid "Release Ready Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_release_ready
+msgid "Release Ready Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_released
+msgid "Released Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_released
+msgid "Released Transfers Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model,name:stock_release_channel_show_volume.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_done
+msgid "Transfers Done  VolumeToday"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_uom_name
+msgid "Volume Unit of Measure label"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_move_waiting
+msgid "Waiting Moves (Estimate) Volume"
+msgstr ""
+
+#. module: stock_release_channel_show_volume
+#: model:ir.model.fields,field_description:stock_release_channel_show_volume.field_stock_release_channel__volume_picking_waiting
+msgid "Waiting Transfers Volume"
+msgstr ""
