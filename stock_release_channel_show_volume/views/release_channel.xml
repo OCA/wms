@@ -1,0 +1,111 @@
+<odoo>
+    <record id="stock_release_channel_list_view" model="ir.ui.view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_tree_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//field[last()]" position="after">
+                <field name="volume_picking_all" optional="hide" />
+                <field name="volume_picking_release_ready" optional="hide" />
+                <field name="volume_picking_released" optional="hide" />
+                <field name="volume_picking_assigned" optional="hide" />
+                <field name="volume_picking_waiting" optional="hide" />
+                <field name="volume_picking_late" optional="hide" />
+                <field name="volume_picking_priority" optional="hide" />
+                <field name="volume_picking_done" optional="hide" />
+                <field name="volume_picking_full_progress" optional="hide" />
+                <field name="volume_move_all" optional="hide" />
+                <field name="volume_move_release_ready" optional="hide" />
+                <field name="volume_move_released" optional="hide" />
+                <field name="volume_move_assigned" optional="hide" />
+                <field name="volume_move_waiting" optional="hide" />
+                <field name="volume_move_late" optional="hide" />
+                <field name="volume_move_priority" optional="hide" />
+                <field name="volume_move_done" optional="hide" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_release_channel_kanban_view" model="ir.ui.view">
+        <field name="model">stock.release.channel</field>
+        <field name='type'>kanban</field>
+        <field
+            name='inherit_id'
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='count_to_release']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 35px; white-space:nowrap; text-align: right"
+                >
+                    <field name="volume_picking_release_ready" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='count_released']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 35px; white-space:nowrap; text-align: right"
+                >
+                    <field name="volume_picking_released" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='count_done_today']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 35px; white-space:nowrap; text-align: right"
+                >
+                    <field name="volume_picking_done" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+
+            <button
+                class="btn btn-primary"
+                name="action_picking_assigned"
+                type="object"
+                position="inside"
+            >
+                <br />
+                <!-- Show moves ready to ship -->
+                <field name="volume_move_assigned" />
+                <field name="volume_uom_name" />
+            </button>
+
+            <xpath expr="//div[@name='count_waiting']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 50px; white-space:nowrap; text-align: right"
+                >
+                    <!-- Show moves as a picking can be partially waiting -->
+                    <field name="volume_move_waiting" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='count_late']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 50px; white-space:nowrap; text-align: right"
+                >
+                    <!-- Show moves as a picking can be partially late -->
+                    <field name="volume_move_late" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='count_priority']" position="inside">
+                <div
+                    class="col-auto"
+                    style="flex: 0 50px; white-space:nowrap; text-align: right"
+                >
+                    <!-- Show moves as only some moves inside a picking can have a high prio -->
+                    <field name="volume_move_priority" />
+                    <field name="volume_uom_name" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

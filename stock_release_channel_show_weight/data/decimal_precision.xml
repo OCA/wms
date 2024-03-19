@@ -1,0 +1,6 @@
+<odoo noupdate="1">
+    <record id="decimal_product_uom" model="decimal.precision" forcecreate="True">
+        <field name="name">Release Channel Weight</field>
+        <field name="digits" eval="0" />
+    </record>
+</odoo>

@@ -221,11 +221,9 @@
                 <field name="count_move_priority" />
                 <field name="count_picking_done" />
                 <field name="count_move_done" />
-                <field name="last_done_picking_id" />
-                <field name="last_done_picking_name" />
-                <field name="last_done_picking_date_done" />
                 <field name="count_picking_chain_done" />
                 <field name="count_picking_chain" />
+                <field name="show_last_picking_done" />
                 <field name="state" />
                 <field name="is_release_allowed" />
                 <templates>
@@ -267,8 +265,14 @@
                                     </div>
                                 </div>
                                 <div class="container o_kanban_card_content">
-                                    <div class="row o_kanban_card_upper_content">
-                                        <div class="col-4 o_kanban_primary_left">
+                                    <div
+                                        class="row"
+                                        style="--gutter-x:15px; align-items:center; flex-wrap:nowrap"
+                                    >
+                                        <div
+                                            class="col-auto"
+                                            style="min-width:72px; min-height:65px"
+                                        >
                                             <field
                                                 name="is_release_allowed"
                                                 invisible="1"
@@ -287,9 +291,16 @@
                                                 />
                                             </button>
                                         </div>
-                                        <div class="col-8 o_kanban_primary_right">
-                                            <div class="row">
-                                                <div class="col-7">
+                                        <div class="col">
+                                            <div
+                                                name="count_to_release"
+                                                class="row"
+                                                style="justify-content: flex-end; --gutter-x: 5px"
+                                            >
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:0 80px"
+                                                >
                                                     <a
                                                         name="action_picking_release_ready"
                                                         type="object"
@@ -298,12 +309,17 @@
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
+                                                    class="col-auto"
+                                                    style="flex:1; text-align:right"
                                                 >
                                                     <field
                                                         name="count_picking_release_ready"
                                                     />
+                                                </div>
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:1; white-space:nowrap"
+                                                >
                                                     <a
                                                         name="action_move_release_ready"
                                                         type="object"
@@ -315,8 +331,15 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-7">
+                                            <div
+                                                name="count_released"
+                                                class="row"
+                                                style="justify-content: flex-end; --gutter-x: 5px"
+                                            >
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:0 80px"
+                                                >
                                                     <a
                                                         name="action_picking_released"
                                                         type="object"
@@ -325,12 +348,17 @@
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
+                                                    class="col-auto"
+                                                    style="flex:1; text-align:right"
                                                 >
                                                     <field
                                                         name="count_picking_released"
                                                     />
+                                                </div>
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:1; white-space:nowrap"
+                                                >
                                                     <a
                                                         name="action_move_released"
                                                         type="object"
@@ -342,8 +370,15 @@
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-7">
+                                            <div
+                                                name="count_done_today"
+                                                class="row"
+                                                style="justify-content: flex-end; --gutter-x: 5px"
+                                            >
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:0 80px"
+                                                >
                                                     <a
                                                         name="action_picking_done"
                                                         type="object"
@@ -352,10 +387,15 @@
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
+                                                    class="col-auto"
+                                                    style="flex:1; text-align:right"
                                                 >
                                                     <field name="count_picking_done" />
+                                                </div>
+                                                <div
+                                                    class="col-auto"
+                                                    style="flex:1; white-space:nowrap"
+                                                >
                                                     <a
                                                         name="action_move_done"
                                                         type="object"
@@ -366,211 +406,259 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="row">
-
-                                        <div class="col-12 middle_block">
-                                            <field
-                                                name="count_picking_full_progress"
-                                                invisible="1"
-                                            />
-                                            <field
-                                                name="count_picking_done"
-                                                widget="progressbar"
-                                                title="Overall Progress"
-                                                options="{'show_fractional': true, 'current_value': 'count_picking_done', 'max_value': 'count_picking_full_progress', 'editable': false}"
-                                            />
-                                        </div>
-
-                                    </div>
-
-                                    <div class="kanban_middle_title">
-                                        <span
-                                            class="middle_title"
-                                        >To Do Situation</span>
-                                        <hr class="mt4 mb4" />
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-4 o_kanban_primary_left">
-                                            <button
-                                                class="btn btn-primary"
-                                                name="action_picking_assigned"
-                                                type="object"
+                                            <div
+                                                name="last_done_picking"
+                                                class="row"
+                                                t-if="show_last_picking_done"
                                             >
+                                                <a
+                                                    type="object"
+                                                    name="get_action_picking_form"
+                                                    class="col"
+                                                >
+                                                    Last Transfer
+                                                </a>
+                                                <div class="col-auto">
+                                                    <field
+                                                        name="last_done_picking_date_done"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                name="count_done_progress"
+                                                class="row mx-0"
+                                                style="align-items: center"
+                                            >
+                                                <div class="col progress px-0">
+                                                    <div
+                                                        class="progress-bar progress-bar-striped"
+                                                        role="progressbar"
+                                                        t-att-aria-valuenow="record.count_picking_done.value"
+                                                        aria-valuemin="0"
+                                                        t-att-aria-valuemax="record.count_picking_full_progress.value"
+                                                        t-att-style="'width: ' + record.count_picking_done.value / record.count_picking_full_progress.value * 100 + '%;'"
+                                                    >
+                                                        <field
+                                                            name="count_picking_done"
+                                                            t-if="record.count_picking_done.value > 0"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    class="col-auto px-1"
+                                                    style="font-size:smaller"
+                                                >
+                                                    /
+                                                    <field
+                                                        name="count_picking_full_progress"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                      <div
+                                            class="row col mx-0 o_kanban_primary_bottom bottom_block"
+                                            style="--gutter-x:15px; align-items:center; flex-wrap:nowrap"
+                                        >
+                                        <div class="col-auto">
+                                            <button
+                                                    class="btn btn-primary"
+                                                    name="action_picking_assigned"
+                                                    type="object"
+                                                >
                                                 <span><t
-                                                        t-esc="record.count_picking_assigned.value"
-                                                    /> To Ship</span>
+                                                            t-esc="record.count_picking_assigned.value"
+                                                        /> To Ship</span>
                                                 <br />
                                                 <span>[~<t
-                                                        t-esc="record.count_move_assigned.value"
-                                                    /> Lines]</span>
+                                                            t-esc="record.count_move_assigned.value"
+                                                        /> Lines]</span>
                                             </button>
                                         </div>
-                                        <div class="col-8 o_kanban_primary_right">
-                                            <div class="row">
-                                                <div class="col-7">
-                                                    <a
-                                                        name="action_picking_waiting"
-                                                        type="object"
+                                        <div class="col">
+                                            <div
+                                                    name="count_waiting"
+                                                    class="row"
+                                                    style="justify-content: flex-end; --gutter-x: 5px"
+                                                >
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:0 80px"
                                                     >
+                                                    <a
+                                                            name="action_picking_waiting"
+                                                            type="object"
+                                                        >
                                                         Waiting
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
-                                                >
-                                                    <field
-                                                        name="count_picking_waiting"
-                                                    />
-                                                    <a
-                                                        name="action_move_waiting"
-                                                        type="object"
+                                                        class="col-auto"
+                                                        style="flex:1; text-align:right"
                                                     >
+                                                    <field
+                                                            name="count_picking_waiting"
+                                                        />
+                                                </div>
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:1; white-space:nowrap"
+                                                    >
+                                                    <a
+                                                            name="action_move_waiting"
+                                                            type="object"
+                                                        >
                                                         [~<field
-                                                            name="count_move_waiting"
-                                                        />]
+                                                                name="count_move_waiting"
+                                                            />]
                                                     </a>
                                                 </div>
                                             </div>
 
                                             <div
-                                                class="row"
-                                                t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
-                                            >
-                                                <div class="col-7">
-                                                    <a
-                                                        name="action_picking_late"
-                                                        type="object"
-                                                        t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                    name="count_late"
+                                                    class="row"
+                                                    t-attf-style="justify-content: flex-end; --gutter-x: 5px; #{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                >
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:0 80px"
                                                     >
+                                                    <a
+                                                            name="action_picking_late"
+                                                            type="object"
+                                                            t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                        >
                                                         Late
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
-                                                >
-                                                    <field name="count_picking_late" />
-                                                    <a
-                                                        name="action_move_late"
-                                                        type="object"
-                                                        t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                        class="col-auto"
+                                                        style="flex:1; text-align:right"
                                                     >
+                                                    <field name="count_picking_late" />
+                                                </div>
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:1; white-space:nowrap"
+                                                    >
+                                                    <a
+                                                            name="action_move_late"
+                                                            type="object"
+                                                            t-attf-style="#{record.count_picking_late.value > 0 ? 'color: red' : ''}"
+                                                        >
                                                         [~<field
-                                                            name="count_move_late"
-                                                        />]
+                                                                name="count_move_late"
+                                                            />]
                                                     </a>
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-7">
-                                                    <a
-                                                        name="action_picking_priority"
-                                                        type="object"
+                                            <div
+                                                    name="count_priority"
+                                                    class="row"
+                                                    style="justify-content: flex-end; --gutter-x: 5px"
+                                                >
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:0 80px"
                                                     >
+                                                    <a
+                                                            name="action_picking_priority"
+                                                            type="object"
+                                                        >
                                                         Priority
                                                     </a>
                                                 </div>
                                                 <div
-                                                    class="col-5"
-                                                    style="padding-left: 0;"
-                                                >
-                                                    <field
-                                                        name="count_picking_priority"
-                                                    />
-                                                    <a
-                                                        name="action_move_priority"
-                                                        type="object"
+                                                        class="col-auto"
+                                                        style="flex:1; text-align:right"
                                                     >
+                                                    <field
+                                                            name="count_picking_priority"
+                                                        />
+                                                </div>
+                                                <div
+                                                        class="col-auto"
+                                                        style="flex:1; white-space:nowrap"
+                                                    >
+                                                    <a
+                                                            name="action_move_priority"
+                                                            type="object"
+                                                        >
                                                         [~<field
-                                                            name="count_move_priority"
-                                                        />]
+                                                                name="count_move_priority"
+                                                            />]
                                                     </a>
                                                 </div>
                                             </div>
 
-                                        </div>
 
-
-                                </div>
-
-                                <div class="container o_kanban_footer mt-3">
-
-                                        <div
-                                            class="row"
-                                            t-if="record.last_done_picking_id.raw_value"
-                                        >
-                                            <div class="col-12">
-                                                <strong>Last Transfer</strong>
-                                                <br />
-                                                <a
+                                            <a
+                                                    class="row mx-0"
+                                                    style="align-items: center; display: flex"
+                                                    name="action_picking_all_related"
                                                     type="object"
-                                                    name="get_action_picking_form"
                                                 >
-                                                    <field
-                                                        name="last_done_picking_name"
-                                                    />
-                                                </a>
-                                                (<field
-                                                    name="last_done_picking_date_done"
-                                                />)
-                                            </div>
-                                        </div>
-                                </div>
-
-                                <div class="row">
-
-                                    <div
-                                            class="col-12 o_kanban_primary_bottom bottom_block"
-                                        >
-
-                                        <div
-                                                class="row mt-2 mb-2 primary_bottom_buttons"
-                                            >
-                                            <div class="col-6 bottom_buttons_left">
-                                            </div>
-                                            <div class="col-6 bottom_buttons_right">
-                                                <button
-                                                        class="btn btn-secondary"
-                                                        name="action_picking_all_related"
-                                                        type="object"
+                                                <div
+                                                        name="count_picking_chain_progress"
+                                                        class="col progress px-0"
+                                                        style="background-color: #FFF"
                                                     >
-                                                    <span>Transfers</span>
-                                                </button>
-                                            </div>
-                                        </div>
+                                                    <div
+                                                            class="progress-bar progress-bar-striped"
+                                                            role="progressbar"
+                                                            t-att-aria-valuenow="record.count_picking_chain_done.value"
+                                                            aria-valuemin="0"
+                                                            t-att-aria-valuemax="record.count_picking_chain.value"
+                                                            t-att-style="'width: ' + record.count_picking_chain_done.value / record.count_picking_chain.value * 100 + '%'"
+                                                        >
+                                                        <field
+                                                                name="count_picking_chain_done"
+                                                                t-if="record.count_picking_chain_done.value > 0"
+                                                            />
+                                                    </div>
+                                                    <!--div
+                                                        class="progress-bar progress-bar-striped"
+                                                        role="progressbar"
+                                                        t-att-aria-valuenow="record.count_picking_chain_waiting.value"
+                                                        aria-valuemin="0"
+                                                        t-att-aria-valuemax="record.count_picking_chain.value"
+                                                        t-att-style="'width: ' + record.count_picking_chain_waiting.value / record.count_picking_chain.value * 100 + '%'"
 
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-                                                <field
-                                                        name="count_picking_chain_done"
-                                                        widget="progressbar"
-                                                        title="Transfers Progress"
-                                                        options="{'current_value': 'count_picking_chain_done', 'max_value': 'count_picking_chain', 'editable': false}"
-                                                    />
-                                            </div>
+                                                    >
+                                                        <field
+                                                            name="count_picking_chain_waiting"
+                                                            t-if="record.count_picking_chain_waiting.value > 0"
+                                                        />
+                                                    </div-->
+                                                </div>
+                                                <div
+                                                        class="col-auto px-1"
+                                                        style="font-size:smaller"
+                                                    >
+                                                    /
+                                                    <field name="count_picking_chain" />
+                                                </div>
+                                            </a>
                                         </div>
-
+                                      </div>
                                     </div>
-
                                 </div>
 
-
-                            </div>
-
-                            <div
+                                <div
                                     class="container o_kanban_card_manage_pane dropdown-menu"
                                     role="menu"
                                 >
                                  <div class="row">
                                      <div
                                             class="col-6 o_kanban_card_manage_section o_kanban_manage_view"
-                                            name="dropdown-menu-left-panel"
+                                            name="actions dropdown-menu-left-panel"
                                         >
                                          <field
                                                 name="is_action_lock_allowed"
@@ -594,7 +682,7 @@
                                             >
                                             <span>Actions</span>
                                         </div>
-                                         <t
+                                        <t
                                                 t-if="record.is_action_lock_allowed.raw_value"
                                             >
                                              <div role="menuitem">
@@ -602,7 +690,7 @@
                                                         name="action_lock"
                                                         type="object"
                                                         icon="fa-lock"
-                                                    >Lock</a>
+                                                    ><span class="ms-2">Lock</span></a>
                                              </div>
                                         </t>
                                         <t
@@ -613,7 +701,9 @@
                                                         name="action_unlock"
                                                         type="object"
                                                         icon="fa-unlock"
-                                                    >Unlock</a>
+                                                    ><span
+                                                            class="ms-2"
+                                                        >Unlock</span></a>
                                             </div>
                                         </t>
                                         <t
@@ -624,7 +714,7 @@
                                                         name="action_sleep"
                                                         type="object"
                                                         icon="fa-bed"
-                                                    >Sleep</a>
+                                                    ><span class="ms-2">Sleep</span></a>
                                             </div>
                                         </t>
                                         <t
@@ -635,7 +725,9 @@
                                                         name="action_wake_up"
                                                         type="object"
                                                         icon="fa-bolt"
-                                                    >Wake Up</a>
+                                                    ><span
+                                                            class="ms-2"
+                                                        >Wake Up</span></a>
                                             </div>
                                         </t>
                                      </div>
