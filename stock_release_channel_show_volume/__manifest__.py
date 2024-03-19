@@ -4,7 +4,7 @@
 {
     "name": "Stock Release Channels show Volume",
     "summary": "Display volumes of stock release channels",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "license": "AGPL-3",
     "author": "MT-Software, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",

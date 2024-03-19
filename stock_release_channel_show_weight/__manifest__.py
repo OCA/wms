@@ -4,7 +4,7 @@
 {
     "name": "Stock Release Channels show Weight",
     "summary": "Display weights of stock release channels",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "license": "AGPL-3",
     "author": "BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
