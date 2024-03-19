@@ -12,7 +12,17 @@ class ProductProduct(models.Model):
         move_line = self.env["stock.move"].search(
             [
                 ("product_id", "=", self.id),
-                ("state", "not in", ["done", "cancel"]),
+                (
+                    "state",
+                    "in",
+                    [
+                        "draft",
+                        "waiting",
+                        "confirmed",
+                        "partially_available",
+                        "assigned",
+                    ],
+                ),
                 ("picking_type_id.code", "=", "incoming"),
             ],
             limit=1,
