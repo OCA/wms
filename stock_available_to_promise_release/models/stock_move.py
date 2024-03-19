@@ -9,7 +9,7 @@ import operator as py_operator
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.osv import expression
-from odoo.tools import date_utils, float_compare, float_round
+from odoo.tools import date_utils, float_compare, float_round, groupby
 
 _logger = logging.getLogger(__name__)
 
@@ -189,8 +189,8 @@ class StockMove(models.Model):
     def _previous_promised_qty_sql_moves_no_release(self):
         return "m.need_release IS false OR m.need_release IS null"
 
-    def _previous_promised_qty_sql_lateral_where(self):
-        locations = self._ordered_available_to_promise_locations()
+    def _previous_promised_qty_sql_lateral_where(self, warehouse):
+        locations = warehouse.view_location_id
         sql = """
                 m.id != move.id
                 AND m.product_id = move.product_id
@@ -224,19 +224,41 @@ class StockMove(models.Model):
             params["horizon"] = horizon_date
         return sql, params
 
-    def _previous_promised_qty_sql(self):
+    def _previous_promised_qty_sql(self, warehouse):
         """Lookup query for product promised qty in the same warehouse.
 
         Moves to consider are either already released or still be to released
         but not done yet. Each of them should fit the reservation horizon.
         """
         params = {"move_ids": tuple(self.ids)}
-        lateral_where, lateral_params = self._previous_promised_qty_sql_lateral_where()
+        lateral_where, lateral_params = self._previous_promised_qty_sql_lateral_where(
+            warehouse
+        )
         params.update(lateral_params)
         query = self._previous_promised_qty_sql_main_query().format(
             lateral_where=lateral_where
         )
         return query, params
+
+    def _group_by_warehouse(self):
+        return groupby(self, lambda m: m.warehouse_id)
+
+    def _get_previous_promised_qties(self):
+        self.env.flush_all()
+        self.env["stock.move.line"].flush_model(["move_id", "reserved_qty"])
+        self.env["stock.location"].flush_model(["parent_path"])
+        previous_promised_qties = {}
+        for warehouse, moves in self._group_by_warehouse():
+            moves = self.browse().union(*moves)
+            if not warehouse:
+                for move in moves:
+                    previous_promised_qties[move.id] = 0
+                continue
+            query, params = moves._previous_promised_qty_sql(warehouse)
+            self.env.cr.execute(query, params)
+            rows = dict(self.env.cr.fetchall())
+            previous_promised_qties.update(rows)
+        return previous_promised_qties
 
     # As we don't set depends here, we need to invalidate cache before
     # accessing the computed value.
@@ -245,15 +267,10 @@ class StockMove(models.Model):
     def _compute_previous_promised_qty(self):
         if not self.ids:
             return
-        self.env.flush_all()
-        self.env["stock.move.line"].flush_model(["move_id", "reserved_qty"])
-        self.env["stock.location"].flush_model(["parent_path"])
-        self.previous_promised_qty = 0
-        query, params = self._previous_promised_qty_sql()
-        self.env.cr.execute(query, params)
-        rows = dict(self.env.cr.fetchall())
+        previous_promised_qty_by_move = self._get_previous_promised_qties()
         for move in self:
-            move.previous_promised_qty = rows.get(move.id, 0)
+            previous_promised_qty = previous_promised_qty_by_move.get(move.id, 0)
+            move.previous_promised_qty = previous_promised_qty
 
     def _is_release_needed(self):
         self.ensure_one()
@@ -308,30 +325,19 @@ class StockMove(models.Model):
         moves = moves.filtered(lambda m: m.release_ready)
         return [("id", "in", moves.ids)]
 
-    def _ordered_available_to_promise_locations(self):
-        return self.env["stock.warehouse"].search([]).mapped("view_location_id")
+    def _get_ordered_available_to_promise_by_warehouse(self, warehouse):
+        res = {}
+        if not warehouse:
+            for move in self:
+                res[move] = {
+                    "ordered_available_to_promise_uom_qty": 0,
+                    "ordered_available_to_promise_qty": 0,
+                }
+            return res
 
-    @api.depends()
-    def _compute_ordered_available_to_promise(self):
-        moves = self.filtered(
-            lambda move: move._should_compute_ordered_available_to_promise()
-        )
-        (self - moves).update(
-            {
-                "ordered_available_to_promise_qty": 0.0,
-                "ordered_available_to_promise_uom_qty": 0.0,
-            }
-        )
-
-        locations = moves._ordered_available_to_promise_locations()
-
-        # Compute On-Hand quantity (equivalent of qty_available) for all "view
-        # locations" of all the warehouses: we may release as soon as we have
-        # the quantity somewhere. Do not use "qty_available" to get a faster
-        # computation.
-        location_domain = locations._get_available_to_promise_domain()
+        location_domain = warehouse.view_location_id._get_available_to_promise_domain()
         domain_quant = expression.AND(
-            [[("product_id", "in", moves.product_id.ids)], location_domain]
+            [[("product_id", "in", self.product_id.ids)], location_domain]
         )
         location_quants = self.env["stock.quant"].read_group(
             domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
@@ -339,7 +345,7 @@ class StockMove(models.Model):
         quants_available = {
             item["product_id"][0]: item["quantity"] for item in location_quants
         }
-        for move in moves:
+        for move in self:
             product_uom = move.product_id.uom_id
             previous_promised_qty = move.previous_promised_qty
 
@@ -355,15 +361,41 @@ class StockMove(models.Model):
                 move.product_uom,
                 rounding_method="HALF-UP",
             )
+            res[move] = {
+                "ordered_available_to_promise_uom_qty": max(
+                    min(uom_promised, move.product_uom_qty), 0.0
+                ),
+                "ordered_available_to_promise_qty": max(
+                    min(real_promised, move.product_qty), 0.0
+                ),
+            }
+        return res
 
-            move.ordered_available_to_promise_uom_qty = max(
-                min(uom_promised, move.product_uom_qty),
-                0.0,
-            )
-            move.ordered_available_to_promise_qty = max(
-                min(real_promised, move.product_qty),
-                0.0,
-            )
+    def _get_ordered_available_to_promise(self):
+        res = {}
+        moves_by_warehouse = self._group_by_warehouse()
+        # Compute On-Hand quantity (equivalent of qty_available) for all "view
+        # locations" of all the warehouses: we may release as soon as we have
+        # the quantity somewhere. Do not use "qty_available" to get a faster
+        # computation.
+        for warehouse, moves in moves_by_warehouse:
+            moves = self.browse().union(*moves)
+            res.update(moves._get_ordered_available_to_promise_by_warehouse(warehouse))
+        return res
+
+    @api.depends()
+    def _compute_ordered_available_to_promise(self):
+        moves = self.filtered(
+            lambda move: move._should_compute_ordered_available_to_promise()
+        )
+        (self - moves).update(
+            {
+                "ordered_available_to_promise_qty": 0.0,
+                "ordered_available_to_promise_uom_qty": 0.0,
+            }
+        )
+        for move, values in moves._get_ordered_available_to_promise().items():
+            move.update(values)
 
     def _search_ordered_available_to_promise_uom_qty(self, operator, value):
         operator_mapping = {

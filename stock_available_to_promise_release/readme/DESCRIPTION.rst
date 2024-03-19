@@ -32,3 +32,9 @@ the remaining qty is split and attached to a new picking that can be released la
 
 Important: if the "Stock reservation horizon" is set, the qty is calculated
 on moves which have an expected date not beyond $today + $horizon (in days).
+
+Important: Moves without a warehouse set are not supported.
+If the warehouse is not set on the move, the "Ordered Available to Promise" Quantity
+will always be 0. It will also not be considered as consuming existing stock.
+The warehouse gets set by the Stock rule, if the Rule
+is not assigned to a warehouse, also the move will not end up with a warehouse.
