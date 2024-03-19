@@ -331,6 +331,10 @@ export class WMSUtils {
         };
         return _.extend(props, override || {});
     }
+    split_picking_note(state) {
+        // Allow to introduce line breaks in the note.
+        return state.data.picking.note.split("\n");
+    }
 }
 
 utils_registry.add("wms", new WMSUtils());
