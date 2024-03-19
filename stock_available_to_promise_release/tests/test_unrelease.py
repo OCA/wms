@@ -54,13 +54,14 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(self.picking.move_lines.state, "cancel")
         self.assertEqual(self.picking.state, "cancel")
+        self.assertFalse(self.picking.last_release_date)
 
     def test_unrelease_full(self):
         """Unrelease all moves of a released ship. The pick should be deleted and
         the moves should be mark as to release"""
         with self._assert_full_unreleased():
             self.shipping.move_lines.unrelease()
-
+        self.assertFalse(self.shipping.last_release_date)
         # I can release again the move and a new pick is created
         self.shipping.release_available_to_promise()
         new_picking = self._prev_picking(self.shipping) - self.picking
