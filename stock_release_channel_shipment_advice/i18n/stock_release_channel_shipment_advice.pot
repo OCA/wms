@@ -15,7 +15,7 @@ msgstr ""
 
 #. module: stock_release_channel_shipment_advice
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice.stock_release_channel_kanban_view
-msgid "<span>Plan Shipment</span>"
+msgid "<span class=\"ms-2\">Plan Shipments</span>"
 msgstr ""
 
 #. module: stock_release_channel_shipment_advice
