@@ -1,0 +1,109 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_show_weight
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_all
+msgid "All Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_all
+msgid "All Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_assigned
+msgid "Available Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_assigned
+msgid "Available Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_full_progress
+msgid "Full Progress Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_late
+msgid "Late Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_late
+msgid "Late Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_done
+msgid "Moves Done Today (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_priority
+msgid "Priority Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_priority
+msgid "Priority Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_release_ready
+msgid "Release Ready Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_release_ready
+msgid "Release Ready Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_released
+msgid "Released Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_released
+msgid "Released Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model,name:stock_release_channel_show_weight.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_done
+msgid "Transfers Done  WeightToday"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_move_waiting
+msgid "Waiting Moves (Estimate) Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_picking_waiting
+msgid "Waiting Transfers Weight"
+msgstr ""
+
+#. module: stock_release_channel_show_weight
+#: model:ir.model.fields,field_description:stock_release_channel_show_weight.field_stock_release_channel__weight_uom_name
+msgid "Weight Unit of Measure label"
+msgstr ""
