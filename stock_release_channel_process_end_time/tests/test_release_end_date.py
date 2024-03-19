@@ -5,7 +5,6 @@ from freezegun import freeze_time
 
 from odoo import fields
 
-from odoo.addons.queue_job.job import Job
 from odoo.addons.stock_release_channel.tests.common import ChannelReleaseCase
 
 
@@ -79,12 +78,8 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         # Asleep the release channel to void the process end date
         self.channel.action_sleep()
         self.channel.invalidate_recordset()
-        self.channel.action_wake_up()
         # Execute the picking channel assignations
-        jobs_after = self.env["queue.job"].search([])
-        for job in jobs_after:
-            job = Job.load(job.env, job.uuid)
-            job.perform()
+        self.channel.with_context(queue_job__no_delay=True).action_wake_up()
 
         self.assertEqual(pickings, self.channel.picking_ids)
         # at this stage, the pickings are not ready to be released as the
@@ -118,12 +113,8 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         # Asleep the release channel to void the process end date
         self.channel.action_sleep()
         self.channel.invalidate_recordset()
-        self.channel.action_wake_up()
         # Execute the picking channel assignations
-        jobs_after = self.env["queue.job"].search([])
-        for job in jobs_after:
-            job = Job.load(job.env, job.uuid)
-            job.perform()
+        self.channel.with_context(queue_job__no_delay=True).action_wake_up()
         pickings = self.channel.picking_ids
         # Check the scheduled date is corresponding to the one on channel
         for picking in pickings:
