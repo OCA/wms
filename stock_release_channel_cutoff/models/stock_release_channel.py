@@ -1,10 +1,13 @@
 # Copyright 2023 Camptocamp
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-
 
 from odoo import api, fields, models
 
-from odoo.addons.stock_release_channel_process_end_time.utils import float_to_time
+from odoo.addons.stock_release_channel_process_end_time.utils import (
+    float_to_time,
+    time_to_datetime,
+)
 
 
 class StockReleaseChannel(models.Model):
@@ -17,23 +20,18 @@ class StockReleaseChannel(models.Model):
     # Technical field for warning on kanban view
     cutoff_warning = fields.Boolean(compute="_compute_cutoff_warning")
 
-    @api.depends_context("tz")
-    @api.depends("cutoff_time", "state")
+    @api.depends("cutoff_time", "state", "process_end_date", "process_end_time_tz")
     def _compute_cutoff_warning(self):
         now = fields.Datetime.now()
-        for rec in self:
-            if rec.cutoff_time and rec.process_end_date:
-                hours = float_to_time(
-                    rec.cutoff_time,
-                    tz=rec.env.user.tz or "UTC",
+        for channel in self:
+            cutoff_warning = False
+            if channel.state == "open" and channel.cutoff_time:
+                cutoff = time_to_datetime(
+                    float_to_time(
+                        channel.cutoff_time,
+                    ),
+                    now=channel.process_end_date,
+                    tz=channel.process_end_time_tz,
                 )
-                datetime = rec.process_end_date.replace(
-                    hour=hours.hour, minute=hours.minute, second=0, microsecond=0
-                )
-                if hours.tzinfo:
-                    datetime += hours.utcoffset()
-                rec.cutoff_warning = (
-                    True if datetime < now and rec.state == "open" else False
-                )
-            else:
-                rec.cutoff_warning = False
+                cutoff_warning = cutoff < now
+            channel.cutoff_warning = cutoff_warning
