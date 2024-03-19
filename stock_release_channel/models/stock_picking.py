@@ -15,7 +15,33 @@ class StockPicking(models.Model):
         ondelete="restrict",
         copy=False,
         tracking=True,
+        inverse="_inverse_release_channel_id",
     )
+
+    def _inverse_release_channel_id(self):
+        """When the release channel is modified, update the expected date
+
+        Set new date on all moves in the chain"""
+        for delivery in self:
+            if not delivery.last_release_date:
+                continue
+            if delivery.picking_type_code != "outgoing":
+                continue
+            channel = delivery.release_channel_id
+            new_date = channel and channel._get_expected_date()
+            if not new_date:
+                continue
+            moves = delivery.move_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            )
+            move_chain_ids = []
+            while moves:
+                move_chain_ids += moves.ids
+                moves = moves.move_orig_ids.filtered(
+                    lambda m: m.state not in ("cancel", "done")
+                )
+            all_moves = moves.browse(move_chain_ids)
+            all_moves._release_set_expected_date(new_date)
 
     def _delay_assign_release_channel(self):
         for picking in self:

@@ -499,7 +499,8 @@ class StockReleaseChannel(models.Model):
             current = channel._assign_release_channel_additional_filter(current)
             if not current:
                 continue
-            current.release_channel_id = channel
+            if current.release_channel_id != channel:
+                current.release_channel_id = channel
             break
 
         if not picking.release_channel_id:
@@ -798,3 +799,8 @@ class StockReleaseChannel(models.Model):
         )
         for pick in pickings:
             pick._delay_assign_release_channel()
+
+    def _get_expected_date(self):
+        """Return the new date to set on move chain"""
+        self.ensure_one()
+        return False
