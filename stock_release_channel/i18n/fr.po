@@ -32,24 +32,27 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "<span class=\"middle_title\">To Do Situation</span>"
+msgid "<span class=\"ms-2\">Lock</span>"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "<span class=\"ms-2\">Sleep</span>"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "<span class=\"ms-2\">Unlock</span>"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "<span class=\"ms-2\">Wake Up</span>"
 msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "<span>Actions</span>"
-msgstr ""
-
-#. module: stock_release_channel
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "<span>Transfers</span>"
-msgstr ""
-
-#. module: stock_release_channel
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid ""
-"<strong>Last Transfer</strong>\n"
-"                                                <br/>"
 msgstr ""
 
 #. module: stock_release_channel
@@ -184,8 +187,24 @@ msgid "Channel %(name)s has no validated transfer yet."
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_company__release_channel_show_last_picking_done
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_config_settings__release_channel_show_last_picking_done
+msgid "Channels dashboard - Show last delivery done"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__color
 msgid "Color"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model,name:stock_release_channel.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model,name:stock_release_channel.model_res_config_settings
+msgid "Config Settings"
 msgstr ""
 
 #. module: stock_release_channel
@@ -264,6 +283,14 @@ msgid "In progress Related Transfers"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_res_company__release_channel_show_last_picking_done
+#: model:ir.model.fields,help:stock_release_channel.field_res_config_settings__release_channel_show_last_picking_done
+msgid ""
+"In release channels dashboard, add link to last done picking and show "
+"transfer date"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_action_lock_allowed
 msgid "Is Action Lock Allowed"
 msgstr ""
@@ -309,6 +336,11 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
+msgid "Last Transfer"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -345,7 +377,6 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Lock"
 msgstr ""
 
@@ -421,11 +452,6 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
 msgid "Options"
-msgstr ""
-
-#. module: stock_release_channel
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "Overall Progress"
 msgstr ""
 
 #. module: stock_release_channel
@@ -547,8 +573,17 @@ msgid "Settings"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__show_last_picking_done
+msgid "Show Last Picking Done"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.res_config_settings_view
+msgid "Show last delivery done in release channels dashboard"
+msgstr ""
+
+#. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Sleep"
 msgstr ""
 
@@ -654,18 +689,12 @@ msgid "Transfers Done Today"
 msgstr ""
 
 #. module: stock_release_channel
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
-msgid "Transfers Progress"
-msgstr ""
-
-#. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.view_picking_internal_search
 msgid "Transfers that couldn't be assigned in a release channel"
 msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Unlock"
 msgstr ""
 
@@ -691,7 +720,6 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
-#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid "Wake Up"
 msgstr ""
 
