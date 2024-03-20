@@ -37,8 +37,12 @@ class StockPicking(models.Model):
                 and rec.picking_type_id.code in ("incoming", "outgoing")
             )
 
+    def _is_user_allowed_to_cancel(self):
+        return self.env.user.has_group("stock.group_stock_manager")
+
     def action_force_cancel_wms(self):
-        self.env.user.has_group("stock.group_stock_manager")
+        if not self._is_user_allowed_to_cancel():
+            raise UserError(_("You are not allowed to cancel this picking"))
         self.wms_export_date = None
         self.wms_export_attachment_id = None
         return self.with_context(skip_wms_cancel_check=True).action_cancel()
