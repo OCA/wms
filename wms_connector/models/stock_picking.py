@@ -40,7 +40,7 @@ class StockPicking(models.Model):
     def action_force_cancel_wms(self):
         self.env.user.has_group("stock.group_stock_manager")
         self.wms_export_date = None
-        self.wms_export_attachment_id.unlink()
+        self.wms_export_attachment_id = None
         return self.with_context(skip_wms_cancel_check=True).action_cancel()
 
     def action_cancel(self):
