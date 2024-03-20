@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="shopfloor_menu_form_view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <group name="options" position="after">
+                <group
+                    name="pack_pickings"
+                    string="Packing"
+                    attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
+                >
+                    <field name="pack_pickings" />
+                </group>
+            </group>
+        </field>
+    </record>
+
+
+</odoo>
