@@ -111,7 +111,6 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
                 "selected_move_lines": [
                     self._move_line_data(ml) for ml in selected_lines.sorted()
                 ],
-                "packing_info": self.service._data_for_packing_info(self.picking),
                 "no_package_enabled": not self.service.options.get(
                     "checkout__disable_no_package"
                 ),
