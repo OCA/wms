@@ -1,3 +1,4 @@
+# Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Camptocamp
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
@@ -11,7 +12,6 @@
     "maintainers": ["jbaudoux"],
     "website": "https://github.com/OCA/wms",
     "depends": [
-        "web",
         "stock_release_channel",  # OCA/wms
         "stock_release_channel_process_end_time",  # OCA/wms
         "stock_warehouse_calendar",  # OCA/stock-logistics-warehouse

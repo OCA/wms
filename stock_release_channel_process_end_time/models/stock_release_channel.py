@@ -20,6 +20,7 @@ class StockReleaseChannel(models.Model):
         "be ended. This information will be used to compute the channel pickings "
         "scheduled date at channel awaking.",
     )
+    # TODO: move this field to stock_release_channel, make stored and rename to tz
     process_end_time_tz = fields.Selection(
         selection=_tz_get,
         compute="_compute_process_end_time_tz",
@@ -91,7 +92,7 @@ class StockReleaseChannel(models.Model):
             if criteria[0] == "scheduled_date":
                 new_domain.append(
                     (
-                        "schedule_date_prior_to_channel_process_end_date_search",
+                        "scheduled_date_prior_to_channel_end_date_search",
                         "=",
                         True,
                     )

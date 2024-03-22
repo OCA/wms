@@ -1,5 +1,14 @@
-This module allows to set delivery lead time for release channel.
-When setting on shipment lead time on release channel, the shipment date is computed automatically base on
-lead time days or warehouse calendar. There are 2 main enhanced features with this module:
-- Filter deliveries base on shipment date defined on a channel
-- Set delivery date for shipment advice if picking is linked to a channel
+Manage shipment date and delivery lead time on release channel.
+The shipment date is computed automatically base on process end date + shipment
+lead time days and warehouse calendar.
+
+Exclude deliveries promised after shipment date. A delivery with a deadline
+won't be assigned to a channel with a shipment date prior to the deadline. This
+allows to prevent to deliver a sales order with a commitment date in the
+future.
+
+Adapt computation of release ready to take into account the shipment lead time.
+A delivery part of a release channel won't be counted as release ready if the
+scheduled date is after the shipment date.
+
+Add the delivery date on the shipment advice.
