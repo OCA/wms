@@ -1,0 +1,102 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_service_level_route
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_procurement_group__display_name
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__display_name
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_service_level__display_name
+msgid "Display Name"
+msgstr "Libellé"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_procurement_group__id
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__id
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_service_level__id
+msgid "ID"
+msgstr ""
+
+#. module: stock_service_level_route
+#: model:ir.model,name:stock_service_level_route.model_stock_location_route
+msgid "Inventory Routes"
+msgstr "Route logistique"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_procurement_group____last_update
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route____last_update
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_service_level____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,help:stock_service_level_route.field_stock_location_route__service_level_ids
+msgid ""
+"Linking this route to service levels restrict the route for given service "
+"levels. If no service level set the route will be available only for stock."
+"move without level service."
+msgstr ""
+"Restreint l'applicabilité de cette route aux prestations (offres/niveau de "
+"service) liées.Si aucune prestation renseignée (et que la restriction par "
+"niveau de service est applicable) la route ne s'applique qu'aux lignes de "
+"mouvements (stock.move) non lié à une prestation."
+
+#. module: stock_service_level_route
+#: model:ir.model,name:stock_service_level_route.model_procurement_group
+msgid "Procurement Group"
+msgstr "Groupe d'approvisionnement"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_service_level__route_ids
+msgid "Routes"
+msgstr "Routes"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,help:stock_service_level_route.field_stock_service_level__route_ids
+msgid ""
+"Routes restricted to this service level. To get the route available in this "
+"list first turn on service_level_selectable on the route."
+msgstr ""
+"Routes logistiques lié à cette prestation. Pour permettre de visualiser une "
+"route ici il faut que la route soit sélectionnable/applicable par niveau de "
+"service."
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__service_level_selectable
+msgid "Service level"
+msgstr "Prestation"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__service_level_ids
+msgid "Service levels"
+msgstr "Prestations"
+
+#. module: stock_service_level_route
+#: model:ir.model,name:stock_service_level_route.model_stock_service_level
+msgid "Stock Service level"
+msgstr "Prestation - Offre - Niveau de service"
+
+#. module: stock_service_level_route
+#: model:ir.model.fields,help:stock_service_level_route.field_stock_location_route__service_level_selectable
+msgid ""
+"What ever we should apply service level restriction. This boolean as impact "
+"in the route selection because no service level defined means only stock."
+"move without service level. Otherwise if this is not select it means ignore "
+"service level and route may apply on any case."
+msgstr ""
+"Détermine si un restriciton par prestation doit s'appliquer à la route "
+"logistique. Ce champ impacte lors de la sélection des route logistique car "
+"si il n'y a pas de prestation configuré ci dessous et que ce champ est vrai, "
+"alors la route s'appliquera uniquement aux stock.move sans prestation. (ie: "
+"cas consitution de stock)"

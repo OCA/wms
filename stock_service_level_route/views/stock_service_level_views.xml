@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Foodles (http://www.foodles.co).
+     @author Pierre Verkest <pierreverkest84@gmail.com>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+<odoo>
+
+    <record model="ir.ui.view" id="view_stock_service_level_form">
+        <field name="name">stock.service.level.form</field>
+        <field name="model">stock.service.level</field>
+        <field
+            name="inherit_id"
+            ref="stock_service_level.view_stock_service_level_form"
+        />
+        <field name="arch" type="xml">
+
+            <group name="main" position="after">
+                <group name="route">
+                    <field
+                        name="route_ids"
+                        widget="many2many_tags"
+                        options="{'no_open': True, 'no_create': True}"
+                    />
+                </group>
+            </group>
+
+        </field>
+    </record>
+
+
+</odoo>
