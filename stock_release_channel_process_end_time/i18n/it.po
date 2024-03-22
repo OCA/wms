@@ -19,8 +19,8 @@ msgstr ""
 #. module: stock_release_channel_process_end_time
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_process_end_time.res_config_settings_view_form_stock
 msgid ""
-"Allow to update scheduled date follow process end date/time on stock release"
-" channel."
+"Allow to update scheduled date follow process end date/time on stock release "
+"channel."
 msgstr ""
 "Consente di aggiornare la data schedulata seguente alla data/ora di fine del "
 "processo nel canale di rilascio del magazzino."
@@ -39,8 +39,8 @@ msgstr "Data fine"
 #: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time
 msgid ""
 "Fill in this to indicates when this channel release process would be ended. "
-"This information will be used to compute the channel pickings scheduled date"
-" at channel awaking."
+"This information will be used to compute the channel pickings scheduled date "
+"at channel awaking."
 msgstr ""
 "Compilare questo campo per indicare quando il processo di rilascio di questo "
 "canale sarà completato. Questa informazione verrà utilizzata per calcolare "
@@ -74,10 +74,9 @@ msgid "Process End Time Tz"
 msgstr "Tz ora termine processo"
 
 #. module: stock_release_channel_process_end_time
-#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
-msgid "Schedule Date Prior To Channel Process End Date Search"
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__scheduled_date_prior_to_channel_end_date_search
+msgid "Scheduled Date Prior To Channel End Date Search"
 msgstr ""
-"Ricerca data schedulazione precedente alla data fine processo del canale"
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model,name:stock_release_channel_process_end_time.model_stock_release_channel
@@ -91,8 +90,7 @@ msgstr "Rilascio magazzino utilizza la data fine canale"
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_time_can_edit
-msgid ""
-"Technical field in order to know if user can edit the end date in views"
+msgid "Technical field in order to know if user can edit the end date in views"
 msgstr "Campo tecnico per sapere se l'utente modifica la data fine nella vista"
 
 #. module: stock_release_channel_process_end_time
@@ -101,13 +99,11 @@ msgid "Technical field to compute the timezone for the process end time."
 msgstr "Campo tecnico per calcolare il fuso orario per l'ora fine processo."
 
 #. module: stock_release_channel_process_end_time
-#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_picking__scheduled_date_prior_to_channel_end_date_search
 msgid ""
-"Technical field to search on not processed pickings where the scheduled date"
-" is prior to the process end date of available channels."
+"Technical field to search on not processed pickings where the scheduled date "
+"is prior to the end date of related channel."
 msgstr ""
-"Campo tecnico per cercare nei prelievi non processati dove la data "
-"schedulata è precedente alla data fine processo dei canali disponibili."
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_date
@@ -127,3 +123,14 @@ msgid ""
 msgstr ""
 "Aggiornerà la data schedulata del prelievo in base alla data fine processo "
 "invece alla data rilascio + ritardo."
+
+#~ msgid "Schedule Date Prior To Channel Process End Date Search"
+#~ msgstr ""
+#~ "Ricerca data schedulazione precedente alla data fine processo del canale"
+
+#~ msgid ""
+#~ "Technical field to search on not processed pickings where the scheduled "
+#~ "date is prior to the process end date of available channels."
+#~ msgstr ""
+#~ "Campo tecnico per cercare nei prelievi non processati dove la data "
+#~ "schedulata è precedente alla data fine processo dei canali disponibili."
