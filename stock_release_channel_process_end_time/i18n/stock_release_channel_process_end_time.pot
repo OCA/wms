@@ -66,8 +66,8 @@ msgid "Process End Time Tz"
 msgstr ""
 
 #. module: stock_release_channel_process_end_time
-#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
-msgid "Schedule Date Prior To Channel Process End Date Search"
+#: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__scheduled_date_prior_to_channel_end_date_search
+msgid "Scheduled Date Prior To Channel End Date Search"
 msgstr ""
 
 #. module: stock_release_channel_process_end_time
@@ -92,10 +92,10 @@ msgid "Technical field to compute the timezone for the process end time."
 msgstr ""
 
 #. module: stock_release_channel_process_end_time
-#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_picking__schedule_date_prior_to_channel_process_end_date_search
+#: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_picking__scheduled_date_prior_to_channel_end_date_search
 msgid ""
 "Technical field to search on not processed pickings where the scheduled date"
-" is prior to the process end date of available channels."
+" is prior to the end date of related channel."
 msgstr ""
 
 #. module: stock_release_channel_process_end_time
