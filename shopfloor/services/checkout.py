@@ -568,35 +568,39 @@ class Checkout(Component):
                     "body": _("Lot is not in the current transfer."),
                 },
             )
-
-        # When lots are as units outside of packages, we can select them for
-        # packing, but if they are in a package, we want the user to scan the packages.
-        # If the product is only in one package though, scanning the lot selects
-        # the package.
+        # Related lines will be visible with the line picked (qty done changed)
+        related_lines = self.env["stock.move.line"]
         packages = lines.mapped("package_id")
         # Do not use mapped here: we want to see if we have more than one
         # package, but also if we have one lot as a package and the same lot as
         # a unit in another line. In both cases, we want the user to scan the
         # package.
         if packages and len({line.package_id for line in lines}) > 1:
+            # The lot is spread out in multiple packages, ask to scan a package
             return self._response_for_select_line(
                 picking, message=self.msg_store.lot_multiple_packages_scan_package()
             )
         elif packages:
-            # Select all the lines of the package when we scan a lot in a
-            # package and we have only one.
-            return self._select_lines_from_package(
-                picking, selection_lines, packages, prefill_qty=prefill_qty, **kw
+            # The lot is only in one package
+            # Related lines are the one in the same package
+            related_lines = selection_lines.filtered(
+                lambda l: l.package_id == packages and l.lot_id != lot
             )
+        else:
+            # Lot as units outside of packages, can be selected for packing.
+            # Related lines are all other lines not in a package
+            related_lines = selection_lines.filtered(
+                lambda l: not l.package_id and l.lot_id != lot
+            )
+        # Only one line selected should have its quantity done updated
+        line_to_update = fields.first(lines)
+        if len(lines) > 1:
+            related_lines |= lines - line_to_update
 
-        first_allowed_line = fields.first(lines)
-        return self._select_lines_from_product(
-            picking,
-            selection_lines,
-            first_allowed_line.product_id,
-            prefill_qty=prefill_qty,
-            check_lot=False,
+        lines = self._select_lines(
+            line_to_update, prefill_qty=prefill_qty, related_lines=related_lines
         )
+        return self._response_for_select_package(picking, lines)
 
     def _select_lines_from_serial(self, picking, selection_lines, lot, **kw):
         # Search for serial number is actually the same as searching for lot (as of v14...)
