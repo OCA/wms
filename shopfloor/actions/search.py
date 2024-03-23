@@ -169,11 +169,13 @@ class SearchAction(Component):
         )
 
     def origin_move_from_scan(self, barcode, extra_domain=None):
+        if type(barcode) is not list:
+            barcode = [barcode]
         model = self.env["stock.move"]
         outgoing_move_domain = [
             # We could have the same origin for multiple transfers
             # but we're interested only in the "done" ones.
-            ("origin", "=", barcode),
+            ("origin", "in", barcode),
             ("state", "=", "done"),
         ]
         if extra_domain:
