@@ -5,6 +5,8 @@
 * Benoit Guillot <benoit.guillot@akretion.com>
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
 * Michael Tietz (MT Software) <mtietz@mt-software.de>
+* Denis Roussel <denis.roussel@acsone.eu>
+* Laurent Mignon <laurent.mignon@acsone.eu>
 
 Design
 ~~~~~~

@@ -2,9 +2,16 @@
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
+import json
+import logging
+
+from werkzeug.exceptions import BadRequest
+
 from odoo.http import request
 
 from odoo.addons.base_rest.controllers.main import RestController
+
+_logger = logging.getLogger(__name__)
 
 
 class ShopfloorController(RestController):
@@ -25,10 +32,25 @@ class ShopfloorController(RestController):
         collection = collection or request.env["shopfloor.app"].browse(app_id)
         # TODO: in base_rest `*args` is passed based on
         # the type of route (eg: /<int:id>/update)
+        params = kwargs
+        # This in order to be compliant with recent Odoo changes
+        try:
+            httprequest = request._HTTPRequest__wrapped
+        except AttributeError:
+            httprequest = request.httprequest
+        if httprequest.mimetype == "application/json":
+            data = httprequest.get_data().decode(httprequest.charset)
+            if data:
+                try:
+                    params.update(json.loads(data))
+                except (ValueError, json.decoder.JSONDecodeError) as e:
+                    msg = "Invalid JSON data: %s" % str(e)
+                    _logger.info("%s: %s", request.httprequest.path, msg)
+                    raise BadRequest(msg) from e
         return self._process_method(
             service_name,
             service_method_name,
             *args,
             collection=collection,
-            params=kwargs
+            params=params
         )
