@@ -57,7 +57,7 @@
                     role="alert"
                     attrs="{'invisible': [('wms_export_error', '=', False)]}"
                 >
-                    <p>Erreur de Synchronisation avec Reflex</p>
+                    <p>Synchronisation error</p>
                     <field name="wms_export_error" />
                 </div>
             </header>

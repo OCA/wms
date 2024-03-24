@@ -62,3 +62,13 @@ class StockPicking(models.Model):
                     % record.name
                 )
         return super().action_cancel()
+
+    def _wms_check_if_editable(self):
+        if self._context.get("skip_check_protected_fields"):
+            return True
+        for picking in self:
+            if picking.wms_export_date:
+                raise UserError(
+                    _("The picking %s have been exported and can not be modified")
+                    % picking.name
+                )

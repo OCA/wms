@@ -11,6 +11,7 @@
                     icon="fa-archive"
                     class="oe_stat_button"
                     type="object"
+                    attrs="{'invisible': [('picking_imported_count', '=', 0)]}"
                 >
                     <field
                         name="picking_imported_count"
