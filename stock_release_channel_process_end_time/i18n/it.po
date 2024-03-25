@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-10-16 12:38+0000\n"
+"PO-Revision-Date: 2024-03-25 11:36+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -76,7 +76,7 @@ msgstr "Tz ora termine processo"
 #. module: stock_release_channel_process_end_time
 #: model:ir.model.fields,field_description:stock_release_channel_process_end_time.field_stock_picking__scheduled_date_prior_to_channel_end_date_search
 msgid "Scheduled Date Prior To Channel End Date Search"
-msgstr ""
+msgstr "Ricerca data schedulazione precedente alla data fine del canale"
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model,name:stock_release_channel_process_end_time.model_stock_release_channel
@@ -104,6 +104,8 @@ msgid ""
 "Technical field to search on not processed pickings where the scheduled date "
 "is prior to the end date of related channel."
 msgstr ""
+"Campo tecnico per cercare nei prelievi non elaborati dove la data schedulata "
+"è antecedente alla data fine del canale relativo."
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model.fields,help:stock_release_channel_process_end_time.field_stock_release_channel__process_end_date
