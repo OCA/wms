@@ -58,6 +58,13 @@ class StockMove(models.Model):
         self._apply_routing_rule_pull(moves_with_routing_details)
         self._apply_routing_rule_push(moves_with_routing_details)
 
+    def _action_cancel(self):
+        origin_moves = self.mapped("move_dest_ids")
+        res = super()._action_cancel()
+        for move in origin_moves:
+            move.picking_id.state = "confirmed"
+        return res
+
     def _action_assign(self, force_qty=False):
         if self.env.context.get("exclude_apply_dynamic_routing"):
             return super()._action_assign(force_qty=force_qty)

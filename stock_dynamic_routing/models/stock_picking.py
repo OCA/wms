@@ -17,7 +17,11 @@ class StockPicking(models.Model):
         res = super()._compute_state()
         for picking in self:
             if picking.canceled_by_routing:
-                picking.state = "cancel"
+                if not picking.move_ids:
+                    picking.state = "cancel"
+                else:
+                    # call to dynamic_routing_handle_empty to check/reset the flag
+                    self._dynamic_routing_handle_empty()
         return res
 
     def _dynamic_routing_handle_empty(self):
@@ -29,3 +33,6 @@ class StockPicking(models.Model):
                 # We could drop it but it can make code crash later in the
                 # transaction. This flag will set the picking as cancel.
                 picking.canceled_by_routing = True
+            else:
+                # If picking is not empty, update value.
+                picking.canceled_by_routing = False
