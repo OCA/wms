@@ -219,6 +219,7 @@ class StockMove(models.Model):
                 new_move_vals = move._split(qty)
                 if new_move_vals:
                     new_move = self.env["stock.move"].create(new_move_vals)
+                    move.with_context(exclude_apply_dynamic_routing=True)._action_assign()
                     new_move._action_confirm(merge=False)
                 else:
                     # If no split occurred keep the current move

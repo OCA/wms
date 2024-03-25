@@ -364,7 +364,7 @@ class TestRoutingPull(TestRoutingPullCommon):
 
         # it splits the stock move to be able to chain the quantities from
         # the Highbay
-        self.assertEqual(len(pick_picking.move_ids), 2)
+        self.assertEqual(len(pick_picking.move_ids), 3)
         move_a1 = pick_picking.move_ids.filtered(lambda move: move.product_uom_qty == 4)
         move_a2 = pick_picking.move_ids.filtered(lambda move: move.product_uom_qty == 6)
         move_ho = move_a2.move_orig_ids
@@ -616,7 +616,7 @@ class TestRoutingPull(TestRoutingPullCommon):
         # move_a should remain in the PICK with an unreserved qty of 2
         self.assertEqual(move_a.picking_id, pick_picking)
         self.assertEqual(move_a.product_qty, 2)
-        self.assertEqual(move_a.state, "confirmed")
+        self.assertEqual(move_a.state, "assigned")
 
         # we have a new waiting move in the PICK with a qty of 8
         split_move = move_a.move_dest_ids.move_orig_ids - move_a
@@ -1053,3 +1053,40 @@ class TestRoutingPull(TestRoutingPullCommon):
                 {"location_id": self.location_hb_1_2.id, "reserved_uom_qty": 7},
             ],
         )
+
+    def test_sale_order_routing(self):
+        # Create a sale order with 7 units of the product
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.env.ref('base.res_partner_1').id,
+            'order_line': [(0, 0, {
+                'product_id': self.product1.id,
+                'product_uom_qty': 7,
+            })],
+        })
+        sale_order.action_confirm()
+
+        # Ensure there are 2 units in the main location and 5 in the supply location
+        self.env['stock.quant']._update_available_quantity(self.product1, self.main_location, 2)
+        self.env['stock.quant']._update_available_quantity(self.product1, self.supply_location, 5)
+
+        # Generate the picking with the reservation
+        picking = sale_order.picking_ids
+        picking.action_assign()
+
+        # Generate the supply move with the reservation of 5 units
+        supply_move = self.env['stock.move'].create({
+            'name': self.product1.name,
+            'product_id': self.product1.id,
+            'product_uom_qty': 5,
+            'product_uom': self.product1.uom_id.id,
+            'location_id': self.supply_location.id,
+            'location_dest_id': self.main_location.id,
+            'state': 'confirmed',
+        })
+        supply_move._action_assign()
+
+        # Check the reservations and locations
+        self.assertEqual(picking.move_lines.reserved_availability, 2)
+        self.assertEqual(supply_move.reserved_availability, 5)
+        self.assertEqual(picking.move_lines.location_id, self.main_location)
+        self.assertEqual(supply_move.location_id, self.supply_location)
