@@ -1056,33 +1056,47 @@ class TestRoutingPull(TestRoutingPullCommon):
 
     def test_sale_order_routing(self):
         # Create a sale order with 7 units of the product
-        sale_order = self.env['sale.order'].create({
-            'partner_id': self.env.ref('base.res_partner_1').id,
-            'order_line': [(0, 0, {
-                'product_id': self.product1.id,
-                'product_uom_qty': 7,
-            })],
-        })
+        sale_order = self.env["sale.order"].create(
+            {
+                "partner_id": self.env.ref("base.res_partner_1").id,
+                "order_line": [
+                    (
+                        0,
+                        0,
+                        {
+                            "product_id": self.product1.id,
+                            "product_uom_qty": 7,
+                        },
+                    )
+                ],
+            }
+        )
         sale_order.action_confirm()
 
         # Ensure there are 2 units in the main location and 5 in the supply location
-        self.env['stock.quant']._update_available_quantity(self.product1, self.main_location, 2)
-        self.env['stock.quant']._update_available_quantity(self.product1, self.supply_location, 5)
+        self.env["stock.quant"]._update_available_quantity(
+            self.product1, self.main_location, 2
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product1, self.supply_location, 5
+        )
 
         # Generate the picking with the reservation
         picking = sale_order.picking_ids
         picking.action_assign()
 
         # Generate the supply move with the reservation of 5 units
-        supply_move = self.env['stock.move'].create({
-            'name': self.product1.name,
-            'product_id': self.product1.id,
-            'product_uom_qty': 5,
-            'product_uom': self.product1.uom_id.id,
-            'location_id': self.supply_location.id,
-            'location_dest_id': self.main_location.id,
-            'state': 'confirmed',
-        })
+        supply_move = self.env["stock.move"].create(
+            {
+                "name": self.product1.name,
+                "product_id": self.product1.id,
+                "product_uom_qty": 5,
+                "product_uom": self.product1.uom_id.id,
+                "location_id": self.supply_location.id,
+                "location_dest_id": self.main_location.id,
+                "state": "confirmed",
+            }
+        )
         supply_move._action_assign()
 
         # Check the reservations and locations
