@@ -72,7 +72,10 @@
                         <tree>
                             <field name="name" />
                             <field name="state" />
-                            <field name="preparation_weekday_ids" />
+                            <field
+                                name="preparation_weekday_ids"
+                                widget="many2many_tags"
+                            />
                         </tree>
                     </field>
                 </sheet>
