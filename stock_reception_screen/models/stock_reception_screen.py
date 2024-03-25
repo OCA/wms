@@ -136,10 +136,10 @@ class StockReceptionScreen(models.Model):
         related="current_move_id.vendor_code"
     )
     current_move_product_qty_available = fields.Float(
-        related="current_move_id.product_id.qty_available"
+        compute="_compute_current_move_product_qty_fields"
     )
     current_move_product_outgoing_qty = fields.Float(
-        related="current_move_id.product_id.outgoing_qty"
+        compute="_compute_current_move_product_qty_fields"
     )
     current_move_product_last_lot_expiration_date = fields.Datetime(
         compute="_compute_current_move_product_last_lot_expiration_date",
@@ -204,6 +204,20 @@ class StockReceptionScreen(models.Model):
 
     warn_notification = fields.Char(default=False)
     warn_notification_html = fields.Html(compute="_compute_warn_notification")
+
+    @api.depends(
+        # NOTE: do not depends on qty product fields on purpose,
+        # Odoo ORM triggers a global search on stock.moves when a move is created
+        "current_move_id.product_id"
+    )
+    def _compute_current_move_product_qty_fields(self):
+        for rec in self:
+            rec.current_move_product_qty_available = (
+                rec.current_move_id.product_id.qty_available
+            )
+            rec.current_move_product_outgoing_qty = (
+                rec.current_move_id.product_id.outgoing_qty
+            )
 
     @api.depends("warn_notification")
     def _compute_warn_notification(self):
