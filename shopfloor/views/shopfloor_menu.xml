@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+              <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+            </field>
+            <group name="options" position="inside">
+              <group
+                    name="move_create"
+                    attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
+                >
+                  <field name="move_create_is_possible" invisible="1" />
+                  <field name="allow_move_create" />
+              </group>
+              <group
+                    name="unreserve_other_moves"
+                    attrs="{'invisible': [('unreserve_other_moves_is_possible', '=', False)]}"
+                >
+                  <field name="unreserve_other_moves_is_possible" invisible="1" />
+                  <field name="allow_unreserve_other_moves" />
+              </group>
+              <group
+                    name="ignore_no_putaway_available"
+                    attrs="{'invisible': [('ignore_no_putaway_available_is_possible', '=', False)]}"
+                >
+                  <field name="ignore_no_putaway_available_is_possible" invisible="1" />
+                  <field name="ignore_no_putaway_available" />
+              </group>
+              <group
+                    name="pick_pack_same_time"
+                    attrs="{'invisible': [('pick_pack_same_time_is_possible', '=', False)]}"
+                >
+                  <field name="pick_pack_same_time_is_possible" invisible="1" />
+                  <field name="pick_pack_same_time" />
+              </group>
+              <group
+                    name="force_reservation"
+                    attrs="{'invisible': [('allow_force_reservation_is_possible', '=', False)]}"
+                >
+                  <field name="allow_force_reservation_is_possible" invisible="1" />
+                  <field name="allow_force_reservation" />
+              </group>
+              <group
+                    name="prepackaged_product"
+                    attrs="{'invisible': [('prepackaged_product_is_possible', '=', False)]}"
+                >
+                  <field name="prepackaged_product_is_possible" invisible="1" />
+                  <field name="allow_prepackaged_product" />
+              </group>
+              <group
+                    name="unload_at_destination"
+                    attrs="{'invisible': [('unload_package_at_destination_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="unload_package_at_destination_is_possible"
+                        invisible="1"
+                    />
+                  <field
+                        name="unload_package_at_destination"
+                        attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
+                    />
+              </group>
+              <group
+                    name="disable_full_bin_action"
+                    attrs="{'invisible': [('disable_full_bin_action_is_possible', '=', False)]}"
+                >
+                  <field name="disable_full_bin_action_is_possible" invisible="1" />
+                  <field name="disable_full_bin_action" />
+              </group>
+              <group
+                    name="multiple_move_single_pack"
+                    attrs="{'invisible': [('multiple_move_single_pack_is_possible', '=', False)]}"
+                >
+                  <field name="multiple_move_single_pack_is_possible" invisible="1" />
+                  <field
+                        name="multiple_move_single_pack"
+                        attrs="{'readonly': [('pick_pack_same_time', '=', True)]}"
+                    />
+              </group>
+              <group
+                    name="get_work"
+                    attrs="{'invisible': [('allow_get_work_is_possible', '=', False)]}"
+                >
+                  <field name="allow_get_work_is_possible" invisible="1" />
+                  <field name="allow_get_work" />
+              </group>
+              <group
+                    name="no_prefill_qty"
+                    attrs="{'invisible': [('no_prefill_qty_is_possible', '=', False)]}"
+                >
+                  <field name="no_prefill_qty_is_possible" invisible="1" />
+                  <field name="no_prefill_qty" />
+              </group>
+              <group
+                    name="show_oneline_package_content"
+                    attrs="{'invisible': [('show_oneline_package_content_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="show_oneline_package_content_is_possible"
+                        invisible="1"
+                    />
+                  <field name="show_oneline_package_content" />
+              </group>
+              <group
+                    name="scan_location_or_pack_first"
+                    attrs="{'invisible': [('scan_location_or_pack_first_is_possible', '=', False)]}"
+                >
+                  <field name="scan_location_or_pack_first_is_possible" invisible="1" />
+                  <field name="scan_location_or_pack_first" />
+              </group>
+              <group
+                    name="auto_post_line"
+                    attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
+                >
+                  <field name="auto_post_line_is_possible" invisible="1" />
+                  <field name="auto_post_line" />
+              </group>
+              <group
+                    name="allow_alternative_destination"
+                    attrs="{'invisible': [('allow_alternative_destination_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="allow_alternative_destination_is_possible"
+                        invisible="1"
+                    />
+                    <field name="allow_alternative_destination" />
+              </group>
+              <group
+                    name="allow_return"
+                    attrs="{'invisible': [('allow_return_is_possible', '=', False)]}"
+                >
+                  <field name="allow_return_is_possible" invisible="1" />
+                  <field name="allow_return" />
+              </group>
+            </group>
+        </field>
+    </record>
+    <record id="shopfloor_menu_search_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_search_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+                <field name="picking_type_ids" />
+            </field>
+        </field>
+    </record>
+    <record id="shopfloor_menu_tree_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_tree_view" />
+        <field name="arch" type="xml">
+            <field name="profile_id" position="after">
+              <field
+                    name="picking_type_ids"
+                    widget="many2many_tags"
+                    options="{'no_create': 1}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>

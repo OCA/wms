@@ -1,0 +1,56 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml delivery_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Delivery scenario</size>
+
+== /list_stock_picking ==
+deliver -> manual_selection: **/list_stock_picking**
+
+== /select ==
+manual_selection -> deliver: **/select**(picking_id)
+
+== /scan_deliver ==
+deliver -> deliver: **/scan_deliver**(barcode, picking_id=None) \n(scan a picking to display its lines, or a package/lot/product to process related lines,\nwhen all the available move lines of the transfer are done, the stock picking is set to done)
+
+== /set_qty_done_pack ==
+
+deliver -> deliver: **/set_qty_done_pack(picking_id, package_id)** \n(when all the available move lines of the transfer are done, the transfer is set to done.)
+
+== /set_qty_done_line ==
+
+deliver -> deliver: **/set_qty_done_line(picking_id, move_line_id)** \n(when all the available move lines of the transfer are done, the transfer is set to done.)
+
+== /reset_qty_done_pack ==
+
+deliver -> deliver: **/reset_qty_done_pack(picking_id, package_id)** \n(remove "Done" on a package)
+
+== /reset_qty_done_line ==
+
+deliver -> deliver: **/reset_qty_done_line(picking_id, move_line_id)** \n(remove "Done" on a move line)
+
+== /done ==
+
+deliver -> deliver: **/done(picking_id)** \n(all lines processed)
+deliver -> confirm_done: **/done(picking_id)** \n(lines partially processed, need confirmation)
+confirm_done -> deliver: **/done(picking_id, confirm=True)**
+
+@enduml
