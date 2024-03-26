@@ -1,0 +1,6 @@
+mock
+
+# OCA/wms
+odoo-addon-shopfloor-base @ git+https://github.com/OCA/wms.git@refs/pull/642/head#subdirectory=setup/shopfloor_base
+odoo-addon-shopfloor-mobile-base @ git+https://github.com/OCA/wms.git@refs/pull/694/head#subdirectory=setup/shopfloor_mobile_base
+odoo-addon-shopfloor @ git+https://github.com/OCA/wms.git@refs/pull/679/head#subdirectory=setup/shopfloor

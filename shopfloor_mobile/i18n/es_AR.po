@@ -1,0 +1,39 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_mobile
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2021-02-06 22:45+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
+"Language-Team: none\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
+
+#~ msgid ""
+#~ "<strong>\n"
+#~ "          We're sorry but wms doesn't work properly without JavaScript "
+#~ "enabled.\n"
+#~ "          Please enable it to continue.\n"
+#~ "        </strong>"
+#~ msgstr ""
+#~ "<strong>\n"
+#~ "           Lo sentimos, pero wms no funciona correctamente sin JavaScript "
+#~ "habilitado.\n"
+#~ "           Por favor, activelo para continuar.\n"
+#~ "         </strong>"
+
+#~ msgid "Shopfloor WMS app"
+#~ msgstr "Aplicación WMS del Taller"
+
+#~ msgid "Shopfloor mobile app"
+#~ msgstr "Aplicación móvil del Taller"
+
+#~ msgid "Shopfloor mobile app DEMO"
+#~ msgstr "Aplicación móvil del Taller DEMO"
