@@ -90,3 +90,19 @@ class TestStockReleaseChannelShipmentAdvice(ChannelReleaseCase):
             ValidationError, msg="The dock doesn't belong to the selected warehouse"
         ):
             channel_form.save()
+
+    def test_action_wake_up(self):
+        self.channel.state = "asleep"
+        self.channel.shipment_planning_method = "none"
+        # Raise error
+        with self.assertRaises(UserError) as e:
+            self.channel.action_wake_up()
+        msg = (
+            "Shipping Planning Method must be set on "
+            "Release Channel if you want to Wake it up."
+        )
+        self.assertEqual(msg, e.exception.args[0])
+        # Wake it up
+        self.channel.shipment_planning_method = "simple"
+        self.channel.action_wake_up()
+        self.assertEqual(self.channel.state, "open")

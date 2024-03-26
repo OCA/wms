@@ -28,6 +28,7 @@ class StockReleaseChannel(models.Model):
         comodel_name="stock.dock", domain='[("warehouse_id", "=", warehouse_id)]'
     )
     warehouse_id = fields.Many2one(inverse="_inverse_warehouse_id")
+    state = fields.Selection(default="asleep")
 
     def button_show_shipment_advice(self):
         self.ensure_one()
@@ -131,3 +132,18 @@ class StockReleaseChannel(models.Model):
     def _onchange_check_warehouse(self):
         self.ensure_one()
         self._check_warehouse()
+
+    def _check_shipment_planning_method(self):
+        for rec in self:
+            if rec.state == "asleep" and rec.shipment_planning_method == "none":
+                raise UserError(
+                    _(
+                        "Shipping Planning Method must be set on "
+                        "Release Channel if you want to Wake it up."
+                    )
+                )
+
+    def action_wake_up(self):
+        self._check_shipment_planning_method()
+        res = super().action_wake_up()
+        return res
