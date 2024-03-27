@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field
+            name="name"
+        >stock.release.channel.form (in stock_release_channel_delivery)</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="rule_domain" position="before">
+                <field name="carrier_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
