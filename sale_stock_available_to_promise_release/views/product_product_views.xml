@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="product_normal_form_view">
+        <field name="name">product.product.move.release.inherited</field>
+        <field name="model">product.product</field>
+        <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.product_normal_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="move_need_release_count" position="attributes">
+                <attribute
+                    name="groups"
+                >stock.group_stock_manager,sales_team.group_sale_manager</attribute>
+            </field>
+            <button name="action_open_move_need_release" position="attributes">
+                <attribute
+                    name="groups"
+                >stock.group_stock_manager,sales_team.group_sale_manager</attribute>
+            </button>
+        </field>
+    </record>
+</odoo>

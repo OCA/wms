@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <template
+        id="report_saleorder_document"
+        inherit_id="sale.report_saleorder_document"
+    >
+      <xpath expr="//th[@name='th_description']" position="after">
+        <th
+                t-if="doc.state != 'draft'"
+                name="th_is_available"
+                class="text-right nowrap"
+            >Available</th>
+      </xpath>
+
+      <xpath expr="//td[@name='td_name']" position="after">
+          <td
+                t-if="doc.state != 'draft'"
+                name="td_is_available"
+                class="nowrap text-right"
+            >
+              <t
+                    t-if="not (line.display_type or line.is_delivery or line.product_id.type == 'service')"
+                >
+                  <span
+                        t-if="line.availability_status == 'on_order'"
+                        name="availability_status_on_order"
+                    >On order</span>
+                  <span
+                        t-elif="line.availability_status == 'full'"
+                        name="availability_status_full"
+                    >Yes</span>
+                  <t
+                        t-elif="line.availability_status == 'partial'"
+                        name="availablility_status_partial"
+                    >
+                    <span t-field="line.available_qty" />
+                    <span t-field="line.product_uom" />
+                  </t>
+                  <t
+                        t-elif="line.availability_status == 'restock'"
+                        name="availability_status_restock"
+                    >
+                      As of <span
+                            t-field="line.expected_availability_date"
+                            t-options="{'date_only': 'True'}"
+                        />
+                  </t>
+                  <span
+                        t-elif="line.availability_status == 'no'"
+                        name="availability_status_no"
+                    >No</span>
+            </t>
+          </td>
+      </xpath>
+    </template>
+
+</odoo>
