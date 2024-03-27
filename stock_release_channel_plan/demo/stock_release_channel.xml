@@ -6,26 +6,32 @@
     <record model="stock.release.channel" id="stock_release_channel_mon_thu1">
         <field name="name">Channel 1 (Mon/Thu)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
     <record model="stock.release.channel" id="stock_release_channel_mon_thu2">
         <field name="name">Channel 2 (Mon/Thu)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
     <record model="stock.release.channel" id="stock_release_channel_tue_fri1">
         <field name="name">Channel 1 (Tue/Fri)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
     <record model="stock.release.channel" id="stock_release_channel_tue_fri2">
         <field name="name">Channel 2 (Tue/Fri)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
     <record model="stock.release.channel" id="stock_release_channel_wed1">
         <field name="name">Channel 1 (Wed)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
     <record model="stock.release.channel" id="stock_release_channel_wed2">
         <field name="name">Channel 2 (Wed)</field>
         <field name="rule_domain">[]</field>
+        <field name="state">asleep</field>
     </record>
 
 </odoo>
