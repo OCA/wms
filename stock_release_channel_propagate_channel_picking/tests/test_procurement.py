@@ -1,4 +1,5 @@
 # Copyright 2022 ACSONE SA/NV (http://www.acsone.eu)
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 from odoo.addons.stock_release_channel.tests.common import ReleaseChannelCase
 
@@ -15,6 +16,9 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
         cls._update_qty_in_location(cls.wh.lot_stock_id, cls.product1, 20.0)
         cls._update_qty_in_location(cls.wh.lot_stock_id, cls.product2, 20.0)
         cls.wh.out_type_id.propagate_to_pickings_chain = True
+        cls.env["stock.release.channel"].search(
+            [("id", "!=", cls.default_channel.id)]
+        ).active = False
 
     @classmethod
     def _create_propagate_channel(cls):

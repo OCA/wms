@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_preparation_plan_search_view">
+        <field name="model">stock.release.channel.preparation.plan</field>
+        <field name="arch" type="xml">
+            <search string="Preparation Plans">
+                <field name="name" />
+                <separator />
+                <filter
+                    name="archived"
+                    string="Archived"
+                    domain="[('active', '=', False)]"
+                />
+            </search>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="stock_release_channel_preparation_plan_tree_view">
+        <field name="model">stock.release.channel.preparation.plan</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="release_channel_ids" />
+                <button
+                    type="action"
+                    name="%(stock_release_channel_plan_wizard_launch_act_window)d"
+                    string="Launch"
+                />
+            </tree>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="stock_release_channel_preparation_plan_form_view">
+        <field name="model">stock.release.channel.preparation.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        type="action"
+                        name="%(stock_release_channel_plan_wizard_launch_act_window)d"
+                        string="Launch"
+                    />
+                </header>
+                <sheet>
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}"
+                    />
+                    <div class="oe_title">
+                        <div>
+                            <label for="name" />
+                        </div>
+                        <h1 class="mb32">
+                            <field
+                                name="name"
+                                placeholder="Preparation plan"
+                                class="mb16"
+                            />
+                        </h1>
+                        <field name="active" invisible="1" />
+                    </div>
+                    <field name="release_channel_ids">
+                        <tree>
+                            <field name="name" />
+                            <field name="state" />
+                            <field name="preparation_weekday_ids" />
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record
+        model="ir.actions.act_window"
+        id="stock_release_channel_preparation_plan_act_window"
+    >
+        <field name="name">Preparation Plans</field>
+        <field name="res_model">stock.release.channel.preparation.plan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <record model="ir.ui.menu" id="stock_release_channel_preparation_plan_menu">
+        <field name="name">Preparation Plans</field>
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt" />
+        <field name="action" ref="stock_release_channel_preparation_plan_act_window" />
+        <field name="sequence" eval="7" />
+    </record>
+
+</odoo>

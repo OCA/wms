@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record
+        model="ir.model.access"
+        id="stock_release_channel_preparation_plan_access_all"
+    >
+        <field name="name">stock.release.channel.preparation.plan access all</field>
+        <field name="model_id" ref="model_stock_release_channel_preparation_plan" />
+        <field name="group_id" ref="stock.group_stock_user" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_create" eval="0" />
+        <field name="perm_write" eval="0" />
+        <field name="perm_unlink" eval="0" />
+    </record>
+    <record
+        model="ir.model.access"
+        id="stock_release_channel_preparation_plan_access_manager"
+    >
+        <field name="name">stock.release.channel.preparation.plan access manager</field>
+        <field name="model_id" ref="model_stock_release_channel_preparation_plan" />
+        <field name="group_id" ref="stock.group_stock_manager" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+</odoo>
