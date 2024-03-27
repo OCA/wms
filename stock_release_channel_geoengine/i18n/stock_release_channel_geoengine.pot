@@ -1,0 +1,113 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_geoengine
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model,name:stock_release_channel_geoengine.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_stock_release_channel__delivery_zone
+msgid "Delivery Zone"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_res_partner__in_geo_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_res_users__in_geo_release_channel
+msgid "Delivery based on geo-localization?"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_form_view
+msgid "Delivery zone"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "Done Today:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:geoengine.vector.layer,name:stock_release_channel_geoengine.stock_release_channel_geoengine_vector_layer
+msgid "Geographic zones"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,help:stock_release_channel_geoengine.field_res_partner__in_geo_release_channel
+#: model:ir.model.fields,help:stock_release_channel_geoengine.field_res_users__in_geo_release_channel
+msgid "Include in release channels based on geographic zones"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "Late:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_res_partner__located_in_stock_release_channel_ids
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_res_users__located_in_stock_release_channel_ids
+msgid "Located in"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:geoengine.raster.layer,name:stock_release_channel_geoengine.stock_release_channel_geoengine_raster_layer
+msgid "OSM layer"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "Priority:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,field_description:stock_release_channel_geoengine.field_stock_release_channel__restrict_to_delivery_zone
+msgid "Restrict To Delivery Zone"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model,name:stock_release_channel_geoengine.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model.fields,help:stock_release_channel_geoengine.field_res_partner__located_in_stock_release_channel_ids
+#: model:ir.model.fields,help:stock_release_channel_geoengine.field_res_users__located_in_stock_release_channel_ids
+msgid "This partner is located within those release channels."
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "To Do:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "To Release:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model:ir.model,name:stock_release_channel_geoengine.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "Waiting:"
+msgstr ""
+
+#. module: stock_release_channel_geoengine
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
+msgid "Warehouse:"
+msgstr ""
