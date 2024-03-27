@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_mon_thu1"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">10.0</field>
+    </record>
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_mon_thu2"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">14.0</field>
+    </record>
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_tue_fri1"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">10.0</field>
+    </record>
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_tue_fri2"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">14.0</field>
+    </record>
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_wed1"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">10.0</field>
+    </record>
+    <record
+        model="stock.release.channel"
+        id="stock_release_channel_plan.stock_release_channel_wed2"
+    >
+        <field name="warehouse_id" ref="stock.warehouse0" />
+        <field name="process_end_time">14.0</field>
+    </record>
+
+</odoo>

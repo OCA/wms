@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_plan_wizard_launch_form_view">
+        <field name="model">stock.release.channel.plan.wizard.launch</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_plan.stock_release_channel_plan_wizard_launch_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="preparation_plan_id" position="after">
+                <field name="process_end_date" default_focus="1" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
