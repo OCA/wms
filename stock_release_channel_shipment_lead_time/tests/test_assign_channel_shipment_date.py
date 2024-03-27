@@ -12,7 +12,9 @@ from odoo.addons.stock_release_channel.tests.common import ReleaseChannelCase
 class TestReleaseChannel(ReleaseChannelCase):
     def test_shipment_advice_planner(self):
         # deactive all existing channels before testing
-        all_default_channel = self.env["stock.release.channel"].search([])
+        all_default_channel = self.env["stock.release.channel"].search(
+            [("state", "!=", "asleep")]
+        )
         all_default_channel.action_sleep()
 
         # create a testing lead time without calendar
@@ -58,9 +60,10 @@ class TestReleaseChannel(ReleaseChannelCase):
         )
 
     def test_assign_channel_with_shipment_date(self):
-
         # deactive all existing channels before testing
-        all_default_channel = self.env["stock.release.channel"].search([])
+        all_default_channel = self.env["stock.release.channel"].search(
+            [("state", "!=", "asleep")]
+        )
         all_default_channel.action_sleep()
 
         # create a testing lead time without calendar
