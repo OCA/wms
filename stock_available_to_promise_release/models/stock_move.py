@@ -304,13 +304,16 @@ class StockMove(models.Model):
             > 0
         )
 
-    @api.depends(
-        "ordered_available_to_promise_qty",
-        "picking_id.move_type",
-        "picking_id.move_ids",
-        "need_release",
-        "state",
-    )
+    def _get_release_ready_depends(self):
+        return [
+            "ordered_available_to_promise_qty",
+            "picking_id.move_type",
+            "picking_id.move_ids",
+            "need_release",
+            "state",
+        ]
+
+    @api.depends(lambda self: self._get_release_ready_depends())
     def _compute_release_ready(self):
         for move in self:
             release_ready = move._is_release_ready()
