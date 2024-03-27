@@ -43,6 +43,11 @@ msgid "Carrier"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__delayed_qty
+msgid "Delayed Qty"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__date_expected
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__sale_date_expected
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__sale_date_expected
