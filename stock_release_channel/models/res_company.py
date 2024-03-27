@@ -11,5 +11,8 @@ class ResCompany(models.Model):
         string="Channels dashboard - Show last delivery done",
         help="In release channels dashboard, add link to last done picking "
         "and show transfer date",
+    )
+    recompute_channel_on_pickings_at_release = fields.Boolean(
+        help="When releasing a transfer, recompute channel",
         default=True,
     )
