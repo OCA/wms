@@ -10,6 +10,7 @@ msgstr ""
 "PO-Revision-Date: 2023-07-28 16:02+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -22,6 +23,7 @@ msgstr "Actif"
 
 #. module: stock_release_channel_plan
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_search_view
 msgid "Archived"
 msgstr "Archivé"
 
@@ -34,6 +36,11 @@ msgstr "Annuler"
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_plan_wizard_launch_form_view
 msgid "Confirm"
 msgstr "Confirmer"
+
+#. module: stock_release_channel_plan
+#: model:ir.model,name:stock_release_channel_plan.model_res_partner
+msgid "Contact"
+msgstr ""
 
 #. module: stock_release_channel_plan
 #: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_plan_wizard_launch__create_uid
@@ -97,8 +104,14 @@ msgstr "Plan de préparation"
 #: model:ir.actions.act_window,name:stock_release_channel_plan.stock_release_channel_preparation_plan_act_window
 #: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel__preparation_plan_ids
 #: model:ir.ui.menu,name:stock_release_channel_plan.stock_release_channel_preparation_plan_menu
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_search_view
 msgid "Preparation Plans"
 msgstr "Plans de préparation"
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel__preparation_weekday_ids
+msgid "Preparation Weekday"
+msgstr ""
 
 #. module: stock_release_channel_plan
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
@@ -109,6 +122,17 @@ msgstr "Plan de préparation"
 #: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__release_channel_ids
 msgid "Release channels"
 msgstr "Canaux de livraisons"
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: stock_release_channel_plan
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_res_partner__stock_release_channel_delivery_weekday_ids
+#: model:ir.model.fields,field_description:stock_release_channel_plan.field_res_users__stock_release_channel_delivery_weekday_ids
+msgid "Stock Release Channel Delivery Weekday"
+msgstr ""
 
 #. module: stock_release_channel_plan
 #: model:ir.model,name:stock_release_channel_plan.model_stock_release_channel_plan_wizard_launch
