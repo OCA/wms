@@ -4,10 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-15 17:33+0000\n"
-"PO-Revision-Date: 2023-05-15 17:33+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,16 +14,16 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: stock_release_channel_delivery
+#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
+msgid "Shipping Methods"
+msgstr ""
+
+#. module: stock_release_channel_delivery
 #: model:ir.model,name:stock_release_channel_delivery.model_stock_release_channel
 msgid "Stock Release Channels"
 msgstr ""
 
 #. module: stock_release_channel_delivery
-#: model:ir.model.fields,help:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
-msgid "The shipping methods linked to the release channel."
-msgstr ""
-
-#. module: stock_release_channel_delivery
-#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
-msgid "Shipping Methods"
+#: model:ir.model,name:stock_release_channel_delivery.model_stock_picking
+msgid "Transfer"
 msgstr ""
