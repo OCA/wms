@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record model="ir.ui.view" id="stock_release_channel_form_view">
+    <field name="model">stock.release.channel</field>
+    <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='warehouse_id']" position="after">
+        <field name="restrict_to_delivery_zone" />
+      </xpath>
+      <notebook position="inside">
+        <page
+                    string="Delivery zone"
+                    name="delivery_zone"
+                    groups="stock.group_stock_manager,stock.group_stock_manager"
+                    attrs="{'invisible': [('restrict_to_delivery_zone', '=', False)]}"
+                >
+          <field name="delivery_zone" />
+        </page>
+      </notebook>
+    </field>
+  </record>
+
+  <record id="stock_release_channel_geoengine_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <geoengine>
+        <field name="delivery_zone" />
+        <templates>
+          <t t-name="info_box">
+            <div id="content">
+              <b>
+                <field name="name" />
+              </b>
+              <hr />
+              <ul>
+                <li t-if="warehouse_id">Warehouse: <field name="warehouse_id" /> </li>
+                <li>To Release: <field name="count_picking_release_ready" /> </li>
+                <li>To Do: <field name="count_picking_released" /> </li>
+                <li>Done Today: <field name="count_picking_done" /> </li>
+                <li>Waiting: <field name="count_move_waiting" /> </li>
+                <li>Late: <field name="count_move_late" /> </li>
+                <li>Priority: <field name="count_move_priority" /> </li>
+              </ul>
+            </div>
+          </t>
+        </templates>
+      </geoengine>
+    </field>
+    <field eval="16" name="priority" />
+    <field name="model">stock.release.channel</field>
+  </record>
+
+  <record
+        id="stock_release_channel_geoengine_vector_layer"
+        model="geoengine.vector.layer"
+    >
+    <field
+            name="geo_field_id"
+            ref="stock_release_channel_geoengine.field_stock_release_channel__delivery_zone"
+        />
+    <field name="name">Geographic zones</field>
+    <field name="view_id" ref="stock_release_channel_geoengine_view" />
+    <field name="geo_repr">basic</field>
+    <field name="begin_color">#33ccff</field>
+    <field name="layer_opacity">0.6</field>
+    <field name="display_polygon_labels" eval="1" />
+    <field name="active_on_startup" eval="1" />
+    <field
+            name="attribute_field_id"
+            ref="stock_release_channel.field_stock_release_channel__name"
+        />
+  </record>
+  <record
+        id="stock_release_channel_geoengine_raster_layer"
+        model="geoengine.raster.layer"
+    >
+    <field name="raster_type">osm</field>
+    <field name="name">OSM layer</field>
+    <field name="view_id" ref="stock_release_channel_geoengine_view" />
+    <field eval="0" name="overlay" />
+  </record>
+  <record id="action_stock_release_channel_kanban" model="ir.actions.act_window.view">
+    <field eval="5" name="sequence" />
+    <field name="view_mode">kanban</field>
+    <field
+            name="view_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+    <field
+            name="act_window_id"
+            ref="stock_release_channel.stock_release_channel_act_window"
+        />
+  </record>
+  <record
+        id="action_stock_release_channel_geoengine"
+        model="ir.actions.act_window.view"
+    >
+    <field eval="10" name="sequence" />
+    <field name="view_mode">geoengine</field>
+    <field name="view_id" ref="stock_release_channel_geoengine_view" />
+    <field
+            name="act_window_id"
+            ref="stock_release_channel.stock_release_channel_act_window"
+        />
+  </record>
+  <record id="action_stock_release_channel_tree" model="ir.actions.act_window.view">
+    <field eval="15" name="sequence" />
+    <field name="view_mode">tree</field>
+    <field name="view_id" ref="stock_release_channel.stock_release_channel_tree_view" />
+    <field
+            name="act_window_id"
+            ref="stock_release_channel.stock_release_channel_act_window"
+        />
+  </record>
+  <record id="action_stock_release_channel_form" model="ir.actions.act_window.view">
+    <field eval="20" name="sequence" />
+    <field name="view_mode">form</field>
+    <field name="view_id" ref="stock_release_channel.stock_release_channel_form_view" />
+    <field
+            name="act_window_id"
+            ref="stock_release_channel.stock_release_channel_act_window"
+        />
+  </record>
+</odoo>
