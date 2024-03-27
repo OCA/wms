@@ -1,0 +1,1 @@
+odoo-addon-shipment-advice @ git+https://github.com/OCA/stock-logistics-transport.git@refs/pull/114/head#subdirectory=setup/shipment_advice

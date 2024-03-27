@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record
+        model="ir.ui.view"
+        id="stock_release_channel_deliver_check_wizard_form_view"
+    >
+        <field name="model">stock.release.channel.deliver.check.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Stock Release Channel Deliver Check">
+                <field name="release_channel_id" invisible="1" />
+                <p>
+                    There are some preparations that have not been completed.
+                    If you choose to proceed, these preparations will be unreleased.<br
+                    />
+                    Are you sure you want to proceed with the delivery?
+                </p>
+                <footer>
+                    <button
+                        string="Cancel the deliver"
+                        class="btn-primary"
+                        special="cancel"
+                    />
+                    <button
+                        name="action_deliver"
+                        string="Deliver any way"
+                        class="btn-default"
+                        type="object"
+                    />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+</odoo>
