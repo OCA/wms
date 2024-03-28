@@ -77,3 +77,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(
             all(m.procure_method == "make_to_order" for m in self.shipping2.move_ids)
         )
+
+    def test_cancel_pick(self):
+        """
+        if we manually cancel one of picking chain we set the dest moves
+        to need_release so they can be released again
+        """
+        self.assertFalse(self.shipping1.need_release)
+        self.picking1.action_cancel()
+        self.assertTrue(self.shipping1.need_release)
