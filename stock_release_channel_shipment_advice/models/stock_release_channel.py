@@ -131,3 +131,15 @@ class StockReleaseChannel(models.Model):
     def _onchange_check_warehouse(self):
         self.ensure_one()
         self._check_warehouse()
+
+    def action_print_shipment(self):
+        if self.shipment_advice_ids:
+            return self.env.ref(
+                "shipment_advice.action_report_shipment_advice"
+            ).report_action(self.shipment_advice_ids)
+        return {}
+
+    def action_print_deliveryslip(self):
+        if self.shipment_advice_ids:
+            return self.shipment_advice_ids.print_all_deliveryslip()
+        return {}

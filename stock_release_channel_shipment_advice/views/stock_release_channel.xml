@@ -66,6 +66,26 @@
                     </div>
                 </t>
             </xpath>
+            <xpath expr="//div[@name='dropdown-menu-right-panel']" position="inside">
+                <t>
+                    <div role="menuitem">
+                        <a
+                            name="action_print_shipment"
+                            type="object"
+                            icon="fa-archive"
+                        ><span class="ms-2">Print Shipment</span></a>
+                    </div>
+                </t>
+                <t>
+                    <div role="menuitem">
+                        <a
+                            name="action_print_deliveryslip"
+                            type="object"
+                            icon="fa-truck"
+                        ><span class="ms-2">Print Deliveries</span></a>
+                    </div>
+                </t>
+            </xpath>
         </field>
     </record>
 

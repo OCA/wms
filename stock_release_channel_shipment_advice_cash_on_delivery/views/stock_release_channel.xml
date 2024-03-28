@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="stock_release_channel_kanban_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='dropdown-menu-right-panel']" position="inside">
+                <t>
+                    <div role="menuitem">
+                        <a
+                            name="action_print_cash_on_delivery_invoices"
+                            type="object"
+                            icon="fa-money"
+                        ><span class="ms-2">Print COD Invoices</span></a>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+</odoo>
