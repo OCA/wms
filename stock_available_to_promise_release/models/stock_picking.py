@@ -192,3 +192,6 @@ class StockPicking(models.Model):
         processing has already started will be ignored
         """
         self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
+        self.filtered(lambda pick: pick.need_release).update(
+            {"last_release_date": False}
+        )
