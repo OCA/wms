@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-28 16:02+0000\n"
-"PO-Revision-Date: 2023-07-28 16:02+0000\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2024-03-28 13:07+0000\n"
+"Last-Translator: Bejaoui Souheil <souheil_bejaoui@hotmail.fr>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel_plan
 #: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel_preparation_plan__active
@@ -111,7 +112,7 @@ msgstr "Plans de préparation"
 #. module: stock_release_channel_plan
 #: model:ir.model.fields,field_description:stock_release_channel_plan.field_stock_release_channel__preparation_weekday_ids
 msgid "Preparation Weekday"
-msgstr ""
+msgstr "Jour de préparation en semaine"
 
 #. module: stock_release_channel_plan
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_plan.stock_release_channel_preparation_plan_form_view
@@ -147,7 +148,7 @@ msgstr ""
 #. module: stock_release_channel_plan
 #: model:ir.model,name:stock_release_channel_plan.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canaux de livraison"
 
 #. module: stock_release_channel_plan
 #: model:ir.actions.act_window,name:stock_release_channel_plan.stock_release_channel_plan_wizard_launch_act_window
