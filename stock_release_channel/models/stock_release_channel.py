@@ -217,6 +217,7 @@ class StockReleaseChannel(models.Model):
     show_last_picking_done = fields.Boolean(
         compute="_compute_show_last_picking_done",
     )
+    is_manual_assignment = fields.Boolean("Manual assignment")
 
     @api.depends("state")
     def _compute_is_action_lock_allowed(self):

@@ -56,3 +56,15 @@ class TestReleaseChannel(ReleaseChannelCase):
         self.assertEqual(channel2.sequence, 10)
         channel3 = self._create_channel(name="Test3")
         self.assertEqual(channel3.sequence, 20)
+
+    def test_is_manual_assignment(self):
+        # Manual Assignment
+        self.default_channel.is_manual_assignment = True
+        move = self._create_single_move(self.product1, 10)
+        move.picking_id.assign_release_channel()
+        self.assertEqual(move.picking_id.release_channel_id.id, False)
+        # Automatic Assignment
+        self.default_channel.is_manual_assignment = False
+        move = self._create_single_move(self.product1, 10)
+        move.picking_id.assign_release_channel()
+        self.assertEqual(move.picking_id.release_channel_id.id, self.default_channel.id)

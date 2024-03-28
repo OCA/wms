@@ -100,6 +100,7 @@
                                         <field name="code" />
                                     </tree>
                                 </field>
+                                <field name="is_manual_assignment" />
                                 <field
                                     name="rule_domain"
                                     widget="domain"

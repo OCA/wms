@@ -109,6 +109,7 @@ class StockPicking(models.Model):
     def _get_release_channel_possible_candidate_domain(self):
         self.ensure_one()
         return [
+            ("is_manual_assignment", "=", False),
             ("state", "!=", "asleep"),
             "|",
             ("picking_type_ids", "=", False),
