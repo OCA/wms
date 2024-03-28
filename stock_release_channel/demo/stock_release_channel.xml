@@ -5,6 +5,7 @@
         <field name="name">Default</field>
         <field name="sequence">999</field>
         <field name="rule_domain">[]</field>
+        <field name="state">open</field>
     </record>
 
 </odoo>
