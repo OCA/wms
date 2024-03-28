@@ -27,6 +27,7 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
                 "name": "Propagate Channel",
                 "sequence": 200,
                 "rule_domain": [],
+                "state": "open",
             }
         )
 

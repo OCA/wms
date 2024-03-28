@@ -153,6 +153,7 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
             {
                 "name": "Test Date",
                 "process_end_time": 15,
+                "state": "open",
             }
         )
         channel.action_sleep()

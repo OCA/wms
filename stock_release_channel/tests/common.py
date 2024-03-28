@@ -100,6 +100,8 @@ class ReleaseChannelCase(common.TransactionCase):
 
     @classmethod
     def _create_channel(cls, **vals):
+        # Forced update state of channel to "open"
+        vals.update({"state": "open"})
         return cls.env["stock.release.channel"].create(vals)
 
     def _run_customer_procurement(self, date=None):

@@ -182,7 +182,7 @@ class StockReleaseChannel(models.Model):
         "still working)\n"
         "* Asleep: Assigned pickings not processed are unassigned from the release "
         "channel.\n",
-        default="open",
+        default="asleep",
     )
     is_action_lock_allowed = fields.Boolean(
         compute="_compute_is_action_lock_allowed",
@@ -217,6 +217,7 @@ class StockReleaseChannel(models.Model):
     show_last_picking_done = fields.Boolean(
         compute="_compute_show_last_picking_done",
     )
+    is_manual_assignment = fields.Boolean("Manual assignment")
 
     @api.depends("state")
     def _compute_is_action_lock_allowed(self):
