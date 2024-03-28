@@ -846,6 +846,7 @@ class StockReleaseChannel(models.Model):
         pickings_to_unassign.write({"release_channel_id": False})
         pickings_to_unassign.unrelease()
         self.write({"state": "asleep"})
+        pickings_to_unassign.assign_release_channel()
 
     def action_wake_up(self):
         self._check_is_action_wake_up_allowed()
