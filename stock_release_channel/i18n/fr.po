@@ -387,6 +387,11 @@ msgid "Locked"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_manual_assignment
+msgid "Manual assignment"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__max
 msgid "Max"
 msgstr ""
