@@ -20,6 +20,7 @@ class TestStockReleaseChannelDeliverCommon(ChannelReleaseCase):
         cls.dock.warehouse_id = cls.wh
         cls.warehouse2 = cls.env.ref("stock.stock_warehouse_shop0")
         cls.channel.dock_id = cls.dock
+        cls.channel.auto_deliver = True
         cls.channel.action_lock()
         cls.channel.shipment_planning_method = "simple"
         cls.internal_pickings = (
