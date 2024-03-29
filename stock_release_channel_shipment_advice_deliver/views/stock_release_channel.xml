@@ -30,6 +30,9 @@
                     <field name="delivering_error" />
                     </div>
             </xpath>
+            <field name="release_forbidden" position="after">
+                <field name="auto_deliver" />
+            </field>
         </field>
     </record>
     <record model="ir.ui.view" id="stock_release_channel_search_view">

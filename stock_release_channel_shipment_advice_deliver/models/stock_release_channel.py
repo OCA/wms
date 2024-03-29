@@ -40,6 +40,7 @@ class StockReleaseChannel(models.Model):
     in_process_shipment_advice_ids = fields.One2many(
         "shipment.advice", compute="_compute_in_process_shipment_advice_ids"
     )
+    auto_deliver = fields.Boolean()
 
     @api.depends("shipment_advice_ids")
     def _compute_in_process_shipment_advice_ids(self):
@@ -63,6 +64,7 @@ class StockReleaseChannel(models.Model):
                 )
                 and bool(rec.picking_to_plan_ids)
                 and rec.shipment_planning_method != "none"
+                and rec.auto_deliver
             )
 
     @api.depends("state")
@@ -291,3 +293,15 @@ class StockReleaseChannel(models.Model):
             self.in_process_shipment_advice_ids.loaded_picking_ids.backorder_ids
         )
         backorders.unrelease(safe_unrelease=True)
+
+    @api.depends("shipment_advice_ids")
+    def _compute_shipment_advice_to_print_ids(self):
+        res = super()._compute_shipment_advice_to_print_ids()
+        for rec in self:
+            if rec.auto_deliver:
+                rec.shipment_advice_to_print_ids = fields.first(
+                    rec.in_process_shipment_advice_ids.filtered(
+                        lambda r: r.state == "done"
+                    ).sorted("id", reverse=True)
+                )
+        return res
