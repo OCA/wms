@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-03-21 15:36+0000\n"
+"PO-Revision-Date: 2024-04-02 12:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -398,7 +398,7 @@ msgstr "Bloccato"
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__is_manual_assignment
 msgid "Manual assignment"
-msgstr ""
+msgstr "Assegnazione manuale"
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__batch_mode__max
