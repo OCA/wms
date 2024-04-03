@@ -273,7 +273,7 @@ class StockLocation(models.Model):
         return self.only_empty
 
     @api.depends(
-        "quant_ids",
+        "quant_ids.quantity",
         "in_move_ids",
         "in_move_line_ids",
         "do_not_mix_products",
@@ -285,14 +285,16 @@ class StockLocation(models.Model):
                 rec.location_will_contain_product_ids = no_product
             else:
                 products = (
-                    rec.mapped("quant_ids.product_id")
+                    rec.mapped("quant_ids")
+                    .filtered(lambda q: q.quantity > 0)
+                    .product_id
                     | rec.mapped("in_move_ids.product_id")
                     | rec.mapped("in_move_line_ids.product_id")
                 )
                 rec.location_will_contain_product_ids = products
 
     @api.depends(
-        "quant_ids",
+        "quant_ids.quantity",
         "in_move_line_ids",
         "do_not_mix_lots",
     )
@@ -302,9 +304,9 @@ class StockLocation(models.Model):
                 no_lot = self.env["stock.lot"].browse()
                 rec.location_will_contain_lot_ids = no_lot
             else:
-                lots = rec.mapped("quant_ids.lot_id") | rec.mapped(
-                    "in_move_line_ids.lot_id"
-                )
+                lots = rec.mapped("quant_ids").filtered(
+                    lambda q: q.quantity > 0
+                ).lot_id | rec.mapped("in_move_line_ids.lot_id")
                 rec.location_will_contain_lot_ids = lots
 
     @api.depends(
