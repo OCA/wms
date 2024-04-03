@@ -1,0 +1,32 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_delivery
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2024-04-03 10:34+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
+
+#. module: stock_release_channel_delivery
+#: model:ir.model.fields,field_description:stock_release_channel_delivery.field_stock_release_channel__carrier_ids
+msgid "Shipping Methods"
+msgstr "Metodi di spedizione"
+
+#. module: stock_release_channel_delivery
+#: model:ir.model,name:stock_release_channel_delivery.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr "Canali rilascio magazzino"
+
+#. module: stock_release_channel_delivery
+#: model:ir.model,name:stock_release_channel_delivery.model_stock_picking
+msgid "Transfer"
+msgstr "Trasferimento"
