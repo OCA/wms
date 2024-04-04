@@ -71,6 +71,11 @@ msgid "Scheduled Date Prior To Channel End Date Search"
 msgstr ""
 
 #. module: stock_release_channel_process_end_time
+#: model:ir.model,name:stock_release_channel_process_end_time.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_release_channel_process_end_time
 #: model:ir.model,name:stock_release_channel_process_end_time.model_stock_release_channel
 msgid "Stock Release Channels"
 msgstr ""
