@@ -55,6 +55,11 @@ msgstr ""
 "                        <span class=\"o_stat_text\">Lista:</span>"
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:stock_available_to_promise_release.selection__stock_picking__release_policy__direct
+msgid "As soon as possible"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_qty
 msgid ""
 "Available to Promise quantity minus quantities promised  to moves with "
@@ -202,6 +207,11 @@ msgid "Inventory Routes"
 msgstr "Rutas de Inventario"
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking__release_policy
+msgid "It specifies how to release a transfer partially or all at once"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_release____last_update
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_unrelease____last_update
 msgid "Last Modified on"
@@ -314,6 +324,11 @@ msgstr "Liberar"
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_release_form
 msgid "Release Move Allocations"
 msgstr "Liberar Asignaciones de Movimiento"
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_policy
+msgid "Release Policy"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__release_ready
@@ -475,6 +490,11 @@ msgstr "Operador no soportado: %s"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_tree
 msgid "View Move Allocations"
 msgstr "Ver Asignaciones de Movimiento"
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields.selection,name:stock_available_to_promise_release.selection__stock_picking__release_policy__one
+msgid "When all products are ready"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_route__no_backorder_at_release
