@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-01-29 17:38+0000\n"
+"PO-Revision-Date: 2024-04-04 11:40+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1338,7 +1338,7 @@ msgstr "Diversi prodotti trovati in %s, scansionare il prodotto."
 msgid ""
 "Several transfers found, please scan a package or select a transfer manually."
 msgstr ""
-"Trovati diversi trasferimenti, scansionare un collo o selezinare il "
+"Trovati diversi trasferimenti, scansionare un collo o selezionare il "
 "trasferimento manualmente."
 
 #. module: shopfloor
@@ -1439,7 +1439,7 @@ msgstr ""
 "Qualche scenaio può creare movimenti quando un rodotto o un collo sono "
 "scansionati e non esistono già movimenti. Ogni nuovo movimento viene creato "
 "nel tipo operazione selezionato, così può essere attivo solo quando il tipo "
-"è selezinato."
+"è selezionato."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/stock.py:0
@@ -1636,7 +1636,7 @@ msgstr "L'operazione di magazzino del collo è stata eseguita"
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "This batch cannot be selected."
-msgstr "Questo gruppo non pò essere selezinato."
+msgstr "Questo gruppo non pò essere selezionato."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
