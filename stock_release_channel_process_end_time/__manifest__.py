@@ -6,7 +6,7 @@
     "summary": """
         Allows to define an end date (and time) on a release channel and
         propagate it to the concerned pickings""",
-    "version": "16.0.1.6.0",
+    "version": "16.0.1.7.0",
     "license": "AGPL-3",
     "maintainers": ["rousseldenis", "jbaudoux"],
     "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
