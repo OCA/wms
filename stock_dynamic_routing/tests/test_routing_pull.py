@@ -616,8 +616,8 @@ class TestRoutingPull(TestRoutingPullCommon):
         # we have a new waiting move in the PICK with a qty of 8
         split_move = move_a.move_dest_ids.move_orig_ids - move_a
         self.assertEqual(split_move.picking_id, pick_picking)
-        total_qty = sum(split_move.mapped('product_qty'))
-        self.assertEqual(total_qty, 8)        
+        total_qty = sum(split_move.mapped("product_qty"))
+        self.assertEqual(total_qty, 8)
         for move in split_move:
             self.assertEqual(move.state, "waiting")
 
