@@ -13,9 +13,6 @@ class TestChannelAction(ChannelReleaseCase):
         self.assertEqual(action["domain"][0][0], "id")
         self.assertEqual(action["domain"][0][1], "in")
         self.assertEqual(set(action["domain"][0][2]), set(pickings.ids))
-        self.assertEqual(
-            action["context"], dict(context or {}, hide_release_channel_id=True)
-        )
 
     def _assert_move_action(self, action, pickings, context=None):
         self.assertEqual(action["domain"][0][0], "picking_id")

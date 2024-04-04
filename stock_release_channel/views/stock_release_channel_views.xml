@@ -52,7 +52,22 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-
+                        <button
+                            class="oe_stat_button"
+                            type="object"
+                            name="action_picking_all_related"
+                            icon="fa-cubes"
+                            string="Internal transfers"
+                            context="{'default_release_channel_id':active_id}"
+                        />
+                        <button
+                            class="oe_stat_button"
+                            type="object"
+                            name="action_picking_all"
+                            icon="fa-truck"
+                            string="Deliveries"
+                            context="{'default_release_channel_id':active_id}"
+                        />
                     </div>
                     <field name="active" invisible="1" />
                     <widget

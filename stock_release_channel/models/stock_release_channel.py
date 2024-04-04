@@ -614,9 +614,7 @@ class StockReleaseChannel(models.Model):
         return eval_context.get("pickings", self.env["stock.picking"].browse())
 
     def action_picking_all(self):
-        return self._action_picking_for_field(
-            "all", context={"search_default_release_ready": 1}
-        )
+        return self._action_picking_for_field("all")
 
     def action_picking_release_ready(self):
         return self._action_picking_for_field("release_ready")
