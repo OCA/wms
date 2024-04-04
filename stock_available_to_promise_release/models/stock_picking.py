@@ -28,6 +28,12 @@ class StockPicking(models.Model):
         "Used to calculate the ordered available to promise.",
     )
     last_release_date = fields.Datetime()
+    release_policy = fields.Selection(
+        [("direct", "As soon as possible"), ("one", "When all products are ready")],
+        default="direct",
+        required=True,
+        help="It specifies how to release a transfer partially or all at once",
+    )
 
     @api.depends("move_ids.need_release")
     def _compute_need_release(self):
@@ -63,14 +69,10 @@ class StockPicking(models.Model):
         picking_ids = [group["picking_id"][0] for group in groups]
         return [("id", in_operator, picking_ids)]
 
-    def _get_shipping_policy(self):
-        """Hook returning the related shipping policy."""
-        self.ensure_one()
-        return self.move_type
-
     # move_ids.ordered_available_to_promise_qty has no depends, so we need to
     # invalidate cache before accessing this release_ready computed value
     @api.depends(
+        "release_policy",
         "move_type",
         "move_ids.ordered_available_to_promise_qty",
         "move_ids.need_release",
@@ -82,7 +84,7 @@ class StockPicking(models.Model):
             release_ready = False
             release_ready_count = sum(1 for move in moves if move._is_release_ready())
             if moves:
-                if picking._get_shipping_policy() == "one":
+                if picking.release_policy == "one":
                     release_ready = release_ready_count == len(moves)
                 else:
                     release_ready = bool(release_ready_count)
