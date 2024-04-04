@@ -22,3 +22,21 @@ class TestStockReleaseChannelPlan(ReleaseChannelPlanCase):
         self.assertEqual(self.plan2_channel2.state, "asleep")
         self.assertEqual(self.plan3_channel1.state, "open")
         self.assertEqual(self.plan3_channel2.state, "open")
+
+    def test_launch_plan_at_locked_state(self):
+        """Test launching plan1"""
+        self.plan1_channel1.write({"state": "locked", "state_at_wakeup": "locked"})
+        self.plan1_channel2.write({"state": "asleep", "state_at_wakeup": "locked"})
+        self.plan2_channel1.write({"state": "locked", "state_at_wakeup": "locked"})
+        self.plan2_channel2.write({"state": "asleep", "state_at_wakeup": "locked"})
+        self.plan3_channel1.write({"state": "open", "state_at_wakeup": "locked"})
+        self.plan3_channel2.write({"state": "open", "state_at_wakeup": "locked"})
+
+        self._launch_channel(self.plan1)
+
+        self.assertEqual(self.plan1_channel1.state, "locked")
+        self.assertEqual(self.plan1_channel2.state, "locked")
+        self.assertEqual(self.plan2_channel1.state, "locked")
+        self.assertEqual(self.plan2_channel2.state, "asleep")
+        self.assertEqual(self.plan3_channel1.state, "open")
+        self.assertEqual(self.plan3_channel2.state, "open")

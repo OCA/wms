@@ -24,7 +24,9 @@ class StockReleaseChannelPlanWizardLaunch(models.TransientModel):
 
     @api.model
     def _action_launch(self, channels):
-        channels.filtered("is_action_unlock_allowed").action_unlock()
+        channels.filtered(
+            lambda c: c.is_action_unlock_allowed and c.state_at_wakeup == "open"
+        ).action_unlock()
 
         channels_to_wakeup = channels.filtered("is_action_wake_up_allowed")
         channels_to_wakeup.action_wake_up()
