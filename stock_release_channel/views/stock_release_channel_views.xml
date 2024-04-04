@@ -72,6 +72,7 @@
                             groups="stock.group_stock_manager"
                         >
                             <group name="options">
+                        <field name="state_at_wakeup" />
                         <field name="release_forbidden" />
                         <field
                                     name="release_mode"

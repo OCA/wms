@@ -184,6 +184,12 @@ class StockReleaseChannel(models.Model):
         "channel.\n",
         default="asleep",
     )
+    state_at_wakeup = fields.Selection(
+        selection=[("open", "Open"), ("locked", "Locked")],
+        default="open",
+        required=True,
+        help="The state of the channel upon waking it up",
+    )
     is_action_lock_allowed = fields.Boolean(
         compute="_compute_is_action_lock_allowed",
         help="Technical field to check if the " "action 'Lock' is allowed.",
@@ -849,7 +855,8 @@ class StockReleaseChannel(models.Model):
 
     def action_wake_up(self):
         self._check_is_action_wake_up_allowed()
-        self.write({"state": "open"})
+        for rec in self:
+            rec.state = rec.state_at_wakeup
         self.assign_pickings()
 
     @api.model

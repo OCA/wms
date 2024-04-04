@@ -60,7 +60,20 @@ class TestReleaseChannelLifeCycle(ReleaseChannelCase):
                 ),
             )
             trap.enqueued_jobs[0].perform()
+        self.assertEqual(self.default_channel.state, "open")
         self.assertEqual(move.picking_id.release_channel_id, self.default_channel)
+
+    def test_release_channel_wake_up_at_open_state(self):
+        self.assertEqual(self.default_channel.state_at_wakeup, "open")
+        self.default_channel.action_sleep()
+        self.default_channel.action_wake_up()
+        self.assertEqual(self.default_channel.state, "open")
+
+    def test_release_channel_wake_up_at_locked_state(self):
+        self.default_channel.state_at_wakeup = "locked"
+        self.default_channel.action_sleep()
+        self.default_channel.action_wake_up()
+        self.assertEqual(self.default_channel.state, "locked")
 
     def test_release_channel_sleep_unassign(self):
         self.move = self._create_single_move(self.product1, 10)
