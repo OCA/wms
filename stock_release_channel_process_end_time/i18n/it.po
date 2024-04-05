@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-03-25 11:36+0000\n"
+"PO-Revision-Date: 2024-04-05 11:37+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -81,7 +81,7 @@ msgstr "Ricerca data schedulazione precedente alla data fine del canale"
 #. module: stock_release_channel_process_end_time
 #: model:ir.model,name:stock_release_channel_process_end_time.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
 
 #. module: stock_release_channel_process_end_time
 #: model:ir.model,name:stock_release_channel_process_end_time.model_stock_release_channel
