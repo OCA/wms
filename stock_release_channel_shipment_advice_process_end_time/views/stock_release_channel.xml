@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_shipment_advice.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <!-- As field is retricted to stock manager group in parent form -->
+                <field name="shipment_planning_method" invisible="1" />
+                <page
+                    string="Shipment loading and departure Settings"
+                    name="loading"
+                    attrs="{'invisible': [('shipment_planning_method', '=', 'none')]}"
+                >
+                    <group name="shipment_advice_arrival">
+                        <p
+                            colspan="2"
+                            style="color: grey; font-style: italic;"
+                        >The delay between the process end time and the arrival of shipments to the dock.</p>
+                        <group>
+
+                            <label for="shipment_advice_arrival_delay" />
+                            <div>
+                                <field
+                                    name="shipment_advice_arrival_delay"
+                                    class="oe_inline"
+                                />
+                                <span>minutes</span>
+                            </div>
+                        </group>
+                        <group>
+                            <field
+                                name="shipment_advice_arrival_time"
+                                widget="float_time"
+                            />
+                        </group>
+                    </group>
+                    <group name="shipment_advice_departure">
+                        <p
+                            colspan="2"
+                            style="color: grey; font-style: italic;"
+                        >The delay between the process end time and the departure of shipments to the dock.</p>
+                        <group>
+
+                            <label for="shipment_advice_departure_delay" />
+                            <div>
+                                <field
+                                    name="shipment_advice_departure_delay"
+                                    class="oe_inline"
+                                />
+                                <span>minutes</span>
+                            </div>
+                        </group>
+                        <group>
+                            <field
+                                name="shipment_advice_departure_time"
+                                widget="float_time"
+                            />
+                        </group>
+                    </group>
+                    <group name="group_loading">
+                        <group name="group_loading_left" />
+                        <group name="group_loading_right" />
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
