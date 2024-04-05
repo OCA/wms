@@ -382,6 +382,7 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__locked
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state_at_wakeup__locked
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Locked"
 msgstr ""
@@ -445,6 +446,7 @@ msgstr ""
 
 #. module: stock_release_channel
 #: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state__open
+#: model:ir.model.fields.selection,name:stock_release_channel.selection__stock_release_channel__state_at_wakeup__open
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_search_view
 msgid "Open"
 msgstr ""
@@ -598,6 +600,11 @@ msgid "State"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__state_at_wakeup
+msgid "State At Wakeup"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_move
 msgid "Stock Move"
 msgstr ""
@@ -656,6 +663,11 @@ msgid ""
 "still working)\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release "
 "channel.\n"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state_at_wakeup
+msgid "The state of the channel upon waking it up"
 msgstr ""
 
 #. module: stock_release_channel
