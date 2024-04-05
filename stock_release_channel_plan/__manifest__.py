@@ -5,7 +5,7 @@
 {
     "name": "Stock Release Channel Preparation Plan",
     "summary": "Manage release channel preparation plan",
-    "version": "16.0.1.2.0",
+    "version": "16.0.1.3.0",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
