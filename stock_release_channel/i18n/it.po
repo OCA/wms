@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-04-02 12:37+0000\n"
+"PO-Revision-Date: 2024-04-08 09:34+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -613,7 +613,7 @@ msgstr "Stato"
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__state_at_wakeup
 msgid "State At Wakeup"
-msgstr ""
+msgstr "Stato all'attivazione"
 
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_stock_move
@@ -688,7 +688,7 @@ msgstr ""
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state_at_wakeup
 msgid "The state of the channel upon waking it up"
-msgstr ""
+msgstr "Stado del canale al momento dell'attivazione"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__count_picking_full_progress
