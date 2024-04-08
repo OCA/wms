@@ -316,3 +316,9 @@ class StockReleaseChannel(models.Model):
                     ).sorted("id", reverse=True)
                 )
         return res
+
+    @api.model
+    def _get_print_shipment_allowed_states(self):
+        res = super()._get_print_shipment_allowed_states()
+        res.append("delivered")
+        return res
