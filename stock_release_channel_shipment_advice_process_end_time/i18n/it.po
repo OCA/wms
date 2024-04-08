@@ -1,0 +1,113 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_release_channel_shipment_advice_process_end_time
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_process_end_time.stock_release_channel_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_process_end_time.stock_warehouse_form_view
+msgid "<span>minutes</span>"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_arrival_time
+msgid "Arrival to dock at"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_advice_process_end_time.field_stock_warehouse__release_channel_shipment_advice_arrival_delay
+msgid ""
+"Default value for the delay between the release channel process end time and"
+" the arrival of shipments to docks of this warehouse."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_advice_process_end_time.field_stock_warehouse__release_channel_shipment_advice_departure_delay
+msgid ""
+"Default value for the delay between the release channel process end time and"
+" the departure of shipments from the dock."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_departure_time
+msgid "Departure from dock at"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_warehouse__release_channel_shipment_advice_arrival_delay
+msgid "Release Channel Shipment Advice Arrival Delay"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_warehouse__release_channel_shipment_advice_departure_delay
+msgid "Release Channel Shipment Advice Departure Delay"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_arrival_delay
+msgid "Shipment Advice Arrival Delay"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_departure_delay
+msgid "Shipment Advice Departure Delay"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model,name:stock_release_channel_shipment_advice_process_end_time.model_shipment_advice_planner
+msgid "Shipment Advice Planner"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_process_end_time.stock_release_channel_form_view
+msgid "Shipment loading and departure Settings"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model,name:stock_release_channel_shipment_advice_process_end_time.model_stock_release_channel
+msgid "Stock Release Channels"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_process_end_time.stock_release_channel_form_view
+msgid ""
+"The delay between the process end time and the arrival of shipments to the "
+"dock."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_process_end_time.stock_release_channel_form_view
+msgid ""
+"The delay between the process end time and the departure of shipments to the"
+" dock."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_arrival_delay
+msgid ""
+"The delay between the release channel process end time and the arrival of "
+"shipments to the dock."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_advice_process_end_time.field_stock_release_channel__shipment_advice_departure_delay
+msgid ""
+"The delay between the release channel process end time and the departure of "
+"shipments to the dock."
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_process_end_time
+#: model:ir.model,name:stock_release_channel_shipment_advice_process_end_time.model_stock_warehouse
+msgid "Warehouse"
+msgstr ""
