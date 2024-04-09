@@ -1,0 +1,99 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_available_to_promise_release_block
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_route__autoblock_release_on_backorder
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_rule__autoblock_release_on_backorder
+msgid "Auto-block Release on Backorders"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.actions.server,name:stock_available_to_promise_release_block.action_stock_move_block_release
+msgid "Block Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.stock_picking_form_view
+msgid "Block release"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_picking__block_release_allowed
+msgid "Block release allowed?"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#. odoo-python
+#: code:addons/stock_available_to_promise_release_block/models/stock_move.py:0
+#: code:addons/stock_available_to_promise_release_block/models/stock_picking.py:0
+#, python-format
+msgid "Blocked"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model,name:stock_available_to_promise_release_block.model_stock_route
+msgid "Inventory Routes"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_move__release_blocked
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_move__release_blocked_label
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_picking__release_blocked
+#: model:ir.model.fields,field_description:stock_available_to_promise_release_block.field_stock_picking__release_blocked_label
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.view_picking_internal_search
+msgid "Release Blocked"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.view_picking_internal_search
+msgid "Release of operations blocked."
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model,name:stock_available_to_promise_release_block.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model,name:stock_available_to_promise_release_block.model_stock_rule
+msgid "Stock Rule"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model.fields,help:stock_available_to_promise_release_block.field_stock_picking__block_release_allowed
+msgid "Technical field: tell if the release of operation can be blocked."
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.stock_picking_form_view
+msgid ""
+"The release of this operation is blocked. Click on the 'Unblock' button to "
+"unblock it."
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.model,name:stock_available_to_promise_release_block.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model:ir.actions.server,name:stock_available_to_promise_release_block.action_stock_move_unblock_release
+msgid "Unblock Release"
+msgstr ""
+
+#. module: stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.stock_picking_form_view
+msgid "Unblock release"
+msgstr ""
