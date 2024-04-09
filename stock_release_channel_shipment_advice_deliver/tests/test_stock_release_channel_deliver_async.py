@@ -114,7 +114,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         - the backorder should be assigned to the available channel
         - the backorder should not be assigned to the shipment advice
         """
-        channel = self.channel.copy({"name": "channel 2"})
+        channel = self.channel.copy({"name": "channel 2", "state": "open"})
         self._do_internal_pickings()
         self._update_qty_in_location(self.output_loc, self.product2, 10)
         self.pickings.do_unreserve()
