@@ -15,7 +15,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         super().setUpClass()
         cls.env.user.company_id.shipment_advice_run_in_queue_job = True
 
-    def test_01(self):
+    def test_deliver_process(self):
         """Shipment advices are created and automatically processed."""
         self._do_internal_pickings()
         with trap_jobs() as trap_rc:
@@ -52,7 +52,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
     @mute_logger(
         "odoo.addons.stock_release_channel_shipment_advice_deliver.models.shipment_advice"
     )
-    def test_02(self):
+    def test_deliver_error_message(self):
         """An error occurred while processing the shipment advices.
 
         The release channel is notified and the error is logged
@@ -76,14 +76,14 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
             f"{shipment_advice.name}.",
         )
 
-    def test_03(self):
+    def test_deliver_retry(self):
         """Re-deliver after fail."""
-        self.test_02()
+        self.test_deliver_error_message()
         self.assertEqual(self.channel.state, "delivering_error")
         self.channel.dock_id = self.dock
-        self.test_01()
+        self.test_deliver_process()
 
-    def test_04(self):
+    def test_deliver_error_empty(self):
         """No picking to deliver, an error should be raised."""
         self._do_internal_pickings()
         self.pickings.write({"release_channel_id": False})
@@ -92,7 +92,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         ):
             self.channel.action_deliver()
 
-    def test_05(self):
+    def test_deliver_backorder_not_reassigned(self):
         """
         Deliver with backorder, no other channel available:
 
@@ -102,12 +102,12 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         self._update_qty_in_location(self.output_loc, self.product2, 10)
         self.pickings.do_unreserve()
         self.pickings.action_assign()
-        self.test_01()
+        self.test_deliver_process()
         backorder = self.pickings.backorder_ids
         self.assertFalse(backorder.release_channel_id)
         self.assertFalse(backorder.planned_shipment_advice_id)
 
-    def test_06(self):
+    def test_deliver_backorder_reassigned(self):
         """
         Deliver with backorder, another channel available:
 
@@ -119,24 +119,15 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         self._update_qty_in_location(self.output_loc, self.product2, 10)
         self.pickings.do_unreserve()
         self.pickings.action_assign()
-        self.test_01()
+        self.test_deliver_process()
         backorder = self.pickings.backorder_ids
         self.assertEqual(backorder.release_channel_id, channel)
         self.assertFalse(backorder.planned_shipment_advice_id)
 
-    def test_07(self):
-        """Deliver is not allowed if one of the pickings is started."""
-        self.internal_pickings[0].printed = True
-        with self.assertRaises(
-            UserError,
-            msg="One of the pickings to deliver for channel Default is started.",
-        ):
-            self.channel.action_deliver()
+    def test_deliver_remaining_picking_unreleased(self):
+        """Deliver is allowed by a user confirmation.
 
-    def test_08(self):
-        """Deliver is allowed by a user confirmation if one of the released picking.
-
-        is not done. the undone picking will be unreleased
+        If one of the released picking is not done, the undone picking will be unreleased
         """
         self._do_picking(self.internal_pickings[0])
         self._do_picking(self.internal_pickings[1])
@@ -194,8 +185,8 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
                         trap_ba.perform_enqueued_jobs()
         return advices
 
-    def test_09(self):
-        """Retry deliver from rc after partial fail."""
+    def test_deliver_retry_after_partial_fail(self):
+        """Retry deliver from release channel after partial fail."""
         self._do_internal_pickings()
         picking = self.channel.picking_to_plan_ids[0]
         package = self.env["stock.quant.package"].create({})
@@ -215,8 +206,8 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         self.assertEqual(picking.state, "done")
         self.assertEqual(shipment_advice.state, "done")
 
-    def test_10(self):
-        """Retry deliver from sa after partial fail."""
+    def test_deliver_retry_from_shipment_advice(self):
+        """Retry deliver from shipment advice after partial fail."""
         self._do_internal_pickings()
         picking = self.channel.picking_to_plan_ids[0]
         package = self.env["stock.quant.package"].create({})
