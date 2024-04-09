@@ -175,3 +175,20 @@ class TestStockReleaseChannelDeliver(TestStockReleaseChannelDeliverCommon):
             " Please handle them manually before proceeding with the delivery.",
         ):
             self.channel.action_deliver()
+
+    def test_deliver_partial_pick_without_bo(self):
+        """Partial picking without backorder creation.
+
+        Deliver must be allowed"""
+        # Process 2 out of 5
+        self.internal_pickings.picking_type_id.create_backorder = "never"
+        for move in self.internal_pickings[0].move_ids:
+            move.quantity_done = 2
+        self.internal_pickings[0].button_validate()
+        res = self.channel.action_deliver()
+        self.assertIsInstance(res, dict)
+        wizard = (
+            self.env[res.get("res_model")].with_context(**res.get("context")).create({})
+        )
+        wizard.with_context(test_queue_job_no_delay=True).action_deliver()
+        self.assertEqual(self.channel.state, "delivered")
