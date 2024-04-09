@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="stock_route_form_view" model="ir.ui.view">
+        <field name="name">stock.route.form</field>
+        <field name="model">stock.route</field>
+        <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release.stock_route_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="no_backorder_at_release" position="after">
+                <field
+                    name="autoblock_release_on_backorder"
+                    attrs="{'invisible': [('available_to_promise_defer_pull', '=', False)]}"
+                />
+            </field>
+        </field>
+    </record>
+
+</odoo>

@@ -69,15 +69,18 @@ class StockPicking(models.Model):
         picking_ids = [group["picking_id"][0] for group in groups]
         return [("id", in_operator, picking_ids)]
 
+    def _get_release_ready_depends(self):
+        return [
+            "release_policy",
+            "move_type",
+            "move_ids.ordered_available_to_promise_qty",
+            "move_ids.need_release",
+            "move_ids.state",
+        ]
+
     # move_ids.ordered_available_to_promise_qty has no depends, so we need to
     # invalidate cache before accessing this release_ready computed value
-    @api.depends(
-        "release_policy",
-        "move_type",
-        "move_ids.ordered_available_to_promise_qty",
-        "move_ids.need_release",
-        "move_ids.state",
-    )
+    @api.depends(lambda self: self._get_release_ready_depends())
     def _compute_release_ready(self):
         for picking in self:
             moves = picking.move_ids.filtered(lambda move: move._is_release_needed())
