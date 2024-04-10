@@ -25,4 +25,5 @@
     "application": False,
     "development_status": "Beta",
     "pre_init_hook": "pre_init_hook",
+    "external_dependencies": {"python": ["openupgradelib"]},
 }
