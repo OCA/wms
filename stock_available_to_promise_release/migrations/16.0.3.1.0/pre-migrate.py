@@ -2,23 +2,14 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from openupgradelib import openupgrade
 
+# pylint: disable=odoo-addons-relative-import
+from odoo.addons.stock_available_to_promise_release.hooks import init_release_policy
+
 
 @openupgrade.migrate()
 def migrate(env, version):
     """
-    Initialize default value when adding field instead updating every record.
+    Use the default sql query instead relying on ORM as all records will
+    be updated.
     """
-
-    field_spec = [
-        (
-            "release_policy",
-            "stock.picking",
-            False,
-            "char",
-            "varchar",
-            "stock_available_to_promise_release",
-            "direct",
-        )
-    ]
-
-    openupgrade.add_fields(env, field_spec=field_spec)
+    init_release_policy(env.cr)
