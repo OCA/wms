@@ -50,6 +50,15 @@ ul.packaging span:first-child {
 .packaging-qty-picker .qty-todo {
     text-align: center;
 }
+.packaging-qty-picker .qty-color-green {
+    background-color: rgb(143, 191, 68, 0.5);
+}
+.packaging-qty-picker .qty-color-orangered {
+    background-color: orangered;
+}
+.packaging-qty-picker .qty-color-pink {
+    background-color: pink;
+}
 .packaging-qty-picker .pkg-name {
     line-height: 1;
     padding-top: 2px;
@@ -70,4 +79,9 @@ I tested only w/ checkout/select_package for now
     position: absolute;
     top: 5px;
     right: 5px;
+}
+
+.qty-picker-packaging-icon {
+    width: 30px;
+    height: 30px;
 }
