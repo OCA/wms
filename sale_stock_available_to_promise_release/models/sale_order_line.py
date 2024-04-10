@@ -22,6 +22,9 @@ class SaleOrderLine(models.Model):
     available_qty = fields.Float(
         digits="Product Unit of Measure", compute="_compute_availability_status"
     )
+    delayed_qty = fields.Float(
+        digits="Product Unit of Measure", compute="_compute_availability_status"
+    )
 
     def _on_order_route(self):
         self.ensure_one()
@@ -45,7 +48,12 @@ class SaleOrderLine(models.Model):
 
     def _get_availability_data(self):
         data = dict.fromkeys(
-            ("availability_status", "expected_availability_date", "available_qty"),
+            (
+                "availability_status",
+                "expected_availability_date",
+                "available_qty",
+                "delayed_qty",
+            ),
             False,
         )
         self.ensure_one()
@@ -61,6 +69,7 @@ class SaleOrderLine(models.Model):
         available_qty = sum(
             self.mapped("move_ids.ordered_available_to_promise_uom_qty")
         )
+        delayed_qty = 0
         # required values
         product = self.product_id
         rounding = product.uom_id.rounding
@@ -80,6 +89,7 @@ class SaleOrderLine(models.Model):
         # Partially available
         elif float_compare(available_qty, 0, precision_rounding=rounding) == 1:
             availability_status = "partial"
+            delayed_qty = self.product_uom_qty - available_qty
         # No stock
         elif float_is_zero(available_qty, precision_rounding=rounding):
             product_replenishment_date = product._get_next_replenishment_date()
@@ -87,8 +97,10 @@ class SaleOrderLine(models.Model):
             if product_replenishment_date:
                 availability_status = "restock"
                 expected_availability_date = product_replenishment_date
+                delayed_qty = self.product_uom_qty
         return {
             "availability_status": availability_status,
             "expected_availability_date": expected_availability_date,
             "available_qty": available_qty,
+            "delayed_qty": delayed_qty,
         }
