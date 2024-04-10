@@ -962,7 +962,11 @@ class ZonePicking(Component):
 
         location_changed = True
         # Zero check
-        zero_check = self.picking_type.shopfloor_zero_check
+        # Only apply zero check if the product is of type "product".
+        zero_check = (
+            move_line.product_id.type == "product"
+            and self.picking_type.shopfloor_zero_check
+        )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
         return (location_changed, response)
@@ -1045,7 +1049,11 @@ class ZonePicking(Component):
             return (package_changed, response)
         package_changed = True
         # Zero check
-        zero_check = self.picking_type.shopfloor_zero_check
+        # Only apply zero check if the product is of type "product".
+        zero_check = (
+            move_line.product_id.type == "product"
+            and self.picking_type.shopfloor_zero_check
+        )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
         return (package_changed, response)
