@@ -163,6 +163,9 @@ const ManualProductTransfer = {
             }
             if ("qty_done" in data) return data.qty_done;
             if ("quantity" in data) return data.quantity;
+            if ("move_lines" in data) {
+                return data.move_lines.reduce((total, val) => total + val.qty_done, 0);
+            }
             return 0;
         },
         lot: function () {
