@@ -563,17 +563,6 @@ class DeliveryShipment(Component):
         It returns a dict where keys are source locations and values are
         dictionaries listing package_levels and move_lines that remain to load
         from transfers partially loaded in a shipment.
-
-        E.g:
-            {
-                "SRC_LOCATION1": {
-                    "package_levels": [{PKG_LEVEL_DATA}, ...],
-                    "move_lines": [{MOVE_LINE_DATA}, ...],
-                },
-                "SRC_LOCATION2": {
-                    ...
-                },
-            }
         """
         domain = self._find_move_lines_domain(shipment_advice)
         # Restrict to lines not loaded
@@ -593,7 +582,7 @@ class DeliveryShipment(Component):
             pickings_partially_loaded = loaded_lines.picking_id
             domain += [("picking_id", "in", pickings_partially_loaded.ids)]
         move_lines = self.env["stock.move.line"].search(domain)
-        return self._prepare_data_for_content(move_lines)
+        return self._prepare_data_for_content(move_lines, group_by_sale=False)
 
     def _data_for_content_to_load_from_picking(
         self, shipment_advice, picking=None, location=None
@@ -601,17 +590,6 @@ class DeliveryShipment(Component):
         """Return a dictionary where keys are source locations
         and values are dictionaries listing package_levels and move_lines
         loaded or to load.
-
-        E.g:
-            {
-                "SRC_LOCATION1": {
-                    "package_levels": [{PKG_LEVEL_DATA}, ...],
-                    "move_lines": [{MOVE_LINE_DATA}, ...],
-                },
-                "SRC_LOCATION2": {
-                    ...
-                },
-            }
         """
         # Grab move lines to sort, restricted to the current delivery
         if picking:
@@ -620,19 +598,71 @@ class DeliveryShipment(Component):
             )
         elif location:
             move_lines = self._find_move_lines_from_location(shipment_advice, location)
-        return self._prepare_data_for_content(move_lines)
+        group_by_sale = bool(location)
+        return self._prepare_data_for_content(move_lines, group_by_sale=group_by_sale)
 
-    def _prepare_data_for_content(self, move_lines):
+    def _prepare_data_for_content(self, move_lines, group_by_sale=False):
+        """Returns data for package levels and/or move lines.
+
+        The data is grouped by source location with a key for package levels and
+        a key for move lines.
+        The package levels can be grouped by related sales order and if they are not
+        they will be all stored into a key whose name is only spaces.
+        The move lines are not grouped by sales.
+
+        E.g:
+            {
+                "SRC_LOCATION1": {
+                    "package_levels": {
+                       "sale 01": [{PKG_LEVEL_DATA}, ...],
+                       "sale 02": [{PKG_LEVEL_DATA}, ...],
+                       " ": [{PKG_LEVEL_DATA}, ...],
+                    }
+                    "move_lines": [{MOVE_LINE_DATA}, ...],
+                },
+                "SRC_LOCATION2": {
+                    ...
+                },
+            }
+        """
+        empty_group_name = "null"
         data = collections.OrderedDict()
         package_level_ids = []
+
         # Sort and group move lines by source location and prepare the data
-        for move_line in move_lines.sorted(lambda ml: ml.location_id.name):
+        sales_started = []
+        if group_by_sale:
+            sales_started = move_lines.shipment_advice_id.loaded_picking_ids.sale_id
+            # Grouping by sales (the packages) sort starting from last position
+            #  2 the lines NOT in a sales order whose loading has started.
+            #  1 the lines in a sales being loaded and the line is done.
+            #  0 the lines in a sales being loaded and not yet done
+            move_lines = move_lines.sorted(
+                lambda ml: 2
+                if ml.move_id.sale_line_id.order_id not in sales_started
+                else (1 if ml.package_level_id.is_done else 0)
+            )
+        else:
+            move_lines = move_lines.sorted(lambda ml: ml.location_id.name)
+
+        for move_line in move_lines:
             location_data = data.setdefault(move_line.location_id.name, {})
             if move_line.package_level_id:
-                pl_data = location_data.setdefault("package_levels", [])
+                pl_data = location_data.setdefault(
+                    "package_levels", collections.OrderedDict()
+                )
                 if move_line.package_level_id.id in package_level_ids:
                     continue
-                pl_data.append(self.data.package_level(move_line.package_level_id))
+                if group_by_sale:
+                    group_name = (
+                        move_line.move_id.sale_line_id.order_id.name or empty_group_name
+                    )
+                else:
+                    group_name = empty_group_name
+                pl_group_data = pl_data.setdefault(group_name, [])
+                pl_group_data.append(
+                    self.data.package_level(move_line.package_level_id)
+                )
                 package_level_ids.append(move_line.package_level_id.id)
             else:
                 location_data.setdefault("move_lines", []).append(

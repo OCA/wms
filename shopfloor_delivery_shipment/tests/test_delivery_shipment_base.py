@@ -128,7 +128,10 @@ class DeliveryShipmentCommonCase(common.CommonCase):
                 shipment_advice, picking
             )
         if lines_to_load:
-            data["content"] = self.service._prepare_data_for_content(lines_to_load)
+            group_by_sale = bool(location)
+            data["content"] = self.service._prepare_data_for_content(
+                lines_to_load, group_by_sale=group_by_sale
+            )
         self.assert_response(
             response,
             next_state="scan_document",

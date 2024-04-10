@@ -71,13 +71,20 @@ const DeliveryShipment = {
                     <v-card-title>{{ name }}</v-card-title>
                     <v-card-subtitle> {{ package_level_process(value.package_levels) }}</v-card-subtitle>
                 </v-card>
-                <item-detail-card
-                    v-for="packlevel in value.package_levels"
-                    :key="make_state_component_key(['shipment-pack', packlevel.id])"
-                    :record="packlevel.package_src"
-                    :options="pack_options(packlevel)"
-                    :card_color="pack_color(packlevel)"
-                    />
+
+                <div v-for="(value, name, index) in value.package_levels">
+                    <v-card v-if="name!=='null'" color="grey lighten-1" class="detail v-card mt-5 main mb-2">
+                        <v-card-title>{{ name }}</v-card-title>
+                    </v-card>
+                    <item-detail-card
+                        v-for="packlevel in value"
+                        :key="make_state_component_key(['shipment-pack', packlevel.id])"
+                        :record="packlevel.package_src"
+                        :options="pack_options(packlevel)"
+                        :card_color="pack_color(packlevel)"
+                        />
+                </div>
+
                 <item-detail-card
                     v-for="line in value.move_lines"
                     :key="make_state_component_key(['shipment-product', line.product.id])"
@@ -248,8 +255,10 @@ const DeliveryShipment = {
             return this.utils.colors.color_for(color);
         },
         package_level_process(package_levels) {
-            const package_level_count = package_levels.length;
-            const done_package_level_count = package_levels.reduce((acc, next) => {
+            // Package data can be grouped by sales order, put them all in one array
+            const all_package_levels = Object.values(package_levels).flat();
+            const package_level_count = all_package_levels.length;
+            const done_package_level_count = all_package_levels.reduce((acc, next) => {
                 return next.is_done ? acc + 1 : acc;
             }, 0);
             return `Progress: ${done_package_level_count} / ${package_level_count}`;
