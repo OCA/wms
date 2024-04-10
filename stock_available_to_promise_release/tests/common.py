@@ -55,7 +55,7 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         if products is None:
             products = []
 
-        group = cls.env["procurement.group"].create(
+        cls.group = cls.env["procurement.group"].create(
             {
                 "name": "TEST",
                 "move_type": move_type,
@@ -64,7 +64,7 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         )
         values = {
             "company_id": wh.company_id,
-            "group_id": group,
+            "group_id": cls.group,
             "date_planned": date or fields.Datetime.now(),
             "warehouse_id": wh,
         }
@@ -94,7 +94,7 @@ class PromiseReleaseCommonCase(common.TransactionCase):
                     )
                 ]
             )
-        pickings = cls._pickings_in_group(group)
+        pickings = cls._pickings_in_group(cls.group)
         pickings.mapped("move_ids").write(
             {"date_priority": date or fields.Datetime.now()}
         )
