@@ -1,5 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo import _
+
 from .test_checkout_scan_line_base import CheckoutScanLineCaseBase
 
 
@@ -110,6 +112,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         )
 
     def test_scan_line_product_lot_ok(self):
+        """Check scanning a lot and there is only one lot for that product."""
         picking = self._create_picking(
             lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
         )
@@ -120,6 +123,89 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         lot = first_line.lot_id
         related_lines = picking.move_line_ids - first_line
         self._test_scan_line_ok(lot.name, first_line, related_lines)
+
+    def test_scan_line_product_lot_ok_multiple_lot(self):
+        """Check scanning a lot and there is two different lot for that product."""
+        picking = self._create_picking(
+            lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
+        )
+        # For product A, lets have two lines with different lot
+        lot_1 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_1
+        )
+        lot_2 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_2
+        )
+        self._fill_stock_for_moves(picking.move_lines[1], in_lot=True)
+        picking.action_assign()
+        line_with_lot_1 = picking.move_line_ids.filtered(lambda l: l.lot_id == lot_1)
+        related_lines = picking.move_line_ids - line_with_lot_1
+        self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
+
+    def test_scan_line_product_lot_in_package_ok(self):
+        """Check scanning a lot in a package with other products."""
+        picking = self._create_picking(
+            lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
+        )
+        package = self.env["stock.quant.package"].create({"name": "packTST001"})
+        # For product A, lets have two lines with different lot
+        lot_1 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, package, lot_1
+        )
+        lot_2 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, package, lot_2
+        )
+        self._fill_stock_for_moves(
+            picking.move_lines[1], in_package=package, in_lot=True
+        )
+        picking.action_assign()
+        line_with_lot_1 = picking.move_line_ids.filtered(lambda l: l.lot_id == lot_1)
+        related_lines = picking.move_line_ids - line_with_lot_1
+        self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
+
+    def test_scan_line_product_lot_on_multiple_line_ok(self):
+        """Check scanning a lot set on multiple lines of the transfer."""
+        picking = self._create_picking(
+            lines=[(self.product_a, 1), (self.product_a, 1), (self.product_b, 1)]
+        )
+        sub_location = (
+            self.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "location_id": picking.location_id.id,
+                    "name": "sub location to have lot on multiple lines",
+                }
+            )
+        )
+        # For product A, lets have two lines with the same lot
+        # For that update the stock on two different location
+        lot_1 = self.env["stock.production.lot"].create(
+            {"product_id": self.product_a.id, "company_id": self.env.company.id}
+        )
+        self._update_qty_in_location(
+            picking.location_id, self.product_a, 1, None, lot_1
+        )
+        self._update_qty_in_location(sub_location, self.product_a, 1, None, lot_1)
+        self._fill_stock_for_moves(picking.move_lines[1], in_package=False, in_lot=True)
+        picking.action_assign()
+        self.assertTrue(len(picking.move_line_ids), 3)
+        # Only the first line with the lot should be updated
+        line_with_lot_1 = picking.move_line_ids.filtered(lambda l: l.lot_id == lot_1)[0]
+        related_lines = picking.move_line_ids - line_with_lot_1
+        self._test_scan_line_ok(lot_1.name, line_with_lot_1, related_lines)
 
     def test_scan_line_product_in_one_package_all_package_lines_ok(self):
         picking = self._create_picking(
@@ -132,7 +218,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         # more than one package, it would be an error.
         self._test_scan_line_ok(self.product_a.barcode, picking.move_line_ids)
 
-    def _test_scan_line_error(self, picking, barcode, message):
+    def _test_scan_line_error(self, picking, barcode, message, need_confirm_lot=None):
         """Test errors for /scan_line
 
         :param picking: the picking we are currently working with (selected)
@@ -145,7 +231,9 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self.assert_response(
             response,
             next_state="select_line",
-            data=self._data_for_select_line(picking),
+            data=dict(
+                self._data_for_select_line(picking), need_confirm_lot=need_confirm_lot
+            ),
             message=message,
         )
 
@@ -247,17 +335,50 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             },
         )
 
-    def test_scan_line_error_lot_not_in_picking(self):
+    def test_scan_line_error_lot_different_change_success(self):
+        """Scan the wrong lot while a line with the same product exists."""
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking.move_lines, in_lot=True)
         picking.action_assign()
+        previous_lot = picking.move_line_ids.lot_id
+        # Create a lot that is not registered in the location we are working on
+        # so a draft inventory for control is generated automatically when the
+        # lot is changed.
         lot = self.env["stock.production.lot"].create(
             {"product_id": self.product_a.id, "company_id": self.env.company.id}
         )
         self._test_scan_line_error(
             picking,
             lot.name,
-            {"message_type": "error", "body": "Lot is not in the current transfer."},
+            self.msg_store.lot_different_change(),
+            need_confirm_lot=lot.id,
+        )
+        # Second scan to confirm the change of lot
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+                "confirm_lot": lot.id,
+            },
+        )
+        message = self.msg_store.lot_replaced_by_lot(previous_lot, lot)
+        inventory_message = _("A draft inventory has been created for control.")
+        message["body"] = f"{message['body']} {inventory_message}"
+        self.assert_response(
+            response,
+            next_state="select_package",
+            data={
+                "selected_move_lines": [
+                    self._move_line_data(ml) for ml in picking.move_line_ids
+                ],
+                "picking": self.service.data.picking(picking),
+                "packing_info": self.service._data_for_packing_info(picking),
+                "no_package_enabled": not self.service.options.get(
+                    "checkout__disable_no_package"
+                ),
+            },
+            message=message,
         )
 
     def test_scan_line_error_lot_in_two_packages(self):
