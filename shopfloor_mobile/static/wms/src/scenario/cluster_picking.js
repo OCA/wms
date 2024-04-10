@@ -34,7 +34,7 @@ const ClusterPicking = {
                 v-on:cancel="state.on_cancel"
                 />
             <v-alert type="info" tile v-if="state_is('start_line') && state.data.picking.note" class="packing-info">
-                <p v-text="state.data.picking.note" />
+                <p class="split-text-lines" v-text="state.data.picking.note" />
             </v-alert>
             <batch-picking-line-detail
                 v-if="state_in(['start_line', 'scan_destination', 'change_pack_lot', 'stock_issue'])"
