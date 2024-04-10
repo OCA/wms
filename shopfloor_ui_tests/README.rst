@@ -18,6 +18,9 @@ Tech details
 * The end-to-end tests are built using `Cypress <https://www.cypress.io/>`_.
 * The unit tests are built using `jest <https://jestjs.io/docs/getting-started>`_.
 
+Warning, the Jest units tests have been disabled on Github !
+
+
 End-to-end tests with Cypress
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
