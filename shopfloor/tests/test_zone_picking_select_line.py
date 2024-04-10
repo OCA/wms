@@ -348,6 +348,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             message=self.service.msg_store.package_replaced_by_package(
                 package1, package1b
             ),
+            qty_done=self.service._get_prefill_qty(move_lines[0]),
         )
         # Check the package has been changed on the move line
         self.assertEqual(self.picking1.package_level_ids[0].package_id, package1b)

@@ -87,6 +87,7 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             message=self.service.msg_store.package_replaced_by_package(
                 previous_package, self.free_package
             ),
+            qty_done=self.service._get_prefill_qty(move_line),
         )
 
     def test_change_pack_lot_change_lot_ok(self):
@@ -137,4 +138,5 @@ class ZonePickingChangePackLotCase(ZonePickingCommonCase):
             message=self.service.msg_store.lot_replaced_by_lot(
                 previous_lot, self.free_lot
             ),
+            qty_done=self.service._get_prefill_qty(move_line),
         )
