@@ -81,7 +81,9 @@ I tested only w/ checkout/select_package for now
     right: 5px;
 }
 
-.qty-picker-packaging-icon {
-    width: 30px;
-    height: 30px;
+/*
+Split the lines correctly if there are multiple lines separated by \n in a v-text.
+*/
+.split-text-lines {
+    white-space: pre-line;
 }
