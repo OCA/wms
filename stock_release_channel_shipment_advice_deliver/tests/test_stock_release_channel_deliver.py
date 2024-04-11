@@ -1,6 +1,7 @@
 # Copyright 2023 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tools import mute_logger
 
@@ -194,3 +195,20 @@ class TestStockReleaseChannelDeliver(TestStockReleaseChannelDeliverCommon):
         )
         wizard.with_context(test_queue_job_no_delay=True).action_deliver()
         self.assertEqual(self.channel.state, "delivered")
+
+    def test_delivering_from_shipment_advice(self):
+        self.assertEqual(self.channel.state, "locked")
+        self.pickings.write({"release_channel_id": self.channel.id})
+        self._do_internal_pickings()
+        self.assertTrue(self.channel.is_action_deliver_allowed)
+        shipment_advice = self.env["shipment.advice"].create(
+            {
+                "shipment_type": "outgoing",
+                "release_channel_id": self.channel.id,
+                "dock_id": self.channel.dock_id.id,
+                "arrival_date": fields.Datetime.now(),
+            }
+        )
+        shipment_advice.action_confirm()
+        shipment_advice.action_in_progress()
+        self.assertEqual(self.channel.state, "delivering")

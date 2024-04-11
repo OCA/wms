@@ -97,3 +97,10 @@ class ShipmentAdvice(models.Model):
             ):
                 rec.release_channel_id.state = "delivering"
         return super().action_done()
+
+    def action_in_progress(self):
+        res = super().action_in_progress()
+        self.release_channel_id.filtered(
+            "is_action_deliver_allowed"
+        ).state = "delivering"
+        return res
