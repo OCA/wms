@@ -10,6 +10,7 @@ setuptools.setup(
     install_requires=[
         'odoo-addon-delivery_carrier_warehouse>=16.0dev,<16.1dev',
         'odoo-addon-sale_stock_available_to_promise_release>=16.0dev,<16.1dev',
+        'odoo-addon-sale_stock_available_to_promise_release_block>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_base>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release_block>=16.0dev,<16.1dev',
