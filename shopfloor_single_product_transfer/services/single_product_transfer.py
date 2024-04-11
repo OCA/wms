@@ -746,11 +746,10 @@ class ShopfloorSingleProductTransfer(Component):
             )
             if response:
                 return response
-            response = self._set_quantity__post_move(
+            move_line.result_package_id = package
+            return self._set_quantity__post_move(
                 move_line, location, confirmation=confirmation
             )
-            move_line.result_package_id = package
-            return response
         # Else, go to `set_location` screen
         move_line.result_package_id = package
         return self._response_for_set_location(move_line, package)
