@@ -1,0 +1,79 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sale_stock_available_to_promise_release_block
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.actions.server,name:sale_stock_available_to_promise_release_block.action_sale_order_line_block_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__block_release
+msgid "Block Release"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release_block.field_sale_order__block_release
+msgid "Block the release of the generated delivery at order confirmation."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#. odoo-python
+#: code:addons/sale_stock_available_to_promise_release_block/models/sale_order_line.py:0
+#, python-format
+msgid "Blocked"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order_line__is_release_blocked
+msgid "Has Blocked Delivery"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_sales_order_line_filter
+msgid "Is Release Blocked"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order_line__release_blocked_label
+msgid "Release Blocked"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model,name:sale_stock_available_to_promise_release_block.model_sale_order
+msgid "Sales Order"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model,name:sale_stock_available_to_promise_release_block.model_sale_order_line
+msgid "Sales Order Line"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_sales_order_line_filter
+msgid "Sales Order Lines having blocked deliveries"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model,name:sale_stock_available_to_promise_release_block.model_stock_rule
+msgid "Stock Rule"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#. odoo-python
+#: code:addons/sale_stock_available_to_promise_release_block/models/sale_order_line.py:0
+#, python-format
+msgid "This operator is not supported"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.actions.server,name:sale_stock_available_to_promise_release_block.action_sale_order_line_unblock_release
+msgid "Unblock Release"
+msgstr ""
