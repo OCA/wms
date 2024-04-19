@@ -1,2 +1,6 @@
 freezegun
 odoo_test_helper
+
+odoo14-addon-shopfloor @ git+https://github.com/OCA/wms@refs/pull/870/head#subdirectory=setup/shopfloor
+odoo14-addon-shopfloor_reception @ git+https://github.com/OCA/wms@refs/pull/870/head#subdirectory=setup/shopfloor_reception
+odoo14-addon-shopfloor_reception_refund_return @ git+https://github.com/OCA/wms@refs/pull/870/head#subdirectory=setup/shopfloor_reception_refund_return
