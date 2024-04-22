@@ -16,7 +16,7 @@
                     icon="fa-refresh"
                     class="oe_stat_button"
                     type="object"
-                    attrs="{'invisible': [('flow_ids', '=', [])]}"
+                    invisible="not flow_ids"
                 />
       </div>
     </field>

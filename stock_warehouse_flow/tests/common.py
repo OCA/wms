@@ -67,7 +67,7 @@ class CommonFlow(TransactionCase):
 
     def _validate_picking(self, picking):
         for move_line in picking.move_line_ids:
-            move_line.qty_done = move_line.reserved_uom_qty
+            move_line.picked = True
         picking._action_done()
 
     def _prepare_split_test(self, qty=None):

@@ -316,10 +316,11 @@ class StockWarehouseFlow(models.Model):
                     self.pack_type_id.sequence_id.prefix += f"{self.sequence_prefix}/"
                 # Create a dedicated 'Packing Zone/SUB' location
                 if not self.pack_stock_loc_id:
-                    self.pack_stock_loc_id = self.warehouse_id.wh_pack_stock_loc_id.copy(
+                    warehouse = self.warehouse_id
+                    self.pack_stock_loc_id = warehouse.wh_pack_stock_loc_id.copy(
                         {
                             "name": self.sequence_prefix,
-                            "location_id": self.warehouse_id.wh_pack_stock_loc_id.id,
+                            "location_id": warehouse.wh_pack_stock_loc_id.id,
                             "active": True,
                         }
                     )
@@ -465,8 +466,10 @@ class StockWarehouseFlow(models.Model):
             }
             if html_exc:
                 args = {
-                    "picking_type": f"<strong>{self.to_picking_type_id.display_name}</strong>",
-                    "delivery_route": f"<strong>{self.delivery_route_id.display_name}</strong>",
+                    "picking_type": "<strong>"
+                    + "{self.to_picking_type_id.display_name}</strong>",
+                    "delivery_route": "<strong>"
+                    + "{self.delivery_route_id.display_name}</strong>",
                 }
             raise UserError(
                 _(

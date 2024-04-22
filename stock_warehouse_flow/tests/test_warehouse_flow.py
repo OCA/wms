@@ -75,9 +75,11 @@ class TestWarehouseFlow(common.CommonFlow):
         self.assertTrue(flow.warning)
         # Check that an error is raised when processing the move
         exception_msg = (
-            f"No rule corresponding to .*{flow.to_picking_type_id.display_name}.* operation type "
-            f"has been found on delivery route .*{flow.delivery_route_id.display_name}.*.\n"
-            "Please check your configuration."
+            "No rule corresponding to ."
+            + f"*{flow.to_picking_type_id.display_name}.* operation type "
+            + "has been found on delivery route ."
+            + f"*{flow.delivery_route_id.display_name}.*.\n"
+            + "Please check your configuration."
         )
         with self.assertRaisesRegex(UserError, exception_msg):
             self._run_procurement(self.product, 10, flow.carrier_ids)
