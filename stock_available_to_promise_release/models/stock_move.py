@@ -279,14 +279,23 @@ class StockMove(models.Model):
     def _is_release_ready(self):
         """Checks if a move itself is ready for release
         without considering the picking release_ready
+
+
+        Be careful, when calling this method, you must ensure that the
+        'ordered_available_to_promise_qty' field is up to date. If not,
+        you should invalidate the cache before calling this method. This
+        is not done automatically to avoid unnecessary cache invalidation
+        and to allow batch computation. The `_is_release_ready` method
+        is designed to be called on a single record. If we do the cache
+        invalidation here, it would be done for each record, which means
+        that the computation of the 'ordered_available_to_promise_qty'
+        would be done for each record, which is not efficient.
         """
         self.ensure_one()
         if not self._is_release_needed() or self.state == "draft":
             return False
         release_policy = self.picking_id.release_policy
         rounding = self.product_id.uom_id.rounding
-        # computed field has no depends set, invalidate cache before reading
-        self.invalidate_recordset(["ordered_available_to_promise_qty"])
         ordered_available_to_promise_qty = self.ordered_available_to_promise_qty
         if release_policy == "one":
             return (
@@ -315,6 +324,7 @@ class StockMove(models.Model):
 
     @api.depends(lambda self: self._get_release_ready_depends())
     def _compute_release_ready(self):
+        self.invalidate_recordset(["ordered_available_to_promise_qty"])
         for move in self:
             release_ready = move._is_release_ready()
             if release_ready and move.picking_id.release_policy == "one":
