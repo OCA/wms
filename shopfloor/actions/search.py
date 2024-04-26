@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2024 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.osv.expression import AND
@@ -74,18 +75,20 @@ class SearchAction(Component):
         barcode = barcode or ""
         return self.generic_find(barcode, types=types, handler_kw=handler_kw)
 
-    def generic_find(self, barcode, types=None, handler_kw=None):
+    def _find_record_by_type(self, barcode, btype, handler_kw=None):
         handler_kw = handler_kw or {}
+        handler = self._barcode_type_handler.get(btype)
+        if not handler:
+            return
+        return handler(barcode, **handler_kw.get(btype, {}))
+
+    def generic_find(self, barcode, types=None, handler_kw=None):
         _types = types or self._barcode_type_handler.keys()
         # TODO: decide the best default order in case we don't pass `types`
         for btype in _types:
-            handler = self._barcode_type_handler.get(btype)
-            if not handler:
-                continue
-            record = handler(barcode, **handler_kw.get(btype, {}))
+            record = self._find_record_by_type(barcode, btype, handler_kw)
             if record:
                 return self._make_search_result(record=record, code=barcode, type=btype)
-
         return self._make_search_result(type="none")
 
     def location_from_scan(self, barcode, limit=1):
