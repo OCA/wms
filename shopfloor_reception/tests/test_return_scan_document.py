@@ -1,4 +1,5 @@
 # Copyright 2023 Camptocamp SA
+# Copyright 2024 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from .reception_return_common import CommonCaseReturn
@@ -61,7 +62,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
             data={"pickings": []},
             message={
                 "message_type": "error",
-                "body": "You cannot move this using this menu.",
+                "body": "Barcode not found",
             },
         )
 
@@ -87,6 +88,25 @@ class TestScanDocumentReturn(CommonCaseReturn):
             "scan_document", params={"barcode": self.order.name}
         )
         return_picking = self.get_new_pickings()
+        self.assert_return_of(return_picking, self.order.name)
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data={"picking": self._data_for_picking_with_moves(return_picking)},
+        )
+
+    def test_scan_partial_delivered_order(self):
+        # Order has been partial delivered.
+        # Now, the SO name can be used as an input on the `scan_document` to create
+        # a return.
+        self._enable_allow_return()
+        delivery = self.create_delivery()
+        backorder = self.partial_deliver(delivery, 10)
+        self.assertEqual(backorder.move_lines.product_qty, 10)
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": self.order.name}
+        )
+        return_picking = self.get_new_pickings() - backorder
         self.assert_return_of(return_picking, self.order.name)
         self.assert_response(
             response,
