@@ -271,7 +271,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transferred from {} to {}."
+msgid "Content transferred from %(location_name)s to %(location_dest_name)s."
 msgstr ""
 
 #. module: shopfloor
@@ -452,7 +452,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/completion_info.py:0
 #, python-format
 msgid ""
-"Last operation of transfer {}. Next operation ({}) is ready to proceed."
+"Last operation of transfer %(picking_names)s. Next operation (%(next_picking_names)s) is ready to "
 msgstr ""
 
 #. module: shopfloor
@@ -531,7 +531,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Lot {} replaced by lot {}."
+msgid "Lot %(old_lot_name)s replaced by lot %(new_lot_name)s."
 msgstr ""
 
 #. module: shopfloor
@@ -809,20 +809,20 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} cannot be picked, already moved by transfer {}."
+msgid "Package %(package_name)s cannot be picked, already moved by transfer %(picking_name)s."
 msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} cannot be used: {} "
+msgid "Package %(package_name)s cannot be used: %(error)s"
 msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid ""
-"Package {} does not contain available product {}, cannot replace package."
+"Package %(package_name)s does not contain available product %(product_name)s, cannot replace package."
 msgstr ""
 
 #. module: shopfloor
@@ -846,7 +846,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} is not available in transfer {}."
+msgid "Package %(package_name)s is not available in transfer %(picking_name)s."
 msgstr ""
 
 #. module: shopfloor
@@ -864,7 +864,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} replaced by package {}."
+msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
 msgstr ""
 
 #. module: shopfloor
@@ -875,7 +875,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging '{}' is not allowed for carrier {}."
+msgid "Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s."
 msgstr ""
 
 #. module: shopfloor
@@ -911,7 +911,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
-msgid "Pick: stock issue on lot: {} found in {}"
+msgid "Pick: stock issue on lot: %(lot_name)s found in %(location_name)s"
 msgstr ""
 
 #. module: shopfloor
@@ -1109,9 +1109,9 @@ msgstr ""
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
-"Scenario `{}` require(s) 'Move Entire Packages' to be enabled.\n"
+"Scenario `%(scenario_name)s` require(s) 'Move Entire Packages' to be enabled.\n"
 "These type(s) do not satisfy this constraint: \n"
-"{}.\n"
+"%(bad_picking_types)s.\n"
 "Please, adjust your configuration."
 msgstr ""
 
@@ -1787,5 +1787,5 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "{} {} put in {}"
+msgid "%(qty)s %(product_name)s put in %(package_name)s"
 msgstr ""

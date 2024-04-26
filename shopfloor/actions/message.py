@@ -112,9 +112,9 @@ class MessageAction(Component):
     def package_not_available_in_picking(self, package, picking):
         return {
             "message_type": "warning",
-            "body": _("Package {} is not available in transfer {}.").format(
-                package.name, picking.name
-            ),
+            "body": _(
+                "Package %(package_name)s is not available in transfer %(picking_name)s."
+            ).format(package.name, picking.name),
         }
 
     def package_not_empty(self, package):
@@ -352,8 +352,11 @@ class MessageAction(Component):
     def x_units_put_in_package(self, qty, product, package):
         return {
             "message_type": "success",
-            "body": _("{} {} put in {}").format(
-                qty, product.display_name, package.name
+            "body": _(
+                "%(qty)s %(product_name)s put in %(package_name)s",
+                qty=qty,
+                product_name=product.display_name,
+                package_name=package.name,
             ),
         }
 
@@ -536,9 +539,9 @@ class MessageAction(Component):
     def location_content_transfer_complete(self, location_src, location_dest):
         return {
             "message_type": "success",
-            "body": _("Content transferred from {} to {}.").format(
-                location_src.name, location_dest.name
-            ),
+            "body": _(
+                "Content transferred from %(location_name)s to %(location_dest_name)s."
+            ).format(location_src.name, location_dest.name),
         }
 
     def location_content_unable_to_transfer(self, location_dest):
@@ -686,23 +689,28 @@ class MessageAction(Component):
     def lot_replaced_by_lot(self, old_lot, new_lot):
         return {
             "message_type": "success",
-            "body": _("Lot {} replaced by lot {}.").format(old_lot.name, new_lot.name),
+            "body": _("Lot %(old_lot_name)s replaced by lot %(new_lot_name)s.").format(
+                old_lot.name, new_lot.name
+            ),
         }
 
     def package_replaced_by_package(self, old_package, new_package):
         return {
             "message_type": "success",
-            "body": _("Package {} replaced by package {}.").format(
-                old_package.name, new_package.name
-            ),
+            "body": _(
+                "Package %(old_package_name)s replaced by package %(new_package_name)s."
+            ).format(old_package.name, new_package.name),
         }
 
     def package_already_picked_by(self, package, picking):
         return {
             "message_type": "error",
             "body": _(
-                "Package {} cannot be picked, already moved by transfer {}."
-            ).format(package.name, picking.name),
+                "Package %(package_name)s cannot be picked, already moved "
+                "by transfer %(picking_name)s.",
+                package_name=package.name,
+                picking_name=picking.name,
+            ),
         }
 
     def units_replaced_by_package(self, new_package):
@@ -714,7 +722,11 @@ class MessageAction(Component):
     def package_change_error(self, package, error_msg):
         return {
             "message_type": "error",
-            "body": _("Package {} cannot be used: {} ").format(package.name, error_msg),
+            "body": _(
+                "Package %(package_name)s cannot be used: %(error)s",
+                package_name=package.name,
+                error=error_msg,
+            ),
         }
 
     def cannot_change_lot_already_picked(self, lot):
@@ -764,8 +776,11 @@ class MessageAction(Component):
     def packaging_invalid_for_carrier(self, packaging, carrier):
         return {
             "message_type": "error",
-            "body": _("Packaging '{}' is not allowed for carrier {}.").format(
-                packaging.name if packaging else _("No value"), carrier.name
+            "body": _(
+                "Packaging '%(package_name)s' is not allowed for carrier "
+                "%(carrier_name)s.or carrier %(carrier_name)s.",
+                package_name=packaging.name if packaging else _("No value"),
+                carrier_name=carrier.name,
             ),
         }
 

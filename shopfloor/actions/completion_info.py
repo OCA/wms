@@ -34,10 +34,9 @@ class CompletionInfo(Component):
             return None
         return {
             "body": _(
-                "Last operation of transfer {}. "
-                "Next operation ({}) is ready to proceed."
-            ).format(
-                ", ".join(pickings.mapped("name")),
-                ", ".join(next_pickings.mapped("name")),
+                "Last operation of transfer %(picking_names)s. "
+                "Next operation (%(next_picking_names)s) is ready to proceed.",
+                picking_names=", ".join(pickings.mapped("name")),
+                next_picking_names=", ".join(next_pickings.mapped("name")),
             )
         }

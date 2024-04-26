@@ -372,11 +372,14 @@ class ShopfloorMenu(models.Model):
                 scenario_name = menu.scenario_id.name
                 raise exceptions.ValidationError(
                     _(
-                        "Scenario `{}` require(s) "
+                        "Scenario `%(scenario_name)s` require(s) "
                         "'Move Entire Packages' to be enabled.\n"
-                        "These type(s) do not satisfy this constraint: \n{}.\n"
-                        "Please, adjust your configuration."
-                    ).format(scenario_name, "\n- ".join(bad_picking_types))
+                        "These type(s) do not satisfy this constraint: "
+                        "\n%(bad_picking_types)s.\n"
+                        "Please, adjust your configuration.",
+                        scenario_name=scenario_name,
+                        bad_picking_types="\n- ".join(bad_picking_types),
+                    )
                 )
 
     @api.depends("scenario_id")

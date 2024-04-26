@@ -251,9 +251,11 @@ class StockMoveLine(models.Model):
         if not quant:
             raise exceptions.UserError(
                 _(
-                    "Package {} does not contain available product {},"
-                    " cannot replace package."
-                ).format(new_package.display_name, self.product_id.display_name)
+                    "Package %(package_name)s does not contain available product "
+                    "%(product_name)s, cannot replace package.",
+                    package_name=new_package.display_name,
+                    product_name=self.product_id.display_name,
+                )
             )
 
         values = {

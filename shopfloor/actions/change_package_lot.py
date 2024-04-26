@@ -90,8 +90,10 @@ class ChangePackageLot(Component):
                 move_line.location_id,
                 move_line.product_id,
                 lot=lot,
-                name=_("Pick: stock issue on lot: {} found in {}").format(
-                    lot.name, move_line.location_id.name
+                name=_(
+                    "Pick: stock issue on lot: %(lot_name)s found in %(location_name)s",
+                    lot_name=lot.name,
+                    location_name=move_line.location_id.name,
                 ),
             )
             message = self.msg_store.cannot_change_lot_already_picked(lot)

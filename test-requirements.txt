@@ -1,3 +1,2 @@
 vcrpy-unittest
 odoo_test_helper
-

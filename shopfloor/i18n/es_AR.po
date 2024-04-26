@@ -309,8 +309,8 @@ msgstr "Transferencia de contenido a {} completada"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transferred from {} to {}."
-msgstr "Transferencia de contenido desde {} hacia {}."
+msgid "Content transferred from %(location_name)s to %(location_dest_name)s."
+msgstr "Transferencia de contenido desde %(location_name)s hacia %(location_dest_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/inventory.py:0
@@ -499,9 +499,9 @@ msgstr "Última Modificación el"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/completion_info.py:0
 #, python-format
-msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
+msgid "Last operation of transfer %(picking_names)s. Next operation (%(next_picking_names)s) is ready to "
 msgstr ""
-"Última operación de transferencia: {}. Siguiente operación ({}) está lista "
+"Última operación de transferencia: %(picking_names)s. Siguiente operación (%(next_picking_names)s) está lista "
 "para proceder."
 
 #. module: shopfloor
@@ -582,8 +582,8 @@ msgstr "El Lote {} es para otro producto."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Lot {} replaced by lot {}."
-msgstr "Lote {} reemplazado por lote {}."
+msgid "Lot %(old_lot_name)s replaced by lot %(new_lot_name)s."
+msgstr "Lote %(old_lot_name)s reemplazado por lote %(new_lot_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/inventory.py:0
@@ -865,24 +865,24 @@ msgstr "El Paquete {} pertenece a una entrega sin un estado válido."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} cannot be picked, already moved by transfer {}."
+msgid "Package %(package_name)s cannot be picked, already moved by transfer %(picking_name)s."
 msgstr ""
-"El Paquete {} no puede ser seleccionado, ya ha sido movido por la "
-"transferencia {}."
+"El Paquete %(package_name)s no puede ser seleccionado, ya ha sido movido por la "
+"transferencia %(picking_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} cannot be used: {} "
-msgstr "El Paquete {} no puede ser usado: {} "
+msgid "Package %(package_name)s cannot be used: %(error)s"
+msgstr "El Paquete %(package_name)s no puede ser usado: %(error)s"
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid ""
-"Package {} does not contain available product {}, cannot replace package."
+"Package %(package_name)s does not contain available product %(product_name)s, cannot replace package."
 msgstr ""
-"El Paquete {} no contiene un producto disponible {}, no se puede reemplazar "
+"El Paquete %(package_name)s no contiene un producto disponible %(product_name)s, no se puede reemplazar "
 "el paquete."
 
 #. module: shopfloor
@@ -906,8 +906,8 @@ msgstr "El Paquete {} está usado."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} is not available in transfer {}."
-msgstr "El Paquete {} no está disponible en la transferencia {}."
+msgid "Package %(package_name)s is not available in transfer %(picking_name)s."
+msgstr "El Paquete %(package_name)s no está disponible en la transferencia %(picking_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -924,8 +924,8 @@ msgstr "El Paquete {} no está en la transferencia actual."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} replaced by package {}."
-msgstr "El Paquete {} está reemplazado por el paquete {}."
+msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
+msgstr "El Paquete %(old_package_name)s está reemplazado por el paquete %(new_package_name)s."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant_package
@@ -935,8 +935,8 @@ msgstr "Paquetes"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging '{}' is not allowed for carrier {}."
-msgstr "El Paquete '{}' no está permitido para el transportista {}."
+msgid "Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s."
+msgstr "El Paquete '%(package_name)s' no está permitido para el transportista %(carrier_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
@@ -973,8 +973,8 @@ msgstr "Pick y pack al mismo tiempo"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
-msgid "Pick: stock issue on lot: {} found in {}"
-msgstr "Entrega: error de inventario en el lote: {} encontrado en {}"
+msgid "Pick: stock issue on lot: %(lot_name)s found in %(location_name)s"
+msgstr "Entrega: error de inventario en el lote: %(lot_name)s encontrado en %(location_name)s"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__picking_id
@@ -1175,14 +1175,14 @@ msgstr "Escanear el paquete"
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
-"Scenario `{}` require(s) 'Move Entire Packages' to be enabled.\n"
+"Scenario `%(scenario_name)s` require(s) 'Move Entire Packages' to be enabled.\n"
 "These type(s) do not satisfy this constraint: \n"
-"{}.\n"
+"%(bad_picking_types)s.\n"
 "Please, adjust your configuration."
 msgstr ""
-"El escenario `{}` requiere que se habilite 'Mover paquetes completos'.\n"
+"El escenario `%(scenario_name)s` requiere que se habilite 'Mover paquetes completos'.\n"
 "Estos tipos no satisfacen esta restricción:\n"
-"{}.\n"
+"%(bad_picking_types)s.\n"
 "Por favor, ajuste su configuración."
 
 #. module: shopfloor
@@ -1896,8 +1896,8 @@ msgstr "{} no encontrado en la transferencia actual o ya está en un paquete."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "{} {} put in {}"
-msgstr "{} {} poner en {}"
+msgid "%(qty)s %(product_name)s put in %(package_name)s"
+msgstr "%(qty)s %(product_name)s poner en %(package_name)s"
 
 #, python-format
 #~ msgid "No line to pack found"
