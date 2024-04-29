@@ -54,7 +54,7 @@ class TestActionsStock(CommonCase):
         cls._fill_stock_for_moves(cls.move0)
         cls._fill_stock_for_moves(cls.move1)
         cls._deliver(cls.picking)
-    
+
     @classmethod
     def _deliver(cls, picking):
         picking.action_assign()
