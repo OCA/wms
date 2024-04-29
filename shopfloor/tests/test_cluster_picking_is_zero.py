@@ -79,7 +79,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             [
                 ("location_id", "=", self.line.location_id.id),
                 ("product_id", "=", self.line.product_id.id),
-                ("inventory_quantity_set", "=", False),
+                ("inventory_quantity_set", "=", True),
             ]
         )
         self.assertTrue(quant)
