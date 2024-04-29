@@ -230,11 +230,8 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._fill_stock_for_moves(pack2_moves, in_package=True)
         picking.action_assign()
 
-        delivery_packaging = self.env.ref(
-            "stock_storage_type.product_product_9_packaging_single_bag"
-        )
         package = self.env["stock.quant.package"].create(
-            {"product_packaging_id": delivery_packaging.id}
+            {"package_type_id": self.delivery_packaging.id}
         )
 
         # assume that product d was already put in a package,
@@ -373,15 +370,13 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         selected_lines.qty_done = selected_lines.reserved_uom_qty
 
         packaging = (
-            self.env["product.packaging"]
+            self.env["stock.package.type"]
             .sudo()
             .create(
                 {
                     "name": "DeliverX",
+                    "package_carrier_type": "none",
                     "barcode": "XXX",
-                    "height": 12,
-                    "width": 13,
-                    "packaging_length": 14,
                 }
             )
         )

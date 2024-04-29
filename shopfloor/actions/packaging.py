@@ -11,7 +11,12 @@ class PackagingAction(Component):
     _usage = "packaging"
 
     def packaging_valid_for_carrier(self, packaging, carrier):
-        return packaging.package_type_id.package_carrier_type in (
+        return self.packaging_type_valide_for_carrier(
+            packaging.package_type_id, carrier
+        )
+
+    def packaging_type_valid_for_carrier(self, packaging_type, carrier):
+        return packaging_type.package_carrier_type in (
             "none",
             carrier.delivery_type,
         )
@@ -28,7 +33,7 @@ class PackagingAction(Component):
         # AFAIS there's no reason to have 1 field per carrier type.
         fname = carrier.delivery_type + "_default_packaging_id"
         if fname not in carrier._fields:
-            return self.env["product.packaging"].browse()
+            return self.env["stock.package.type"].browse()
         return carrier[fname]
 
     def create_package_from_packaging(self, packaging=None):
@@ -40,7 +45,7 @@ class PackagingAction(Component):
 
     def _package_vals_from_packaging(self, packaging):
         return {
-            "product_packaging_id": packaging.id,
+            "package_type_id": packaging.id,
             "pack_length": packaging.packaging_length,
             "width": packaging.width,
             "height": packaging.height,

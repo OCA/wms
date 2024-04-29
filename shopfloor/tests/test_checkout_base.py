@@ -17,6 +17,17 @@ class CheckoutCommonCase(CommonCase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.wh.sudo().delivery_steps = "pick_pack_ship"
+        cls.delivery_packaging = (
+            cls.env["stock.package.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Pallet",
+                    "package_carrier_type": "none",
+                    "barcode": "PALCODE",
+                }
+            )
+        )
 
     def setUp(self):
         super().setUp()

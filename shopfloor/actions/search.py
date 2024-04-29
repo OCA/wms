@@ -54,7 +54,7 @@ class SearchAction(Component):
             "lot": self.lot_from_scan,
             "serial": self.lot_from_scan,
             "packaging": self.packaging_from_scan,
-            "delivery_packaging": self.generic_packaging_from_scan,
+            "delivery_packaging": self.delivery_packaging_from_scan,
             "origin_move": self.origin_move_from_scan,
         }
 
@@ -167,6 +167,12 @@ class SearchAction(Component):
         return model.search(
             [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
         )
+
+    def delivery_packaging_from_scan(self, barcode):
+        model = self.env["stock.package.type"]
+        if not barcode:
+            return model.browse()
+        return model.search([("barcode", "=", barcode)], limit=1)
 
     def origin_move_from_scan(self, barcode, extra_domain=None):
         model = self.env["stock.move"]

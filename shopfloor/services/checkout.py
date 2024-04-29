@@ -991,7 +991,7 @@ class Checkout(Component):
         carrier = self._get_carrier(picking)
         if carrier:
             # Validate against carrier
-            is_valid = self._packaging_good_for_carrier(packaging, carrier)
+            is_valid = self._packaging_type_good_for_carrier(packaging, carrier)
         else:
             is_valid = True
         if carrier and not is_valid:
@@ -1011,6 +1011,10 @@ class Checkout(Component):
 
     def _get_carrier(self, picking):
         return picking.ship_carrier_id or picking.carrier_id
+
+    def _packaging_type_good_for_carrier(self, packaging, carrier):
+        actions = self._actions_for("packaging")
+        return actions.packaging_type_valid_for_carrier(packaging, carrier)
 
     def _packaging_good_for_carrier(self, packaging, carrier):
         actions = self._actions_for("packaging")
