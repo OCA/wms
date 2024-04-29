@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-12-06 14:33+0000\n"
+"PO-Revision-Date: 2024-04-29 14:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -135,12 +135,12 @@ msgstr "Riga movimento attuale collo depositato"
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_outgoing_qty
 msgid "Current Move Product Outgoing Qty"
-msgstr ""
+msgstr "Q.tà in uscita prodotto del movimento attuale"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_reception_screen__current_move_product_qty_available
 msgid "Current Move Product Qty Available"
-msgstr ""
+msgstr "Q.tà disponibile prodotto movimento attuale"
 
 #. module: stock_reception_screen
 #: model:ir.model.fields,field_description:stock_reception_screen.field_stock_move__reception_screen_current_step
