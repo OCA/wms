@@ -604,7 +604,7 @@ class TestActionsChangePackageLot(CommonCase):
         )
 
         self.assertRecordValues(
-            line, [{"package_id": new_package.id, "result_package_id": False}]
+            line, [{"package_id": new_package.id, "result_package_id": new_package.id}]
         )
         self.assertRecordValues(line.package_level_id, [{"package_id": new_package.id}])
         # check that reservations have been updated, the new package is not
