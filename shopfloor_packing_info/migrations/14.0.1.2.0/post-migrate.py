@@ -41,11 +41,12 @@ def populate_stock_picking_note__packing(env):
                 "note_type_id": packing_note_type.id,
             }
         )
-        partner = env["res.partner"].search(
-            [("shopfloor_packing_info_id", "=", packing_info.id)], limit=1
+        partners = env["res.partner"].search(
+            [("shopfloor_packing_info_id", "=", packing_info.id)]
         )
-        if partner:
-            partner.stock_picking_note_ids |= note
+        if partners:
+            for partner in partners:
+                partner.stock_picking_note_ids |= note
 
 
 def migrate(cr, version):
