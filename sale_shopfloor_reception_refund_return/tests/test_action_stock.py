@@ -1,4 +1,5 @@
 # Copyright 2024 vnikolayev1 Raumschmiede GmbH
+# Copyright 2024 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from odoo.tests import Form
 
@@ -52,19 +53,27 @@ class TestActionsStock(CommonCase):
         # filling shopfloor.stock.action with moves
         cls._fill_stock_for_moves(cls.move0)
         cls._fill_stock_for_moves(cls.move1)
-        cls.picking.action_assign()
-        cls.picking._action_done()
+        cls._deliver(cls.picking)
+    
+    @classmethod
+    def _deliver(cls, picking):
+        picking.action_assign()
+        for line in picking.mapped("move_lines.move_line_ids"):
+            line.qty_done = line.product_uom_qty
+        picking._action_done()
 
     def test_create_return_move(self):
         # For incoming returns, moves are set to `to_refund`
+        move_line = self.picking.move_lines[0]
+        sale_order_line = move_line.sale_line_id
+        self.assertEqual(sale_order_line.qty_delivered, 10)
         return_picking = self.stock.create_return_picking(
             self.picking, self.picking_type_in, "potato"
         )
-        move_line = self.picking.move_lines[0]
         return_moves = self.stock.create_return_move(return_picking, move_line)
-        self.assertEqual(return_moves.sale_line_id, move_line.sale_line_id)
-        return_picking.action_assign()
-        return_picking._action_done()
+        self.assertEqual(return_moves.sale_line_id, sale_order_line)
+        self._deliver(return_picking)
+        self.assertEqual(sale_order_line.qty_delivered, 0)
         outgoing_return = self.stock.create_return_picking(
             return_picking, self.picking_type, "potato"
         )
