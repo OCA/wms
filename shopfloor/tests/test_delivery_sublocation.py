@@ -44,9 +44,9 @@ class DeliveryScanSublocationCase(DeliveryCommonCase):
             lines=[
                 (cls.product_d, 10),  # D as raw product
                 (cls.product_e, 10),  # E as raw product with a lot
-            ]
+            ],
+            location_id=cls.sublocation,
         )
-        cls.picking_sublocation.location_id = cls.sublocation
         cls.raw_move_sublocation = cls.picking_sublocation.move_ids[0]
         cls.raw_lot_move_sublocation = cls.picking_sublocation.move_ids[1]
         cls._fill_stock_for_moves(cls.raw_move_sublocation, location=cls.sublocation)
