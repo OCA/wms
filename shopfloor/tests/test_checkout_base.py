@@ -49,7 +49,7 @@ class CheckoutCommonCase(CommonCase):
         return self.data.package(package, picking=picking, with_packaging=True)
 
     def _packaging_data(self, packaging):
-        return self.data.packaging(packaging)
+        return self.data.delivery_packaging(packaging)
 
     def _data_for_select_line(self, picking, **kw):
         data = {

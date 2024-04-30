@@ -161,7 +161,9 @@ class Checkout(Component):
                 "package": self.data.package(
                     package, picking=picking, with_packaging=True
                 ),
-                "packaging": self.data.delivery_packaging_list(packaging_list.sorted()),
+                "packaging": self.data.delivery_packaging_list(
+                    packaging_list.sorted("sequence")
+                ),
             },
         )
 
@@ -1055,7 +1057,7 @@ class Checkout(Component):
             return response
         return self._response_for_select_delivery_packaging(picking, delivery_packaging)
 
-    def new_package(self, picking_id, selected_line_ids, product_packaging_id=None):
+    def new_package(self, picking_id, selected_line_ids, package_type_id=None):
         """Add all selected lines in a new package
 
         It creates a new package and set it as the destination package of all
@@ -1073,10 +1075,8 @@ class Checkout(Component):
         if message:
             return self._response_for_select_document(message=message)
         packaging = None
-        if product_packaging_id:
-            packaging = (
-                self.env["stock.package.type"].browse(product_packaging_id).exists()
-            )
+        if package_type_id:
+            packaging = self.env["stock.package.type"].browse(package_type_id).exists()
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         return self._create_and_assign_new_packaging(picking, selected_lines, packaging)
 
@@ -1250,7 +1250,7 @@ class Checkout(Component):
         packaging_list = self._get_allowed_packaging()
         return self._response_for_change_packaging(picking, package, packaging_list)
 
-    def set_packaging(self, picking_id, package_id, product_packaging_id):
+    def set_packaging(self, picking_id, package_id, package_type_id):
         """Set a package type on a package
 
         Transitions:
@@ -1263,12 +1263,12 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
 
         package = self.env["stock.quant.package"].browse(package_id).exists()
-        packaging = self.env["stock.package.type"].browse(product_packaging_id).exists()
+        packaging = self.env["stock.package.type"].browse(package_type_id).exists()
         if not (package and packaging):
             return self._response_for_summary(
                 picking, message=self.msg_store.record_not_found()
             )
-        package.product_packaging_id = packaging
+        package.package_type_id = packaging
         return self._response_for_summary(
             picking,
             message={
@@ -1464,7 +1464,7 @@ class ShopfloorCheckoutValidator(Component):
                 "required": True,
                 "schema": {"coerce": to_int, "required": True, "type": "integer"},
             },
-            "product_packaging_id": {
+            "package_type_id": {
                 "coerce": to_int,
                 "required": False,
                 "type": "integer",
@@ -1519,7 +1519,7 @@ class ShopfloorCheckoutValidator(Component):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "product_packaging_id": {
+            "package_type_id": {
                 "coerce": to_int,
                 "required": True,
                 "type": "integer",
@@ -1583,7 +1583,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             "select_dest_package": self._schema_select_package,
             "select_delivery_packaging": self._schema_select_delivery_packaging,
             "summary": self._schema_summary,
-            "change_packaging": self._schema_select_delivery_packaging,
+            "change_packaging": self._schema_select_packaging,
             "confirm_done": self._schema_confirm_done,
         }
 
@@ -1662,7 +1662,7 @@ class ShopfloorCheckoutValidatorResponse(Component):
             },
             "packaging": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas.packaging()},
+                "schema": {"type": "dict", "schema": self.schemas.delivery_packaging()},
             },
         }
 

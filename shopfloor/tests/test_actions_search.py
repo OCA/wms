@@ -213,15 +213,6 @@ class TestFindCase(TestSearchBaseCase):
         )
         self.assertEqual(res.record, lots[1])
 
-    def test_find_generic_packaging(self):
-        rec = (
-            self.env["product.packaging"]
-            .sudo()
-            .create({"name": "TEST PKG", "barcode": "1234"})
-        )
-        res = self.search.find(rec.barcode, types=("delivery_packaging",))
-        self.assertEqual(res.record, rec)
-
     def test_find_chain(self):
         prod = self.product_a
         # prod last type -> found

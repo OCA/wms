@@ -8,13 +8,14 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
+        cls.env["stock.package.type"].sudo().search([]).active = False
         pallet_type = (
             cls.env["product.packaging.level"]
             .sudo()
             .create({"name": "Pallet", "code": "P", "sequence": 3})
         )
         cls.packaging_pallet = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -24,6 +25,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "height": 100,
                     "width": 100,
                     "packaging_length": 100,
+                    "sequence": 2,
                 }
             )
         )
@@ -33,7 +35,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             .create({"name": "Box", "code": "B", "sequence": 2})
         )
         cls.packaging_box = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -43,6 +45,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "height": 20,
                     "width": 20,
                     "packaging_length": 20,
+                    "sequence": 1,
                 }
             )
         )
@@ -52,7 +55,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             .create({"name": "Inner Box", "code": "I", "sequence": 1})
         )
         cls.packaging_inner_box = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -62,6 +65,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                     "height": 10,
                     "width": 10,
                     "packaging_length": 10,
+                    "sequence": 0,
                 }
             )
         )
@@ -69,7 +73,8 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
         cls._fill_stock_for_moves(cls.picking.move_ids, in_package=True)
         cls.picking.action_assign()
         cls.package = cls.picking.move_line_ids.result_package_id
-        cls.package.product_packaging_id = cls.packaging_pallet
+        cls.package.package_type_id = cls.packaging_pallet
+        cls.packagings = cls.env["stock.package.type"].search([]).sorted()
 
     def test_list_packaging_ok(self):
         response = self.service.dispatch(
@@ -115,11 +120,11 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": self.package.id,
-                "product_packaging_id": self.packaging_inner_box.id,
+                "package_type_id": self.packaging_inner_box.id,
             },
         )
         self.assertRecordValues(
-            self.package, [{"product_packaging_id": self.packaging_inner_box.id}]
+            self.package, [{"package_type_id": self.packaging_inner_box.id}]
         )
         self.assert_response(
             response,
@@ -140,7 +145,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": 0,
-                "product_packaging_id": self.packaging_inner_box.id,
+                "package_type_id": self.packaging_inner_box.id,
             },
         )
         self.assert_response(
@@ -162,7 +167,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             params={
                 "picking_id": self.picking.id,
                 "package_id": self.package.id,
-                "product_packaging_id": 0,
+                "package_type_id": 0,
             },
         )
         self.assert_response(

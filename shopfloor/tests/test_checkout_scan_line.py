@@ -9,7 +9,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
         cls.delivery_packaging = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {

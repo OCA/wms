@@ -300,7 +300,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         move_line3.qty_done = 0
 
         packaging = (
-            self.env["product.packaging"]
+            self.env["stock.package.type"]
             .sudo()
             .create(
                 {
@@ -330,7 +330,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             new_package,
             [
                 {
-                    "product_packaging_id": packaging.id,
+                    "package_type_id": packaging.id,
                     "pack_length": packaging.packaging_length,
                     "width": packaging.width,
                     "height": packaging.height,

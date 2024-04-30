@@ -22,17 +22,6 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         selected_move_line_c = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_c
         )
-        packaging = (
-            self.env["product.packaging"]
-            .sudo()
-            .create(
-                {
-                    "name": "AutoPost Packaging",
-                    "barcode": "APPackaging",
-                    "qty": 1.0,
-                }
-            )
-        )
 
         # User has selected 7 units out of 10 for product_a,
         # and 9 units out of 20 for product_b.
@@ -42,7 +31,7 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_ids": [selected_move_line_a.id, selected_move_line_b.id],
-                "barcode": packaging.barcode,
+                "barcode": self.delivery_packaging.barcode,
             },
         )
 

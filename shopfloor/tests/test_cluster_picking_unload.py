@@ -878,11 +878,16 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         next_picking = picking.copy(
             {
                 "picking_type_id": self.wh.out_type_id.id,
-                "location_id": picking.location_dest_id.id,
+                "location_id": dest_location.id,
                 "location_dest_id": self.customer_location.id,
             }
         )
-        next_picking.move_ids.write({"move_orig_ids": [(6, 0, picking.move_ids.ids)]})
+        next_picking.move_ids.write(
+            {
+                "move_orig_ids": [(6, 0, picking.move_ids.ids)],
+                "location_id": dest_location.id,
+            }
+        )
         next_picking.action_confirm()
 
         response = self.service.dispatch(
