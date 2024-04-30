@@ -42,7 +42,8 @@
     <field name="state">code</field>
     <field name="code">
     if records:
-        records.move_ids.action_unblock_release()
+      for move in records.move_ids:
+        move.action_unblock_release()
     </field>
   </record>
 
@@ -54,7 +55,8 @@
     <field name="state">code</field>
     <field name="code">
     if records:
-        records.move_ids.action_block_release()
+      for move in records.move_ids:
+        move.action_block_release()
     </field>
   </record>
 
