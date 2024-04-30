@@ -15,6 +15,7 @@
         "views/stock_picking_views.xml",
         "views/product_product_views.xml",
         "views/sale_order_views.xml",
+        "views/res_config_settings.xml",
     ],
     "installable": True,
     "license": "LGPL-3",

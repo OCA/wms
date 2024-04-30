@@ -9,7 +9,7 @@
     >
       <xpath expr="//th[@name='th_description']" position="after">
         <th
-                t-if="doc.state != 'draft'"
+                t-if="doc.state != 'draft' and doc.company_id.stock_sale_report_display_is_available"
                 name="th_is_available"
                 class="text-right nowrap"
             >Available</th>
@@ -17,7 +17,7 @@
 
       <xpath expr="//td[@name='td_name']" position="after">
           <td
-                t-if="doc.state != 'draft'"
+                t-if="doc.state != 'draft' and doc.company_id.stock_sale_report_display_is_available"
                 name="td_is_available"
                 class="nowrap text-right"
             >
