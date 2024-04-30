@@ -51,8 +51,10 @@ class InventoryAction(Component):
             domain.append(("lot_id", "=", False))
         return self.inventory_model.search(domain, limit=limit)
 
-    def _create_draft_inventory(self, location, product, lot=None):
-        quants = self._get_existing_quant(location, product, lot=lot, limit=None)
+    def _create_draft_inventory(self, location, product, package=None, lot=None):
+        quants = self._get_existing_quant(
+            location, product, package=package, lot=lot, limit=None
+        )
         if quants:
             for quant in quants:
                 if quant.inventory_quantity_set:
@@ -73,6 +75,7 @@ class InventoryAction(Component):
                     "lot_id": lot.id,
                     "inventory_quantity": 1,
                     "inventory_date": fields.Date.today(),
+                    "package_id": package.id if package else False,
                 }
             )
 
@@ -84,8 +87,8 @@ class InventoryAction(Component):
         If a draft or in progress inventory already exists for the same
         combination of product/package/lot, no inventory is created.
         """
-        if not self._inventory_exists(location, product, lot=lot):
-            self._create_draft_inventory(location, product, lot=lot)
+        if not self._inventory_exists(location, product, package=package, lot=lot):
+            self._create_draft_inventory(location, product, package=package, lot=lot)
 
     def create_stock_issue(self, move, location, package, lot):
         """Create an inventory for a stock issue

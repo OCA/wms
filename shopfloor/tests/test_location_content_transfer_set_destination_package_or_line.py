@@ -477,12 +477,11 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assertEqual(move.product_id, self.product_c)
         self.assertEqual(move.product_uom_qty, 4)
         self.assertEqual(move.move_line_ids.reserved_uom_qty, 4)
-        self.assertEqual(move.move_line_ids.qty_done, 0)
-        # Check the response
-        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assertEqual(move.move_line_ids.qty_done, 4)
+        # Check the response -> we must first process the backorder
         self.assert_response_start_single(
             response,
-            move_lines.mapped("picking_id"),
+            done_picking.backorder_ids,
             message=self.service.msg_store.location_content_transfer_item_complete(
                 self.dest_location
             ),
@@ -928,7 +927,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         move_line = move.move_line_ids
         self.assertEqual(move_line.move_id.product_uom_qty, 4)
         self.assertEqual(move_line.reserved_uom_qty, 4)
-        self.assertEqual(move_line.qty_done, 0)
+        self.assertEqual(move_line.qty_done, 4)
 
     def test_set_destination_package_partial_qty_with_move_orig_ids(self):
         """Scanned destination location with partial qty, but related moves

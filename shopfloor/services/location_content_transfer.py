@@ -851,6 +851,7 @@ class LocationContentTransfer(Component):
         inventory = self._actions_for("inventory")
         package_move_lines = package_level.move_line_ids
         package_moves = package_move_lines.mapped("move_id")
+        package = package_level.package_id
         for package_move in package_moves:
             # Check if there is no other lines linked to the move others than
             # the lines related to the package itself. In such case we have to
@@ -863,27 +864,14 @@ class LocationContentTransfer(Component):
             package_move._do_unreserve()
             package_move._recompute_state()
             # Create an inventory at 0 in the move's source location
-            inventory.create_stock_issue(
-                package_move, location, package_level.package_id, lot
-            )
+            inventory.create_stock_issue(package_move, location, package, lot)
             # Create a draft inventory to control stock
             inventory.create_control_stock(
-                location, package_move.product_id, package_level.package_id, lot
+                location, package_move.product_id, package, lot
             )
             package_move._action_cancel()
         # remove the package level (this is what does the `picking.do_unreserve()`
         # method, but here we want to unreserve+unlink this package alone)
-        assert package_level.state == "draft", "Package level has to be in draft"
-        if package_level.state != "draft":
-            move_lines = self._find_transfer_move_lines(location)
-            return self._response_for_start_single(
-                move_lines.mapped("picking_id"),
-                message={
-                    "message_type": "error",
-                    "body": _("Package level has to be in draft"),
-                },
-            )
-        package_level.unlink()
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
