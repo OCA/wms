@@ -1,0 +1,12 @@
+<odoo noupdate="1">
+  <record id="app_demo" model="shopfloor.app">
+    <field name="name">Shopfloor WMS (demo)</field>
+    <field name="short_name">WMS (demo)</field>
+    <field name="tech_name">wms_demo</field>
+    <field name="category">wms</field>
+    <field
+            name="profile_ids"
+            eval="[(4, ref('shopfloor.profile_demo_1')), (4, ref('shopfloor.profile_demo_2'))]"
+        />
+  </record>
+</odoo>

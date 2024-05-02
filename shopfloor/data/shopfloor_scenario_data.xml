@@ -1,0 +1,73 @@
+<odoo noupdate="1">
+    <record id="scenario_single_pack_transfer" model="shopfloor.scenario">
+        <field name="name">Single Pack Transfer</field>
+        <field name="key">single_pack_transfer</field>
+        <field name="options_edit">
+{
+    "allow_create_moves": true,
+    "allow_unreserve_other_moves": true,
+    "allow_ignore_no_putaway_available": true,
+    "must_move_entire_pack": true
+}
+        </field>
+    </record>
+    <record id="scenario_zone_picking" model="shopfloor.scenario">
+        <field name="name">Zone Picking</field>
+        <field name="key">zone_picking</field>
+        <field name="options_edit">
+{
+    "pick_pack_same_time": true,
+    "unload_package_at_destination": true,
+    "multiple_move_single_pack": true,
+    "no_prefill_qty": true,
+    "scan_location_or_pack_first": true
+}
+        </field>
+    </record>
+    <record id="scenario_cluster_picking" model="shopfloor.scenario">
+        <field name="name">Cluster Picking</field>
+        <field name="key">cluster_picking</field>
+        <field name="options_edit">
+{
+    "unload_package_at_destination": true,
+    "multiple_move_single_pack": true,
+    "no_prefill_qty": true,
+    "scan_location_or_pack_first": true
+}
+        </field>
+    </record>
+    <record id="scenario_checkout" model="shopfloor.scenario">
+        <field name="name">Checkout</field>
+        <field name="key">checkout</field>
+        <field name="options_edit">
+{
+    "no_prefill_qty": true,
+    "show_oneline_package_content": true,
+    "auto_post_line": true
+}
+        </field>
+    </record>
+    <record id="scenario_delivery" model="shopfloor.scenario">
+        <field name="name">Delivery</field>
+        <field name="key">delivery</field>
+        <field name="options_edit">
+{
+    "must_move_entire_pack": true,
+    "allow_prepackaged_product": true
+}
+        </field>
+    </record>
+    <record id="scenario_location_content_transfer" model="shopfloor.scenario">
+        <field name="name">Location content transfer</field>
+        <field name="key">location_content_transfer</field>
+        <field name="options_edit">
+{
+    "allow_create_moves": true,
+    "allow_unreserve_other_moves": true,
+    "allow_ignore_no_putaway_available": true,
+    "allow_get_work": true,
+    "no_prefill_qty": true
+}
+        </field>
+    </record>
+</odoo>

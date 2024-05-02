@@ -1,0 +1,36 @@
+# Diagram to generate with PlantUML (https://plantuml.com/)
+#
+#   $ sudo apt install plantuml
+#   $ plantuml single_pack_transfer_diag_seq.plantuml
+#
+
+@startuml
+
+skinparam roundcorner 20
+skinparam sequence {
+
+ParticipantBorderColor #875A7B
+ParticipantBackgroundColor #875A7B
+ParticipantFontSize 17
+ParticipantFontColor white
+
+LifeLineBorderColor #875A7B
+
+ArrowColor #00A09D
+}
+
+header <img:oca_logo.png>
+title <size:35>Single Pack Transfer scenario</size>
+
+== /start ==
+start -> scan_location: **/start**(barcode[pack|location], confirmation=False)
+start -> start: **/start**(barcode[pack|location], confirmation=False)
+
+== /cancel ==
+scan_location -> start: **/cancel**(package_level_id)
+
+== /validate ==
+scan_location -> scan_location: **/validate**(package_level_id, location_barcode, confirmation=False)
+scan_location -> start: **/validate**(package_level_id, location_barcode, confirmation=False)
+
+@enduml
