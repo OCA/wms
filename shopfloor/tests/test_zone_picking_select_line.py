@@ -182,6 +182,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         )
         move_lines = self.pickings.move_line_ids.filtered(
             lambda l: l.location_id == self.zone_sublocation2
+        ).sorted(
+            self.service.search_move_line._sort_key_move_lines(self.service.lines_order)
         )
         self.assert_response_select_line(
             response,
@@ -291,8 +293,8 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             picking1b.move_ids, in_package=True, location=self.zone_sublocation1
         )
         picking1b.action_assign()
-        picking1b.action_cancel()
         package1b = picking1b.package_level_ids[0].package_id
+        picking1b.action_cancel()
         package1 = self.picking1.package_level_ids[0].package_id
         # 1st scan
         response = self.service.dispatch(

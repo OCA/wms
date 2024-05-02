@@ -11,9 +11,7 @@ class PackagingAction(Component):
     _usage = "packaging"
 
     def packaging_valid_for_carrier(self, packaging, carrier):
-        return self.packaging_type_valide_for_carrier(
-            packaging.package_type_id, carrier
-        )
+        return self.packaging_type_valid_for_carrier(packaging.package_type_id, carrier)
 
     def packaging_type_valid_for_carrier(self, packaging_type, carrier):
         return packaging_type.package_carrier_type in (

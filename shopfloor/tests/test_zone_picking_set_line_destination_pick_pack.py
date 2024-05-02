@@ -48,18 +48,11 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
             .sudo()
             .create({"name": "TEST DEFAULT", "package_carrier_type": "test"})
         )
-        default_pkging = (
-            cls.env["product.packaging"]
-            .sudo()
-            .create(
-                {"name": "TEST DEFAULT", "package_type_id": delivery_packaging_type.id}
-            )
-        )
         cls.carrier.sudo().write(
             {
                 "delivery_type": "test",
                 "integration_level": "rate",  # avoid sending emails
-                "test_default_packaging_id": default_pkging.id,
+                "test_default_packaging_id": delivery_packaging_type.id,
             }
         )
 
@@ -121,7 +114,7 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         delivery_pkg = move_line.result_package_id
         self.assertNotIn(delivery_pkg, existing_packages)
         self.assertEqual(
-            delivery_pkg.product_packaging_id, self.carrier.test_default_packaging_id
+            delivery_pkg.package_type_id, self.carrier.test_default_packaging_id
         )
         message = self.msg_store.confirm_pack_moved()
         message["body"] += "\n" + self.msg_store.goods_packed_in(delivery_pkg)["body"]
@@ -201,7 +194,18 @@ class ZonePickingSetLineDestinationPickPackCase(ZonePickingCommonCase):
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
         move_line.picking_id.carrier_id = self.carrier
-        self.free_package.product_packaging_id = self.carrier.test_default_packaging_id
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "TEST DEFAULT",
+                    "package_type_id": self.carrier.test_default_packaging_id.id,
+                }
+            )
+        )
+
+        self.free_package.product_packaging_id = packaging
         response = self.service.dispatch(
             "set_destination",
             params={

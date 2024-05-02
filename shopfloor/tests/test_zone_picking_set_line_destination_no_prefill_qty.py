@@ -96,7 +96,7 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
     def test_set_destination_increment_with_lot(self):
         """Check increment quantity by scanning the lot."""
         picking_type = self.picking2.picking_type_id
-        move_line = self.picking2.move_line_ids[0]
+        move_line = self.picking2.move_line_ids.filtered("lot_id")[0]
         # Scan twice the lot in a row to increment the quantity
         for qty_done in range(2):
             response = self.service.dispatch(

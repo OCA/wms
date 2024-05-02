@@ -856,8 +856,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="start",
             message={
-                "message_type": "success",
-                "body": "Canceled, you can scan a new pack.",
+                "message_type": "error",
+                "body": "This operation does not exist anymore.",
             },
         )
         package_level_b = self._simulate_started(self.pack_b)
