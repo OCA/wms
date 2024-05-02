@@ -28,6 +28,35 @@ class StockReleaseChannel(models.Model):
         comodel_name="stock.dock", domain='[("warehouse_id", "=", warehouse_id)]'
     )
     warehouse_id = fields.Many2one(inverse="_inverse_warehouse_id")
+    shipment_advice_to_print_ids = fields.One2many(
+        "shipment.advice", compute="_compute_shipment_advice_to_print_ids"
+    )
+    is_action_print_shipment_allowed = fields.Boolean(
+        compute="_compute_is_action_print_shipment_allowed"
+    )
+
+    @api.depends("shipment_advice_ids")
+    def _compute_shipment_advice_to_print_ids(self):
+        for rec in self:
+            rec.shipment_advice_to_print_ids = fields.first(
+                rec.shipment_advice_ids.filtered(lambda r: r.state == "done").sorted(
+                    "id", reverse=True
+                )
+            )
+
+    @api.model
+    def _get_print_shipment_allowed_states(self):
+        return ["locked"]
+
+    def _compute_is_action_print_shipment_allowed(self):
+        allowed_states = self._get_print_shipment_allowed_states()
+        for rec in self:
+            rec.is_action_print_shipment_allowed = (
+                rec.state in allowed_states
+                and rec.shipment_advice_to_print_ids
+                and True
+                or False
+            )
 
     def button_show_shipment_advice(self):
         self.ensure_one()
@@ -131,3 +160,15 @@ class StockReleaseChannel(models.Model):
     def _onchange_check_warehouse(self):
         self.ensure_one()
         self._check_warehouse()
+
+    def action_print_shipment(self):
+        if self.shipment_advice_to_print_ids:
+            return self.env.ref(
+                "shipment_advice.action_report_shipment_advice"
+            ).report_action(self.shipment_advice_to_print_ids)
+        return {}
+
+    def action_print_deliveryslip(self):
+        if self.shipment_advice_to_print_ids:
+            return self.shipment_advice_to_print_ids.print_all_deliveryslip()
+        return {}

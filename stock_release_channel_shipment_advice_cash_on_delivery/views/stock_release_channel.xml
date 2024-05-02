@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="stock_release_channel_kanban_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='dropdown-menu-right-panel']" position="inside">
+                <t t-if="record.is_action_print_shipment_allowed.raw_value">
+                    <div role="menuitem">
+                        <a
+                            name="action_print_cash_on_delivery_invoices"
+                            type="object"
+                            icon="fa-money"
+                        ><span class="ms-2">Print COD Invoices</span></a>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_shipment_advice.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button
+                    name="action_print_cash_on_delivery_invoices"
+                    type="object"
+                    string="Print COD Invoices"
+                    attrs="{'invisible': [('is_action_print_shipment_allowed', '=', False)]}"
+                />
+            </header>
+        </field>
+    </record>
+
+</odoo>
