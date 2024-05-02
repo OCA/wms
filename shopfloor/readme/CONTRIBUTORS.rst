@@ -8,6 +8,8 @@
 * Jacques-Etienne Baudoux <je@bcim.be>
 * Juan Miguel Sánchez Arce <juan.sanchez@camptocamp.com>
 * Michael Tietz (MT Software) <mtietz@mt-software.de>
+* Souheil Bejaoui <souheil.bejaoui@acsone.eu>
+* Laurent Mignon <laurent.mignon@acsone.eu>
 
 Design
 ~~~~~~
