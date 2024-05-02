@@ -97,12 +97,14 @@ class MoveLineSearch(Component):
             return lambda line: (
                 -int(line.move_id.priority or "0"),
                 line.move_id.date,
+                line.move_id.id,
             )
         elif order == "location":
             return lambda line: (
                 line.move_id.location_id.shopfloor_picking_sequence or "",
                 line.move_id.location_id.name,
                 line.move_id.date,
+                line.move_id.id,
             )
         return lambda line: line
 
