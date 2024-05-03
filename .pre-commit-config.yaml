@@ -88,12 +88,14 @@ repos:
     rev: v8.24.0
     hooks:
       - id: eslint
-        # Useless for external libs
-        exclude: ^shopfloor_mobile_base/static/wms/src/.*
         verbose: true
         args:
           - --color
           - --fix
+        # SPECIAL CASE: barcode scanner app use Vue.js +
+        # advanced JS (modules, classes, etc)
+        # which are not supported by OCA rules yet.
+        exclude: shopfloor_*/*
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
