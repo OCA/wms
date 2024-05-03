@@ -1,0 +1,116 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_workstation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2021-10-19 23:35+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
+"Language-Team: none\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: shopfloor_workstation
+#: model_terms:ir.ui.view,arch_db:shopfloor_workstation.shopfloor_workstation_form_view
+#: model_terms:ir.ui.view,arch_db:shopfloor_workstation.shopfloor_workstation_search_view
+msgid "Archived"
+msgstr "Archivado"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__barcode
+msgid "Barcode"
+msgstr "Código de Barras"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: shopfloor_workstation
+#: code:addons/shopfloor_workstation/services/workstation.py:0
+#, python-format
+msgid "Default workstation set to {}"
+msgstr "Estación de trabajo predeterminada para configurar {}"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__display_name
+msgid "Display Name"
+msgstr "Mostrar Nombre"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__id
+msgid "ID"
+msgstr "ID"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation____last_update
+msgid "Last Modified on"
+msgstr "Última Modificación el"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__write_uid
+msgid "Last Updated by"
+msgstr "Última Actualización por"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__write_date
+msgid "Last Updated on"
+msgstr "Última Actualización el"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__shopfloor_profile_id
+msgid "Shopfloor Profile"
+msgstr "Perfil del Taller"
+
+#. module: shopfloor_workstation
+#: model:ir.model,name:shopfloor_workstation.model_shopfloor_workstation
+msgid "Shopfloor workstation settings"
+msgstr "Configuración de la Estación de trabajo del Taller"
+
+#. module: shopfloor_workstation
+#: model:ir.model.fields,field_description:shopfloor_workstation.field_shopfloor_workstation__printing_printer_id
+msgid "Standard Printer"
+msgstr "Impresora Estándar"
+
+#. module: shopfloor_workstation
+#: model:ir.model.constraint,message:shopfloor_workstation.constraint_shopfloor_workstation_barcode_unique
+msgid "This barcode is already in use."
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.model.constraint,message:shopfloor_workstation.constraint_shopfloor_workstation_name_unique
+msgid "This name is already in use."
+msgstr ""
+
+#. module: shopfloor_workstation
+#: model:ir.actions.act_window,name:shopfloor_workstation.action_shopfloor_workstation
+#: model:ir.ui.menu,name:shopfloor_workstation.menu_action_shopfloor_workstation
+msgid "Workstation"
+msgstr "Estación de Trabajo"
+
+#. module: shopfloor_workstation
+#: code:addons/shopfloor_workstation/services/workstation.py:0
+#, python-format
+msgid "Workstation not found"
+msgstr "Estación de Trabajo no encontrada"
