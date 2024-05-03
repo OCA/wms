@@ -5,7 +5,7 @@
 {
     "name": "Stock Available to Promise Release - Block",
     "summary": """Block Release of Operations""",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.1.1",
     "license": "AGPL-3",
     "author": "Camptocamp, ACSONE SA/NV, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
