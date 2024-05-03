@@ -36,8 +36,9 @@ class StockMove(models.Model):
 
     def action_block_release(self):
         """Block the release."""
-        if self.need_release:
-            self.release_blocked = True
+        for move in self:
+            if move.need_release:
+                move.release_blocked = True
 
     def action_unblock_release(self):
         """Unblock the release."""
