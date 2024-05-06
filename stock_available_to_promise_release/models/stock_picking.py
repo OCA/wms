@@ -188,7 +188,7 @@ class StockPicking(models.Model):
     def unrelease(self, safe_unrelease=False):
         """Unrelease the moves of the picking.
 
-        If safe_unrelease is True, the unreleasaable moves for which the
+        If safe_unrelease is True, the unreleasable moves for which the
         processing has already started will be ignored
         """
         self.mapped("move_lines").unrelease(safe_unrelease=safe_unrelease)
