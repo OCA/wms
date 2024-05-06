@@ -1,4 +1,5 @@
 # Copyright 2023 Camptocamp SA
+# Copyright 2024 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo.tests import Form
@@ -86,6 +87,18 @@ class CommonCaseReturn(CommonCase):
             for line in ready_picking.move_line_ids:
                 line.qty_done = line.product_qty
             ready_picking._action_done()
+
+    @classmethod
+    def partial_deliver(cls, picking, qty_done):
+        picking.move_line_ids.write({"qty_done": qty_done})
+        action_data = picking.button_validate()
+        if not action_data or action_data is True:
+            return picking.browse()
+        backorder_wizard = Form(
+            cls.env["stock.backorder.confirmation"].with_context(action_data["context"])
+        ).save()
+        backorder_wizard.process()
+        return cls.env["stock.picking"].search([("backorder_id", "=", picking.id)])
 
     def assert_return_of(self, picking_in, origin):
         self.assertEqual(origin, picking_in.origin)

@@ -319,7 +319,11 @@ class Reception(Component):
         reception_pickings = picking_filter_result.filtered(
             lambda p: p.picking_type_id.id in self.picking_types.ids
         )
-        if picking_filter_result and not reception_pickings:
+        if (
+            picking_filter_result
+            and not reception_pickings
+            and not self.work.menu.allow_return
+        ):
             return self._response_for_select_document(
                 message=self.msg_store.cannot_move_something_in_picking_type()
             )
@@ -357,7 +361,8 @@ class Reception(Component):
             return self._select_document_from_packaging(packaging)
 
     def _scan_document__by_lot(self, lot, barcode):
-        return self._select_document_from_lot(lot)
+        if lot:
+            return self._select_document_from_lot(lot)
 
     def _scan_document__by_origin_move(self, moves, barcode):
         if not self.work.menu.allow_return:
@@ -890,12 +895,15 @@ class Reception(Component):
         handlers_by_type = self._scan_document__get_handlers_by_type()
         search = self._actions_for("search")
         find_kw = self._scan_document__get_find_kw()
-        search_result = search.find(
-            barcode, handlers_by_type.keys(), handler_kw=find_kw
-        )
-        handler = handlers_by_type.get(search_result.type)
-        if handler:
-            return handler(search_result.record, barcode)
+        for handler_type, handler in handlers_by_type.items():
+            record = search._find_record_by_type(
+                barcode, handler_type, handler_kw=find_kw
+            )
+            if not record:
+                continue
+            res = handler(record, barcode)
+            if res:
+                return res
         return self._scan_document__fallback()
 
     def list_stock_pickings(self):
