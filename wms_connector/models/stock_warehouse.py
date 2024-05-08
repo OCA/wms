@@ -144,8 +144,14 @@ class StockWarehouse(models.Model):
             rec._activate_crons()
             rec._activate_filters()
 
+    def _get_mappings(self):
+        return MAPPINGS
+
+    def _get_filter_vals(self):
+        return FILTER_VALS
+
     def _activate_tasks(self):
-        for mappings in MAPPINGS.values():
+        for mappings in self._get_mappings().values():
             task_field_name = mappings["fieldname_task"]
             task = self[task_field_name]
             if task:
@@ -161,7 +167,7 @@ class StockWarehouse(models.Model):
                 )
 
     def _activate_crons(self):
-        for mappings in MAPPINGS.values():
+        for mappings in self._get_mappings().values():
             cron_field_name = mappings["fieldname_cron"]
             cron = self[cron_field_name]
             if cron:
@@ -173,7 +179,7 @@ class StockWarehouse(models.Model):
                 )
 
     def _activate_filters(self):
-        for filter_fieldname, vals in FILTER_VALS.items():
+        for filter_fieldname, vals in self._get_filter_vals().items():
             ir_filter = self[filter_fieldname]
             if ir_filter:
                 ir_filter.active = True
@@ -217,7 +223,7 @@ class StockWarehouse(models.Model):
 
     def _deactivate_crons_tasks(self):
         for rec in self:
-            for mappings in MAPPINGS.values():
+            for mappings in self._get_mappings().values():
                 rec[mappings["fieldname_task"]].active = False
                 rec[mappings["fieldname_cron"]].active = False
 
