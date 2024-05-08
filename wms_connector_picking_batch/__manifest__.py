@@ -2,22 +2,16 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Wms Connector",
+    "name": "Wms Connector Picking batch",
     "summary": """
-        WMS Connector""",
+        WMS Connector Picking batch""",
     "version": "14.0.1.0.0",
     "license": "AGPL-3",
     "author": "Akretion,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
-    "depends": ["stock", "sale", "attachment_synchronize"],
+    "depends": ["wms_connector", "stock_picking_batch"],
     "data": [
-        "security/wms_product_sync.xml",
-        "views/wms_product_sync.xml",
-        "views/stock_picking.xml",
+        "views/stock_picking_batch.xml",
         "views/stock_warehouse.xml",
-        "views/attachment_queue_view.xml",
-    ],
-    "demo": [
-        "demo/storage_backend.xml",
     ],
 }
