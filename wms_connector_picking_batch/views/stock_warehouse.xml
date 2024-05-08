@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Akretion
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record model="ir.ui.view" id="stock_warehouse_form_view">
+        <field name="name">stock.warehouse.form (in wms_connector)</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse" />
+        <field name="arch" type="xml">
+            <div class="oe_button_box" position="inside">
+                <button
+                    name="button_open_wms_batch_pickings_in"
+                    string="WMS sync batch transfer in"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
+                <button
+                    name="button_open_wms_pickings_out"
+                    string="WMS sync batch transfer pickings out"
+                    icon="fa-refresh"
+                    class="oe_stat_button"
+                    type="object"
+                />
+            </div>
+        </field>
+    </record>
+</odoo>
