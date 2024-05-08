@@ -2,7 +2,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-class StockPikcingBatch(models.Model):
+class StockPickingBatch(models.Model):
     _inherit = ["synchronize.exportable.mixin", "stock.picking.batch"]
     _name = "stock.picking.batch"
 
@@ -68,6 +68,8 @@ class StockPikcingBatch(models.Model):
         for picking_batch in self:
             if picking_batch.wms_export_date:
                 raise UserError(
-                    _("The batch transfer %s have been exported and can not be modified")
+                    _(
+                        "The batch transfer %s have been exported and can not be modified"
+                    )
                     % picking_batch.name
                 )

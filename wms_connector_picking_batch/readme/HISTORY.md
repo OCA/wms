@@ -12,6 +12,3 @@ the README.rst or other documents where this fragment is included. ]
 - [ADD] New feature. ([#74](https://github.com/OCA/repo/issues/74))
 - [FIX] Correct this. ([#71](https://github.com/OCA/repo/issues/71))
 
-## 11.0.x.y.z (YYYY-MM-DD)
-
-- ...

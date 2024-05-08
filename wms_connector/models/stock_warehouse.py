@@ -3,7 +3,7 @@
 
 from copy import deepcopy
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 FILTER_VALS = {
     "wms_export_product_filter_id": {
@@ -144,9 +144,11 @@ class StockWarehouse(models.Model):
             rec._activate_crons()
             rec._activate_filters()
 
+    @api.model
     def _get_mappings(self):
         return MAPPINGS
 
+    @api.model
     def _get_filter_vals(self):
         return FILTER_VALS
 

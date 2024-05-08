@@ -16,7 +16,7 @@
                     type="object"
                 />
                 <button
-                    name="button_open_wms_pickings_out"
+                    name="button_open_wms_batch_pickings_out"
                     string="WMS sync batch transfer pickings out"
                     icon="fa-refresh"
                     class="oe_stat_button"

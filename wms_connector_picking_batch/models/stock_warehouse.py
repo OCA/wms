@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 FILTER_VALS = {
     "wms_export_batch_picking_in_filter_id": {
@@ -10,11 +10,15 @@ FILTER_VALS = {
         "model_id": "stock.picking.batch",
     },
 }
+# Find a better way to override filters
 FILTER_DOMAINS = {
-    "wms_export_product_filter_id": "[]",
     "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
+    ' ("picking_type_id", "=", {}), ("state", "=", "assigned"), ("batch_id", "=", False)]',
     "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
+    ' ("picking_type_id", "=", {}), ("state", "=", "assigned"), ("batch_id", "=", False)]',
+    "wms_export_batch_picking_in_filter_id": '[("wms_export_date", "=", False),'
+    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
+    "wms_export_batch_picking_out_filter_id": '[("wms_export_date", "=", False),'
     ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
 }
 
@@ -44,8 +48,10 @@ MAPPINGS = {
     },
 }
 
+
 class StockWarehouse(models.Model):
     _inherit = "stock.warehouse"
+    _name = "stock.warehouse"
 
     wms_export_batch_picking_in_cron_id = fields.Many2one("ir.cron", readonly=True)
     wms_export_batch_picking_out_cron_id = fields.Many2one("ir.cron", readonly=True)
@@ -59,11 +65,13 @@ class StockWarehouse(models.Model):
         }
         return domains[model_domain]
 
+    @api.model
     def _get_mappings(self):
         mappings = super()._get_mappings()
         mappings.update(MAPPINGS)
         return mappings
 
+    @api.model
     def _get_filter_vals(self):
         # TODO(franz) remove picking with batch id from the picking in and out filter
         filter_vals = super()._get_filter_vals()
@@ -71,6 +79,7 @@ class StockWarehouse(models.Model):
         return filter_vals
 
     def _activate_filters(self):
+        super()._activate_filters()
         self.wms_export_batch_picking_in_filter_id.domain = FILTER_DOMAINS[
             "wms_export_batch_picking_in_filter_id"
         ].format(self.in_type_id.id)
