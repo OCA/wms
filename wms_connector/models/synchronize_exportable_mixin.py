@@ -34,10 +34,10 @@ class SynchronizeExportableMixin(models.AbstractModel):
         for rec in self:
             try:
                 with self._cr.savepoint():
-                    data += rec._prepare_export_data(sequence)
+                    sequence, rec_data = rec._prepare_export_data(sequence)
+                    data += rec_data
                     records |= rec
                     rec.wms_export_error = None
-                    sequence += 1
             except Exception as e:
                 if raise_error:
                     raise
