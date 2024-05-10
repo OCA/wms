@@ -351,7 +351,7 @@ export const checkout_states = function ($instance) {
                     $instance.odoo.call("set_packaging", {
                         picking_id: $instance.state.data.picking.id,
                         package_id: $instance.state.data.package.id,
-                        packaging_id: selected.id,
+                        package_type_id: selected.id,
                     })
                 );
             },
