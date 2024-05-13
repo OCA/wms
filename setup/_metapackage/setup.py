@@ -14,6 +14,7 @@ setuptools.setup(
         'odoo-addon-shopfloor>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_base>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_mobile_base>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_rest_log>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_workstation>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_workstation_mobile>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release>=16.0dev,<16.1dev',
