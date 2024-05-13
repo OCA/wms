@@ -1,0 +1,54 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_mobile_base_auth_api_key
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:ir.model,name:shopfloor_mobile_base_auth_api_key.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__auth_api_key_group_ids
+msgid "Allowed API key groups"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base_auth_api_key.shopfloor_app_form_view
+msgid "Manage groups"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:shopfloor.app,name:shopfloor_mobile_base_auth_api_key.app_demo1
+msgid "Shopfloor Demo (api key auth)"
+msgstr ""
+
+#. module: shopfloor_mobile_base_auth_api_key
+#: model:shopfloor.app,short_name:shopfloor_mobile_base_auth_api_key.app_demo1
+msgid "demo api key"
+msgstr ""

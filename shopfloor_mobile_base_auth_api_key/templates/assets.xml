@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2021 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <script id="script_page_login" position="after">
+        <t t-set="mod_name" t-value="'shopfloor_mobile_base_auth_api_key'" />
+          <script
+                id="script_login_api_key"
+                t-attf-src="/shopfloor_mobile_base_auth_api_key/static/wms/src/login.js?v=#{get_version(mod_name)}"
+                type="module"
+            />
+        </script>
+    </template>
+</odoo>
