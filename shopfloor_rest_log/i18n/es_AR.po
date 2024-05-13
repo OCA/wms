@@ -32,24 +32,6 @@ msgid "App version"
 msgstr "Versión de la app"
 
 #. module: shopfloor_rest_log
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__display_name
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__display_name
-msgid "Display Name"
-msgstr "Mostrar Nombre"
-
-#. module: shopfloor_rest_log
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__id
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__id
-msgid "ID"
-msgstr "ID"
-
-#. module: shopfloor_rest_log
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log____last_update
-#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
-
-#. module: shopfloor_rest_log
 #: model:ir.actions.act_window,name:shopfloor_rest_log.action_shopfloor_log
 #: model:ir.ui.menu,name:shopfloor_rest_log.menu_action_shopfloor_log
 msgid "Logs"
@@ -82,3 +64,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.shopfloor_app_form_view
 msgid "View logs"
 msgstr "Ver Registros"
+
+#~ msgid "Display Name"
+#~ msgstr "Mostrar Nombre"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
