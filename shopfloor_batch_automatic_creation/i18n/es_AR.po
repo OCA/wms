@@ -1,0 +1,115 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_batch_automatic_creation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2021-10-11 17:34+0000\n"
+"Last-Translator: Ignacio Buioli <ibuioli@gmail.com>\n"
+"Language-Team: none\n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.3.2\n"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
+msgid "Automatic Batch Creation"
+msgstr "Creación Automática de Lotes"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
+msgid ""
+"Automatically create a batch when an operator uses the \"Get Work\" button "
+"and no existing batch has been found. The system will first look for "
+"priority transfers and fill up the batch till the defined constraints (max "
+"of transfers, volume, weight, ...). It never mixes priorities, so if you get "
+"2 available priority transfers and a max quantity of 3, the batch will only "
+"contain the 2 priority transfers."
+msgstr ""
+"Crea automáticamente un lote cuando un operador utilice el botón \"Obtener "
+"trabajo\" y no se haya encontrado ningún lote existente. El sistema primero "
+"buscará transferencias prioritarias y completará el lote hasta las "
+"restricciones definidas (máximo de transferencias, volumen, peso, ...). "
+"Nunca mezcla prioridades, por lo que si obtiene 2 transferencias "
+"prioritarias disponibles y una cantidad máxima de 3, el lote solo contendrá "
+"las 2 transferencias prioritarias."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__display_name
+msgid "Display Name"
+msgstr "Mostrar Nombre"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid "Group by commercial entity"
+msgstr "Agrupar por entidad comercial"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__id
+msgid "ID"
+msgstr "ID"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid ""
+"If enabled, transfers will be grouped by commercial entity.This could mix "
+"priorities and will ignore the constraints to apply."
+msgstr ""
+"Si está habilitado, las transferencias se agruparán por entidad comercial. "
+"Esto podría mezclar prioridades e ignorar las restricciones para aplicar."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu____last_update
+msgid "Last Modified on"
+msgstr "Última Modificación el"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
+msgid "Max Weight (kg)"
+msgstr "Peso Máximo (kg)"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
+msgid "Max transfers"
+msgstr "Transferencias máximas"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
+msgid "Max volume (m³)"
+msgstr "Volumen máximo (m³)"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
+msgid ""
+"Maximum number of transfers to add in an automatic batch. 0 means no limit."
+msgstr ""
+"Número máximo de transferencias para agregar en un lote automático. 0 "
+"significa sin límite."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
+msgid ""
+"Maximum volume in cubic meters of goods in transfers to add in an automatic "
+"batch. 0 means no limit."
+msgstr ""
+"Volumen máximo en metros cúbicos de mercadería en transferencias para "
+"agregar en un lote automático. 0 significa sin límite."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
+msgid ""
+"Maximum weight in kg of goods in transfers to add in an automatic batch. 0 "
+"means no limit."
+msgstr ""
+"Peso máximo en kg de mercancía en transferencias para agregar en un lote "
+"automático. 0 significa sin límite."
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model,name:shopfloor_batch_automatic_creation.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr "Menú mostrado en la aplicación de escaner"

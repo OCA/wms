@@ -1,0 +1,97 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_batch_automatic_creation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
+msgid "Automatic Batch Creation"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
+msgid ""
+"Automatically create a batch when an operator uses the \"Get Work\" button "
+"and no existing batch has been found. The system will first look for "
+"priority transfers and fill up the batch till the defined constraints (max "
+"of transfers, volume, weight, ...). It never mixes priorities, so if you get"
+" 2 available priority transfers and a max quantity of 3, the batch will only"
+" contain the 2 priority transfers."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid "Group by commercial entity"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
+msgid ""
+"If enabled, transfers will be grouped by commercial entity.This could mix "
+"priorities and will ignore the constraints to apply."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
+msgid "Max Weight (kg)"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
+msgid "Max transfers"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
+msgid "Max volume (m³)"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
+msgid ""
+"Maximum number of transfers to add in an automatic batch. 0 means no limit."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
+msgid ""
+"Maximum volume in cubic meters of goods in transfers to add in an automatic "
+"batch. 0 means no limit."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
+msgid ""
+"Maximum weight in kg of goods in transfers to add in an automatic batch. 0 "
+"means no limit."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model,name:shopfloor_batch_automatic_creation.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
