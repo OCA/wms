@@ -1,0 +1,77 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_rest_log
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_rest_log
+#: model:ir.model,name:shopfloor_rest_log.model_shopfloor_app
+msgid "A Shopfloor application"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__app_version
+msgid "App Version"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.rest_log_search_view
+msgid "App version"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__display_name
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__id
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app__id
+msgid "ID"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log____last_update
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_shopfloor_app____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.actions.act_window,name:shopfloor_rest_log.action_shopfloor_log
+#: model:ir.ui.menu,name:shopfloor_rest_log.menu_action_shopfloor_log
+msgid "Logs"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model,name:shopfloor_rest_log.model_rest_log
+msgid "REST API Logging"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,field_description:shopfloor_rest_log.field_rest_log__real_uid
+#: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.rest_log_search_view
+msgid "Real user"
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model:ir.model.fields,help:shopfloor_rest_log.field_rest_log__real_uid
+msgid ""
+"Some services might use a different user in the environment. Whenever "
+"possible, this field will hold a reference to the real user doing the call. "
+"This information can be found in the header `App-User-Id`."
+msgstr ""
+
+#. module: shopfloor_rest_log
+#: model_terms:ir.ui.view,arch_db:shopfloor_rest_log.shopfloor_app_form_view
+msgid "View logs"
+msgstr ""
