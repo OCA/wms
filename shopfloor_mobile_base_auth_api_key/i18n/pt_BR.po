@@ -24,21 +24,6 @@ msgid "Allowed API key groups"
 msgstr ""
 
 #. module: shopfloor_mobile_base_auth_api_key
-#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: shopfloor_mobile_base_auth_api_key
-#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app__id
-msgid "ID"
-msgstr ""
-
-#. module: shopfloor_mobile_base_auth_api_key
-#: model:ir.model.fields,field_description:shopfloor_mobile_base_auth_api_key.field_shopfloor_app____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: shopfloor_mobile_base_auth_api_key
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base_auth_api_key.shopfloor_app_form_view
 msgid "Manage groups"
 msgstr ""
