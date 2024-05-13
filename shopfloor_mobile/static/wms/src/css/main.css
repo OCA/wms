@@ -1,0 +1,73 @@
+ul.packaging {
+    list-style: none;
+}
+ul.packaging span:first-child {
+    width: 33%;
+    float: left;
+}
+
+.summary-content {
+    max-width: 100%;
+}
+.summary-content .v-list-item__title {
+    max-width: 100%;
+    white-space: normal;
+    font-size: 90%;
+    line-height: 130%;
+}
+.summary-content .v-list-item__subtitle {
+    font-size: 85%;
+    line-height: 125%;
+}
+.summary-content .summary-content-item {
+    margin-bottom: 0.4em;
+    padding-bottom: 0.4em;
+}
+.summary-content .v-expansion-panel-content .summary-content-item:not(:last-child) {
+    border-bottom: 1px dotted #ccc;
+}
+
+/* packaging-qty-picker */
+.packaging-qty-picker .v-expansion-panel-header {
+    padding: 0;
+    min-height: 0;
+}
+.packaging-qty-picker .v-expansion-panel-content {
+    border-left: 2px dashed;
+    padding-left: 7px;
+}
+.packaging-qty-picker .v-expansion-panel-content > div {
+    padding: 0;
+}
+.packaging-qty-picker input {
+    line-height: 35px;
+}
+.packaging-qty-picker .qty-done {
+    text-align: center;
+    width: 100%;
+    outline: -webkit-focus-ring-color auto 1px;
+}
+.packaging-qty-picker .qty-todo {
+    text-align: center;
+}
+.packaging-qty-picker .pkg-name {
+    line-height: 1;
+    padding-top: 2px;
+}
+.packaging-qty-picker .pkg-qty {
+    font-size: 75%;
+}
+
+/*
+TODO: this is probably to be applied to all .manual-select.
+I tested only w/ checkout/select_package for now
+ */
+.detail-picking-select .manual-select .v-list-item .v-list-item__action--stack {
+    flex-direction: column;
+}
+
+.v-list-item.location-will-be-empty .field-detail.location_will_be_empty {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
