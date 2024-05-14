@@ -45,7 +45,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
                     raise
                 rec.wms_export_error = str(e)
                 continue
-            if len(records) >= self.record_per_file:
+            if self.record_per_file > 0 and len(records) >= self.record_per_file:
                 yield records, data
                 data = []
                 records = self.browse()
