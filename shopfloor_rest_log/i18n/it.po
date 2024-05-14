@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-04-17 14:35+0000\n"
+"PO-Revision-Date: 2024-05-14 18:41+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -53,7 +53,7 @@ msgstr "Ultima modifica il"
 #: model:ir.actions.act_window,name:shopfloor_rest_log.action_shopfloor_log
 #: model:ir.ui.menu,name:shopfloor_rest_log.menu_action_shopfloor_log
 msgid "Logs"
-msgstr "Registri"
+msgstr "Log"
 
 #. module: shopfloor_rest_log
 #: model:ir.model,name:shopfloor_rest_log.model_rest_log
