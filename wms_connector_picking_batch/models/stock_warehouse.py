@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from odoo import api, fields, models
 
 FILTER_VALS = {
@@ -12,14 +14,18 @@ FILTER_VALS = {
 }
 # Find a better way to override filters
 FILTER_DOMAINS = {
-    "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned"), ("batch_id", "=", False)]',
-    "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned"), ("batch_id", "=", False)]',
-    "wms_export_batch_picking_in_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
-    "wms_export_batch_picking_out_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
+    "wms_export_picking_in_filter_id": [("batch_id", "=", False)],
+    "wms_export_picking_out_filter_id": [("batch_id", "=", False)],
+    "wms_export_batch_picking_in_filter_id": [
+        ("wms_export_date", "=", False),
+        ("picking_type_id", "=", {}),
+        ("state", "=", "in_progress"),
+    ],
+    "wms_export_batch_picking_out_filter_id": [
+        ("wms_export_date", "=", False),
+        ("picking_type_id", "=", {}),
+        ("state", "=", "in_progress"),
+    ],
 }
 
 
@@ -58,18 +64,37 @@ class StockWarehouse(models.Model):
     wms_export_batch_picking_in_filter_id = fields.Many2one("ir.filters")
     wms_export_batch_picking_out_filter_id = fields.Many2one("ir.filters")
 
-    def _wms_domain_for(self, model_domain):
-        domains = {
-            "batch_pickings_in": self.wms_export_batch_picking_in_filter_id._get_eval_domain(),
-            "batch_pickings_out": self.wms_export_batch_picking_out_filter_id._get_eval_domain(),
-        }
-        return domains[model_domain]
+    def _get_domains(self):
+        domains = super()._get_domains()
+        domains.update(
+            {
+                "batch_pickings_in": self.wms_export_batch_picking_in_filter_id._get_eval_domain(),
+                "batch_pickings_out": self.wms_export_batch_picking_out_filter_id._get_eval_domain(),
+            }
+        )
+        return domains
 
     @api.model
     def _get_mappings(self):
         mappings = super()._get_mappings()
         mappings.update(MAPPINGS)
         return mappings
+
+    @api.model
+    def _get_filter_domains(self):
+        filter_domains = deepcopy(super()._get_filter_domains())
+
+        modified = []
+        for k, v in FILTER_DOMAINS.items():
+            if k in filter_domains:
+                filter_domains[k] += v
+                modified.append(k)
+
+        filter_domains.update(
+            {k: v for k, v in FILTER_DOMAINS.items() if k not in modified}
+        )
+
+        return filter_domains
 
     @api.model
     def _get_filter_vals(self):
@@ -80,12 +105,12 @@ class StockWarehouse(models.Model):
 
     def _activate_filters(self):
         super()._activate_filters()
-        self.wms_export_batch_picking_in_filter_id.domain = FILTER_DOMAINS[
-            "wms_export_batch_picking_in_filter_id"
-        ].format(self.in_type_id.id)
-        self.wms_export_batch_picking_out_filter_id.domain = FILTER_DOMAINS[
-            "wms_export_batch_picking_out_filter_id"
-        ].format(self.out_type_id.id)
+        self.wms_export_batch_picking_in_filter_id.domain = str(
+            self._get_filter_domains()["wms_export_batch_picking_in_filter_id"]
+        ).format(self.in_type_id.id)
+        self.wms_export_batch_picking_out_filter_id.domain = str(
+            self._get_filter_domains()["wms_export_batch_picking_out_filter_id"]
+        ).format(self.out_type_id.id)
 
     def button_open_wms_batch_pickings_in(self):
         return {
