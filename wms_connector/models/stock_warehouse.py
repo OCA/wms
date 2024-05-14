@@ -20,11 +20,17 @@ FILTER_VALS = {
     },
 }
 FILTER_DOMAINS = {
-    "wms_export_product_filter_id": "[]",
-    "wms_export_picking_in_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
-    "wms_export_picking_out_filter_id": '[("wms_export_date", "=", False),'
-    ' ("picking_type_id", "=", {}), ("state", "=", "assigned")]',
+    "wms_export_product_filter_id": [],
+    "wms_export_picking_in_filter_id": [
+        ("wms_export_date", "=", False),
+        ("picking_type_id", "=", {}),
+        ("state", "=", "assigned"),
+    ],
+    "wms_export_picking_out_filter_id": [
+        ("wms_export_date", "=", False),
+        ("picking_type_id", "=", {}),
+        ("state", "=", "assigned"),
+    ],
 }
 
 MAPPINGS = {
@@ -119,8 +125,8 @@ class StockWarehouse(models.Model):
     wms_export_picking_out_filter_id = fields.Many2one("ir.filters")
     wms_product_sync_ids = fields.One2many("wms.product.sync", "warehouse_id")
 
-    def _wms_domain_for(self, model_domain):
-        domains = {
+    def _get_domains(self):
+        return {
             "product": [
                 ("warehouse_id", "=", self.id),
                 ("to_export", "=", True),
@@ -129,6 +135,9 @@ class StockWarehouse(models.Model):
             "pickings_in": self.wms_export_picking_in_filter_id._get_eval_domain(),
             "pickings_out": self.wms_export_picking_out_filter_id._get_eval_domain(),
         }
+
+    def _wms_domain_for(self, model_domain):
+        domains = self._get_domains()
         return domains[model_domain]
 
     def _inverse_active_wms_sync(self):
@@ -151,6 +160,10 @@ class StockWarehouse(models.Model):
     @api.model
     def _get_filter_vals(self):
         return FILTER_VALS
+
+    @api.model
+    def _get_filter_domains(self):
+        return FILTER_DOMAINS
 
     def _activate_tasks(self):
         for mappings in self._get_mappings().values():
@@ -189,15 +202,15 @@ class StockWarehouse(models.Model):
                 vals_fmt = deepcopy(vals)
                 vals_fmt["name"] = vals["name"].format(self.name)
                 self[filter_fieldname] = self.env["ir.filters"].create(vals_fmt)
-        self.wms_export_product_filter_id.domain = FILTER_DOMAINS[
-            "wms_export_product_filter_id"
-        ]
-        self.wms_export_picking_in_filter_id.domain = FILTER_DOMAINS[
-            "wms_export_picking_in_filter_id"
-        ].format(self.in_type_id.id)
-        self.wms_export_picking_out_filter_id.domain = FILTER_DOMAINS[
-            "wms_export_picking_out_filter_id"
-        ].format(self.out_type_id.id)
+        self.wms_export_product_filter_id.domain = str(
+            self._get_filter_domains()["wms_export_product_filter_id"]
+        )
+        self.wms_export_picking_in_filter_id.domain = str(
+            self._get_filter_domains()["wms_export_picking_in_filter_id"]
+        ).format(self.in_type_id.id)
+        self.wms_export_picking_out_filter_id.domain = str(
+            self._get_filter_domains()["wms_export_picking_out_filter_id"]
+        ).format(self.out_type_id.id)
 
     def _prepare_wms_task_vals(
         self, filetype, name_fragment="", method_type="export", filepath="IN/"
