@@ -73,6 +73,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
 
     def test_list_move_lines_order_by_location(self):
         self.service.work.current_lines_order = "location"
+        last_move_line = self.picking1.move_line_ids[-1]
+        last_move_line_location = last_move_line.location_id
+        last_move_line_location.sudo().name = "z"
         response = self.service.dispatch("list_move_lines", params={})
         move_lines = self.service._find_location_move_lines()
         res = [
@@ -80,6 +83,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             for x in response["data"]["select_line"]["move_lines"]
         ]
         self.assertEqual(res, [x.location_id.name for x in move_lines])
+        self.assertEqual(res[-1], last_move_line_location.name)
         self.maxDiff = None
         self.assert_response_select_line(
             response,
