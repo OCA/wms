@@ -783,7 +783,7 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
         self.env.user = self.shopfloor_manager
         self.assertTrue(self.env.user != self.picking.create_uid)
         move_line = self.move_product_b.move_line_ids.filtered(
-            lambda ml: ml.product_uom_qty == 4  # 4/10 to stock out
+            lambda ml: ml.reserved_uom_qty == 4  # 4/10 to stock out
         )
         move_line.shopfloor_user_id = self.env.user
         self.service.dispatch(

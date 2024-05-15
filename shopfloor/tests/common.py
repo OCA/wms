@@ -221,6 +221,7 @@ class CommonCase(BaseCommonCase):
                     package = cls.env["stock.quant.package"].create({})
                 product_packages[key] = package
         for (product, location), qty in product_locations.items():
+            product_package = product_packages.get((product, location))
             lot = None
             if in_lot:
                 if isinstance(in_lot, models.BaseModel):
@@ -236,7 +237,7 @@ class CommonCase(BaseCommonCase):
                 # of units to pick a package
                 qty *= 2
             cls._update_qty_in_location(
-                location, product, qty, package=package, lot=lot
+                location, product, qty, package=product_package, lot=lot
             )
 
     # used by _create_package_in_location

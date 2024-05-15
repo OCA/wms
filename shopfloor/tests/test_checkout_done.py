@@ -83,12 +83,12 @@ class CheckoutDonePartialCase(CheckoutCommonCase):
             .create(
                 {
                     "name": "Test Location Usage View",
-                    "location_id": self.picking.move_lines.location_dest_id.id,
+                    "location_id": self.picking.move_ids.location_dest_id.id,
                     "usage": "view",
                 }
             )
         )
-        self.picking.move_lines.location_dest_id = view_location
+        self.picking.move_ids.location_dest_id = view_location
         response = self.service.dispatch(
             "done", params={"picking_id": self.picking.id, "confirmation": True}
         )

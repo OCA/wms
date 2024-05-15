@@ -1,6 +1,8 @@
 # Copyright 2023 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-# from odoo.tests.common import Form
+
+# pylint: disable=missing-return
+
 
 from .common import CommonCase
 
@@ -16,10 +18,10 @@ class TestActionsPackaging(CommonCase):
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)], confirm=True
         )
-        cls.move0 = cls.picking.move_lines[0]
-        cls.move1 = cls.picking.move_lines[1]
+        cls.move0 = cls.picking.move_ids[0]
+        cls.move1 = cls.picking.move_ids[1]
         cls._fill_stock_for_moves(
-            cls.picking.move_lines, in_package=True, same_package=True
+            cls.picking.move_ids, in_package=True, same_package=True
         )
         cls.picking.action_assign()
         cls.package1 = cls.move0.move_line_ids.package_id
@@ -37,5 +39,5 @@ class TestActionsPackaging(CommonCase):
         # Package has 2 products from pick 1 reserved
         pick2 = self._create_picking(lines=[(self.product_c, 10)], confirm=True)
         # But adding 1 more product from pick 2 that is not yet reserved
-        self._fill_stock_for_moves(pick2.move_lines, in_package=self.package1)
+        self._fill_stock_for_moves(pick2.move_ids, in_package=self.package1)
         self.assertFalse(self.packaging.is_complete_mix_pack(self.package1))

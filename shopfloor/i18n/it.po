@@ -619,14 +619,14 @@ msgstr "Il lotto {} è per un altro prodotto."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Lot {} not found in location {}"
-msgstr "Il lotto {} non è presente nell'ubicazione {}"
+msgid "Lot %(lot_name)s not found in location %(location_name)s"
+msgstr "Il lotto %(lot_name)s non è presente nell'ubicazione %(location_name)s"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Lot {} not found in transfer {}"
-msgstr "Il lotto {} non è presentenel trasferimento {}"
+msgid "Lot %(lot_name)s not found in transfer %(picking_name)s"
+msgstr "Il lotto %(lot_name)s non è presentenel trasferimento %(picking_name)s"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -927,8 +927,8 @@ msgstr "Il collo {} non può essere utilizzato: {} "
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} contains already lines from a different operation type {}"
-msgstr "Il collo {} contiene già righe di un tipo operazione diverso {}"
+msgid "Package %(package_name)s contains already lines from a different operation type %(picking_type_name)s."
+msgstr "Il collo %(package_name)s contiene già righe di un tipo operazione diverso %(picking_type_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/models/stock_move_line.py:0
@@ -978,14 +978,14 @@ msgstr "Il collo {} non è nel trasferimento attuale."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} not found in location {}"
-msgstr "Il collo {} non è stato trovato nell'ubicazione {}"
+msgid "Package %(package_name)s not found in location %(location_name)s"
+msgstr "Il collo %(package_name)s non è stato trovato nell'ubicazione %(location_name)s"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} not found in transfer {}"
-msgstr "Il collo {} non è stato trovato nel trasferimento {}"
+msgid "Package %(package_name)s not found in transfer %(picking_name)s"
+msgstr "Il collo %(package_name)s non è stato trovato nel trasferimento %(picking_name)s"
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1154,8 +1154,8 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Product {} not found in location {} or transfer {}."
-msgstr "Prodotto {} non trovato nell'ubicazione {} o trasferimento {}."
+msgid "Product %(product_name)s not found in location %(location_name)s or transfer %(picking_name)s."
+msgstr "Prodotto %(product_name)s non trovato nell'ubicazione %(location_name)s o trasferimento %(picking_name)s."
 
 #. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0

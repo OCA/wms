@@ -455,7 +455,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 20)]
         )
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
 
         # Test that the move lines are marked as 'shopfloor_checkout_done'

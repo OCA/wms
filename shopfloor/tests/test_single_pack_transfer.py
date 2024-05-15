@@ -860,7 +860,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
         self.assertRecordValues(move, [{"state": "cancel"}])
         self.assertRecordValues(picking, [{"state": "cancel"}])
-        self.assertRecordValues(package_level, [{"is_done": False}])
+        self.assertFalse(package_level.exists())
 
         self.assert_response(
             response,

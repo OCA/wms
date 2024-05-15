@@ -21,7 +21,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         cls.picking.action_assign()
         cls.move_lines = cls.picking.move_line_ids
         cls.delivery_packaging = (
-            cls.env["product.packaging"]
+            cls.env["stock.package.type"]
             .sudo()
             .create(
                 {

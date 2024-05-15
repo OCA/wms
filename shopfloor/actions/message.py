@@ -113,8 +113,10 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Package %(package_name)s is not available in transfer %(picking_name)s."
-            ).format(package.name, picking.name),
+                "Package %(package_name)s is not available in transfer %(picking_name)s.",
+                package_name=package.name,
+                picking_name=picking.name,
+            ),
         }
 
     def package_not_empty(self, package):
@@ -133,8 +135,11 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Package {} contains already lines from a different operation type {}"
-            ).format(package.name, picking_type.name),
+                "Package %(package_name)s contains already lines from a different "
+                "operation type %(picking_type_name)s.",
+                package_name=package.name,
+                picking_type_name=picking_type.name,
+            ),
         }
 
     def dest_package_required(self):
@@ -447,9 +452,11 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _(
-                "Product {} not found in location {} or transfer {}.".format(
-                    product.name, location.name, picking.name
-                )
+                "Product %(product_name)s not found in location %(location_name)s "
+                "or transfer %(picking_name)s.",
+                product_name=product.name,
+                location_name=location.name,
+                picking_name=picking.name,
             ),
         }
 
@@ -539,15 +546,21 @@ class MessageAction(Component):
     def lot_not_found_in_location(self, lot, location):
         return {
             "message_type": "error",
-            "body": _("Lot {} not found in location {}").format(
-                lot.name, location.name
+            "body": _(
+                "Lot %(lot_name)s not found in location %(location_name)s",
+                lot_name=lot.name,
+                location_name=location.name,
             ),
         }
 
     def lot_not_found_in_picking(self, lot, picking):
         return {
             "message_type": "error",
-            "body": _("Lot {} not found in transfer {}").format(lot.name, picking.name),
+            "body": _(
+                "Lot %(lot_name)s not found in transfer %(picking_name)s",
+                lot_name=lot.name,
+                pcking_name=picking.name,
+            ),
         }
 
     def batch_transfer_complete(self):
@@ -782,16 +795,20 @@ class MessageAction(Component):
     def package_not_found_in_location(self, package, location):
         return {
             "message_type": "error",
-            "body": _("Package {} not found in location {}").format(
-                package.name, location.name
+            "body": _(
+                "Package %(package_name)s not found in location %(location_name)s",
+                package_name=package.name,
+                location_name=location.name,
             ),
         }
 
     def package_not_found_in_picking(self, package, picking):
         return {
             "message_type": "error",
-            "body": _("Package {} not found in transfer {}").format(
-                package.name, picking.name
+            "body": _(
+                "Package %(package_name)s not found in transfer %(picking_name)s",
+                package_name=package.name,
+                picking_name=picking.name,
             ),
         }
 

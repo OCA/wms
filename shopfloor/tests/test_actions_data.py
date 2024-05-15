@@ -53,8 +53,8 @@ class ActionsDataCase(ActionsDataCaseBase):
             "name": location.name,
             "barcode": location.name,
             "operation_progress": {
-                "done": 2.0,
-                "to_do": 210.0,
+                "done": 0.0,
+                "to_do": 228.0,
             },
         }
         self.assertDictEqual(data, expected)
@@ -86,10 +86,8 @@ class ActionsDataCase(ActionsDataCaseBase):
         expected = {
             "id": package.id,
             "name": package.name,
-            "packaging": self._expected_packaging(package.packaging_id),
-            "storage_type": self._expected_storage_type(
-                package.package_storage_type_id
-            ),
+            "packaging": self._expected_packaging(package.product_packaging_id),
+            "storage_type": self._expected_storage_type(package.package_type_id),
             "total_quantity": 10.0,
             "weight": 20.0,
         }
@@ -97,8 +95,8 @@ class ActionsDataCase(ActionsDataCaseBase):
 
     def test_data_package_with_move_line_count(self):
         package = self.move_a.move_line_ids.package_id
-        package.packaging_id = self.packaging.id
-        package.package_storage_type_id = self.storage_type_pallet
+        package.product_packaging_id = self.packaging.id
+        package.package_type_id = self.storage_type_pallet
         data = self.data.package(
             package,
             picking=self.picking,

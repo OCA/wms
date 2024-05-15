@@ -357,7 +357,7 @@ class DataAction(Component):
         operations_done = 0
         for line in lines:
             operations_done += line.qty_done
-            operations_to_do += line.product_uom_qty - line.qty_done
+            operations_to_do += line.reserved_uom_qty - line.qty_done
         return {
             "done": operations_done,
             "to_do": operations_to_do,

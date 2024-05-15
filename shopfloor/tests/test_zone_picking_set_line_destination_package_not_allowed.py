@@ -29,7 +29,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": None,
             },
         )
@@ -79,7 +79,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": None,
             },
         )

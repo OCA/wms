@@ -176,6 +176,19 @@ class ZonePickingCommonCase(CommonCase):
                 }
             )
         )
+        cls.product_i = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product I",
+                    "type": "product",
+                    "default_code": "I",
+                    "barcode": "I",
+                    "weight": 3,
+                }
+            )
+        )
         products = (
             cls.product_a
             + cls.product_b
@@ -185,6 +198,7 @@ class ZonePickingCommonCase(CommonCase):
             + cls.product_f
             + cls.product_g
             + cls.product_h
+            + cls.product_i
         )
         for product in products:
             cls.env["stock.putaway.rule"].sudo().create(
@@ -218,12 +232,12 @@ class ZonePickingCommonCase(CommonCase):
         cls._update_qty_in_location(cls.zone_sublocation4, cls.product_e, 4)
         # 2 products in a package available in zone_sublocation4
         cls.picking5 = picking5 = cls._create_picking(
-            lines=[(cls.product_b, 10), (cls.product_f, 10)]
+            lines=[(cls.product_i, 10), (cls.product_f, 10)]
         )
         cls._fill_stock_for_moves(
             picking5.move_ids,
             in_package=True,
-            same_package=False,
+            same_package=True,
             location=cls.zone_sublocation4,
         )
         # 2 products available in zone_sublocation5, but one is partially available

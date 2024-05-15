@@ -167,7 +167,7 @@ class DataDetailAction(Component):
             "packaging_length:length",
             "width",
             "height",
-            "max_weight",
+            ("max_weight", lambda rec, fname: rec.package_type_id.max_weight),
             "length_uom_name:length_uom",
             "weight_uom_name:weight_uom",
             "barcode:barcode",

@@ -604,7 +604,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             params={
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": None,
             },
         )
@@ -612,7 +612,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             response["message"],
             {
                 "body": "Package FREE_PACKAGE contains already lines"
-                " from a different operation type test",
+                " from a different operation type test.",
                 "message_type": "warning",
             },
         )
@@ -694,7 +694,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "package_id": self.free_package.id,
                 "barcode": self.packing_location.barcode,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "confirmation": None,
             },
         )
@@ -708,5 +708,5 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "message_type": "error",
                 "body": "Someone is already working on these transfers",
             },
-            qty_done=move_line.product_uom_qty,
+            qty_done=move_line.reserved_uom_qty,
         )

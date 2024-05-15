@@ -1008,7 +1008,7 @@ class Checkout(Component):
         If none are found, return the first line for that product.
         """
         return next(
-            (line for line in product_lines if line.qty_done < line.product_uom_qty),
+            (line for line in product_lines if line.qty_done < line.reserved_uom_qty),
             fields.first(product_lines),
         )
 

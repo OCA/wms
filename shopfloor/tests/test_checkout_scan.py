@@ -34,7 +34,7 @@ class CheckoutScanCase(CheckoutCommonCase):
     def test_scan_document_with_option_product_not_ok(self):
         self.menu.sudo().scan_location_or_pack_first = True
         picking = self._create_picking()
-        self._fill_stock_for_moves(picking.move_lines)
+        self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         barcode = picking.move_line_ids.product_id[0].barcode
         response = self.service.dispatch("scan_document", params={"barcode": barcode})

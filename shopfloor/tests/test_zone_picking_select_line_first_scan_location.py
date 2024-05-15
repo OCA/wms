@@ -145,7 +145,7 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
 
         pickingB = self._create_picking(lines=[(self.product_b, 5)])
         self._fill_stock_for_moves(
-            pickingB.move_lines, in_package=package, location=self.zone_sublocation1
+            pickingB.move_ids, in_package=package, location=self.zone_sublocation1
         )
         # If all products in package are reserved, it will be handle as a full package
         # pickingB.action_assign()

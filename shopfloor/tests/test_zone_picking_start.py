@@ -57,14 +57,14 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         expected_sub2 = dict(
             self.data.location(self.zone_sublocation2),
             lines_count=2,
-            picking_count=2,
+            picking_count=1,
             priority_lines_count=0,
             priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
                     lines_count=2,
-                    picking_count=2,
+                    picking_count=1,
                     priority_lines_count=0,
                     priority_picking_count=0,
                 )
@@ -89,14 +89,14 @@ class ZonePickingStartCase(ZonePickingCommonCase):
         expected_sub4 = dict(
             self.data.location(self.zone_sublocation4),
             lines_count=3,
-            picking_count=3,
+            picking_count=2,
             priority_lines_count=0,
             priority_picking_count=0,
             operation_types=[
                 dict(
                     op_type_data,
                     lines_count=3,
-                    picking_count=3,
+                    picking_count=2,
                     priority_lines_count=0,
                     priority_picking_count=0,
                 )

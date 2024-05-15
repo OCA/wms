@@ -450,11 +450,6 @@ msgid "To sync"
 msgstr ""
 
 #. module: shopfloor_base
-#: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
-msgid "To sync"
-msgstr ""
-
-#. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__url
 msgid "Url"
 msgstr ""

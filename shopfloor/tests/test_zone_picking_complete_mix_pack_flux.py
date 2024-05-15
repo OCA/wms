@@ -36,7 +36,7 @@ class ZonePickingCompleteMixPackageFluxCase(ZonePickingCommonCase):
         )
         # Lets move this pack somwehere...
         move_line.location_dest_id = self.shelf1
-        quantity_done = move_line.product_uom_qty
+        quantity_done = move_line.reserved_uom_qty
         response = self.service.dispatch(
             "set_destination",
             params={

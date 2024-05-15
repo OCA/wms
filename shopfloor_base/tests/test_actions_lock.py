@@ -5,6 +5,7 @@ from contextlib import closing
 from .common import CommonCase
 
 
+# pylint: disable=missing-return
 class ActionsLockCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls):

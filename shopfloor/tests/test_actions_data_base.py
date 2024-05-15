@@ -251,7 +251,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                 "length": record.packaging_length,
                 "width": record.width,
                 "height": record.height,
-                "max_weight": record.max_weight,
+                "max_weight": record.package_type_id.max_weight,
                 "length_uom": record.length_uom_name,
                 "weight_uom": record.weight_uom_name,
                 "barcode": record.barcode,

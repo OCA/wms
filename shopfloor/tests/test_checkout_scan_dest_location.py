@@ -1,5 +1,8 @@
 # Copyright 2023 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+# pylint: disable=missing-return
+
 from .test_checkout_base import CheckoutCommonCase
 
 
@@ -10,7 +13,7 @@ class CheckoutSelectChildLocationCase(CheckoutCommonCase):
         cls.picking = picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)]
         )
-        cls._fill_stock_for_moves(picking.move_lines)
+        cls._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         cls.line1 = picking.move_line_ids[0]
         cls.line2 = picking.move_line_ids[1]
@@ -46,7 +49,7 @@ class CheckoutSelectChildLocationCase(CheckoutCommonCase):
 
         self.assertRecordValues(self.picking, [{"state": "done"}])
         self.assertTrue(self.picking.backorder_ids)
-        self.assertEqual(self.picking.backorder_ids.move_line_ids.product_uom_qty, 8)
+        self.assertEqual(self.picking.backorder_ids.move_line_ids.reserved_uom_qty, 8)
 
         self.assert_response(
             response,
