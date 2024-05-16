@@ -77,7 +77,7 @@ class SaleOrderLine(models.Model):
         if self._on_order_route():
             availability_status = "on_order"
         # Fully available
-        elif (
+        if (
             product.type == "service"
             or float_compare(
                 available_qty, self.product_uom_qty, precision_rounding=rounding
