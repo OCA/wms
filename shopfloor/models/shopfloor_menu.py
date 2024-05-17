@@ -228,7 +228,6 @@ class ShopfloorMenu(models.Model):
     allow_alternative_destination_package_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_package_is_possible"
     )
-
     move_line_search_additional_domain_is_possible = fields.Boolean(
         compute="_compute_move_line_search_additional_domain_is_possible"
     )
@@ -250,6 +249,16 @@ class ShopfloorMenu(models.Model):
     move_line_search_sort_order_custom_code = fields.Text(
         string="Custom sort key code", help="Python code to sort move lines. "
     )
+    require_destination_package = fields.Boolean(
+        string="Destination package required",
+        default=True,
+        help="If set, the user will have to scan only the source location "
+        "and the destination location to process a line. The unload step will be skipped.",
+    )
+
+    require_destination_package_is_possible = fields.Boolean(
+        compute="_compute_require_destination_package_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -267,6 +276,16 @@ class ShopfloorMenu(models.Model):
                 record.unload_package_at_destination = False
                 record.multiple_move_single_pack = False
 
+    @api.onchange("require_destination_package")
+    def _onchange_require_destination_package(self):
+        # require_destination_package is incompatible with pick_pack_same_time and
+        # unload_package_at_destination and multiple_move_single_pack
+        for record in self:
+            if not record.require_destination_package:
+                record.pick_pack_same_time = False
+                record.unload_package_at_destination = False
+                record.multiple_move_single_pack = False
+
     @api.onchange("multiple_move_single_pack")
     def _onchange_multiple_move_single_pack(self):
         # multiple_move_single_pack is incompatible with pick_pack_same_time,
@@ -278,6 +297,7 @@ class ShopfloorMenu(models.Model):
         "unload_package_at_destination",
         "pick_pack_same_time",
         "multiple_move_single_pack",
+        "require_destination_package",
     )
     def _check_options(self):
         if self.pick_pack_same_time and self.unload_package_at_destination:
@@ -292,6 +312,19 @@ class ShopfloorMenu(models.Model):
                 _(
                     "'Pick and pack at the same time' is incompatible with "
                     "'Multiple moves same destination package'."
+                )
+            )
+        elif not self.require_destination_package and (
+            self.pick_pack_same_time
+            or self.unload_package_at_destination
+            or self.multiple_move_single_pack
+        ):
+            raise exceptions.UserError(
+                _(
+                    "'No destination package required' is incompatible with "
+                    "'Pick and pack at the same time',"
+                    "'Unload package at destination' and 'Multiple moves "
+                    "same destination package'."
                 )
             )
 
@@ -495,6 +528,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.move_line_search_sort_order_is_possible = menu.scenario_id.has_option(
                 "allow_move_line_search_sort_order"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_require_destination_package_is_possible(self):
+        for menu in self:
+            menu.require_destination_package_is_possible = menu.scenario_id.has_option(
+                "require_destination_package"
             )
 
     @api.constrains(

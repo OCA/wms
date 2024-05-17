@@ -161,6 +161,9 @@ class ZonePicking(Component):
     def _pick_pack_same_time(self):
         return self.work.menu.pick_pack_same_time
 
+    def _packing_required(self):
+        return self.work.menu.require_destination_package
+
     def _handle_complete_mix_pack(self, package):
         packaging = self._actions_for("packaging")
         return (
@@ -924,7 +927,7 @@ class ZonePicking(Component):
             return (location_changed, response)
 
         # If no destination package
-        if not move_line.result_package_id:
+        if self._packing_required() and not move_line.result_package_id:
             response = self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.dest_package_required(),

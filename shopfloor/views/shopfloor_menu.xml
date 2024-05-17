@@ -33,6 +33,16 @@
                   <field name="ignore_no_putaway_available_is_possible" invisible="1" />
                   <field name="ignore_no_putaway_available" />
               </group>
+                <group
+                    name="require_destination_package"
+                    attrs="{'invisible': [('require_destination_package_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="require_destination_package_is_possible"
+                        invisible="1"
+                    />
+                    <field name="require_destination_package" />
+              </group>
               <group
                     name="pick_pack_same_time"
                     attrs="{'invisible': [('pick_pack_same_time_is_possible', '=', False)]}"

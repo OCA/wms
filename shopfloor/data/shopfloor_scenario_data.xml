@@ -23,7 +23,8 @@
     "scan_location_or_pack_first": true,
     "allow_alternative_destination_package": true,
     "allow_move_line_search_sort_order": false,
-    "allow_move_line_search_additional_domain": true
+    "allow_move_line_search_additional_domain": true,
+    "require_destination_package": true
 }
         </field>
     </record>
