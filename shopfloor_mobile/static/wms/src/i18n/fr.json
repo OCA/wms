@@ -20,7 +20,6 @@
   "location_content_transfer.start_single.scan_placeholder": "Scannez une boite / un produit / un lot",
   "misc.btn_get_work": "Obtenir du travail",
   "misc.btn_manual_selection": "Sélection manuelle",
-  "misc.lines_count": "Nombre de lignes",
   "misc.stock_zero_check.confirm_stock_not_zero": "Confirmer le stock",
   "misc.stock_zero_check.confirm_stock_zero": "Rupture de stock",
   "scan_placeholder_translation": "Scannez un emplacement"
