@@ -26,13 +26,6 @@ class SaleOrderLine(models.Model):
         digits="Product Unit of Measure", compute="_compute_availability_status"
     )
 
-    def _on_order_route(self):
-        self.ensure_one()
-        mto_route = self.env.ref("stock.route_warehouse0_mto")
-        product_is_mto = mto_route in self.product_id.route_ids
-        line_is_mto = mto_route == self.route_id
-        return product_is_mto or line_is_mto
-
     @api.depends(
         "move_ids.ordered_available_to_promise_uom_qty",
         "product_id.route_ids",
@@ -73,11 +66,8 @@ class SaleOrderLine(models.Model):
         # required values
         product = self.product_id
         rounding = product.uom_id.rounding
-        # on_order product
-        if self._on_order_route():
-            availability_status = "on_order"
         # Fully available
-        elif (
+        if (
             product.type == "service"
             or float_compare(
                 available_qty, self.product_uom_qty, precision_rounding=rounding
@@ -90,6 +80,9 @@ class SaleOrderLine(models.Model):
         elif float_compare(available_qty, 0, precision_rounding=rounding) == 1:
             availability_status = "partial"
             delayed_qty = self.product_uom_qty - available_qty
+        # On order product
+        elif self.is_mto:
+            availability_status = "on_order"
         # No stock
         elif float_is_zero(available_qty, precision_rounding=rounding):
             product_replenishment_date = product._get_next_replenishment_date()
