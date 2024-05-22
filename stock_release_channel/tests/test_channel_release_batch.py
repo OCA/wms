@@ -68,7 +68,7 @@ class TestChannelReleaseBatch(ChannelReleaseCase):
         self.assertTrue(all(p.need_release) for p in other_pickings)
 
     def test_release_auto_group_commercial_partner_no_next_batch(self):
-        self.channel.auto_release = "group_commercial_partner"
+        self.channel.batch_mode = "group_commercial_partner"
         pickings = self.channel.picking_ids.filtered(lambda p: p.release_ready)
         for _i in range(0, len(pickings.partner_id.commercial_partner_id)):
             action = self.channel.release_next_batch()

@@ -733,7 +733,7 @@ class StockReleaseChannel(models.Model):
 
     def _get_pickings_to_release(self):
         """Get the pickings to release."""
-        domain = self._field_picking_domains()["count_picking_release_ready"]
+        domain = self._field_picking_domains()["release_ready"]
         domain += [("release_channel_id", "in", self.ids)]
         return self.env["stock.picking"].search(domain)
 
