@@ -428,9 +428,8 @@ class StockMove(models.Model):
         )
 
     def _action_cancel(self):
-        # Unrelease moves that can be, before canceling them.
-        moves_to_unrelease = self.filtered(lambda m: m.unrelease_allowed)
-        moves_to_unrelease.unrelease()
+        # Unrelease moves that must be, before canceling them.
+        self.unrelease()
         super()._action_cancel()
         self.write({"need_release": False})
         return True

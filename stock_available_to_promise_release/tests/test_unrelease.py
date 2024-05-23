@@ -81,9 +81,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         ).button_validate()
         self.assertEqual(self.picking.state, "done")
         self.assertFalse(self.shipping.move_ids.unrelease_allowed)
-        with self.assertRaisesRegex(
-            UserError, "You are not allowed to unrelease this move"
-        ):
+        with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
             self.shipping.move_ids.unrelease()
 
     def test_unrelease_backorder(self):

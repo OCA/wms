@@ -3,6 +3,8 @@
 
 from datetime import datetime
 
+from odoo.exceptions import UserError
+
 from .common import PromiseReleaseCommonCase
 
 
@@ -62,8 +64,8 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     #     self.assertEqual(self.picking1.state, "done")
     #     self.shipping1.unrelease()
 
-    def test_simulate_cancel_so(self):
-        """Simulate a sale order cancelation.
+    def test_simulate_cancel_so_success(self):
+        """Simulate a sales order cancellation.
 
         action_cancel is called on all related pickings not set to done.
         """
@@ -77,3 +79,37 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(
             all(m.procure_method == "make_to_order" for m in self.shipping2.move_ids)
         )
+
+    def test_simulate_cancel_so_forbidden(self):
+        """Simulate a sales order cancellation.
+
+        action_cancel is called on all related pickings not set to done.
+        """
+        self.picking1.printed = True
+        with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
+            self.shipping1.action_cancel()
+
+    def test_simulate_cancel_so_line_success(self):
+        """Simulate a sales order line cancellation.
+
+        action_cancel is called on all related moves not set to done.
+        """
+        self.shipping1.move_ids._action_cancel()
+        self.assertEqual(self.shipping1.state, "cancel")
+        move_active = self.picking1.move_ids.filtered(lambda l: l.state == "assigned")
+        move_cancel = self.picking1.move_ids.filtered(lambda l: l.state == "cancel")
+        self.assertEqual(move_active.product_uom_qty, 3.0)
+        self.assertEqual(move_cancel.product_uom_qty, 2.0)
+        self.assertEqual(move_active.move_dest_ids, self.shipping2.move_ids)
+        self.assertTrue(
+            all(m.procure_method == "make_to_order" for m in self.shipping2.move_ids)
+        )
+
+    def test_simulate_cancel_so_line_forbidden(self):
+        """Simulate a sales order line cancellation.
+
+        action_cancel is called on all related moves not set to done.
+        """
+        self.picking1.printed = True
+        with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
+            self.shipping1.move_ids._action_cancel()
