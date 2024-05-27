@@ -56,7 +56,7 @@ class StockMove(models.Model):
     zip_code = fields.Char(related="partner_id.zip", store=True)
     city = fields.Char(related="partner_id.city", store=True)
 
-    @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
+    @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
         for move in self:
             unrelease_allowed = move._is_unreleaseable()
@@ -91,35 +91,47 @@ class StockMove(models.Model):
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
         """We check that the origin moves are in a state that allows the unrelease
         of the current move. At this stage, a move can't be unreleased if
-          * a picking is already printed. (The work on the picking is planed and
-            we don't want to change it)
-          * the processing of the origin moves is partially started.
+        the processed origin moves is not consumed by the dest moves.
         """
         self.ensure_one()
-        pickings = origin_moves.mapped("picking_id")
-        ongoing_pickings = pickings.filtered(
-            lambda p: p.printed and p.state not in ("cancel", "done")
+        open_origin_moves = origin_moves.filtered(
+            lambda m: m.state not in ("done", "cancel")
         )
-        if ongoing_pickings:
-            # The picking is either printed or done/cancelled.
-            # We can't unrelease the move because the processing of the origin moves
-            # is either started or done.
+        pickings = open_origin_moves.mapped("picking_id")
+        if pickings.filtered("printed"):
+            # The picking is printed, we can't unrelease the move
+            # because the processing of the origin moves is started.
             return False
-        # If allow_unrelease_on_cancel is not checked, only release assigned/waiting
-        # moves. If checked, also unrelease done moves.
+        if any(m.quantity_done for m in open_origin_moves):
+            # The origin move is being processed, we can't unrelease the move
+            return False
+        origin_done_moves = origin_moves.filtered(lambda m: m.state == "done")
         if self.rule_id.allow_unrelease_return_done_move:
-            unreleasable_states = ("cancel",)
-        else:
-            unreleasable_states = ("done", "cancel")
-        origin_moves = origin_moves.filtered(
-            lambda m: m.state not in unreleasable_states
+            origin_done_moves = origin_done_moves.filtered(
+                lambda m: not m.picking_type_id.return_picking_type_id
+            )
+        origin_qty_done = sum(
+            m.product_uom._compute_quantity(
+                m.quantity_done,
+                m.product_id.uom_id,
+                rounding_method="HALF-UP",
+            )
+            for m in origin_done_moves
         )
-        origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+        dest_done_moves = origin_done_moves.move_dest_ids
+        dest_qty_done = sum(
+            m.product_uom._compute_quantity(
+                m.quantity_done,
+                m.product_id.uom_id,
+                rounding_method="HALF-UP",
+            )
+            for m in dest_done_moves
+        )
         return (
             float_compare(
-                self.product_qty,
-                origin_qty_todo,
-                precision_rounding=self.product_uom.rounding,
+                origin_qty_done,
+                dest_qty_done,
+                precision_rounding=self.product_id.uom_id.rounding,
             )
             <= 0
         )
