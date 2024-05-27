@@ -53,7 +53,7 @@ class StockMove(models.Model):
     need_release = fields.Boolean(index=True, copy=False)
     unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
 
-    @api.depends("rule_id", "rule_id.available_to_promise_defer_pull")
+    @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
         for move in self:
             unrelease_allowed = move._is_unreleaseable()
@@ -88,25 +88,46 @@ class StockMove(models.Model):
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
         """We check that the origin moves are in a state that allows the unrelease
         of the current move. At this stage, a move can't be unreleased if
-          * a picking is already printed. (The work on the picking is planed and
+          * a picking is already printed. (The work on the picking is planned and
             we don't want to change it)
-          * the processing of the origin moves is partially started.
+          * a quantity done is recorded
+          * the processed origin moves is not consumed by the dest moves.
         """
         self.ensure_one()
-        pickings = origin_moves.mapped("picking_id")
+        open_origin_moves = origin_moves.filtered(
+            lambda m: m.state not in ("done", "cancel")
+        )
+        pickings = open_origin_moves.mapped("picking_id")
         if pickings.filtered("printed"):
             # The picking is printed, we can't unrelease the move
             # because the processing of the origin moves is started.
             return False
-        origin_moves = origin_moves.filtered(
-            lambda m: m.state not in ("done", "cancel")
+        if any(m.quantity_done for m in open_origin_moves):
+            # The origin move is being processed, we can't unrelease the move
+            return False
+        origin_done_moves = origin_moves.filtered(lambda m: m.state == "done")
+        origin_qty_done = sum(
+            m.product_uom._compute_quantity(
+                m.quantity_done,
+                m.product_id.uom_id,
+                rounding_method="HALF-UP",
+            )
+            for m in origin_done_moves
         )
-        origin_qty_todo = sum(origin_moves.mapped("product_qty"))
+        dest_done_moves = origin_done_moves.move_dest_ids
+        dest_qty_done = sum(
+            m.product_uom._compute_quantity(
+                m.quantity_done,
+                m.product_id.uom_id,
+                rounding_method="HALF-UP",
+            )
+            for m in dest_done_moves
+        )
         return (
             float_compare(
-                self.product_qty,
-                origin_qty_todo,
-                precision_rounding=self.product_uom.rounding,
+                origin_qty_done,
+                dest_qty_done,
+                precision_rounding=self.product_id.uom_id.rounding,
             )
             <= 0
         )
