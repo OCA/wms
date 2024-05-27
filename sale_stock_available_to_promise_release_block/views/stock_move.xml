@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="view_move_release_tree" model="ir.ui.view">
+    <field name="model">stock.move</field>
+    <field
+            name="inherit_id"
+            ref="stock_available_to_promise_release_block.view_move_release_tree"
+        />
+    <field name="arch" type="xml">
+      <field name="release_blocked_label" position="after">
+        <field
+                    name="unblocked_by_order_id"
+                    widget="badge"
+                    decoration-info="True"
+                    optional="show"
+                />
+      </field>
+    </field>
+  </record>
+
+  <!-- This new 'Unblock Release' window action replaces the original one (server action) -->
+  <record id="action_stock_move_unblock_release" model="ir.actions.act_window">
+    <field name="name">Unblock Release</field>
+    <field name="res_model">unblock.release</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="binding_model_id" ref="stock.model_stock_move" />
+    <field name="binding_view_types">list</field>
+  </record>
+
+</odoo>
