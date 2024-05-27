@@ -14,3 +14,10 @@ class SaleOrder(models.Model):
         states={"draft": [("readonly", False)]},
         help="Block the release of the generated delivery at order confirmation.",
     )
+
+    def action_open_move_need_release(self):
+        action = super().action_open_move_need_release()
+        if not action.get("context"):
+            action["context"] = {}
+        action["context"].update(from_sale_order_id=self.id)
+        return action

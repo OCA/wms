@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_unblock_release_sale,access.unblock.release,model_unblock_release,sales_team.group_sale_salesman,1,1,1,0
+access_unblock_release_stock,access.unblock.release,model_unblock_release,stock.group_stock_user,1,1,1,0

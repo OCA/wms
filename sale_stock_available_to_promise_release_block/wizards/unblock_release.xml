@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="unblock_release_view_form" model="ir.ui.view">
+    <field name="name">unblock.release.form</field>
+    <field name="model">unblock.release</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="option" />
+            <field
+                            name="date_deadline"
+                            attrs="{'invisible': [('option', '=', 'asap')]}"
+                        />
+          </group>
+        </sheet>
+        <footer>
+          <button name="validate" type="object" string="Validate" class="btn-primary" />
+          <button special="cancel" string="Cancel" class="btn-default" />
+        </footer>
+      </form>
+    </field>
+  </record>
+
+</odoo>

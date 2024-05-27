@@ -34,16 +34,13 @@
     </field>
   </record>
 
-  <record id="action_sale_order_line_unblock_release" model="ir.actions.server">
+  <record id="action_sale_order_line_unblock_release" model="ir.actions.act_window">
     <field name="name">Unblock Release</field>
-    <field name="model_id" ref="sale.model_sale_order_line" />
-    <field name="binding_model_id" ref="sale.model_sale_order_line" />
+    <field name="res_model">unblock.release</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="binding_model_id" ref="model_sale_order_line" />
     <field name="binding_view_types">list</field>
-    <field name="state">code</field>
-    <field name="code">
-    if records:
-        records.move_ids.action_unblock_release()
-    </field>
   </record>
 
   <record id="action_sale_order_line_block_release" model="ir.actions.server">
