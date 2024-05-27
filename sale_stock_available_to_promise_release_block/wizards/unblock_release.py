@@ -1,7 +1,7 @@
 # Copyright 2024 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-from odoo import api, fields, models
+from odoo import _, api, exceptions, fields, models
 
 
 class UnblockRelease(models.TransientModel):
@@ -25,13 +25,14 @@ class UnblockRelease(models.TransientModel):
         compute="_compute_date_deadline", store=True, readonly=False, required=True
     )
 
-    _sql_constraints = [
-        (
-            "check_scheduled_date",
-            "CHECK (date_deadline::date >= now()::date)",
-            "You cannot reschedule deliveries in the past.",
-        ),
-    ]
+    @api.constrains("date_deadline")
+    def _constrains_date_deadline(self):
+        today = fields.Date.today()
+        for rec in self:
+            if rec.date_deadline.date() < today:
+                raise exceptions.ValidationError(
+                    _("You cannot reschedule deliveries in the past.")
+                )
 
     def _selection_option(self):
         options = [
@@ -97,3 +98,8 @@ class UnblockRelease(models.TransientModel):
         moves.action_unblock_release()
         # Clean up empty deliveries
         pickings.filtered(lambda o: not o.move_ids and not o.printed).unlink()
+        # Update commitment date of contextual sale order if any
+        from_sale_order_id = self.env.context.get("from_sale_order_id")
+        from_sale_order = self.env["sale.order"].browse(from_sale_order_id).exists()
+        if from_sale_order.state in ("draft", "sent"):
+            from_sale_order.commitment_date = self.date_deadline
