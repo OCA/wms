@@ -22,11 +22,12 @@ class Common(TransactionCase):
         )
 
     @classmethod
+    def _create_sale_order(cls):
+        return cls.env["sale.order"].create({"partner_id": cls.customer.id})
+
+    @classmethod
     def setUpClassSale(cls):
-        customer = cls.env["res.partner"].create(
-            {"name": "Partner who loves storable products"}
-        )
-        cls.sale = cls.env["sale.order"].create({"partner_id": customer.id})
+        cls.sale = cls._create_sale_order()
         cls.line = cls.env["sale.order.line"].create(
             {
                 "order_id": cls.sale.id,
@@ -45,6 +46,9 @@ class Common(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
+        cls.customer = cls.env["res.partner"].create(
+            {"name": "Partner who loves storable products"}
+        )
         cls.setUpClassProduct()
         cls.setUpClassSale()
         cls.setUpClassStock()
