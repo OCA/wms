@@ -11,3 +11,7 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.release_channel_show_last_picking_done",
         readonly=False,
     )
+    recompute_channel_on_pickings_at_release = fields.Boolean(
+        related="company_id.recompute_channel_on_pickings_at_release",
+        readonly=False,
+    )
