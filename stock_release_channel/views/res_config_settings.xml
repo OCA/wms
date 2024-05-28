@@ -22,6 +22,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-12 col-lg-6 o_setting_box">
+                    <div class="o_setting_left_pane">
+                        <field name="recompute_channel_on_pickings_at_release" />
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="recompute_channel_on_pickings_at_release" />
+                        <div class="text-muted">
+                            Recompute channel when releasing a transfer
+                        </div>
+                    </div>
+                </div>
             </xpath>
         </field>
     </record>

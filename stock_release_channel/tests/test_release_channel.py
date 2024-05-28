@@ -68,3 +68,22 @@ class TestReleaseChannel(ReleaseChannelCase):
         move = self._create_single_move(self.product1, 10)
         move.picking_id.assign_release_channel()
         self.assertEqual(move.picking_id.release_channel_id.id, self.default_channel.id)
+
+    def test_recompute_channel(self):
+        channel = self._create_channel(
+            name="Test Domain",
+            sequence=1,
+            rule_domain=[("priority", "=", "1")],
+        )
+        move = self._create_single_move(self.product1, 10)
+        move.picking_id.assign_release_channel()
+        move.picking_id.priority = "1"  # To find new suitable channel for this picking
+
+        # Test with recompute_channel_on_pickings_at_release = False
+        self.env.company.recompute_channel_on_pickings_at_release = False
+        move.release_available_to_promise()
+        self.assertEqual(move.picking_id.release_channel_id, self.default_channel)
+        # Test with recompute_channel_on_pickings_at_release = False
+        self.env.company.recompute_channel_on_pickings_at_release = True
+        move.release_available_to_promise()
+        self.assertEqual(move.picking_id.release_channel_id, channel)
