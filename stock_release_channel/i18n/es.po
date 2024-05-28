@@ -514,6 +514,17 @@ msgid "Re-assign release channel"
 msgstr "Reasignar canal de liberación"
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_company__recompute_channel_on_pickings_at_release
+#: model:ir.model.fields,field_description:stock_release_channel.field_res_config_settings__recompute_channel_on_pickings_at_release
+msgid "Recompute Channel On Pickings At Release"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.res_config_settings_view
+msgid "Recompute channel when releasing a transfer"
+msgstr ""
+
+#. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_tree_view
 msgid "Related Done Total"
 msgstr "Total hecho relacionado"
@@ -780,6 +791,12 @@ msgid ""
 msgstr ""
 "Al hacer clic en el icono del paquete, se liberan X transferencias menos las "
 "que están en curso y no se han enviado (X - En espera). Este campo define X."
+
+#. module: stock_release_channel
+#: model:ir.model.fields,help:stock_release_channel.field_res_company__recompute_channel_on_pickings_at_release
+#: model:ir.model.fields,help:stock_release_channel.field_res_config_settings__recompute_channel_on_pickings_at_release
+msgid "When releasing a transfer, recompute channel"
+msgstr ""
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__code
