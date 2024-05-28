@@ -18,12 +18,30 @@ class UnblockRelease(models.TransientModel):
     )
     option = fields.Selection(
         selection=lambda self: self._selection_option(),
-        default="asap",
+        default="automatic",
         required=True,
+        help=(
+            "- Manual: schedule blocked deliveries at a given date;\n"
+            "- Automatic: schedule blocked deliveries as soon as possible;\n"
+            "- Contextual: schedule blocked deliveries based by default on the "
+            "commitment date of the contextual sale order. Commitment date of "
+            "the order will be updated if not yet confirmed.",
+        ),
+        # help=(
+        #     "- Manual: schedule blocked deliveries at a given date, in the "
+        #     "chosen release channel;\n"
+        #     "- Automatic: schedule blocked deliveries as soon as possible in the "
+        #     "relevant release channel;\n"
+        #     "- Contextual: schedule blocked deliveries based by default on the "
+        #     "commitment date and release channel (if any) of the contextual "
+        #     "sale order. Commitment date and release channel of the order will "
+        #     "be updated if not yet confirmed.\n",
+        # ),
     )
     date_deadline = fields.Datetime(
         compute="_compute_date_deadline", store=True, readonly=False, required=True
     )
+    # release_channel_id = fields.Many2one("stock.release.channel", required=True)
 
     @api.constrains("date_deadline")
     def _constrains_date_deadline(self):
@@ -36,8 +54,8 @@ class UnblockRelease(models.TransientModel):
 
     def _selection_option(self):
         options = [
-            ("free", "Free"),
-            ("asap", "As soon as possible"),
+            ("manual", "Manual"),
+            ("automatic", "Automatic / As soon as possible"),
         ]
         if self.env.context.get("from_sale_order_id"):
             options.append(("contextual", "From contextual sale order"))
@@ -49,7 +67,7 @@ class UnblockRelease(models.TransientModel):
         order = self.env["sale.order"].browse(from_sale_order_id).exists()
         for rec in self:
             rec.date_deadline = False
-            if rec.option == "asap":
+            if rec.option == "automatic":
                 rec.date_deadline = fields.Datetime.now()
             elif rec.option == "contextual" and order:
                 rec.date_deadline = order.commitment_date or order.expected_date
