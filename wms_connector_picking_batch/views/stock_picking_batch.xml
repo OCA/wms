@@ -3,9 +3,9 @@
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
 
-    <record model="ir.ui.view" id="stock_picking_form_view">
-        <field name="model">stock.picking</field>
-        <field name="inherit_id" ref="stock.view_picking_form" />
+    <record model="ir.ui.view" id="stock_picking_batch_form_view">
+        <field name="model">stock.picking.batch</field>
+        <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form" />
         <field name="arch" type="xml">
             <header position="inside">
                 <field name="is_wms_exportable" invisible="True" />
@@ -35,23 +35,23 @@
                              external WMS"
                 />
             </header>
-            <field name="date_done" position="before">
+            <field name="scheduled_date" position="before">
                 <field name="is_wms_exportable" invisible="1"/>
                 <field
                     name="wms_export_date"
                     attrs="{'invisible': [('is_wms_exportable', '=', False)]}"
                 />
             </field>
-            <field name="group_id" position="after">
-                <field
-                    name="wms_export_attachment_id"
-                    attrs="{'invisible': [('wms_export_attachment_id', '=', False)]}"
-                />
-                <field
-                    name="wms_import_attachment_id"
-                    attrs="{'invisible': [('wms_import_attachment_id', '=', False)]}"
-                />
-            </field>
+            <!-- <field name="group_id" position="after"> -->
+            <!--     <field -->
+            <!--         name="wms_export_attachment_id" -->
+            <!--         attrs="{'invisible': [('wms_export_attachment_id', '=', False)]}" -->
+            <!--     /> -->
+            <!--     <field -->
+            <!--         name="wms_import_attachment_id" -->
+            <!--         attrs="{'invisible': [('wms_import_attachment_id', '=', False)]}" -->
+            <!--     /> -->
+            <!-- </field> -->
             <header position="after">
                 <div
                     class="alert alert-danger"
