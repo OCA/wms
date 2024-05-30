@@ -34,7 +34,6 @@ class StockPicking(models.Model):
         for rec in self:
             rec.is_wms_exportable = (
                 rec.picking_type_id.warehouse_id.active_wms_sync
-                and rec.picking_type_id.code in ("incoming", "outgoing")
             )
 
     def _is_user_allowed_to_cancel(self):
