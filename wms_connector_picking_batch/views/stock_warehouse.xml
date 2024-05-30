@@ -23,6 +23,14 @@
                     type="object"
                 />
             </div>
+            <field name="wms_export_picking_out_cron_id" position="after">
+                <field name="wms_export_batch_picking_in_cron_id" />
+                <field name="wms_export_batch_picking_out_cron_id" />
+            </field>
+            <field name="wms_export_picking_out_filter_id" position="after">
+                <field name="wms_export_batch_picking_in_filter_id" />
+                <field name="wms_export_batch_picking_out_filter_id" />
+            </field>
         </field>
     </record>
 </odoo>

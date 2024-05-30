@@ -36,6 +36,7 @@
                 />
             </header>
             <field name="date_done" position="before">
+                <field name="is_wms_exportable" invisible="1"/>
                 <field
                     name="wms_export_date"
                     attrs="{'invisible': [('is_wms_exportable', '=', False)]}"
