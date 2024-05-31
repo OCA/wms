@@ -19,12 +19,12 @@ FILTER_DOMAINS = {
     "wms_export_batch_picking_in_filter_id": [
         ("wms_export_date", "=", False),
         ("picking_type_id", "=", {}),
-        ("state", "=", "in_progress"),
+        ("state", "=", "draft"),
     ],
     "wms_export_batch_picking_out_filter_id": [
         ("wms_export_date", "=", False),
         ("picking_type_id", "=", {}),
-        ("state", "=", "in_progress"),
+        ("state", "=", "draft"),
     ],
 }
 
