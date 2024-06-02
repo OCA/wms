@@ -133,25 +133,38 @@ class StockMove(models.Model):
         )
 
     def _check_unrelease_allowed(self):
-        for move in self:
-            if not move.unrelease_allowed:
-                message = _(
-                    "You are not allowed to unrelease this move %(move_name)s.",
-                    move_name=move.display_name,
+        forbidden_moves = self.filtered(lambda m: not m.unrelease_allowed)
+        if not forbidden_moves:
+            return
+        message = _("You are not allowed to unrelease those deliveries:\n")
+
+        for picking, forbidden_moves_by_picking in groupby(
+            forbidden_moves, lambda m: m.picking_id
+        ):
+            forbidden_moves_by_picking = self.browse().concat(
+                *forbidden_moves_by_picking
+            )
+            message += "\n\t- %s" % picking.name
+            forbidden_origin_pickings = self.picking_id.browse()
+            for move in forbidden_moves_by_picking:
+                iterator = move._get_chained_moves_iterator("move_orig_ids")
+                next(iterator)  # skip the current move
+                for origin_moves in iterator:
+                    for origin_picking, moves_by_picking in groupby(
+                        origin_moves, lambda m: m.picking_id
+                    ):
+                        moves_by_picking = self.browse().concat(*moves_by_picking)
+                        if not move._is_unrelease_allowed_on_origin_moves(
+                            moves_by_picking
+                        ):
+                            forbidden_origin_pickings |= origin_picking
+            if forbidden_origin_pickings:
+                message += " "
+                message += _(
+                    "- blocking transfer(s): %(picking_names)s",
+                    picking_names=" ".join(forbidden_origin_pickings.mapped("name")),
                 )
-                if move.picking_id:
-                    message += _(
-                        "\n- Picking: %(picking_name)s.",
-                        picking_name=move.picking_id.name,
-                    )
-                if move.move_orig_ids and move.move_orig_ids.picking_id:
-                    message += _(
-                        "\n- Origin picking(s):\n\t -%(picking_names)s.",
-                        picking_names="\n\t- ".join(
-                            move.move_orig_ids.picking_id.mapped("name")
-                        ),
-                    )
-                raise UserError(message)
+        raise UserError(message)
 
     def _previous_promised_qty_sql_main_query(self):
         return """
@@ -449,9 +462,8 @@ class StockMove(models.Model):
         )
 
     def _action_cancel(self):
-        # Unrelease moves that can be, before canceling them.
-        moves_to_unrelease = self.filtered(lambda m: m.unrelease_allowed)
-        moves_to_unrelease.unrelease()
+        # Unrelease moves that must be, before canceling them.
+        self.unrelease()
         super()._action_cancel()
         self.write({"need_release": False})
         return True
