@@ -17,30 +17,6 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: stock_available_to_promise_release
-#. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#, python-format
-msgid ""
-"\n"
-"- Origin picking(s):\n"
-"\t -%(picking_names)s."
-msgstr ""
-"\n"
-"- Recogida(s) de origen:\n"
-"-%(picking_names)s."
-
-#. module: stock_available_to_promise_release
-#. odoo-python
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#, python-format
-msgid ""
-"\n"
-"- Picking: %(picking_name)s."
-msgstr ""
-"\n"
-"- Recogida: %(picking_name)s."
-
-#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
 msgid "# of moves ready"
 msgstr "# de movimientos preparados"
@@ -49,6 +25,13 @@ msgstr "# de movimientos preparados"
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__need_release_count
 msgid "# of need release moves"
 msgstr "# de movimientos de liberación de necesidades"
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "- blocking transfer(s): %(picking_names)s"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
@@ -561,10 +544,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
-msgid "You are not allowed to unrelease this move %(move_name)s."
+msgid "You are not allowed to unrelease those deliveries:\n"
 msgstr ""
-"No tienes permiso para cancelar la liberación de este movimiento "
-"%(move_name)s."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
@@ -575,3 +556,27 @@ msgstr "días"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minutos"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "- Origin picking(s):\n"
+#~ "\t -%(picking_names)s."
+#~ msgstr ""
+#~ "\n"
+#~ "- Recogida(s) de origen:\n"
+#~ "-%(picking_names)s."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "- Picking: %(picking_name)s."
+#~ msgstr ""
+#~ "\n"
+#~ "- Recogida: %(picking_name)s."
+
+#, python-format
+#~ msgid "You are not allowed to unrelease this move %(move_name)s."
+#~ msgstr ""
+#~ "No tienes permiso para cancelar la liberación de este movimiento "
+#~ "%(move_name)s."
