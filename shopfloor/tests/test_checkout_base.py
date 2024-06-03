@@ -54,6 +54,7 @@ class CheckoutCommonCase(CommonCase):
             "group_lines_by_location": True,
             "show_oneline_package_content": False,
             "need_confirm_pack_all": "",
+            "need_confirm_lot": None,
         }
         data.update(kw)
         return data

@@ -161,6 +161,9 @@ class ChangePackageLot(Component):
         # lines
         move_line.move_id._action_assign()
 
+        self._change_pack_lot_change_lot__before_assign(
+            previous_lot, lot, to_assign_moves
+        )
         # Find other available goods for the lines which were using the
         # lot before...
         to_assign_moves._action_assign()
@@ -169,6 +172,11 @@ class ChangePackageLot(Component):
         if message_parts:
             message["body"] = "{} {}".format(message["body"], " ".join(message_parts))
         return response_ok_func(move_line, message=message)
+
+    def _change_pack_lot_change_lot__before_assign(
+        self, previous_lot, lot, to_assign_moves
+    ):
+        pass
 
     def _package_content_replacement_allowed(self, package, move_line):
         # we can't replace by a package which doesn't contain the product...
@@ -215,3 +223,14 @@ class ChangePackageLot(Component):
         else:
             message = self.msg_store.units_replaced_by_package(package)
         return response_ok_func(move_line, message=message)
+
+    def filter_lines_allowed_to_change_lot(self, move_lines, lot):
+        """Filter move lines allowed to change their lot.
+
+        We cannot change a lot on a move having ancestors. That would mean we
+        already picked up the wrong lot on the previous move(s) and Odoo already
+        restricts the reservation based on the previous move(s).
+        """
+        return move_lines.filtered(
+            lambda l: (l.product_id == lot.product_id and not l.move_id.move_orig_ids)
+        )
