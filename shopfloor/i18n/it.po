@@ -169,6 +169,7 @@ msgstr "È richiesto un collo destinazione."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/change_package_lot.py:0
+#: code:addons/shopfloor/tests/test_checkout_scan_line.py:0
 #, python-format
 msgid "A draft inventory has been created for control."
 msgstr "Per cntrollo è stato creato una bozza inventario."
@@ -599,10 +600,10 @@ msgid "Location {} empty"
 msgstr "Ubicazione {} vuota"
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
+#: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Lot is not in the current transfer."
-msgstr "Il lotto non è nel trasferimento attuale."
+msgid "Lot changed"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1262,6 +1263,12 @@ msgid "Scan the package"
 msgstr "Scansionare il collo"
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Scanned lot differs from the previous scan: %(lot)s."
+msgstr ""
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
@@ -1678,6 +1685,12 @@ msgstr "Questa ubicazione richiede colli. Scansionare un collo destinazione."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "This lot does not exist anymore."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid ""
 "This lot is part of a package with other products, please scan a package."
 msgstr ""
@@ -1781,6 +1794,12 @@ msgid ""
 msgstr ""
 "Il trasferimento ad un collo differente non è consentito, scansionare invece "
 "un'ubicazione."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Unable to find a line with the same product but different lot."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1977,6 +1996,15 @@ msgstr "Nonsi possono prelevare più di {} unità."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
+"You scanned a different lot with the same product, do you want to change "
+"lot? Scan it again to confirm. The first line matching this product will be "
+"updated. "
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
 "You scanned a different package with the same product, do you want to change "
 "pack? Scan it again to confirm"
 msgstr ""
@@ -2029,3 +2057,7 @@ msgstr "{} non trovato nel trasferimento attuale o già nel collo."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} metti in {}"
+
+#, python-format
+#~ msgid "Lot is not in the current transfer."
+#~ msgstr "Il lotto non è nel trasferimento attuale."
