@@ -46,6 +46,16 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid ""
+"\n"
+"When moving a whole package, the user normally scans\n"
+"a destination location.\n"
+"If enabled, they will also be allowed\n"
+"to scan a destination package.\n"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
@@ -135,6 +145,11 @@ msgid "Allow Alternative Destination Is Possible"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package_is_possible
+msgid "Allow Alternative Destination Package Is Possible"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation_is_possible
 msgid "Allow Force Reservation Is Possible"
 msgstr ""
@@ -157,6 +172,11 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
 msgid "Allow create returns"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid "Allow to change the destination package"
 msgstr ""
 
 #. module: shopfloor
@@ -326,6 +346,11 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__result_package_id
+msgid "Destination Package"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
 msgid "Disable Full Bin Action Is Possible"
 msgstr ""
@@ -368,6 +393,11 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Goods packed into {0.name}"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_stock_move_line__result_package_id
+msgid "If set, the operations are packed into this package"
 msgstr ""
 
 #. module: shopfloor
@@ -467,6 +497,20 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location {} empty"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot %(lot_name)s not found in location %(location_name)s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot %(lot_name)s not found in transfer %(picking_name)s"
 msgstr ""
 
 #. module: shopfloor
@@ -598,6 +642,13 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No line to pack found."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No lines to process, set quantities on some"
 msgstr ""
 
 #. module: shopfloor
@@ -800,6 +851,15 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Package %(package_name)s contains already lines from a different operation "
+"type %(picking_type_name)s."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid ""
@@ -813,6 +873,20 @@ msgstr ""
 #, python-format
 msgid ""
 "Package %(package_name)s is not available in transfer %(picking_name)s."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package %(package_name)s not found in location %(location_name)s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package %(package_name)s not found in transfer %(picking_name)s"
 msgstr ""
 
 #. module: shopfloor
@@ -909,6 +983,13 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging not found in the current transfer."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Packaging {} dimension updated."
 msgstr ""
 
 #. module: shopfloor
@@ -1018,6 +1099,15 @@ msgid "Processing reserved quantities is not allowed for menu {}."
 msgstr ""
 
 #. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Product %(product_name)s not found in location %(location_name)s or transfer"
+" %(picking_name)s."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
 msgstr ""
@@ -1095,6 +1185,11 @@ msgid "Restart the operation, someone has canceled it."
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid "Restrict scannable barcode at work selection"
+msgstr ""
+
+#. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF Priority"
 msgstr ""
@@ -1124,11 +1219,6 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
 msgid "Scan Location Or Pack First Is Possible"
-msgstr ""
-
-#. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
-msgid "Scan first location or pack"
 msgstr ""
 
 #. module: shopfloor
@@ -1423,6 +1513,13 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
+#: code:addons/shopfloor/models/stock_move_line.py:0
+#, python-format
+msgid "The demand cannot be negative"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "The destination bin {} is not empty, please take another."
@@ -1675,6 +1772,15 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"Transferring to a different package is not allowed, please scan a location "
+"instead."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Units replaced by package {}."
 msgstr ""
 
@@ -1729,6 +1835,18 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid ""
+"When checked, the user will be restricted by the type of object barcode  "
+"that he can scan to select the document/transfer/move line to work on."
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "When choosing an order to pack, do not allow to scan a product."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
@@ -1747,10 +1865,10 @@ msgid "When picking, prevent unloading the whole bin when full."
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid ""
-"When selecting work, force the user to first scan a location or pack,then "
-"the product or lot."
+"When selecting a move line, force the user to first scan a package or a "
+"location and not a product or a lot."
 msgstr ""
 
 #. module: shopfloor
@@ -1821,6 +1939,13 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot place it here"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "You cannot process that much units."
 msgstr ""
 
 #. module: shopfloor
