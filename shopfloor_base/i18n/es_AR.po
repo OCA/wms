@@ -30,6 +30,7 @@ msgstr ""
 "        "
 
 #. module: shopfloor_base
+#. odoo-python
 #: code:addons/shopfloor_base/services/forms/form_mixin.py:0
 #, python-format
 msgid "%s updated."
@@ -144,7 +145,6 @@ msgid "Developer"
 msgstr "Desarrollador"
 
 #. module: shopfloor_base
-#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__display_name
@@ -164,7 +164,6 @@ msgid "HTTP Routing"
 msgstr "Ruta HTTP"
 
 #. module: shopfloor_base
-#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__id
@@ -199,7 +198,6 @@ msgid "Language"
 msgstr "Idioma"
 
 #. module: shopfloor_base
-#: model:ir.model.fields,field_description:shopfloor_base.field_ir_http____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile____last_update
@@ -342,12 +340,14 @@ msgid "Public URL to use the app."
 msgstr "URL pública para usar la app."
 
 #. module: shopfloor_base
+#. odoo-python
 #: code:addons/shopfloor_base/actions/message.py:0
 #, python-format
 msgid "Record not found."
 msgstr "Registro no encontrado."
 
 #. module: shopfloor_base
+#. odoo-python
 #: code:addons/shopfloor_base/services/scan_anything.py:0
 #, python-format
 msgid ""
@@ -454,6 +454,7 @@ msgstr ""
 "registradas en el formulario"
 
 #. module: shopfloor_base
+#. odoo-python
 #: code:addons/shopfloor_base/services/service.py:0
 #, python-format
 msgid "The record {model} {_id} does not exist"
