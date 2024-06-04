@@ -33,7 +33,7 @@ by scanning a product or product packaging EAN to increase the quantity
 (i.e. +1 Unit or +1 Box)
 """
 
-AUTO_POST_LINE = """
+AUTO_POST_LINE_HELP = """
 When setting result pack & destination,
 automatically post the corresponding line
 if this option is checked.
@@ -44,6 +44,13 @@ When enabled, you can receive unplanned products that are returned
 from an existing delivery matched on the origin (SO name).
 A new move will be added as a return of the delivery,
 decreasing the delivered quantity of the related SO line.
+"""
+
+ALLOW_ALTERNATIVE_DESTINATION_PACKAGE_HELP = """
+When moving a whole package, the user normally scans
+a destination location.
+If enabled, they will also be allowed
+to scan a destination package.
 """
 
 
@@ -171,11 +178,12 @@ class ShopfloorMenu(models.Model):
     show_oneline_package_content_is_possible = fields.Boolean(
         compute="_compute_show_oneline_package_content_is_possible"
     )
+    # TODO this field could be renamed
     scan_location_or_pack_first = fields.Boolean(
-        string="Scan first location or pack",
+        string="Restrict scannable barcode at work selection",
         help=(
-            "When selecting work, force the user to first scan a location or pack,"
-            "then the product or lot."
+            "When checked, the user will be restricted by the type of object barcode "
+            " that he can scan to select the document/transfer/move line to work on."
         ),
     )
     scan_location_or_pack_first_is_possible = fields.Boolean(
@@ -205,10 +213,18 @@ class ShopfloorMenu(models.Model):
     auto_post_line = fields.Boolean(
         string="Automatically post line",
         default=False,
-        help=AUTO_POST_LINE,
+        help=AUTO_POST_LINE_HELP,
     )
     auto_post_line_is_possible = fields.Boolean(
         compute="_compute_auto_post_line_is_possible"
+    )
+    allow_alternative_destination_package = fields.Boolean(
+        string="Allow to change the destination package",
+        default=False,
+        help=ALLOW_ALTERNATIVE_DESTINATION_PACKAGE_HELP,
+    )
+    allow_alternative_destination_package_is_possible = fields.Boolean(
+        compute="_compute_allow_alternative_destination_package_is_possible"
     )
 
     @api.onchange("unload_package_at_destination")
@@ -424,6 +440,7 @@ class ShopfloorMenu(models.Model):
                 "auto_post_line"
             )
 
+    @api.depends("scenario_id")
     def _compute_allow_alternative_destination_is_possible(self):
         for menu in self:
             menu.allow_alternative_destination_is_possible = (
@@ -434,3 +451,10 @@ class ShopfloorMenu(models.Model):
     def _compute_allow_return_is_possible(self):
         for menu in self:
             menu.allow_return_is_possible = menu.scenario_id.has_option("allow_return")
+
+    @api.depends("scenario_id")
+    def _compute_allow_alternative_destination_package_is_possible(self):
+        for menu in self:
+            menu.allow_alternative_destination_package_is_possible = (
+                menu.scenario_id.has_option("allow_alternative_destination_package")
+            )

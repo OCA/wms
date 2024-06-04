@@ -259,13 +259,14 @@ class Delivery(Component):
             # we added auto_join for this, otherwise, the ORM would search all pickings
             # in the picking type, and then use IN (ids)
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
+            ("picking_id.state", "not in", ("done", "cancel")),
         ]
         if no_qty_done:
             domain.append(("qty_done", "=", 0))
         return domain
 
     def _lines_from_lot_domain(
-        self, lot, no_qty_done=True, product_qty=None, location=None
+        self, lot, no_qty_done=True, product_qty=None, location=None, picking=None
     ):
         location_domain = (
             [("picking_id.location_id", "=", location.id)] if location else []
@@ -283,10 +284,12 @@ class Delivery(Component):
                     ("reserved_qty", ">=", product_qty),
                 ]
             )
+        if picking:
+            domain.extend([("picking_id", "=", picking.id)])
         return domain
 
     def _lines_from_product_domain(
-        self, product, no_qty_done=True, product_qty=None, location=None
+        self, product, no_qty_done=True, product_qty=None, location=None, picking=None
     ):
         # TODO: searching lines is common to other scenario, to refactor
         domain = expression.AND(
@@ -300,12 +303,17 @@ class Delivery(Component):
                     ("reserved_qty", ">=", product_qty),
                 ]
             )
+        if picking:
+            domain.extend([("picking_id", "=", picking.id)])
         return domain
 
-    def _lines_from_package_domain(self, package, no_qty_done=True):
-        return expression.AND(
+    def _lines_from_package_domain(self, package, no_qty_done=True, picking=None):
+        domain = expression.AND(
             [self._lines_base_domain(no_qty_done), [("package_id", "=", package.id)]]
         )
+        if picking:
+            domain.extend([("picking_id", "=", picking.id)])
+        return domain
 
     def _deliver_product(self, picking, product, product_qty=None, location=None):
         """Handle the scan_deliver end point for a product."""
@@ -318,7 +326,11 @@ class Delivery(Component):
 
         lines = self.env["stock.move.line"].search(
             self._lines_from_product_domain(
-                product, no_qty_done=False, product_qty=product_qty, location=location
+                product,
+                no_qty_done=False,
+                product_qty=product_qty,
+                location=location,
+                picking=picking,
             ),
             order="date_planned",
         )
@@ -403,7 +415,11 @@ class Delivery(Component):
     def _deliver_lot(self, picking, lot, product_qty=None, location=None):
         lines = self.env["stock.move.line"].search(
             self._lines_from_lot_domain(
-                lot, no_qty_done=False, product_qty=product_qty, location=location
+                lot,
+                no_qty_done=False,
+                product_qty=product_qty,
+                location=location,
+                picking=picking,
             )
         )
         if not lines:
@@ -608,7 +624,9 @@ class Delivery(Component):
         package = self.env["stock.quant.package"].browse(package_id).exists()
         if package:
             lines = self.env["stock.move.line"].search(
-                self._lines_from_package_domain(package, no_qty_done=False)
+                self._lines_from_package_domain(
+                    package, no_qty_done=False, picking=picking
+                )
             )
             if not lines:
                 return self._response_for_deliver(

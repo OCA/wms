@@ -20,6 +20,16 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             cls._fill_stock_for_moves(move, in_lot=True)
         cls.picking.action_assign()
         cls.move_lines = cls.picking.move_line_ids
+        cls.delivery_packaging = (
+            cls.env["stock.package.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "DelivBox",
+                    "barcode": "DelivBox",
+                }
+            )
+        )
 
     def _assert_quantity_done(self, barcode, selected_lines, qties):
         picking = selected_lines.mapped("picking_id")
@@ -89,3 +99,41 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         # should be the packaging qty, if a packaging is scanned
         qties = [1.0] * len(first_line)
         self._assert_quantity_done(lot.name, first_line, qties)
+
+    def test_scan_line_delivery_package_with_no_prefill_qty(self):
+        # Scan a delivery package
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": self.picking.id,
+                "barcode": self.delivery_packaging.barcode,
+            },
+        )
+        # Back to select_line asking to set some quantities
+        self.assertEqual(response["next_state"], "select_line")
+        self.assertEqual(
+            response["message"],
+            self.msg_store.no_lines_to_process_set_quantities(),
+        )
+        # Scan a product B to set some quantities
+        self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": self.picking.id,
+                "barcode": self.product_b.barcode,
+            },
+        )
+        line_product_b = self.move_lines.filtered(
+            lambda line: line.product_id == self.product_b
+        )
+        self.assertFalse(line_product_b.result_package_id)
+        # Scan the delivery package again
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": self.picking.id,
+                "barcode": self.delivery_packaging.barcode,
+            },
+        )
+        # Check the line has been packed
+        self.assertTrue(line_product_b.result_package_id)

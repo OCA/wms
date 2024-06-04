@@ -24,6 +24,7 @@ class StockMoveLine(models.Model):
     # we search lines based on their location in some workflows
     location_id = fields.Many2one(index=True)
     package_id = fields.Many2one(index=True)
+    result_package_id = fields.Many2one(index=True)
 
     # allow domain on picking_id.xxx without too much perf penalty
     picking_id = fields.Many2one(auto_join=True)
@@ -153,6 +154,8 @@ class StockMoveLine(models.Model):
         :param split_partial: split if qty is less than expected
             otherwise rely on a backorder.
         """
+        if self.reserved_uom_qty < 0:
+            raise UserError(_("The demand cannot be negative"))
         # store a new line if we have split our line (not enough qty)
         new_line = self.env["stock.move.line"]
         rounding = self.product_uom_id.rounding

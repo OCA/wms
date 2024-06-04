@@ -152,3 +152,23 @@ class DataDetailAction(Component):
             "product_name",
             "product_code",
         ]
+
+    @ensure_model("product.packaging")
+    def packaging_detail(self, record, **kw):
+        return self._jsonify(
+            record.with_context(packaging=record.id),
+            self._packaging_detail_parser,
+            **kw
+        )
+
+    @property
+    def _packaging_detail_parser(self):
+        return self._packaging_parser + [
+            "packaging_length:length",
+            "width",
+            "height",
+            ("max_weight", lambda rec, fname: rec.package_type_id.max_weight),
+            "length_uom_name:length_uom",
+            "weight_uom_name:weight_uom",
+            "barcode:barcode",
+        ]

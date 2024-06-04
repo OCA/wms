@@ -26,6 +26,7 @@ from . import test_checkout_select
 from . import test_checkout_scan_line
 from . import test_checkout_scan_line_no_prefill_qty
 from . import test_checkout_scan_line_base
+from . import test_checkout_scan_dest_location
 from . import test_checkout_select_line
 from . import test_checkout_select_package_base
 from . import test_checkout_set_qty
@@ -60,6 +61,7 @@ from . import test_location_content_transfer_set_destination_package_or_line
 from . import test_location_content_transfer_putaway
 from . import test_location_content_transfer_mix
 from . import test_zone_picking_base
+from . import test_zone_picking_complete_mix_pack_flux
 from . import test_zone_picking_start
 from . import test_zone_picking_select_picking_type
 from . import test_zone_picking_select_line

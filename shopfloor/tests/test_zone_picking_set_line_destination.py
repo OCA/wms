@@ -24,7 +24,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": 1234567890,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assert_response_start(
@@ -48,7 +48,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": quantity_done,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         # Check response
@@ -60,7 +60,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             message=self.service.msg_store.confirm_location_changed(
                 move_line.location_dest_id, self.packing_location
             ),
-            confirmation_required=True,
+            confirmation_required=self.packing_location.barcode,
             qty_done=quantity_done,
         )
         # Confirm the destination with a wrong destination (should not happen)
@@ -70,7 +70,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.customer_location.barcode,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": True,
+                "confirmation": self.packing_location.barcode,
             },
         )
         # Check response
@@ -89,7 +89,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": True,
+                "confirmation": self.packing_location.barcode,
             },
         )
         # Check response
@@ -118,7 +118,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_sublocation_b.barcode,
                 "quantity": quantity_done,
-                "confirmation": True,
+                "confirmation": self.packing_sublocation_b.barcode,
             },
         )
         # Check response
@@ -158,7 +158,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertEqual(move_line.state, "done")
@@ -207,7 +207,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": barcode,
                 "quantity": 6,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assert_response_set_line_destination(
@@ -253,7 +253,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.reserved_uom_qty,  # 6 qty
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertEqual(move_line.state, "done")
@@ -315,7 +315,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": barcode,
                 "quantity": 4,  # 4/6 qty
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assert_response_set_line_destination(
@@ -346,7 +346,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.packing_location.barcode,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertTrue(location_is_empty())
@@ -380,7 +380,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         # Check picking data
@@ -434,7 +434,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": 6,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         # Check picking data
@@ -496,7 +496,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertTrue(location_is_empty())
@@ -523,7 +523,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertTrue(location_is_empty())
@@ -545,7 +545,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         self.assertEqual(
@@ -568,7 +568,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
             },
         )
         # We now have no error in the response
@@ -580,6 +580,41 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             picking_type,
             move_lines,
             message=self.service.msg_store.confirm_pack_moved(),
+        )
+
+    def test_set_same_destination_package_different_picking_type(self):
+        self.menu.sudo().write({"multiple_move_single_pack": True})
+        picking_type1 = self.picking1.picking_type_id
+        self._update_qty_in_location(
+            picking_type1.default_location_src_id, self.product_a, 100
+        )
+        picking_type = picking_type1.sudo().copy(
+            {"name": "test", "shopfloor_menu_ids": False}
+        )
+        picking = self._create_picking(
+            picking_type=picking_type, lines=[(self.product_a, 10)]
+        )
+        self.assertEqual(picking.picking_type_id, picking_type)
+        picking.action_assign()
+        move_line = picking.move_line_ids
+        move_line.result_package_id = self.free_package.id
+        self.assertEqual(self.free_package.planned_move_line_ids, move_line)
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "barcode": self.free_package.name,
+                "quantity": move_line.reserved_uom_qty,
+                "confirmation": None,
+            },
+        )
+        self.assertEqual(
+            response["message"],
+            {
+                "body": "Package FREE_PACKAGE contains already lines"
+                " from a different operation type test.",
+                "message_type": "warning",
+            },
         )
 
     def test_set_destination_location_zero_quantity(self):
@@ -609,7 +644,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             qty_done=move_line.reserved_uom_qty,
         )
 
-    def test_set_destination_error_concurent_work(self):
+    def test_set_destination_package_error_concurent_work(self):
         """Scanned barcode is the destination package.
 
         Move line is already being worked on by someone else
@@ -626,7 +661,41 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "move_line_id": move_line.id,
                 "barcode": self.free_package.name,
                 "quantity": move_line.reserved_uom_qty,
-                "confirmation": False,
+                "confirmation": None,
+            },
+        )
+        # Check response
+        self.assert_response_set_line_destination(
+            response,
+            zone_location,
+            picking_type,
+            move_line,
+            message={
+                "message_type": "error",
+                "body": "Someone is already working on these transfers",
+            },
+            qty_done=move_line.reserved_uom_qty,
+        )
+
+    def test_set_destination_location_error_concurent_work(self):
+        """Scanned barcode is the destination location.
+
+        Move line is already being worked on by someone else
+        """
+        zone_location = self.zone_location
+        picking_type = self.picking1.picking_type_id
+        picking_type.sudo().shopfloor_zero_check = True
+        self.assertEqual(len(self.picking1.move_line_ids), 1)
+        move_line = self.picking1.move_line_ids
+        move_line.picking_id.user_id = self.shopfloor_manager
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "move_line_id": move_line.id,
+                "package_id": self.free_package.id,
+                "barcode": self.packing_location.barcode,
+                "quantity": move_line.reserved_uom_qty,
+                "confirmation": None,
             },
         )
         # Check response

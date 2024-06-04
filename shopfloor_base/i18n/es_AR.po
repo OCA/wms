@@ -173,6 +173,7 @@ msgid "ID"
 msgstr "ID"
 
 #. module: shopfloor_base
+#: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__scenario_key
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_scenario__key
 msgid ""
 "Identify scenario univocally. This value must match a service component's "
@@ -187,6 +188,7 @@ msgid "If set, the app will be first loaded with this lang."
 msgstr "Si está configurado, la app se cargará inicialmente con este idioma."
 
 #. module: shopfloor_base
+#: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario_key
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__key
 msgid "Key"
 msgstr "Clave"

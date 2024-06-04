@@ -552,6 +552,32 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             move_lines.mapped("picking_id"),
         )
 
+    def test_stock_out_package_ok_lines_not_owned_by_user(self):
+        """Declare a stock out on a package_level with lines not owned by user.
+
+        Same than the previous test, but lines will not be canceled, but
+        the assigned user will be removed.
+
+        """
+        self.env.user = self.shopfloor_manager
+        self.assertTrue(self.env.user != self.picking1.create_uid)
+        package_level = self.picking1.move_line_ids.package_level_id
+        move_lines_before = self.picking1.move_line_ids
+        move_lines_before.shopfloor_user_id = self.env.user
+        response = self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": self.content_loc.id,
+                "package_level_id": package_level.id,
+            },
+        )
+        move_lines = self.service._find_transfer_move_lines(self.content_loc)
+        self.assert_response_start_single(
+            response,
+            move_lines.mapped("picking_id"),
+        )
+        self.assertFalse(move_lines_before.exists())
+
     def test_stock_out_line_wrong_parameters(self):
         """Wrong 'location_id' and 'move_line_id' parameters, redirect the
         user to the 'start' screen.
@@ -746,3 +772,22 @@ class LocationContentTransferSingleSpecialCase(LocationContentTransferCommonCase
             response,
             move_lines.mapped("picking_id"),
         )
+
+    def test_stock_out_line_not_created_by_user(self):
+        """Declare a stock out on move line not owned by the user.
+
+        This will remove the assigned user but not cancel the move,
+        compare to the previous test.
+
+        """
+        self.env.user = self.shopfloor_manager
+        self.assertTrue(self.env.user != self.picking.create_uid)
+        move_line = self.move_product_b.move_line_ids.filtered(
+            lambda ml: ml.reserved_uom_qty == 4  # 4/10 to stock out
+        )
+        move_line.shopfloor_user_id = self.env.user
+        self.service.dispatch(
+            "stock_out_line",
+            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+        )
+        self.assertFalse(move_line.exists())

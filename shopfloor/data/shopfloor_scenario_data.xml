@@ -20,7 +20,8 @@
     "unload_package_at_destination": true,
     "multiple_move_single_pack": true,
     "no_prefill_qty": true,
-    "scan_location_or_pack_first": true
+    "scan_location_or_pack_first": true,
+    "allow_alternative_destination_package": true
 }
         </field>
     </record>
@@ -43,7 +44,8 @@
 {
     "no_prefill_qty": true,
     "show_oneline_package_content": true,
-    "auto_post_line": true
+    "auto_post_line": true,
+    "scan_location_or_pack_first": true
 }
         </field>
     </record>

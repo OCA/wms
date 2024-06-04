@@ -144,10 +144,10 @@ class ClusterPicking(Component):
             message=message,
         )
 
-    def _response_for_confirm_unload_all(self, batch, message=None):
+    def _response_for_confirm_unload_all(self, batch, message=None, confirmation=None):
         return self._response(
             next_state="confirm_unload_all",
-            data=self._data_for_unload_all(batch),
+            data=self._data_for_unload_all(batch, confirmation=confirmation),
             message=message,
         )
 
@@ -166,10 +166,14 @@ class ClusterPicking(Component):
             message=message,
         )
 
-    def _response_for_confirm_unload_set_destination(self, batch, package):
+    def _response_for_confirm_unload_set_destination(
+        self, batch, package, confirmation=None
+    ):
         return self._response(
             next_state="confirm_unload_set_destination",
-            data=self._data_for_unload_single(batch, package),
+            data=self._data_for_unload_single(
+                batch, package, confirmation=confirmation
+            ),
         )
 
     def find_batch(self):
@@ -776,8 +780,11 @@ class ClusterPicking(Component):
                 qty_done=quantity,
             )
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
-
-        zero_check = move_line.picking_id.picking_type_id.shopfloor_zero_check
+        # Only apply zero check if the product is of type "product".
+        zero_check = (
+            move_line.product_id.type == "product"
+            and move_line.picking_id.picking_type_id.shopfloor_zero_check
+        )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             return self._response_for_zero_check(batch, move_line)
 
@@ -814,20 +821,24 @@ class ClusterPicking(Component):
             # the lines have different destinations
             return self._unload_next_package(batch)
 
-    def _data_for_unload_all(self, batch):
+    def _data_for_unload_all(self, batch, confirmation=None):
         lines = self._lines_to_unload(batch)
         # all the lines destinations are the same here, it looks
         # only for the first one
         first_line = fields.first(lines)
         data = self.data.picking_batch(batch)
         data.update({"location_dest": self.data.location(first_line.location_dest_id)})
+        if confirmation:
+            data.update({"confirmation": confirmation})
         return data
 
-    def _data_for_unload_single(self, batch, package):
+    def _data_for_unload_single(self, batch, package, confirmation=None):
         line = fields.first(
             package.planned_move_line_ids.filtered(self._filter_for_unload)
         )
         data = self.data.picking_batch(batch)
+        if confirmation:
+            data.update({"confirmation": confirmation})
         data.update(
             {
                 "package": self.data.package(package),
@@ -1068,7 +1079,7 @@ class ClusterPicking(Component):
             message=self.msg_store.no_package_or_lot_for_barcode(barcode),
         )
 
-    def set_destination_all(self, picking_batch_id, barcode, confirmation=False):
+    def set_destination_all(self, picking_batch_id, barcode, confirmation=None):
         """Set the destination for all the lines of the batch with a dest. package
 
         This method must be used only if all the move lines which have a destination
@@ -1109,10 +1120,10 @@ class ClusterPicking(Component):
                 batch, message=self.msg_store.dest_location_not_allowed()
             )
 
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             first_line.location_dest_id, scanned_location
         ):
-            return self._response_for_confirm_unload_all(batch)
+            return self._response_for_confirm_unload_all(batch, confirmation=barcode)
 
         self._unload_write_destination_on_lines(lines, scanned_location)
         completion_info = self._actions_for("completion.info")
@@ -1220,7 +1231,7 @@ class ClusterPicking(Component):
         return self._response_for_unload_set_destination(batch, package)
 
     def unload_scan_destination(
-        self, picking_batch_id, package_id, barcode, confirmation=False
+        self, picking_batch_id, package_id, barcode, confirmation=None
     ):
         """Scan the final destination for all the move lines moved with the Bin
 
@@ -1232,7 +1243,7 @@ class ClusterPicking(Component):
         * unload_single: line is processed and the next bin can be unloaded
         * confirm_unload_set_destination: the destination is valid but not the
           expected, ask a confirmation. This state has to call again the
-          endpoint with confirmation=True
+          endpoint with confirmation=barcode
         * start_line: if the batch still has lines to pick
         * start: if the batch is done. In this case, this method *has*
           to handle the closing of the batch to create backorders.
@@ -1262,7 +1273,7 @@ class ClusterPicking(Component):
         self._actions_for("lock").for_update(lines)
 
     def _unload_scan_destination_lines(
-        self, batch, package, lines, barcode, confirmation=False
+        self, batch, package, lines, barcode, confirmation=None
     ):
         # Lock move lines that will be updated
         self._lock_lines(lines)
@@ -1276,10 +1287,12 @@ class ClusterPicking(Component):
             return self._response_for_unload_set_destination(
                 batch, package, message=self.msg_store.dest_location_not_allowed()
             )
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             first_line.location_dest_id, scanned_location
         ):
-            return self._response_for_confirm_unload_set_destination(batch, package)
+            return self._response_for_confirm_unload_set_destination(
+                batch, package, confirmation=barcode
+            )
 
         self._unload_write_destination_on_lines(lines, scanned_location)
 
@@ -1384,7 +1397,7 @@ class ShopfloorClusterPickingValidator(Component):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
     def unload_split(self):
@@ -1404,7 +1417,7 @@ class ShopfloorClusterPickingValidator(Component):
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
 
@@ -1599,6 +1612,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def _schema_for_unload_all(self):
         schema = self.schemas.picking_batch()
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
         return schema
 
     @property
@@ -1606,6 +1620,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         schema = self.schemas.picking_batch()
         schema["package"] = self.schemas._schema_dict_of(self.schemas.package())
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
         return schema
 
     @property

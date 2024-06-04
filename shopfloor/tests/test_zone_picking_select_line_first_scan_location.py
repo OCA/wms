@@ -136,14 +136,19 @@ class ZonePickingSelectLineFirstScanLocationCase(ZonePickingCommonCase):
 
     def test_scan_source_scan_package_first_with_two_product(self):
         """Scan a package with two product and then scan a product."""
-        pickingA = self._create_picking(
-            lines=[(self.product_a, 13), (self.product_b, 5)]
-        )
+        pickingA = self._create_picking(lines=[(self.product_a, 13)])
         self._fill_stock_for_moves(
             pickingA.move_ids, in_package=True, location=self.zone_sublocation1
         )
         pickingA.action_assign()
         package = pickingA.package_level_ids[0].package_id
+
+        pickingB = self._create_picking(lines=[(self.product_b, 5)])
+        self._fill_stock_for_moves(
+            pickingB.move_ids, in_package=package, location=self.zone_sublocation1
+        )
+        # If all products in package are reserved, it will be handle as a full package
+        # pickingB.action_assign()
         response = self.service.dispatch(
             "scan_source",
             params={

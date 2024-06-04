@@ -249,7 +249,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             response,
             self.pickings,
             message=self.service.msg_store.need_confirmation(),
-            confirmation_required=True,
+            confirmation_required=self.shelf2.barcode,
         )
 
     def test_set_destination_all_dest_location_confirmation(self):
@@ -265,7 +265,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
                 # picking type's default dest location, ask confirmation (second scan)
                 # from the user
                 "barcode": self.shelf2.barcode,
-                "confirmation": True,
+                "confirmation": self.shelf2.barcode,
             },
         )
         self.assert_response_start(
@@ -275,6 +275,28 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
             ),
         )
         self.assert_all_done(self.shelf2)
+
+    def test_set_destination_all_dest_location_confirm_different(self):
+        """Scanned different location on location confirmation.
+
+        New confirmation is requested
+        """
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "location_id": self.content_loc.id,
+                # expected shelf2 confirmation, but scanned shelf3
+                # another confirmation is required
+                "barcode": self.shelf3.barcode,
+                "confirmation": self.shelf2.barcode,
+            },
+        )
+        self.assert_response_scan_destination_all(
+            response,
+            self.pickings,
+            message=self.service.msg_store.need_confirmation(),
+            confirmation_required=self.shelf3.barcode,
+        )
 
     def test_set_destination_all_dest_location_invalid(self):
         """The scanned destination location is not in the menu's picking types"""

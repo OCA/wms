@@ -4,15 +4,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0\n"
+"Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-11-22 15:33+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__pick_pack_same_time
@@ -25,6 +27,16 @@ msgid ""
 "* if a package is scanned, the package is validated against the carrier\n"
 "* in both cases, if the picking has no carrier the operation fails.\",\n"
 msgstr ""
+"\n"
+"Se si seleziona questa opzione, nel prelievo di merce da una ubicazione\n"
+"(es: prelievo per area) l'impostazione della destinazione lavora in questo "
+"modo:\n"
+"\n"
+"* se viene scansionata una ubicazione, viene creato un nuovo collo "
+"consegna;\n"
+"* se viene scansionato un collo, il collo è validato per il trasportatore\n"
+"* in entrambi i casi, se il prelievo non ha trasportatore l'operzione "
+"fallisce.\",\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__no_prefill_qty
@@ -35,6 +47,12 @@ msgid ""
 "by scanning a product or product packaging EAN to increase the quantity\n"
 "(i.e. +1 Unit or +1 Box)\n"
 msgstr ""
+"\n"
+"Si presume che chi preleva preleverà la quantità suggerita.\n"
+"Con questa opzione, l'operatore dovrà inserire manualmente la qantità o\n"
+"scansionando un prodotto o un codice EAN imballo prodotto per aumentare la "
+"quantità\n"
+"(es-. +1 Unità o +1 Box)\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_return
@@ -45,14 +63,40 @@ msgid ""
 "A new move will be added as a return of the delivery,\n"
 "decreasing the delivered quantity of the related SO line.\n"
 msgstr ""
+"\n"
+"Qando abilitata, si possono ricevere prodotti non pianificati che vengono "
+"resi\n"
+"da una consegna esistente nell'origine (nome ordine vendita).\n"
+"Un nuovo movimento verrà aggiunto come reso alla consegna,\n"
+"diminuendo la qantità consegnata della relativa riga ordine vendita.\n"
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid ""
+"\n"
+"When moving a whole package, the user normally scans\n"
+"a destination location.\n"
+"If enabled, they will also be allowed\n"
+"to scan a destination package.\n"
+msgstr ""
+"\n"
+"Movimentanto un intero collo, l'utente normalmente scansina\n"
+"l'ubicazione di destinazione.\n"
+"Se abilitata, sarà anche abilitato\n"
+"a scansionare un collo destinazione.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid ""
 "\n"
 "When picking a move,\n"
-"allow to set a destination package that was already used for the other lines.\n"
+"allow to set a destination package that was already used for the other "
+"lines.\n"
 msgstr ""
+"\n"
+"Nel prelievo di un movimento,\n"
+"consente di impostare un collo destinazione che è già stato utilizzato per "
+"altre righe.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__auto_post_line
@@ -62,289 +106,325 @@ msgid ""
 "automatically post the corresponding line\n"
 "if this option is checked.\n"
 msgstr ""
+"\n"
+"Nell'impostare il pacco e la destinazione risultanti,\n"
+"se questa opzione è selezionata viene inviata la\n"
+"riga corrispndente.\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__unload_package_at_destination
 msgid ""
 "\n"
 "With this option, the lines you process by putting on a package during the\n"
-"picking process will be put as bulk products at the final destination location.\n"
+"picking process will be put as bulk products at the final destination "
+"location.\n"
 "\n"
-"This is useful if your picking device is emptied at the destination location or\n"
+"This is useful if your picking device is emptied at the destination location "
+"or\n"
 "if you want to provide bulk products to the next operation.\n"
 "\n"
 "Incompatible with: \"Pick and pack at the same time\"\n"
 msgstr ""
+"\n"
+"Con questa opzione, le righe elaborate con l'inserimento in un collo nel \n"
+"processo di prelievo verranno inserite come prodotti derivati nella "
+"ubicazione della destinazion finale.\n"
+"\n"
+"Questo è utile se il sispositivo di prelievo è disponibile nell'ubicazione "
+"destinazione o\n"
+"se si vuole fornire un prodotto derivato all'operazione successiva.\n"
+"\n"
+"Incompatibile con: \"Preleva e imballa contemporaneamente\"\n"
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "%(qty)s %(product_name)s put in %(package_name)s"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
 "'Pick and pack at the same time' is incompatible with 'Multiple moves same "
 "destination package'."
 msgstr ""
+"'Preleva e imballa contemporaneamente' non è compatibile cn 'Movimenti "
+"multipli medesimo collo destinazione'."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
 "'Pick and pack at the same time' is incompatible with 'Unload package at "
 "destination'."
 msgstr ""
+"'Preleva e imballa contemporaneamente' non è compatibile cn 'Scarica collo "
+"alla destinazione'."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Una applicazione di reparto"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
-msgstr ""
+msgstr "È richiesto un collo destinazione."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/change_package_lot.py:0
+#, python-format
+msgid "A draft inventory has been created for control."
+msgstr "Per cntrollo è stato creato una bozza inventario."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
-msgstr ""
+msgstr "Attiva zero controlli"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
 msgid "Adds shopfloor priority/postpone fields"
-msgstr ""
+msgstr "Aggiunge campi priorità/rinvio reparto"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "All packages processed."
-msgstr ""
+msgstr "Tutti i colli elaborati."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_is_possible
 msgid "Allow Alternative Destination Is Possible"
-msgstr ""
+msgstr "Consente possibilità destinazione alternativa"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package_is_possible
+msgid "Allow Alternative Destination Package Is Possible"
+msgstr "Consente possibilità collo destinazione alternativo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation_is_possible
 msgid "Allow Force Reservation Is Possible"
-msgstr ""
+msgstr "Consente possibilità forza prenotazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work_is_possible
 msgid "Allow Get Work Is Possible"
-msgstr ""
+msgstr "Consente possibilità ottenere lavoro"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_move_create
 msgid "Allow Move Creation"
-msgstr ""
+msgstr "Consente creazione movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return_is_possible
 msgid "Allow Return Is Possible"
-msgstr ""
+msgstr "Consente possibilità reso"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_return
 msgid "Allow create returns"
-msgstr ""
+msgstr "CNsente crea resi"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_package
+msgid "Allow to change the destination package"
+msgstr "Consente la modifica del collo destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
 msgid "Allow to process reserved quantities"
-msgstr ""
+msgstr "Consente l'elaborazione di qantità prenotate"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination
 msgid "Allow to scan alternative destination locations"
-msgstr ""
+msgstr "Consente la scansione di ubicazioni destinazione alternative"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Are you sure?"
-msgstr ""
+msgstr "Si è sicuri?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line_is_possible
 msgid "Auto Post Line Is Possible"
-msgstr ""
+msgstr "È possibile invio automatico riga"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line
 msgid "Automatically post line"
-msgstr ""
+msgstr "Invia riga automaticamente"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode does not match with {}."
-msgstr ""
+msgstr "Il codice a barre non corrisponde con []."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode not found"
-msgstr ""
+msgstr "Codice a barre non trovato"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking_batch
 msgid "Batch Transfer"
-msgstr ""
+msgstr "Trasferimento raggruppato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer complete"
-msgstr ""
+msgstr "Trasferimento raggruppato completo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Batch Transfer line done"
-msgstr ""
+msgstr "Riga trasferimento raggruppato eseguita"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Bin %s doesn't exist"
-msgstr ""
+msgstr "Non esiste contenitore %s"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__bulk_line_count
 msgid "Bulk Line Count"
-msgstr ""
+msgstr "Conteggio righe sfuse"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Canceled, you can scan a new pack."
-msgstr ""
+msgstr "Annullato, si può scansionare un altro pacco."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Cannot change to lot {} which is entirely picked."
-msgstr ""
+msgstr "Non si può cambiate a lotto [] perché completamente prelevato."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__category
 msgid "Category"
-msgstr ""
+msgstr "Categoria"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
 #: model:shopfloor.scenario,name:shopfloor.scenario_checkout
 #: model:stock.picking.type,name:shopfloor.picking_type_checkout_demo
 msgid "Checkout"
-msgstr ""
+msgstr "Check-out"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_cluster_picking
 #: model:shopfloor.scenario,name:shopfloor.scenario_cluster_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_cluster_picking_demo
 msgid "Cluster Picking"
-msgstr ""
+msgstr "Prlievo aggregato"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack
 msgid "Collect multiple moves on a same destination package"
-msgstr ""
+msgstr "Raccoglie movimenti multipli nello stesso collo destinazione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Confirm location change from %(location_from)s to %(location_to)s?"
-msgstr ""
+msgid "Confirm location change from %s to %s?"
+msgstr "Conferma modifica ubicazione da %s a %s?"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Content transfer to {} completed"
-msgstr ""
+msgstr "Tasferimento contenuto a {} completato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transferred from %(location_name)s to %(location_dest_name)s."
-msgstr ""
+msgid "Content transferred from {} to {}."
+msgstr "Contenuto trasferito da {} a {}."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/inventory.py:0
+#, python-format
+msgid "Control stock issue in location {} for {}"
+msgstr "Controllo problema di magazzino nell'ubicazion {} per {}"
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Create new PACK {}? Scan it again to confirm."
-msgstr ""
+msgstr "Creare nuovo collo {}? Scansionare nuovamente per confermare."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Creation of moves is not allowed for menu {}."
-msgstr ""
+msgstr "La creazione di movimenti non è consentita per il menu {}."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
 msgid "Date Scheduled"
-msgstr ""
+msgstr "Data schedulata"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_delivery
 #: model:shopfloor.scenario,name:shopfloor.scenario_delivery
 #: model:stock.picking.type,name:shopfloor.picking_type_delivery_demo
 msgid "Delivery"
-msgstr ""
+msgstr "Consegna"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Delivery package type scanned: %(name)s. Scan again to place all goods in "
 "the same package."
 msgstr ""
+"Tipo collo consegna scansionato: %(name)s. Scansionare nuovamente per "
+"caricare tutta la merce nello stesso collo."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
 msgid "Disable Full Bin Action Is Possible"
-msgstr ""
+msgstr "È possibile disabilitare l'azione contentore pieno"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action
 msgid "Disable full bin action"
-msgstr ""
+msgstr "Disabilita azione contenitore pieno"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant__display_name
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__show_oneline_package_content
 msgid "Display the content of package if it contains 1 line only"
-msgstr ""
+msgstr "Vsualizza il contenuto di un collo se contiene solo una riga"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty
 msgid "Do not pre-fill quantity to pick"
-msgstr ""
+msgstr "Non precompilare la qantità da prelevare"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -353,31 +433,53 @@ msgid ""
 "order Picking), the zero check step will be activated when a location "
 "becomes empty after a move."
 msgstr ""
+"Per lo scenario di reparto che lo usa (Prelievo aggregato, prelievo per "
+"area, prelievo ordine separato), il passo controllo Zero verrà attivato "
+"quando una ubicazione si svuota dopo un movimento."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation
 msgid "Force stock reservation"
-msgstr ""
+msgstr "Forza prenotazione qantità"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__location_id
 msgid "From"
-msgstr ""
+msgstr "Da"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Goods packed into {0.name}"
-msgstr ""
+msgstr "Merce caricata in {0.name}"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__id
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__id
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant__id
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__id
+msgid "ID"
+msgstr "ID"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
 msgid ""
-"If you tick this box, the transfer is reserved only if the put-away can find"
-" a sublocation (when putaway destination is different from the operation "
+"If you tick this box, the transfer is reserved only if the put-away can find "
+"a sublocation (when putaway destination is different from the operation "
 "type's destination)."
 msgstr ""
+"Se si seleziona questa opzione, il trasferimento è riservato solo se "
+"l'inoltro può trovare una sotto ubicazione (quando la destinazione di "
+"inoltro è diversa dalla destinazione del tipo operazione)."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_unreserve_other_moves
@@ -385,972 +487,969 @@ msgid ""
 "If you tick this box, this scenario will allow operator to move goods even "
 "if a reservation is made by a different operation type."
 msgstr ""
+"Se si seleziona questa opzione, questo scenario consentirà all'operatore di "
+"muovre merce anche se la prenotazione è fatta da un tipo operatore diverso."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__ignore_no_putaway_available_is_possible
 msgid "Ignore No Putaway Available Is Possible"
-msgstr ""
+msgstr "È possibile ignorare inoltro non disponibile"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
 msgid "Ignore transfers when no put-away is available"
-msgstr ""
+msgstr "Ignora trasferimenti quando non è disponibile l'inoltro"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Ignoring not found putaway is not allowed for menu {}."
-msgstr ""
+msgstr "Ignorare inoltro non trovato non è consentito per il menu {}."
+
+#. module: shopfloor
+#: model:ir.model,name:shopfloor.model_stock_inventory
+msgid "Inventory"
+msgstr "Inventario"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_location
 msgid "Inventory Locations"
-msgstr ""
+msgstr "Ubicazioni di inventario"
 
 #. module: shopfloor
-#. odoo-python
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_inventory____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_location____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_move_line____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_package_level____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant____last_update
+#: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package____last_update
+msgid "Last Modified on"
+msgstr "Ultima modifica il"
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/completion_info.py:0
 #, python-format
-msgid ""
-"Last operation of transfer %(picking_names)s. Next operation "
-"(%(next_picking_names)s) is ready to proceed."
+msgid "Last operation of transfer {}. Next operation ({}) is ready to proceed."
 msgstr ""
+"Ultima operazione del trasferimento {}. L'operazone sccessiva ({}) è pronta "
+"a procedere."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Line cancelled"
-msgstr ""
+msgstr "Riga annullata"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Lines have different destination location."
-msgstr ""
+msgstr "Le righe hano ubicazioni destinazione differenti."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location %s doesn't contain any package."
-msgstr ""
+msgstr "L'ubicazione %s non contiene colli."
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_location_content_transfer
 #: model:stock.picking.type,name:shopfloor.picking_type_location_content_transfer_demo
 msgid "Location Content Transfer"
-msgstr ""
+msgstr "Trasferimento contenuto ubicazione"
 
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_location_content_transfer
 msgid "Location content transfer"
-msgstr ""
+msgstr "Trasferimento contenuto ubicazione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location empty. Try scanning a package"
-msgstr ""
+msgstr "Ubicazion vuta. Provare a scansionare un collo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location not allowed here."
-msgstr ""
+msgstr "Ubicazione non consentita qui."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Location {} empty"
-msgstr ""
+msgstr "Ubicazione {} vuota"
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "Lot %(old_lot_name)s replaced by lot %(new_lot_name)s."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Lot is not in the current transfer."
-msgstr ""
+msgstr "Il lotto non è nel trasferimento attuale."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Lot {lot} for product {product} found in multiple locations. Scan your "
 "location first."
 msgstr ""
+"Lotto {lot} del prodotto {product} tovato in ubicazioni multiple. "
+"Scansionare prima l'ubicazione."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/delivery.py:0
 #, python-format
 msgid "Lot {} belongs to a picking without a valid state."
-msgstr ""
+msgstr "Il lotto {} appartiene a un prelievo senza uno stato valido."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Lot {} is for another product."
-msgstr ""
+msgstr "Il lotto {} è per un altro prodotto."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot %(lot_name)s not found in location %(location_name)s"
+msgstr "Il lotto %(lot_name)s non è presente nell'ubicazione %(location_name)s"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot %(lot_name)s not found in transfer %(picking_name)s"
+msgstr "Il lotto %(lot_name)s non è presentenel trasferimento %(picking_name)s"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Lot {} replaced by lot {}."
+msgstr "Lotto {} sostituito da lotto {}."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/inventory.py:0
 #, python-format
 msgid "Lot: "
-msgstr ""
+msgstr "Lotto: "
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
-msgstr ""
+msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Missing expiration date."
-msgstr ""
+msgstr "Data scadenza non presente."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_create_is_possible
 msgid "Move Create Is Possible"
-msgstr ""
+msgstr "È possibile creare movimenti"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__move_line_ids
 msgid "Move Line"
-msgstr ""
+msgstr "Riga movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__move_line_count
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__move_line_count
 msgid "Move Line Count"
-msgstr ""
+msgstr "Conteggio righe movimenti"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Move already processed."
-msgstr ""
+msgstr "Mvimento già elaborato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid "Move lines processed have to share the same source location."
 msgstr ""
+"Le righe di movimento elaborate devono avere la stessa ubicazione origine."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__multiple_move_single_pack_is_possible
 msgid "Multiple Move Single Pack Is Possible"
-msgstr ""
+msgstr "È possibile avere movimenti multipli per singolo pacco"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Negative quantity not allowed."
-msgstr ""
+msgstr "Quantità negativa non consentita."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "New move lines cannot be assigned: canceled."
-msgstr ""
+msgstr "Non possono essere assegnate nuove righe movimento: annullato."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty_is_possible
 msgid "No Prefill Qty Is Possible"
-msgstr ""
+msgstr "È possibile non avere quantità precompilata"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No available work could be found."
-msgstr ""
+msgstr "Non c'è un lavoro disponibile."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No delivery package type available."
-msgstr ""
+msgstr "Nessun tipo collo consegna disponibile."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No line to pack found."
-msgstr ""
+msgstr "Nessuna riga da confezionare trovata."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No lines to process."
-msgstr ""
+msgstr "Nessuna riga da elaborare."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No location found for this barcode."
-msgstr ""
+msgstr "Nessuna ubicazione trovata per questo codice a barre."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No lot found for {}"
-msgstr ""
+msgstr "Nessun lotto trovato per {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "No more work to do, please create a new batch transfer"
-msgstr ""
+msgstr "Nessun altro lavoro da fare, creare un nuovo trasferimento raggruppato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No operation found for this menu and profile."
-msgstr ""
+msgstr "Nessuna operazione trovata per questo menu e profilo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No operation type found for this menu and profile."
-msgstr ""
+msgstr "Nessun tipo operazione trovato per questo menu e profilo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/service.py:0
 #, python-format
 msgid "No operation types configured on menu {}."
-msgstr ""
+msgstr "Nessun tipo operazione configrato in questo menu {}."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No package or lot found for barcode {}."
-msgstr ""
+msgstr "Nessun collo o lotto trovati per il codice a barre {}."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No pending operation for package %s."
-msgstr ""
+msgstr "Nessuna operazione in attesa per il collo %s."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No product found for {}"
-msgstr ""
+msgstr "Nessun prodotto trovato per {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No product found in {}"
-msgstr ""
+msgstr "Nessun prodotto trovato in {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No putaway destination is available."
-msgstr ""
+msgstr "Nessuna destinazion di inoltro disponibile."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No quantity has been processed, unable to complete the transfer."
-msgstr ""
+msgstr "Nessuna quantità elaborata, impossibile completare il trasferimento."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for the scanned lot."
-msgstr ""
+msgstr "Nessun trasferimento trovato per il codice scansionato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for the scanned packaging."
-msgstr ""
+msgstr "Nessun trasferimento trovato per l'imballo scansionato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for this lot."
-msgstr ""
+msgstr "Nessun trasferimento trovato per questo lotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No transfer found for this product."
-msgstr ""
+msgstr "Nessun trasferimento trovato per questo prodotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No valid package to select."
-msgstr ""
+msgstr "Nessun collo valido da selezionare."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No value"
-msgstr ""
+msgstr "Nessun valore"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"Not all lines have been processed with full quantity. Do you confirm partial"
-" operation?"
+"Not all lines have been processed with full quantity. Do you confirm partial "
+"operation?"
 msgstr ""
+"Non tutte le righe sono state elaborate per la quantità totale. Confermare "
+"l'operazione parziale?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__picking_type_ids
 msgid "Operation Types"
-msgstr ""
+msgstr "TIpi di operazione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Operation already processed."
-msgstr ""
+msgstr "Operazione già elaborata."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Operation types for this menu are missing default source and destination "
 "locations."
 msgstr ""
+"I tipi operazione per questo menu non hanno le ubicazioni origine e "
+"destinazione predefinite."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Operation's already running. Would you like to take it over?"
-msgstr ""
+msgstr "L'operazione è già in corso. Si vuole gestirla?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__package_id
 msgid "Package"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid ""
-"Package %(package_name)s cannot be picked, already moved by transfer "
-"%(picking_name)s."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "Package %(package_name)s cannot be used: %(error)s"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/models/stock_move_line.py:0
-#, python-format
-msgid ""
-"Package %(package_name)s does not contain available product "
-"%(product_name)s, cannot replace package."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid ""
-"Package %(package_name)s is not available in transfer %(picking_name)s."
-msgstr ""
+msgstr "Collo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__package_level_count
 msgid "Package Level Count"
-msgstr ""
+msgstr "Conteggio livello collo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Package cancelled"
-msgstr ""
+msgstr "Collo annullato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package has been opened. You can move partial quantities."
-msgstr ""
+msgstr "Il collo è stato aperto. Si possono movimentare quantità parziali."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/services/location_content_transfer.py:0
+#, python-format
+msgid "Package level has to be in draft"
+msgstr "Il livello collo deve essere in bozza"
+
+#. module: shopfloor
 #: code:addons/shopfloor/models/stock_quant_package.py:0
 #, python-format
 msgid "Package name must be unique!"
-msgstr ""
+msgstr "Il nome collo deve essere univoco!"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/delivery.py:0
 #, python-format
 msgid "Package {} belongs to a picking without a valid state."
-msgstr ""
+msgstr "Il collo {} appartiene ad un prelievo senza uno stato valido."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} cannot be picked, already moved by transfer {}."
+msgstr ""
+"Il collo {} non può essere prelevato, già movimentato dal trasferimento {}."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} cannot be used: {} "
+msgstr "Il collo {} non può essere utilizzato: {} "
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package %(package_name)s contains already lines from a different operation type %(picking_type_name)s."
+msgstr "Il collo %(package_name)s contiene già righe di un tipo operazione diverso %(picking_type_name)s."
+
+#. module: shopfloor
+#: code:addons/shopfloor/models/stock_move_line.py:0
+#, python-format
+msgid ""
+"Package {} does not contain available product {}, cannot replace package."
+msgstr ""
+"Il collo {} non contiene un prodotto disponibile {}, non è possibile "
+"sostituire il collo."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package {} has a different content."
-msgstr ""
+msgstr "Il collo {} ha un contenuto diverso."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/stock_move_line.py:0
 #, python-format
 msgid "Package {} has been partially picked in another location"
-msgstr ""
+msgstr "Il collo {} è stato parzialmente prelevato in un'altra ubIcazione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package {} is already used."
-msgstr ""
+msgstr "Il collo {} è già in uso."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} is not available in transfer {}."
+msgstr "Il collo {} non è disponibile nel trasferimento {}."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package {} is not empty."
-msgstr ""
+msgstr "Il collo {} non è vuoto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Package {} is not in the current transfer."
-msgstr ""
+msgstr "Il collo {} non è nel trasferimento attuale."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package %(package_name)s not found in location %(location_name)s"
+msgstr "Il collo %(package_name)s non è stato trovato nell'ubicazione %(location_name)s"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package %(package_name)s not found in transfer %(picking_name)s"
+msgstr "Il collo %(package_name)s non è stato trovato nel trasferimento %(picking_name)s"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} replaced by package {}."
+msgstr "Il collo {} è stato sostituito dal collo {}."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant_package
 msgid "Packages"
-msgstr ""
+msgstr "Colli"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid ""
-"Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s.or "
-"carrier %(carrier_name)s."
-msgstr ""
+msgid "Packaging '{}' is not allowed for carrier {}."
+msgstr "L'imballo '{}' non è consentito per il trasportatore {}."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Packaging changed on package {}"
-msgstr ""
+msgstr "Imballo modificato per il collo {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Packaging not found in the current transfer."
-msgstr ""
+msgstr "Imballo non trovato nel trasferimento attuale."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Packaging {} dimension updated."
+msgstr "Dimensione imballo {} aggiornata."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
 msgstr ""
+"Modo Prelievo + Collo attivo: il prelievo {0.name} non ha impostato il "
+"trasportatore. Il sistema non può creare colli di merce automaticamante."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time_is_possible
 msgid "Pick Pack Same Time Is Possible"
-msgstr ""
+msgstr "È possibile avere prelievo e collo simultanei"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__pick_pack_same_time
 msgid "Pick and pack at the same time"
-msgstr ""
+msgstr "Prelievo e collo simultanei"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
-msgid "Pick: stock issue on lot: %(lot_name)s found in %(location_name)s"
-msgstr ""
+msgid "Pick: stock issue on lot: {} found in {}"
+msgstr "Prelievo: problema di magazzino per lotto: {} trovato in {}"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__picking_id
 msgid "Picking"
-msgstr ""
+msgstr "Prelievo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__picking_count
 msgid "Picking Count"
-msgstr ""
+msgstr "Conteggio prelievi"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Tipologia prelievo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Picking has already been started in this location in transfer(s): {}"
-msgstr ""
+msgstr "l prelievo è già iniziato in questo trasferimento ubicazione: {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Picking type {} complete."
-msgstr ""
+msgstr "Tipo prelievo {} completo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Place it in {}?"
-msgstr ""
+msgstr "Mettere in {}?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__planned_move_line_ids
 msgid "Planned Move Line"
-msgstr ""
+msgstr "Riga movimento pianificata"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Please note that the scanned quantity is higher than the maximum allowed."
-msgstr ""
+msgstr "Notare che la qantità scansionata è superore alla massima consentita."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Please scan the location first."
-msgstr ""
+msgstr "Scansionare prima l'ubicazione."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Please scan the package."
-msgstr ""
+msgstr "Scansionare il collo."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__prepackaged_product_is_possible
 msgid "Prepackaged Product Is Possible"
-msgstr ""
+msgstr "È possibile avere pre-colli prodotto"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
 msgid "Process as pre-packaged"
-msgstr ""
+msgstr "Elabora come pre-collo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Processing reserved quantities is not allowed for menu {}."
-msgstr ""
+msgstr "Elaborazione quantità prenotate non consentita da menu {}."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr ""
+msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product is not in the current transfer."
-msgstr ""
+msgstr "Il prodotto non è nel trasferimento attuale."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product tracked by lot, please scan one."
-msgstr ""
+msgstr "Prodotto tracciato a lotto, scansionarne uno."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/delivery.py:0
 #, python-format
 msgid "Product {} belongs to a picking without a valid state."
-msgstr ""
+msgstr "Il prodotto {} appartiene a un prelievo senza uno stato valido."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Product {} found in multiple locations. Scan your location first."
 msgstr ""
+"Prodotto {} trovato in ubicazioni multiple. Scansionare prima l'ubicazione."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product %(product_name)s not found in location %(location_name)s or transfer %(picking_name)s."
+msgstr "Prodotto %(product_name)s non trovato nell'ubicazione %(location_name)s o trasferimento %(picking_name)s."
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Product(s) processed as raw product(s)"
-msgstr ""
+msgstr "Prodotto elaborato come prodotto grezzo"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
 msgid "Quants"
-msgstr ""
+msgstr "Quanti"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Real pack weight or the estimated one."
-msgstr ""
+msgstr "Peso reale o stimato del collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Recovered previous session."
-msgstr ""
+msgstr "Sessione precedente recuperata."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Remaining raw product not packed, proceed anyway?"
-msgstr ""
+msgstr "Prodotti grezzi esidui non in colli, procedere ugualmente?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__reserved_move_line_ids
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__reserved_move_line_ids
 msgid "Reserved Move Line"
-msgstr ""
+msgstr "Riga movimento prenotata"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Restart the operation, someone has canceled it."
-msgstr ""
+msgstr "Riavvia operazione, qualcuno l'ha annullata."
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid "Restrict scannable barcode at work selection"
+msgstr "Restringere i codici a barre scansionabili nella la selezione lavoro"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF Priority"
-msgstr ""
+msgstr "Priorità reparto"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF User"
-msgstr ""
+msgstr "Utente reparto"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF checkout done"
-msgstr ""
+msgstr "Check-out reparto eseguito"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_stock_move_line_detailed_operation_tree
 msgid "SF unloaded"
-msgstr ""
+msgstr "Reparto scaricato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Same package {} is already assigned."
-msgstr ""
+msgstr "Alcuni imballi {} sono già assegnati."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first_is_possible
 msgid "Scan Location Or Pack First Is Possible"
-msgstr ""
+msgstr "È possibile scansionare prima l'ubicazione o il collo"
 
 #. module: shopfloor
-#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
-msgid "Scan first location or pack"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Scan the destination location"
-msgstr ""
+msgstr "Scansionare l'ubicazione destinazione"
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/location_content_transfer.py:0
 #: code:addons/shopfloor/services/location_content_transfer.py:0
 #, python-format
 msgid "Scan the package"
-msgstr ""
+msgstr "Scansionare il collo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid ""
-"Scenario `%(scenario_name)s` require(s) 'Move Entire Packages' to be enabled.\n"
+"Scenario `{}` require(s) 'Move Entire Packages' to be enabled.\n"
 "These type(s) do not satisfy this constraint: \n"
-"%(bad_picking_types)s.\n"
+"{}.\n"
 "Please, adjust your configuration."
 msgstr ""
+"Lo scenario `{}` richiede l'abilitazione di 'Muovi colli interI'.\n"
+"Questo tipo non soddisfa il vincolo: \n"
+"{}.\n"
+"Sistemare la configurazione."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__date_planned
 msgid "Scheduled date until move is done, then date of actual move processing"
 msgstr ""
+"Data schedulata fino a esecuzione movimento, quindi data elaborazione "
+"movimento attuale"
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "Several lots found in %(name)s, please scan the lot."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several lots found in %s, please scan a lot."
-msgstr ""
+msgstr "Diversi lotti trovati in %s, scansionare un lotto."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Several lots found in %s, please scan the lot."
+msgstr "Diversi lotti trovati in %s, scansionare il lotto."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several moves found for different lots, please scan the lot."
-msgstr ""
+msgstr "Diversi movimenti trovati per diversi lotti, scansionare il lotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "Several moves found on different locations, please scan first the location."
 msgstr ""
+"Diversi movimenti trovati per diversi lotti, scansionare prima l'ubicazione."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several operation types found for this menu and profile."
-msgstr ""
+msgstr "Diversi tipi operazione trovati per questo menu e profilo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Several packages found in %(name)s, please scan a package."
-msgstr ""
+msgid "Several packages found in %s, please scan a package."
+msgstr "Diversi colli trovati in %s, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Several products found in %(name)s, please scan a product."
-msgstr ""
+msgid "Several products found in %s, please scan a product."
+msgstr "Diversi prodotti trovati in %s, scansionare un prodotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Several products found in %(name)s, please scan the product."
-msgstr ""
+msgid "Several products found in %s, please scan the product."
+msgstr "Diversi prodotti trovati in %s, scansionare il prodotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid ""
-"Several transfers found, please scan a package or select a transfer "
-"manually."
+"Several transfers found, please scan a package or select a transfer manually."
 msgstr ""
+"Trovati diversi trasferimenti, scansionare un collo o selezinare il "
+"trasferimento manualmente."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several transfers found, please select a transfer manually."
 msgstr ""
+"Trovati diversi trasferimenti, selezionare un trasferimento manualmente."
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_location_form
 #: model_terms:ir.ui.view,arch_db:shopfloor.view_picking_type_form
 msgid "Shopfloor"
-msgstr ""
+msgstr "Reparto"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_checkout_done
 msgid "Shopfloor Checkout Done"
-msgstr ""
+msgstr "Check-out reparto eseguito"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_menu_ids
 msgid "Shopfloor Menus"
-msgstr ""
+msgstr "Menu reparto"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__shopfloor_picking_sequence
 msgid "Shopfloor Picking Sequence"
-msgstr ""
+msgstr "Sequenza prelievo reparto"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__shopfloor_postponed
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_postponed
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__shopfloor_postponed
 msgid "Shopfloor Postponed"
-msgstr ""
+msgstr "Reparto posticipato"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin__shopfloor_priority
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_priority
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__shopfloor_priority
 msgid "Shopfloor Priority"
-msgstr ""
+msgstr "Priorità reparto"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_unloaded
 msgid "Shopfloor Unloaded"
-msgstr ""
+msgstr "Reparto scaricato"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__shopfloor_user_id
 msgid "Shopfloor User"
-msgstr ""
+msgstr "Utente reparto"
 
 #. module: shopfloor
 #: model:shopfloor.app,name:shopfloor.app_demo
 msgid "Shopfloor WMS (demo)"
-msgstr ""
+msgstr "WMS reparto (demo)"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Shopfloor weight (kg)"
-msgstr ""
+msgstr "Peso reparto (kg)"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work
 msgid "Show Get Work on start"
-msgstr ""
+msgstr "Visualizza ottieni lavoro all'avvio"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__show_oneline_package_content_is_possible
 msgid "Show Oneline Package Content Is Possible"
-msgstr ""
+msgstr "È possibile avere visualizza riga singola contenuto collo"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__show_oneline_package_content
 msgid "Show one-line package content"
-msgstr ""
+msgstr "Visalizza riga singola contenuto collo"
 
 #. module: shopfloor
 #: model:shopfloor.scenario,name:shopfloor.scenario_single_pack_transfer
 msgid "Single Pack Transfer"
-msgstr ""
+msgstr "Trasfermento collo singolo"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_single_pallet_transfer
 #: model:stock.picking.type,name:shopfloor.picking_type_single_pallet_transfer_demo
 msgid "Single Pallet Transfer"
-msgstr ""
+msgstr "Trasfermento pallet singolo"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_move_create
 msgid ""
-"Some scenario may create move(s) when a product or package is scanned and no"
-" move already exists. Any new move is created in the selected operation "
-"type, so it can be active only when one type is selected."
+"Some scenario may create move(s) when a product or package is scanned and no "
+"move already exists. Any new move is created in the selected operation type, "
+"so it can be active only when one type is selected."
 msgstr ""
+"Qualche scenaio può creare movimenti quando un rodotto o un collo sono "
+"scansionati e non esistono già movimenti. Ogni nuovo movimento viene creato "
+"nel tipo operazione selezionato, così può essere attivo solo quando il tipo "
+"è selezinato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/stock.py:0
 #, python-format
 msgid "Someone is already working on these transfers"
-msgstr ""
+msgstr "Qualcuno sta già lavorando su questi trasferimenti"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__source_move_line_ids
 msgid "Source Move Line"
-msgstr ""
+msgstr "Riga movimento origine"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__package_id
 msgid "Source Package"
-msgstr ""
+msgstr "Collo origine"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_package_level
 msgid "Stock Package Level"
-msgstr ""
+msgstr "Livello collo magazzino"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_priority_postpone_mixin__shopfloor_postponed
@@ -1360,44 +1459,48 @@ msgid ""
 "Technical field. Indicates if the operation has been postponed in a barcode "
 "scenario."
 msgstr ""
+"Campo tecnico. Indica se l'operazione è stata posticipata in uno scenario "
+"del codice a barre."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__move_line_count
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__move_line_count
 msgid "Technical field. Indicates number of move lines included."
-msgstr ""
+msgstr "Campo tecnico. Indica il numero di righe movimento incluse."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__bulk_line_count
 msgid ""
 "Technical field. Indicates number of move lines without package included."
 msgstr ""
+"Campo tecnico. Indica il numero di righe movimento senza colli inclusi."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__package_level_count
 msgid "Technical field. Indicates number of package_level included."
-msgstr ""
+msgstr "Campo tecnico. Indica il numero di livelli collo inclusi."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__picking_count
 msgid "Technical field. Indicates number of transfers included."
-msgstr ""
+msgstr "Campo tecnico. Indica il numero di trasferimenti inclusi."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking__total_weight
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_batch__total_weight
 msgid "Technical field. Indicates total weight of transfers included."
-msgstr ""
+msgstr "Campo tecnico. Indica il peso totale dei trasferimenti inclusi."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_quant_package__planned_move_line_ids
 msgid "Technical field. Move lines for which destination is this package."
 msgstr ""
+"Campo tecnico. Righe movimento per le quali la destinazione è questo collo."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_quant_package__move_line_ids
 msgid "Technical field. Move lines moving this package."
-msgstr ""
+msgstr "Campo tecnico. Righe movimento che muovono questo collo."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_priority_postpone_mixin__shopfloor_priority
@@ -1405,321 +1508,310 @@ msgstr ""
 #: model:ir.model.fields,help:shopfloor.field_stock_package_level__shopfloor_priority
 msgid "Technical field. Overrides operation priority in barcode scenario."
 msgstr ""
+"Campo tecnico. Forza la priorità operazione nello scenaio codice a barre."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
+"\">%s</a> has been created."
 msgstr ""
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock.picking"
+"\" data-oe-id=\"%d\">%s</a> ."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The content of {} cannot be transferred with this scenario."
-msgstr ""
+msgstr "Il contenuto di {} non può essere trasferito con questo scenario."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/models/stock_move_line.py:0
+#, python-format
+msgid "The demand cannot be negative"
+msgstr "La richiesta non può essere negativa"
+
+#. module: shopfloor
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "The destination bin {} is not empty, please take another."
-msgstr ""
+msgstr "Il contenitore di destinazione {} non è vuto, selezionarne un altro."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The pack has been moved, you can scan a new pack."
-msgstr ""
+msgstr "Il collo è stato movimentato, si può scansionare un nuovo collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The package %s cannot be transferred with this scenario."
-msgstr ""
+msgstr "Il collo %s non può essere trasferito con questo scenario."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The package %s doesn't contain any product to take."
-msgstr ""
+msgstr "Il collo %s non contiene alcun prodotto da prelevare."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The package %s doesn't exist"
-msgstr ""
+msgstr "Il collo %s non esiste"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The picked quantity must be a value above zero."
-msgstr ""
+msgstr "La quantità prelevata deve essere superiore a zero."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_location__shopfloor_picking_sequence
 msgid ""
 "The picking done in Shopfloor scenarios will respect this order. The "
 "sequence is a char so it can be composed of fields such as 'corridor-rack-"
-"side-level'. Pay attention to the padding ('09' is before '19', '9' is not)."
-" It is recommended to use an Export then an Import to populate this field "
+"side-level'. Pay attention to the padding ('09' is before '19', '9' is not). "
+"It is recommended to use an Export then an Import to populate this field "
 "using a spreadsheet."
 msgstr ""
+"Il prelievo eseguito nello scenario reparto rispetterà questo ordine. La "
+"sequenza è un carattere così può essere composto di campi come 'corridor-"
+"rack-side-level'. Fare attenzione al riempimento ('09' viene prima di '19', "
+"'9' no). Si raccomanda di utilizzare un'esportazione qundi un'importazione "
+"per compilare questo campo utilizzando un foglio elettronico."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The product/packaging you selected has already been returned."
-msgstr ""
+msgstr "il prodotto/collo selezionato è già stato reso."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"The quantity scanned for one or more lines cannot be higher than the maximum"
-" allowed."
+"The quantity scanned for one or more lines cannot be higher than the maximum "
+"allowed."
 msgstr ""
+"La qanttà scansionata per una o più righe non può essere maggiore del "
+"massimo consentito."
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/change_package_lot.py:0
-#, python-format
-msgid "The quantity to do has changed!"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The record you were working on does not exist anymore."
-msgstr ""
+msgstr "Il record su cui si stava lavorando non esiste più."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
 msgid "The split order {} has been created."
-msgstr ""
+msgstr "L'ordine sddiviso {} è stato creato."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
 msgid "The stock operation where the packing has been made"
-msgstr ""
+msgstr "L'operazione di magazzino del collo è stata eseguita"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "This batch cannot be selected."
-msgstr ""
+msgstr "Questo gruppo non pò essere selezinato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This line has a package, please select the package instead."
-msgstr ""
+msgstr "Questa riga ha un collo, selezionare il collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This line is not available in transfer {}."
-msgstr ""
+msgstr "Questa riga non è disponibile nel trasferimento {}."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/location_content_transfer.py:0
 #, python-format
 msgid "This location content can't be moved at once."
 msgstr ""
+"Il contenuto di questa ubicazione non può essere movimentato in una volta."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This location does not exist."
-msgstr ""
+msgstr "L'ubicazione non siste."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This location only contains packages, please scan one of them."
-msgstr ""
+msgstr "Questa ubicazione contiene solo colli, selezionarne uno."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This location requires packages. Please scan a destination package."
-msgstr ""
+msgstr "Questa ubicazione richiede colli. Scansionare un collo destinazione."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "This lot is part of a package with other products, please scan a package."
 msgstr ""
+"Questo lotto è parte di un collo con altri prodotti, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This lot is part of multiple packages, please scan a package."
-msgstr ""
+msgstr "Questo lotto è parte di colli multipli, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This operation does not exist anymore."
-msgstr ""
+msgstr "Questa operazione non esiste più."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This package does not exist anymore."
-msgstr ""
+msgstr "Questo collo non esiste più."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This product does not exist anymore."
-msgstr ""
+msgstr "Questo prodotto non esiste più."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"This product is part of a package with other products, please scan a "
-"package."
+"This product is part of a package with other products, please scan a package."
 msgstr ""
+"Questo prodotto è parte di un collo con altri prodotti, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This product is part of a package, please scan a package."
-msgstr ""
+msgstr "Questo prodotto è parte di un collo, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This product is part of multiple packages, please scan a package."
-msgstr ""
+msgstr "Questo prdotto è parte di colli multipli, scansionare un collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
 "This source document is part of multiple transfers, please scan a package."
 msgstr ""
+"Questo documento origine è parte di diversi trasferimenti, scansionare un "
+"collo."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This transfer does not exist or is not available anymore."
-msgstr ""
+msgstr "Questo trasferimento non esiste più o non è più disponibile."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__total_weight
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__total_weight
 msgid "Total Weight"
-msgstr ""
+msgstr "Peso totale"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__picking_id
 msgid "Transfer"
-msgstr ""
+msgstr "Trasferimento"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Transfer {} complete"
-msgstr ""
+msgstr "Trasferimento {} completo"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Transfer {} done"
-msgstr ""
+msgstr "Trasferimento {} eseguito"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Transfer {} is not available."
-msgstr ""
+msgstr "Trasferimento {} non disponibile."
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Transferring to a different package is not allowed, please scan a location "
+"instead."
+msgstr ""
+"Il trasferimento ad un collo differente non è consentito, scansionare invece "
+"un'ubicazione."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Units replaced by package {}."
-msgstr ""
+msgstr "Unità sostituita da collo {}."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination_is_possible
 msgid "Unload Package At Destination Is Possible"
-msgstr ""
+msgstr "È possibile scaricare colli alla destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination
 msgid "Unload package at destination"
-msgstr ""
+msgstr "Scarico colli alla destinazione"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Unrecoverable error, please restart."
-msgstr ""
+msgstr "Errore irrecuperabile, riavviare."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unreserve_other_moves_is_possible
 msgid "Unreserve Other Moves Is Possible"
-msgstr ""
+msgstr "È possibile rilasciare altri movimenti"
 
 #. module: shopfloor
 #: model:shopfloor.profile,name:shopfloor.profile_demo_2
 msgid "WH delivery"
-msgstr ""
+msgstr "Consegna magazzino"
 
 #. module: shopfloor
 #: model:shopfloor.profile,name:shopfloor.profile_demo_1
 msgid "WH worker"
-msgstr ""
+msgstr "Lavoratore magazzino"
 
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_app__category__wms
 msgid "WMS"
-msgstr ""
+msgstr "WMS"
 
 #. module: shopfloor
 #: model:shopfloor.app,short_name:shopfloor.app_demo
 msgid "WMS (demo)"
-msgstr ""
+msgstr "WMS (demo)"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_prepackaged_product
@@ -1728,12 +1820,34 @@ msgid ""
 "'as-is' and the operation will be validated triggering a backorder creation "
 "with the remaining lines."
 msgstr ""
+"Qando ativa, quello che viene scansionato (tipicamente un EAN collo "
+"imballaggio prodotto) verrò spedito 'com'è' e l'operazione sarà validata "
+"attivando la creazione di un codice a barre con righe residue."
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+msgid ""
+"When checked, the user will be restricted by the type of object barcode  "
+"that he can scan to select the document/transfer/move line to work on."
+msgstr ""
+"Quando selezinata, l'utente verrà limitato dal tipo di oggetto codice a "
+"barre che scansiona per selezionare il documento/trasfeimento/riga mvimento "
+"su cui lavora."
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "When choosing an order to pack, do not allow to scan a product."
+msgstr ""
+"Qando si seleziona un ordine da mballare, nn consentire di scansionare un "
+"prodtto."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_get_work
 msgid ""
 "When enabled the user will have the option to ask for a task to work on."
 msgstr ""
+"Quando abilitata l'utente avrà l'opzine di chiedere un'attività su cui "
+"lavorare."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__allow_alternative_destination
@@ -1741,138 +1855,161 @@ msgid ""
 "When enabled the user will have the option to scan destination locations "
 "other than the expected ones (ask for confirmation)."
 msgstr ""
+"Quando abilitata l'utente avrà l'opzione di scansionare una ubicazione "
+"destinazione diversa da qelle attese (richiede conferma)."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__disable_full_bin_action
 msgid "When picking, prevent unloading the whole bin when full."
 msgstr ""
+"Nel prelievo, previene di scaricare l'intero contenitore quando è pieno."
 
 #. module: shopfloor
-#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__scan_location_or_pack_first
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid ""
-"When selecting work, force the user to first scan a location or pack,then "
-"the product or lot."
+"When selecting a move line, force the user to first scan a package or a "
+"location and not a product or a lot."
 msgstr ""
+"Qando si seleziona una riga movimento, forza l'utente a scansionare prima un "
+"collo o una ubicazione e non un prdtto o un lotto."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Working location changed to {}"
-msgstr ""
+msgstr "Ubicazne di lavoro modificata in {}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/services/cluster_picking.py:0
 #, python-format
 msgid "Wrong bin"
-msgstr ""
+msgstr "Contenitore errato"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong location."
-msgstr ""
+msgstr "Ubicazione errata."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong lot."
-msgstr ""
+msgstr "Lotto errato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong pack."
-msgstr ""
+msgstr "Collo errato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong packaging."
-msgstr ""
+msgstr "Imballo errato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong product."
-msgstr ""
+msgstr "Prodotto errato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Wrong."
-msgstr ""
+msgstr "Errato."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot move this using this menu."
-msgstr ""
+msgstr "Questo non si può movimentare con questo menu."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot place it here"
-msgstr ""
+msgstr "Questo non può essere messo qui"
 
 #. module: shopfloor
-#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "You cannot process that much units."
+msgstr "Non si pssono elaborare così tante unità."
+
+#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot return more quantity than what was initially sent."
-msgstr ""
+msgstr "Non si può rendere quantità supriore di quella inviata inizialmente."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid ""
-"You cannot work on a package (%(barcode)s) outside of locations: %(names)s"
-msgstr ""
+msgid "You cannot work on a package (%s) outside of locations: %s"
+msgstr "Non si può lavorare sul collo (%s) fuori dall'ubicazione: %s"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You must not pick more than {} units."
-msgstr ""
+msgstr "Nonsi possono prelevare più di {} unità."
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid ""
-"You scanned a different package with the same product, do you want to change"
-" pack? Scan it again to confirm"
+"You scanned a different package with the same product, do you want to change "
+"pack? Scan it again to confirm"
 msgstr ""
+"È stato scansinato un collo diverso con lo stesso prodotto, si vuole "
+"cambiare collo? Scansionarlo nuovamente per conferma"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/inventory.py:0
+#, python-format
+msgid "Zero check issue on location {}"
+msgstr "Zero controlli problemi nell'ubicazone {}"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/inventory.py:0
+#, python-format
+msgid "Zero check issue on location {} ({})"
+msgstr "Zero controlli problemi nell'ubicazone {} ({})"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_zone_picking
 #: model:shopfloor.scenario,name:shopfloor.scenario_zone_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_zone_picking_demo
 msgid "Zone Picking"
-msgstr ""
+msgstr "Prelievo per area"
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
+#: code:addons/shopfloor/actions/inventory.py:0
 #, python-format
 msgid ""
-"{message_code} not found in the current transfer or already in a package."
+"{picking.name} stock correction in location {location.name} for "
+"{product_desc}"
 msgstr ""
+"{picking.name} correzione di magazzino nell'ubicazone {location.name} per "
+"{product_desc}"
 
 #. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "{} is not a valid destination package."
-msgstr ""
+msgstr "{} non è un collo destinazione valido."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "{} not found in the current transfer or already in a package."
+msgstr "{} non trovato nel trasferimento attuale o già nel collo."
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "{} {} put in {}"
+msgstr "{} {} metti in {}"

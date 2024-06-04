@@ -113,7 +113,7 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
                 packing_sublocation1,
                 packing_sublocation2,
             ),
-            confirmation_required=True,
+            confirmation_required=packing_sublocation2.barcode,
         )
         # set an allowed destination location (inside the picking type default
         # destination location) for all lines in the buffer with an expected one

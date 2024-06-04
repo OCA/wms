@@ -26,6 +26,8 @@ class ShopfloorSchemaAction(Component):
             "ship_carrier": self._schema_dict_of(self._simple_record(), required=False),
             "scheduled_date": {"type": "string", "nullable": False, "required": True},
             "progress": {"type": "float", "nullable": True},
+            "location_dest": self._schema_dict_of(self.location(), required=False),
+            "priority": {"type": "string", "nullable": True, "required": False},
         }
 
     def move_line(self, with_packaging=False, with_picking=False):
@@ -91,6 +93,15 @@ class ShopfloorSchemaAction(Component):
             "weight": {"required": True, "nullable": True, "type": "float"},
             "move_line_count": {"required": False, "nullable": True, "type": "integer"},
             "storage_type": self._schema_dict_of(self._simple_record()),
+            "operation_progress": {
+                "type": "dict",
+                "required": False,
+                "schema": {
+                    "done": {"type": "float", "required": False},
+                    "to_do": {"type": "float", "required": False},
+                },
+            },
+            "total_quantity": {"required": False, "type": "float"},
         }
         if with_packaging:
             schema["packaging"] = self._schema_dict_of(self.packaging())

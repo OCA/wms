@@ -80,7 +80,7 @@ class LocationContentTransfer(Component):
         )
 
     def _response_for_scan_destination_all(
-        self, pickings, message=None, confirmation_required=False
+        self, pickings, message=None, confirmation_required=None
     ):
         """Transition to the 'scan_destination_all' state
 
@@ -116,7 +116,7 @@ class LocationContentTransfer(Component):
         )
 
     def _response_for_scan_destination(
-        self, location, next_content, message=None, confirmation_required=False
+        self, location, next_content, message=None, confirmation_required=None
     ):
         """Transition to the 'scan_destination' state
 
@@ -461,7 +461,7 @@ class LocationContentTransfer(Component):
         """Lock move lines"""
         self._actions_for("lock").for_update(lines)
 
-    def set_destination_all(self, location_id, barcode, confirmation=False):
+    def set_destination_all(self, location_id, barcode, confirmation=None):
         """Scan destination location for all the moves of the location
 
         barcode is a stock.location for the destination
@@ -489,11 +489,11 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination_all(
                 pickings, message=self.msg_store.dest_location_not_allowed()
             )
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             move_lines.location_dest_id, scanned_location
         ):
             return self._response_for_scan_destination_all(
-                pickings, confirmation_required=True
+                pickings, confirmation_required=barcode
             )
         self._lock_lines(move_lines)
 
@@ -663,7 +663,7 @@ class LocationContentTransfer(Component):
         )
 
     def set_destination_package(
-        self, location_id, package_level_id, barcode, confirmation=False
+        self, location_id, package_level_id, barcode, confirmation=None
     ):
         """Scan destination location for package level
 
@@ -697,11 +697,11 @@ class LocationContentTransfer(Component):
                 package_level,
                 message=self.msg_store.dest_location_not_allowed(),
             )
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             package_level.location_dest_id, scanned_location
         ):
             return self._response_for_scan_destination(
-                location, package_level, confirmation_required=True
+                location, package_level, confirmation_required=barcode
             )
         package_move_lines = package_level.move_line_ids
         self._lock_lines(package_move_lines)
@@ -722,7 +722,7 @@ class LocationContentTransfer(Component):
         )
 
     def set_destination_line(
-        self, location_id, move_line_id, quantity, barcode, confirmation=False
+        self, location_id, move_line_id, quantity, barcode, confirmation=None
     ):
         """Scan destination location for move line
 
@@ -754,11 +754,11 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination(
                 location, move_line, message=self.msg_store.dest_location_not_allowed()
             )
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             move_line.location_dest_id, scanned_location
         ):
             return self._response_for_scan_destination(
-                location, move_line, confirmation_required=True
+                location, move_line, confirmation_required=barcode
             )
 
         self._lock_lines(move_line)
@@ -833,9 +833,10 @@ class LocationContentTransfer(Component):
         splits the move to have no side-effect on the other package levels/move
         lines.
 
-        It unreserves the move, create an inventory at 0 in the move's source
-        location, create a second draft inventory (if none exists) to check later.
-        Finally, it cancels the move.
+        If the move has been created by the shopfloor user it will be canceled
+        otherwise it is unreserved.
+        Then create an inventory at 0 in the move's source location, create a
+        second draft inventory (if none exists) to check later.
 
         Transitions:
         * start: no more content to move
@@ -861,15 +862,23 @@ class LocationContentTransfer(Component):
             # We need to set qty_done at 0 because otherwise
             # the move_line will not be deleted
             package_move.move_line_ids.write({"qty_done": 0})
-            package_move._do_unreserve()
-            package_move._recompute_state()
+            package = package_level.package_id
+            if (
+                self.is_allow_move_create()
+                and self.env.user == package_move.picking_id.create_uid
+            ):
+                # Owned by the user deleting the move
+                package_move._action_cancel()
+            else:
+                # Not owned only unreserved
+                package_move._do_unreserve()
+                package_move._recompute_state()
             # Create an inventory at 0 in the move's source location
             inventory.create_stock_issue(package_move, location, package, lot)
             # Create a draft inventory to control stock
             inventory.create_control_stock(
                 location, package_move.product_id, package, lot
             )
-            package_move._action_cancel()
         # remove the package level (this is what does the `picking.do_unreserve()`
         # method, but here we want to unreserve+unlink this package alone)
         move_lines = self._find_transfer_move_lines(location)
@@ -882,9 +891,10 @@ class LocationContentTransfer(Component):
         splits the move to have no side-effect on the other package levels/move
         lines.
 
-        It unreserves the move, create an inventory at 0 in the move's source
-        location, create a second draft inventory (if none exists) to check later.
-        Finally, it cancels the move.
+        If the move has been created by the shopfloor user it will be canceled
+        otherwise it will be unreserved.
+        Then an inventory is created at 0 in the move's source location,
+        create a second draft inventory (if none exists) to check later.
 
         Transitions:
         * start: no more content to move
@@ -906,15 +916,19 @@ class LocationContentTransfer(Component):
         # We need to set qty_done at 0 because otherwise
         # the move_line will not be deleted
         move_line.qty_done = 0
-        move._do_unreserve()
-        move._recompute_state()
+        if self.is_allow_move_create() and self.env.user == move.picking_id.create_uid:
+            # Owned by the user deleting the move
+            move._action_cancel()
+        else:
+            # Not owned unreserve
+            move._do_unreserve()
+            move._recompute_state()
         # Create an inventory at 0 in the move's source location
         inventory.create_stock_issue(move, move_line_src_location, package, lot)
         # Create a draft inventory to control stock
         inventory.create_control_stock(
             move_line_src_location, move.product_id, package, lot
         )
-        move._action_cancel()
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
 
@@ -976,7 +990,7 @@ class ShopfloorLocationContentTransferValidator(Component):
         return {
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
     def go_to_single(self):
@@ -1001,7 +1015,7 @@ class ShopfloorLocationContentTransferValidator(Component):
             "location_id": {"coerce": to_int, "required": True, "type": "integer"},
             "package_level_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
     def set_destination_line(self):
@@ -1010,7 +1024,7 @@ class ShopfloorLocationContentTransferValidator(Component):
             "move_line_id": {"coerce": to_int, "required": True, "type": "integer"},
             "quantity": {"coerce": to_float, "required": True, "type": "float"},
             "barcode": {"required": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
     def postpone_package(self):
@@ -1077,7 +1091,7 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
             "package_levels": self.schemas._schema_list_of(package_level_schema),
             "move_lines": self.schemas._schema_list_of(move_line_schema),
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
@@ -1092,7 +1106,7 @@ class ShopfloorLocationContentTransferValidatorResponse(Component):
             "package_level": self.schemas._schema_dict_of(schema_package_level),
             "move_line": self.schemas._schema_dict_of(schema_move_line),
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },

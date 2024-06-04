@@ -31,6 +31,7 @@
                     <group name="main">
                         <field name="active" invisible="1" />
                         <field name="scenario_id" widget="selection" />
+                        <field name="scenario_key" invisible="1" />
                         <field name="scenario" invisible="1" />
                         <field name="profile_id" options="{'no_create': 1}" />
                     </group>

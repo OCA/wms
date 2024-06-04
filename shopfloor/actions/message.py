@@ -113,8 +113,10 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Package %(package_name)s is not available in transfer %(picking_name)s."
-            ).format(package.name, picking.name),
+                "Package %(package_name)s is not available in transfer %(picking_name)s.",
+                package_name=package.name,
+                picking_name=picking.name,
+            ),
         }
 
     def package_not_empty(self, package):
@@ -127,6 +129,17 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Package {} is already used.").format(package.name),
+        }
+
+    def package_different_picking_type(self, package, picking_type):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Package %(package_name)s contains already lines from a different "
+                "operation type %(picking_type_name)s.",
+                package_name=package.name,
+                picking_type_name=picking_type.name,
+            ),
         }
 
     def dest_package_required(self):
@@ -435,6 +448,18 @@ class MessageAction(Component):
             "body": _("No transfer found for this product."),
         }
 
+    def product_not_found_in_location_or_transfer(self, product, location, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Product %(product_name)s not found in location %(location_name)s "
+                "or transfer %(picking_name)s.",
+                product_name=product.name,
+                location_name=location.name,
+                picking_name=picking.name,
+            ),
+        }
+
     def x_not_found_or_already_in_dest_package(self, message_code):
         return {
             "message_type": "warning",
@@ -447,6 +472,12 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("Packaging not found in the current transfer."),
+        }
+
+    def packaging_dimension_updated(self, packaging):
+        return {
+            "message_type": "success",
+            "body": _("Packaging {} dimension updated.").format(packaging.name),
         }
 
     def expiration_date_missing(self):
@@ -510,6 +541,26 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("No transfer found for this lot."),
+        }
+
+    def lot_not_found_in_location(self, lot, location):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Lot %(lot_name)s not found in location %(location_name)s",
+                lot_name=lot.name,
+                location_name=location.name,
+            ),
+        }
+
+    def lot_not_found_in_picking(self, lot, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Lot %(lot_name)s not found in transfer %(picking_name)s",
+                lot_name=lot.name,
+                pcking_name=picking.name,
+            ),
         }
 
     def batch_transfer_complete(self):
@@ -662,6 +713,12 @@ class MessageAction(Component):
             "body": _("No lines to process."),
         }
 
+    def no_lines_to_process_set_quantities(self):
+        return {
+            "message_type": "info",
+            "body": _("No lines to process, set quantities on some"),
+        }
+
     def location_empty(self, location):
         return {
             "message_type": "error",
@@ -684,6 +741,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("You must not pick more than {} units.").format(quantity),
+        }
+
+    def unable_to_pick_qty(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot process that much units."),
         }
 
     def lot_replaced_by_lot(self, old_lot, new_lot):
@@ -726,6 +789,26 @@ class MessageAction(Component):
                 "Package %(package_name)s cannot be used: %(error)s",
                 package_name=package.name,
                 error=error_msg,
+            ),
+        }
+
+    def package_not_found_in_location(self, package, location):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Package %(package_name)s not found in location %(location_name)s",
+                package_name=package.name,
+                location_name=location.name,
+            ),
+        }
+
+    def package_not_found_in_picking(self, package, picking):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Package %(package_name)s not found in transfer %(picking_name)s",
+                package_name=package.name,
+                picking_name=picking.name,
             ),
         }
 
@@ -843,4 +926,13 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _("No line to pack found."),
+        }
+
+    def package_transfer_not_allowed_scan_location(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "Transferring to a different package is not allowed, "
+                "please scan a location instead."
+            ),
         }

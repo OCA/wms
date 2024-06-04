@@ -1,7 +1,7 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml delivery_diag_seq.plantuml
+#   $ plantuml checkout_diag_seq.plantuml
 #
 
 @startuml
@@ -32,18 +32,29 @@ manual_selection -> select_line: **/select**(picking_id)
 select_document -> select_line: **/scan_document**(barcode, picking_id=None) \n(scan a picking a product or ???)
 
 == /select_line ==
-select_line -> select_package: **/select_line**(picking_id, package_id, move_line_ids)
+select_line -> select_package: **/select_line**(picking_id, package_id, move_line_id)
+
+== /scan_line ==
+select_line -> select_package: **/scan_line**(picking_id, barcode, confirm_pack_all, confirm_lot)
 
 == /list_delivery_packaging ==
 select_package -> select_delivery_packaging: **/list_delivery_packaging**(picking_id, selected_line_ids)
-
 
 == /list_dest_package ==
 select_package -> select_dest_package: **/list_dest_package**(picking_id, selected_line_ids)
 select_package -> select_package: **/list_dest_package**(picking_id, selected_line_ids) \n No Valid package to select
 
+== edit line ==
+select_package -> change_quantity: (State change without call to backend)
+
 == /set_dest_package ==
-select_dest_package -> select_line: **/set_dest_package(picking_id, selected_line_ids, package_id)
+select_dest_package -> select_line: **/set_dest_package**(picking_id, selected_line_ids, package_id)
+
+== /set_custom_qty ==
+change_quantity -> select_package: **/set_custom_qty**(picking_id, selected_line_ids, move_line_id, qty_done)
+
+== /reset_line_qty ==
+select_package -> select_package: **/reset_line_qty**(picking_id, selected_line_ids, move_line_id)
 
 == /scan_package_action ==
 select_delivery_packaging -> summary: **/scan_package_action**(picking_id, selected_line_ids, barcode)
@@ -52,10 +63,13 @@ select_delivery_packaging -> summary: **/scan_package_action**(picking_id, selec
 summary -> select_line: **/cancel_line**(picking_id, package_id=None, line_id=None)
 
  == /select ==
- summary -> select_line: **/select**(picking_id) \nContinue checkout
+summary -> select_line: **/select**(picking_id) \nContinue checkout
 
 == /done ==
 summary -> select_document: **/done(picking_id)**
+summary -> select_child_location: **/done(picking_id)**
 
+== /scan_dest_location ==
+select_child_location -> select_document: **/scan_dest_location(picking_id, barcode)**
 
 @enduml

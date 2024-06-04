@@ -10,6 +10,7 @@ class CheckoutSelectPackageMixin:
         message=None,
         packing_info="",
         no_package_enabled=True,
+        package_allowed=True,
     ):
         picking = selected_lines.mapped("picking_id")
         self.assert_response(
@@ -22,6 +23,7 @@ class CheckoutSelectPackageMixin:
                 "picking": self._picking_summary_data(picking),
                 "packing_info": packing_info,
                 "no_package_enabled": no_package_enabled,
+                "package_allowed": package_allowed,
             },
             message=message,
         )
@@ -61,4 +63,5 @@ class CheckoutSelectPackageMixin:
             )
         for line in unselected_lines + related_lines:
             self.assertEqual(line.qty_done, 0)
-        self._assert_selected_response(response, selected_lines, message=message, **kw)
+        package_lines = selected_lines + related_lines
+        self._assert_selected_response(response, package_lines, message=message, **kw)

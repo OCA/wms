@@ -35,8 +35,15 @@ class CheckoutCommonCase(CommonCase):
             "checkout", menu=self.menu, profile=self.profile
         )
 
-    def _stock_picking_data(self, picking, **kw):
-        return self.service._data_for_stock_picking(picking, **kw)
+    def _stock_picking_data(
+        self, picking, done=False, with_lines=True, with_location=False, **kw
+    ):
+        return self.service._data_for_stock_picking(
+            picking, done, with_lines, with_location, **kw
+        )
+
+    def _stock_locations_data(self, locations, **kw):
+        return self.service._data_for_locations(locations, **kw)
 
     # we test the methods that structure data in test_actions_data.py
     def _picking_summary_data(self, picking):
@@ -45,8 +52,10 @@ class CheckoutCommonCase(CommonCase):
     def _move_line_data(self, move_line):
         return self.data.move_line(move_line)
 
-    def _package_data(self, package, picking):
-        return self.data.package(package, picking=picking, with_packaging=True)
+    def _package_data(self, package, picking, **kwargs):
+        return self.data.package(
+            package, picking=picking, with_packaging=True, **kwargs
+        )
 
     def _packaging_data(self, packaging):
         return self.data.delivery_packaging(packaging)
@@ -56,7 +65,7 @@ class CheckoutCommonCase(CommonCase):
             "picking": self._stock_picking_data(picking),
             "group_lines_by_location": True,
             "show_oneline_package_content": False,
-            "need_confirm_pack_all": False,
+            "need_confirm_pack_all": "",
         }
         data.update(kw)
         return data
@@ -72,6 +81,7 @@ class CheckoutCommonCase(CommonCase):
                 "picking": self._picking_summary_data(picking),
                 "packing_info": "",
                 "no_package_enabled": True,
+                "package_allowed": True,
             },
             message={
                 "message_type": "warning",

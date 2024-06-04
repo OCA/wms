@@ -31,6 +31,20 @@ class CheckoutScanCase(CheckoutCommonCase):
             in_package=False,
         )
 
+    def test_scan_document_with_option_product_not_ok(self):
+        self.menu.sudo().scan_location_or_pack_first = True
+        picking = self._create_picking()
+        self._fill_stock_for_moves(picking.move_ids)
+        picking.action_assign()
+        barcode = picking.move_line_ids.product_id[0].barcode
+        response = self.service.dispatch("scan_document", params={"barcode": barcode})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            message={"message_type": "error", "body": "Barcode not found"},
+            data={"restrict_scan_first": True},
+        )
+
     def test_scan_document_packaging_ok(self):
         self._test_scan_ok(
             lambda picking: picking.move_line_ids.product_id[0].packaging_ids.barcode,
@@ -43,6 +57,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             response,
             next_state="select_document",
             message={"message_type": "error", "body": "Barcode not found"},
+            data={"restrict_scan_first": False},
         )
 
     def _test_scan_document_error_not_available(self, barcode_func):
@@ -65,6 +80,7 @@ class CheckoutScanCase(CheckoutCommonCase):
                 "message_type": "error",
                 "body": "Transfer {} is not available.".format(picking.name),
             },
+            data={"restrict_scan_first": False},
         )
 
     def test_scan_document_error_not_available_picking(self):
@@ -92,6 +108,7 @@ class CheckoutScanCase(CheckoutCommonCase):
             response,
             next_state="select_document",
             message={"message_type": "error", "body": "Location not allowed here."},
+            data={"restrict_scan_first": False},
         )
 
     def _test_scan_document_error_different_picking_type(self, barcode_func):
@@ -107,6 +124,7 @@ class CheckoutScanCase(CheckoutCommonCase):
                 "message_type": "error",
                 "body": "You cannot move this using this menu.",
             },
+            data={"restrict_scan_first": False},
         )
 
     def test_scan_document_error_different_picking_type_picking(self):
@@ -139,6 +157,7 @@ class CheckoutScanCase(CheckoutCommonCase):
                 "body": "Several transfers found, please scan a package"
                 " or select a transfer manually.",
             },
+            data={"restrict_scan_first": False},
         )
 
     def test_scan_document_recover(self):

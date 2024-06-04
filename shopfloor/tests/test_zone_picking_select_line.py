@@ -73,6 +73,9 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
 
     def test_list_move_lines_order_by_location(self):
         self.service.work.current_lines_order = "location"
+        last_move_line = self.picking1.move_line_ids[-1]
+        last_move_line_location = last_move_line.location_id
+        last_move_line_location.sudo().name = "z"
         response = self.service.dispatch("list_move_lines", params={})
         move_lines = self.service._find_location_move_lines()
         res = [
@@ -80,6 +83,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             for x in response["data"]["select_line"]["move_lines"]
         ]
         self.assertEqual(res, [x.location_id.name for x in move_lines])
+        self.assertEqual(res[-1], last_move_line_location.name)
         self.maxDiff = None
         self.assert_response_select_line(
             response,
@@ -260,7 +264,11 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
     def test_scan_source_package_many_products(self):
         """Scan source: scanned package that several product, aborting
         next step 'select_line expected.
+
+        This is only when no prefill quantity option is enabled. If not
+        the related package will be move in one step.
         """
+        self.menu.sudo().no_prefill_qty = True
         pack = self.picking1.package_level_ids[0].package_id
         self._update_qty_in_location(pack.location_id, self.product_b, 2, pack)
         response = self.service.dispatch(
@@ -278,6 +286,28 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             move_lines=move_lines,
             package=pack,
             message=self.service.msg_store.several_products_in_package(pack),
+            location_first=False,
+        )
+
+    def test_scan_source_empty_package(self):
+        """Scan source: scanned an empty package."""
+        pack_empty = self.env["stock.quant.package"].create({})
+        response = self.service.dispatch(
+            "scan_source",
+            params={"barcode": pack_empty.name},
+        )
+        move_lines = self.service._find_location_move_lines(
+            locations=self.zone_location
+        )
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
+            response,
+            zone_location=self.zone_location,
+            picking_type=self.picking_type,
+            move_lines=move_lines,
+            message=self.service.msg_store.package_has_no_product_to_take(
+                pack_empty.name
+            ),
             location_first=False,
         )
 
@@ -311,13 +341,13 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             picking_type=self.picking_type,
             move_lines=move_lines,
             message=self.service.msg_store.package_different_change(),
-            confirmation_required=True,
+            confirmation_required=package1b.name,
         )
         self.assertEqual(self.picking1.package_level_ids[0].package_id, package1)
         # 2nd scan
         response = self.service.dispatch(
             "scan_source",
-            params={"barcode": package1b.name, "confirmation": True},
+            params={"barcode": package1b.name, "confirmation": package1b.name},
         )
         self.assert_response_set_line_destination(
             response,
@@ -327,6 +357,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             message=self.service.msg_store.package_replaced_by_package(
                 package1, package1b
             ),
+            qty_done=self.service._get_prefill_qty(move_lines[0]),
         )
         # Check the package has been changed on the move line
         self.assertEqual(self.picking1.package_level_ids[0].package_id, package1b)

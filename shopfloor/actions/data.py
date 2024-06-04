@@ -13,34 +13,23 @@ class DataAction(Component):
     def location(self, record, **kw):
         parser = self._location_parser
         data = self._jsonify(record.with_context(location=record.id), parser, **kw)
-        if "with_operation_progress" in kw:
-            operation_progress = self._get_location_operations_progress(record)
+        if kw.get("with_operation_progress"):
+            lines_blacklist = (
+                kw.get("progress_lines_blacklist")
+                or self.env["stock.move.line"].browse()
+            )
+            domain = [
+                ("location_id", "=", record.id),
+                ("state", "in", ["partially_available", "assigned"]),
+                ("picking_id.state", "=", "assigned"),
+                ("id", "not in", lines_blacklist.ids),
+            ]
+            operation_progress = self._get_operation_progress(domain)
             data.update({"operation_progress": operation_progress})
         return data
 
-    def locations(self, record, **kw):
-        return self.location(record, multi=True)
-
-    def _get_location_operations_progress(self, location):
-        lines = self.env["stock.move.line"].search(
-            [
-                ("location_id", "=", location.id),
-                ("state", "in", ["partially_available", "assigned"]),
-                ("picking_id.state", "=", "assigned"),
-            ]
-        )
-        # operations_to_do = number of total operations that are pending for this location.
-        # operations_done = number of operations already done.
-        # A line with an assigned package counts as 1 operation.
-        operations_to_do = 0
-        operations_done = 0
-        for line in lines:
-            operations_done += line.qty_done if not line.package_id else 1
-            operations_to_do += line.reserved_uom_qty if not line.package_id else 1
-        return {
-            "done": operations_done,
-            "to_do": operations_to_do,
-        }
+    def locations(self, records, **kw):
+        return [self.location(rec, **kw) for rec in records]
 
     @property
     def _location_parser(self):
@@ -51,16 +40,19 @@ class DataAction(Component):
             ("barcode", lambda rec, fname: rec[fname] if rec[fname] else rec.name),
         ]
 
-    @ensure_model("stock.picking")
-    def picking(self, record, **kw):
+    def _get_picking_parser(self, record, **kw):
         parser = self._picking_parser
         # progress is a heavy computed field,
         # and it may reduce performance significatively
         # when dealing with a large number of pickings.
         # Thus, we make it optional.
-        if "with_progress" in kw:
+        if kw.get("with_progress"):
             parser.append("progress")
-        return self._jsonify(record, parser, **kw)
+        return parser
+
+    @ensure_model("stock.picking")
+    def picking(self, record, **kw):
+        return self._jsonify(record, self._get_picking_parser(record, **kw), **kw)
 
     def pickings(self, record, **kw):
         return self.picking(record, multi=True)
@@ -80,6 +72,7 @@ class DataAction(Component):
             "bulk_line_count",
             "total_weight:weight",
             "scheduled_date",
+            "priority",
         ]
 
     @ensure_model("stock.quant.package")
@@ -93,13 +86,37 @@ class DataAction(Component):
         if with_packaging:
             parser += self._package_packaging_parser
         data = self._jsonify(record, parser, **kw)
+        qty = len(record.quant_ids)
         # handle special cases
-        if data and picking:
-            lines = picking.move_line_ids.filtered(
-                lambda l: l.result_package_id == record
-                and l.state in ["partially_available", "assigned", "done"]
+        progress_package_key = ""
+        if kw.get("with_operation_progress_src"):
+            progress_package_key = "package_id"
+        elif kw.get("with_operation_progress_dest"):
+            progress_package_key = "result_package_id"
+        if progress_package_key:
+            lines_blacklist = (
+                kw.get("progress_lines_blacklist")
+                or self.env["stock.move.line"].browse()
             )
-            data.update({"move_line_count": len(lines)})
+            domain = [
+                (progress_package_key, "=", record.id),
+                ("state", "in", ["partially_available", "assigned"]),
+                ("picking_id.state", "=", "assigned"),
+                ("id", "not in", lines_blacklist.ids),
+            ]
+            operation_progress = self._get_operation_progress(domain)
+            data.update({"operation_progress": operation_progress})
+        if kw.get("with_package_move_line_count") and data and picking:
+            move_line_count = self.env["stock.move.line"].search_count(
+                [
+                    ("picking_id.picking_type_id", "=", picking.picking_type_id.id),
+                    ("result_package_id", "=", record.id),
+                    ("state", "in", ["partially_available", "assigned"]),
+                ]
+            )
+            qty += move_line_count
+            # TODO does this name really makes sense?
+            data.update({"move_line_count": qty})
         return data
 
     def packages(self, records, picking=None, **kw):
@@ -112,6 +129,10 @@ class DataAction(Component):
             "name",
             "shopfloor_weight:weight",
             ("package_type_id:storage_type", ["id", "name"]),
+            (
+                "quant_ids:total_quantity",
+                lambda rec, fname: sum(rec.quant_ids.mapped("quantity")),
+            ),
         ]
 
     @property
@@ -327,3 +348,17 @@ class DataAction(Component):
             "id",
             "name",
         ]
+
+    def _get_operation_progress(self, domain):
+        lines = self.env["stock.move.line"].search(domain)
+        # operations_to_do = number of total operations that are pending for this location.
+        # operations_done = number of operations already done.
+        operations_to_do = 0
+        operations_done = 0
+        for line in lines:
+            operations_done += line.qty_done
+            operations_to_do += line.reserved_uom_qty - line.qty_done
+        return {
+            "done": operations_done,
+            "to_do": operations_to_do,
+        }

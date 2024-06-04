@@ -65,7 +65,7 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def _assert_response_scan_destination_all(
-        self, state, response, pickings, message=None, confirmation_required=False
+        self, state, response, pickings, message=None, confirmation_required=None
     ):
         # this code is repeated from the implementation, not great, but we
         # mostly want to ensure the selection of pickings is right, and the
@@ -87,7 +87,7 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def assert_response_scan_destination_all(
-        self, response, pickings, message=None, confirmation_required=False
+        self, response, pickings, message=None, confirmation_required=None
     ):
         self._assert_response_scan_destination_all(
             "scan_destination_all",
@@ -112,7 +112,7 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def _assert_response_scan_destination(
-        self, state, response, next_content, message=None, confirmation_required=False
+        self, state, response, next_content, message=None, confirmation_required=None
     ):
         location = next_content.location_id
         data = self.service._data_content_line_for_location(location, next_content)
@@ -125,7 +125,7 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def assert_response_scan_destination(
-        self, response, next_content, message=None, confirmation_required=False
+        self, response, next_content, message=None, confirmation_required=None
     ):
         self._assert_response_scan_destination(
             "scan_destination",

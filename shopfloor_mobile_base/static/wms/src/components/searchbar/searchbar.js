@@ -115,7 +115,15 @@ export var Searchbar = Vue.component("searchbar", {
     },
     methods: {
         capture_focus: function () {
-            if (this.autofocus) this.$refs.searchbar.focus();
+            if (this.autofocus && this.$refs.searchbar) {
+                // We need to use both "focus" and "click" in combination
+                // to make sure that the searchbar is fully focused and ready for scanning
+                // without having to manually tap on it.
+                // Using simply one or the other is not enough
+                // to always be able to input any scanned text.
+                this.$refs.searchbar.focus();
+                this.$refs.searchbar.click();
+            }
         },
         show_virtual_keyboard: function (elem) {
             elem.inputMode = this.input_inputmode;

@@ -2,6 +2,8 @@
 # @author Simone Orsi <simahawk@gmail.com>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
+import logging
+
 from odoo import api, fields, models, tools
 from odoo.tools import DotDict
 
@@ -9,6 +11,8 @@ from odoo.addons.base_rest.tools import ROUTING_DECORATOR_ATTR, _inspect_methods
 from odoo.addons.component.core import _component_databases
 
 from ..utils import APP_VERSION, RUNNING_ENV
+
+_logger = logging.getLogger(__file__)
 
 
 class ShopfloorApp(models.Model):
@@ -281,6 +285,13 @@ class ShopfloorApp(models.Model):
         return comp_registry and comp_registry.ready
 
     def _get_services(self):
+        forced_services = self.env.context.get("sf_service_components")
+        if forced_services:
+            _logger.debug(
+                "_get_services forced services: %s",
+                ", ".join([x._usage for x in forced_services]),
+            )
+            return forced_services
         if not self._is_component_registry_ready():
             # No service is available before the registry has been loaded.
             # This is a very special case, when the odoo registry is being

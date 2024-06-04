@@ -27,6 +27,7 @@ class CommonCase(BaseCommonCase):
         cls.input_location = cls.env.ref("stock.stock_location_company")
         cls.shelf1 = cls.env.ref("stock.stock_location_components")
         cls.shelf2 = cls.env.ref("stock.stock_location_14")
+        cls.shelf3 = cls.shelf2.sudo().copy({"barcode": "26019853"})
 
     @classmethod
     def _shopfloor_user_values(cls):
@@ -220,6 +221,7 @@ class CommonCase(BaseCommonCase):
                     package = cls.env["stock.quant.package"].create({})
                 product_packages[key] = package
         for (product, location), qty in product_locations.items():
+            product_package = product_packages.get((product, location))
             lot = None
             if in_lot:
                 if isinstance(in_lot, models.BaseModel):
@@ -235,7 +237,7 @@ class CommonCase(BaseCommonCase):
                 # of units to pick a package
                 qty *= 2
             cls._update_qty_in_location(
-                location, product, qty, package=package, lot=lot
+                location, product, qty, package=product_package, lot=lot
             )
 
     # used by _create_package_in_location

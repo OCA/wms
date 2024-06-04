@@ -161,6 +161,13 @@ class ZonePicking(Component):
     def _pick_pack_same_time(self):
         return self.work.menu.pick_pack_same_time
 
+    def _handle_complete_mix_pack(self, package):
+        packaging = self._actions_for("packaging")
+        return (
+            packaging.is_complete_mix_pack(package)
+            and not self.work.menu.no_prefill_qty
+        )
+
     def _response_for_start(self, message=None):
         zones = self.work.menu.picking_type_ids.mapped(
             "default_location_src_id.child_ids"
@@ -197,7 +204,7 @@ class ZonePicking(Component):
         move_lines,
         message=None,
         popup=None,
-        confirmation_required=False,
+        confirmation_required=None,
         product=False,
         sublocation=False,
         package=False,
@@ -220,7 +227,7 @@ class ZonePicking(Component):
         self,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
         **kw,
     ):
         if confirmation_required and not message:
@@ -228,6 +235,12 @@ class ZonePicking(Component):
         data = self._data_for_move_line(move_line)
         data["move_line"].update(kw)
         data["confirmation_required"] = confirmation_required
+        data[
+            "allow_alternative_destination_package"
+        ] = self.work.menu.allow_alternative_destination_package
+        data["handle_complete_mix_pack"] = self._handle_complete_mix_pack(
+            move_line.package_id
+        )
         return self._response(
             next_state="set_line_destination", data=data, message=message
         )
@@ -252,7 +265,7 @@ class ZonePicking(Component):
         self,
         move_lines,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
@@ -275,7 +288,7 @@ class ZonePicking(Component):
         self,
         move_line,
         message=None,
-        confirmation_required=False,
+        confirmation_required=None,
     ):
         if confirmation_required and not message:
             message = self.msg_store.need_confirmation()
@@ -346,11 +359,19 @@ class ZonePicking(Component):
             # to retrieve if location will be empty.
             # Maybe group lines by location and compute only once.
             move_line = self.env["stock.move.line"].browse(data_move_line["id"])
+            handle_complete_mix_pack = self._handle_complete_mix_pack(
+                move_line.package_id
+            )
+            data_move_line["handle_complete_mix_pack"] = handle_complete_mix_pack
             # `location_will_be_empty` flag states if, by processing this move line
             # and picking the product, the location will be emptied.
             data_move_line[
                 "location_will_be_empty"
-            ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
+            ] = move_line.location_id.planned_qty_in_location_is_empty(
+                move_line.package_id.move_line_ids
+                if handle_complete_mix_pack
+                else move_line
+            )
         return data
 
     def _data_for_location(self, location, zone_location=None, picking_type=None):
@@ -506,7 +527,7 @@ class ZonePicking(Component):
     def _scan_source_location(
         self,
         barcode,
-        confirmation=False,
+        confirmation=None,
         product_id=False,
         sublocation=False,
         package=False,
@@ -576,7 +597,7 @@ class ZonePicking(Component):
     def _scan_source_package(
         self,
         barcode,
-        confirmation=False,
+        confirmation=None,
         product_id=False,
         sublocation=False,
         package=False,
@@ -594,21 +615,28 @@ class ZonePicking(Component):
         package = search.package_from_scan(barcode)
         if not package:
             return response, message
-        if not package.location_id.is_sublocation_of(self.zone_location):
-            # Package is not in an allowed location
-            response = self._list_move_lines(self.zone_location)
-            message = self.msg_store.location_not_allowed()
-            return response, message
+        if package.location_id:
+            if not package.location_id.is_sublocation_of(self.zone_location):
+                # Package is not in an allowed location
+                response = self._list_move_lines(self.zone_location)
+                message = self.msg_store.location_not_allowed()
+                return response, message
 
         move_lines = self._find_location_move_lines(
             locations=sublocation, package=package
         )
+        handle_complete_mix_pack = self._handle_complete_mix_pack(package)
         if move_lines:
+            if handle_complete_mix_pack:
+                response = self._response_for_set_line_destination(
+                    first(move_lines), qty_done=0
+                )
+                return response, message
             if packaging.package_has_several_products(package):
                 message = self.msg_store.several_products_in_package(package)
             if packaging.package_has_several_lots(package):
                 message = self.msg_store.several_lots_in_package(package)
-            if message:
+            if message or self.work.menu.no_prefill_qty:
                 return (
                     self._list_move_lines(
                         self.zone_location,
@@ -617,8 +645,8 @@ class ZonePicking(Component):
                     ),
                     message,
                 )
+
             move_line = first(move_lines)
-            # Fix me for a package prefill qty is zero ?
             qty_done = self._get_prefill_qty(move_line)
             response = self._response_for_set_line_destination(
                 move_line, qty_done=qty_done
@@ -632,19 +660,22 @@ class ZonePicking(Component):
                 product=product,
             )
         if move_lines:
-            if not confirmation:
+            if confirmation != barcode:
                 message = self.msg_store.package_different_change()
                 response = self._response_for_select_line(
-                    move_lines, message, confirmation_required=True
+                    move_lines, message, confirmation_required=barcode
                 )
             else:
                 change_package_lot = self._actions_for("change.package.lot")
+                move_line = first(move_lines)
                 response = change_package_lot.change_package(
-                    first(move_lines),
+                    move_line,
                     package,
-                    # FIXME we may need to pass the quantity being done
-                    self._response_for_set_line_destination,
-                    self._response_for_change_pack_lot,
+                    response_ok_func=functools.partial(
+                        self._response_for_set_line_destination,
+                        qty_done=self._get_prefill_qty(move_line, qty=0),
+                    ),
+                    response_error_func=self._response_for_change_pack_lot,
                 )
         else:
             response = self._list_move_lines(sublocation or self.zone_location)
@@ -668,7 +699,7 @@ class ZonePicking(Component):
     def _scan_source_product(
         self,
         barcode,
-        confirmation=False,
+        confirmation=None,
         product_id=False,
         sublocation=False,
         package=False,
@@ -730,7 +761,7 @@ class ZonePicking(Component):
     def _scan_source_lot(
         self,
         barcode,
-        confirmation=False,
+        confirmation=None,
         product_id=False,
         sublocation=False,
         package=False,
@@ -783,7 +814,7 @@ class ZonePicking(Component):
     def scan_source(
         self,
         barcode,
-        confirmation=False,
+        confirmation=None,
         product_id=None,
         sublocation_id=None,
         package_id=None,
@@ -860,13 +891,15 @@ class ZonePicking(Component):
             base_response=response, message=self.msg_store.barcode_not_found()
         )
 
-    def _set_destination_location(self, move_line, quantity, confirmation, location):
+    def _set_destination_location(
+        self, move_line, package, quantity, confirmation, location, barcode
+    ):
         location_changed = False
         response = None
 
         # A valid location is a sub-location of the original destination, or a
         # any sub-location of the picking type's default destination location
-        # if `confirmation is True
+        # if `confirmation is equal to the barcode scanned.
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
         if not self.is_dest_location_valid(move_line.move_id, location):
@@ -877,7 +910,7 @@ class ZonePicking(Component):
             )
             return (location_changed, response)
 
-        if not confirmation and self.is_dest_location_to_confirm(
+        if confirmation != barcode and self.is_dest_location_to_confirm(
             move_line.location_dest_id, location
         ):
             response = self._response_for_set_line_destination(
@@ -885,7 +918,7 @@ class ZonePicking(Component):
                 message=self.msg_store.confirm_location_changed(
                     move_line.location_dest_id, location
                 ),
-                confirmation_required=True,
+                confirmation_required=barcode,
                 qty_done=quantity,
             )
             return (location_changed, response)
@@ -899,24 +932,41 @@ class ZonePicking(Component):
             )
             return (location_changed, response)
         # destination location set to the scanned one
-        self._write_destination_on_lines(move_line, location)
+
         stock = self._actions_for("stock")
+        move_lines = move_line
+        if package:
+            quantity = None
+            # Handling all move lines from a complete mix pack
+            for _move_line in package.move_line_ids:
+                if _move_line.state not in ("assigned", "partially_available"):
+                    continue
+                _move_line.qty_done = move_line.reserved_uom_qty
+                move_lines |= _move_line
+        self._write_destination_on_lines(move_lines, location)
+
         try:
-            stock.mark_move_line_as_picked(move_line, quantity, check_user=True)
+            stock.mark_move_line_as_picked(move_lines, quantity, check_user=True)
         except ConcurentWorkOnTransfer as error:
+            values = {"qty_done": quantity} if quantity is not None else {}
             response = self._response_for_set_line_destination(
                 move_line,
                 message={
                     "message_type": "error",
                     "body": str(error),
                 },
-                qty_done=quantity,
+                **values,
             )
             return (location_changed, response)
-        stock.validate_moves(move_line.move_id)
+        stock.validate_moves(move_lines.move_id)
+
         location_changed = True
         # Zero check
-        zero_check = self.picking_type.shopfloor_zero_check
+        # Only apply zero check if the product is of type "product".
+        zero_check = (
+            move_line.product_id.type == "product"
+            and self.picking_type.shopfloor_zero_check
+        )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
         return (location_changed, response)
@@ -940,25 +990,34 @@ class ZonePicking(Component):
             move_line.reserved_uom_qty - qty, precision_rounding=rounding
         )
 
-    def _set_destination_package(self, move_line, quantity, package):
-        package_changed = False
-        response = None
+    def _is_package_not_valid(self, package):
+        message = False
         # A valid package is:
         # * an empty package
         # * not used as destination for another move line
+        # * not contains move lines with different operation type
         if not self._is_package_empty(package):
+            message = self.msg_store.package_not_empty(package)
+        elif package.planned_move_line_ids:
+            if not self.work.menu.multiple_move_single_pack:
+                message = self.msg_store.package_already_used(package)
+            else:
+                for line in package.planned_move_line_ids:
+                    if line.picking_id.picking_type_id.id in self.picking_types.ids:
+                        continue
+                    message = self.msg_store.package_different_picking_type(
+                        package, line.picking_id.picking_type_id
+                    )
+                    break
+        return message
+
+    def _set_destination_package(self, move_line, quantity, package):
+        package_changed = False
+        response = None
+        package_invalid_message = self._is_package_not_valid(package)
+        if package_invalid_message:
             response = self._response_for_set_line_destination(
-                move_line,
-                message=self.msg_store.package_not_empty(package),
-                qty_done=quantity,
-            )
-            return (package_changed, response)
-        multiple_move_allowed = self.work.menu.multiple_move_single_pack
-        if package.planned_move_line_ids and not multiple_move_allowed:
-            response = self._response_for_set_line_destination(
-                move_line,
-                message=self.msg_store.package_already_used(package),
-                qty_done=quantity,
+                move_line, message=package_invalid_message, qty_done=quantity
             )
             return (package_changed, response)
         # the quantity done is set to the passed quantity
@@ -973,6 +1032,7 @@ class ZonePicking(Component):
             )
             return (package_changed, response)
         stock = self._actions_for("stock")
+        self._lock_lines(move_line)
         try:
             stock.mark_move_line_as_picked(
                 move_line, quantity, package, check_user=True
@@ -989,7 +1049,11 @@ class ZonePicking(Component):
             return (package_changed, response)
         package_changed = True
         # Zero check
-        zero_check = self.picking_type.shopfloor_zero_check
+        # Only apply zero check if the product is of type "product".
+        zero_check = (
+            move_line.product_id.type == "product"
+            and self.picking_type.shopfloor_zero_check
+        )
         if zero_check and move_line.location_id.planned_qty_in_location_is_empty():
             response = self._response_for_zero_check(move_line)
         return (package_changed, response)
@@ -1028,7 +1092,8 @@ class ZonePicking(Component):
         move_line_id,
         barcode,
         quantity,
-        confirmation=False,
+        handle_complete_mix_pack=False,
+        confirmation=None,
     ):
         """Set a destination location (and done) or a destination package (in buffer)
 
@@ -1068,6 +1133,9 @@ class ZonePicking(Component):
         When the barcode is the product (or its packaging) or the lot on the line:
             * The done quantity is incremented by one or the packaging quantity.
 
+        The `handle_complete_mix_pack` option, when it is set to true. Will move all they
+        lines contained in the package of the move line passed in parameter.
+
         Transitions:
         * select_line: destination has been set, showing the next lines to pick
         * zero_check: if the option is active and if the quantity of product
@@ -1086,12 +1154,12 @@ class ZonePicking(Component):
 
         pkg_moved = False
         search = self._actions_for("search")
-        accept_only_package = not self._move_line_full_qty(move_line, quantity)
+
+        moving_full_quantity = self._move_line_full_qty(move_line, quantity)
 
         response = self._set_destination_update_quantity(move_line, quantity, barcode)
         if response:
             return response
-
         if quantity <= 0:
             message = self.msg_store.picking_zero_quantity()
             return self._response_for_set_line_destination(
@@ -1101,10 +1169,14 @@ class ZonePicking(Component):
             )
 
         extra_message = ""
-        if not accept_only_package:
-            # When the barcode is a location
+        if moving_full_quantity:
+            # When the barcode is a location,
+            # only allow it if moving the full qty.
             location = search.location_from_scan(barcode)
             if location:
+                package = None
+                if handle_complete_mix_pack:
+                    package = move_line.package_id
                 if self._pick_pack_same_time():
                     (
                         good_for_packing,
@@ -1121,9 +1193,11 @@ class ZonePicking(Component):
                         )
                 pkg_moved, response = self._set_destination_location(
                     move_line,
+                    package,
                     quantity,
                     confirmation,
                     location,
+                    barcode,
                 )
                 if response:
                     if extra_message:
@@ -1136,6 +1210,28 @@ class ZonePicking(Component):
         # When the barcode is a package
         package = search.package_from_scan(barcode)
         if package:
+
+            if not moving_full_quantity and move_line.package_id == package:
+                # Check we're not using the source package as transfer package.
+                message = self.msg_store.dest_package_not_valid(package)
+                return self._response_for_set_line_destination(
+                    move_line, message=message, qty_done=quantity
+                )
+
+            allow_alternative_package = (
+                self.work.menu.allow_alternative_destination_package
+            )
+            if (
+                not allow_alternative_package
+                and move_line.result_package_id
+                and move_line.result_package_id != package
+            ):
+                # Check whether the user can move a whole package to a different package.
+                message = self.msg_store.package_transfer_not_allowed_scan_location()
+                return self._response_for_set_line_destination(
+                    move_line, message=message, qty_done=quantity
+                )
+
             if self._pick_pack_same_time():
                 (
                     good_for_packing,
@@ -1155,7 +1251,7 @@ class ZonePicking(Component):
         message = None
 
         if not pkg_moved and not package:
-            if accept_only_package:
+            if not moving_full_quantity:
                 message = self.msg_store.package_not_found_for_barcode(barcode)
             else:
                 # we don't know if user wanted to scan a location or a package
@@ -1341,7 +1437,10 @@ class ZonePicking(Component):
         # pre-configured callable used to generate the response as the
         # change.package.lot component is not aware of the needed response type
         # and related parameters for zone picking scenario
-        response_ok_func = functools.partial(self._response_for_set_line_destination)
+        response_ok_func = functools.partial(
+            self._response_for_set_line_destination,
+            qty_done=self._get_prefill_qty(move_line),
+        )
         response_error_func = functools.partial(self._response_for_change_pack_lot)
         response = None
         change_package_lot = self._actions_for("change.package.lot")
@@ -1416,7 +1515,7 @@ class ZonePicking(Component):
             return self._response_for_select_line(move_lines, message=message)
         return self._response_for_start(message=message)
 
-    def set_destination_all(self, barcode, confirmation=False):
+    def set_destination_all(self, barcode, confirmation=None):
         """Set the destination for all the lines in the buffer
 
         Look in ``prepare_unload`` for the definition of the buffer.
@@ -1458,7 +1557,7 @@ class ZonePicking(Component):
             #     destination set on buffer lines
             #   - To confirm if the scanned destination is not a child of the
             #     current destination set on buffer lines
-            if not confirmation and self.is_dest_location_to_confirm(
+            if confirmation != barcode and self.is_dest_location_to_confirm(
                 buffer_lines.location_dest_id, location
             ):
                 return self._response_for_unload_all(
@@ -1466,7 +1565,7 @@ class ZonePicking(Component):
                     message=self.msg_store.confirm_location_changed(
                         first(buffer_lines.location_dest_id), location
                     ),
-                    confirmation_required=True,
+                    confirmation_required=barcode,
                 )
             # the scanned location is still valid, use it
             self._write_destination_on_lines(buffer_lines, location)
@@ -1568,7 +1667,7 @@ class ZonePicking(Component):
         """Lock move lines"""
         self._actions_for("lock").for_update(lines)
 
-    def unload_set_destination(self, package_id, barcode, confirmation=False):
+    def unload_set_destination(self, package_id, barcode, confirmation=None):
         """Scan the final destination for move lines in the buffer with the
         destination package
 
@@ -1610,7 +1709,7 @@ class ZonePicking(Component):
             #     destination set on buffer lines
             #   - To confirm if the scanned destination is not a child of the
             #     current destination set on buffer lines
-            if not confirmation and self.is_dest_location_to_confirm(
+            if not confirmation == barcode and self.is_dest_location_to_confirm(
                 buffer_lines.location_dest_id, location
             ):
                 return self._response_for_unload_set_destination(
@@ -1618,7 +1717,7 @@ class ZonePicking(Component):
                     message=self.msg_store.confirm_location_changed(
                         first(buffer_lines.location_dest_id), location
                     ),
-                    confirmation_required=True,
+                    confirmation_required=barcode,
                 )
             # the scanned location is valid, use it
             self._write_destination_on_lines(buffer_lines, location)
@@ -1674,7 +1773,7 @@ class ShopfloorZonePickingValidator(Component):
     def scan_source(self):
         return {
             "barcode": {"required": False, "nullable": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
             "product_id": {"required": False, "nullable": True, "type": "integer"},
             "sublocation_id": {"required": False, "nullable": True, "type": "integer"},
             "package_id": {"required": False, "nullable": True, "type": "integer"},
@@ -1689,7 +1788,12 @@ class ShopfloorZonePickingValidator(Component):
                 "required": True,
                 "type": "float",
             },
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
+            "handle_complete_mix_pack": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
         }
 
     def is_zero(self):
@@ -1715,7 +1819,7 @@ class ShopfloorZonePickingValidator(Component):
     def set_destination_all(self):
         return {
             "barcode": {"required": False, "nullable": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
     def unload_split(self):
@@ -1731,7 +1835,7 @@ class ShopfloorZonePickingValidator(Component):
         return {
             "package_id": {"coerce": to_int, "required": True, "type": "integer"},
             "barcode": {"required": False, "nullable": True, "type": "string"},
-            "confirmation": {"type": "boolean", "nullable": True, "required": False},
+            "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
 
@@ -1872,15 +1976,26 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "zone_location": self.schemas._schema_dict_of(self.schemas.location()),
             "picking_type": self.schemas._schema_dict_of(self.schemas.picking_type()),
             "move_line": self.schemas._schema_dict_of(
-                self.schemas.move_line(with_picking=True)
+                self.schemas.move_line(with_picking=True),
+                required=False,
             ),
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
             "product_id": {
                 "type": "integer",
+                "nullable": True,
+                "required": False,
+            },
+            "allow_alternative_destination_package": {
+                "type": "boolean",
+                "nullable": True,
+                "required": False,
+            },
+            "handle_complete_mix_pack": {
+                "type": "boolean",
                 "nullable": True,
                 "required": False,
             },
@@ -1896,7 +2011,7 @@ class ShopfloorZonePickingValidatorResponse(Component):
                 self.schemas.move_line(with_picking=True)
             ),
             "confirmation_required": {
-                "type": "boolean",
+                "type": "string",
                 "nullable": True,
                 "required": False,
             },
@@ -1921,6 +2036,11 @@ class ShopfloorZonePickingValidatorResponse(Component):
             "required": True,
         }
         schema["scan_location_or_pack_first"] = {
+            "type": "boolean",
+            "nullable": False,
+            "required": True,
+        }
+        schema["move_lines"]["schema"]["schema"]["handle_complete_mix_pack"] = {
             "type": "boolean",
             "nullable": False,
             "required": True,
