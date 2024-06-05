@@ -165,3 +165,53 @@ class TestReleaseChannelProcurement(ReleaseChannelCase):
 
         self.assertEqual(1, len(internal_pickings_product_2))
         self.assertEqual(internal_pickings_product_2.release_channel_id, self.channel)
+
+    def test_channel_internal_propagation_backorder(self):
+        """
+        Set release channel to automatic release
+        Create a procurement on customer location
+        Check the picking is well created and channel is well set
+        Transfer partially the picking
+        Transfer partially the delivery
+
+        Check the picking has the channel set
+        """
+        self.product = self.product1
+        pickings_before = self.env["stock.picking"].search(
+            [("product_id", "=", self.product.id)]
+        )
+        self._run_customer_procurement()
+        pickings_after = (
+            self.env["stock.picking"].search([("product_id", "=", self.product.id)])
+            - pickings_before
+        )
+        pickings_after.assign_release_channel()
+        self.assertEqual(pickings_after.release_channel_id, self.default_channel)
+
+        pickings_after.release_available_to_promise()
+
+        pickings_internal = (
+            self.env["stock.picking"].search([("product_id", "=", self.product.id)])
+            - pickings_after
+            - pickings_before
+        )
+
+        self.assertEqual(pickings_internal.release_channel_id, self.default_channel)
+
+        pickings_internal.move_line_ids.qty_done = 5.0
+
+        pickings_internal._action_done()
+
+        # Transfer the available outgoing moves
+        pickings_after.move_line_ids.qty_done = (
+            pickings_after.move_line_ids.reserved_uom_qty
+        )
+
+        pickings_after._action_done()
+        pickings_after.assign_release_channel()
+
+        self.assertTrue(pickings_internal.backorder_ids)
+
+        self.assertEqual(
+            pickings_internal.backorder_ids.release_channel_id, self.default_channel
+        )
