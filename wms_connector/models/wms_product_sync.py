@@ -16,16 +16,21 @@ class WmsProductSync(models.Model):
     warehouse_id = fields.Many2one("stock.warehouse", required=True, readonly=True)
     active = fields.Boolean(default=True)
 
-    to_export = fields.Boolean(compute="_compute_to_export", store=True, readonly=False)
+    to_export = fields.Boolean(compute="_compute_to_export", inverse="_inverse_to_export", store=True, readonly=False)
 
     @api.depends("product_id.name", "active")
     def _compute_to_export(self):
         for record in self:
             record.to_export = True
 
+    def _inverse_to_export(self):
+        for rec in self:
+            rec.to_export = rec.to_export
+
     def _schedule_export(self, warehouse, domain=False):
         warehouse.refresh_wms_products()
         return super()._schedule_export(warehouse, domain)
+
 
     def track_export(self, attachment):
         super().track_export(attachment)

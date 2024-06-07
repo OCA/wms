@@ -32,7 +32,7 @@
         <field name="name">wms.product.sync.tree (in wms_connector)</field>
         <field name="model">wms.product.sync</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree multi_edit="1" editable="bottom">
                 <field name="name" />
                 <field name="product_id" />
                 <field name="warehouse_id" />

@@ -39,11 +39,12 @@ class SynchronizeExportableMixin(models.AbstractModel):
                     records |= rec
                     rec.wms_export_error = None
             except Exception as e:
+                rec.wms_export_error = str(e)
+                rec.to_export = False
                 if raise_error:
                     raise
                 if "pdb" in config.get("dev_mode"):
                     raise
-                rec.wms_export_error = str(e)
                 continue
             if self.record_per_file > 0 and len(records) >= self.record_per_file:
                 yield records, data
@@ -56,7 +57,7 @@ class SynchronizeExportableMixin(models.AbstractModel):
     def synchronize_export(self, raise_error=False):
         attachments = self.env["attachment.queue"]
         for records, data in self._get_export_data(raise_error=raise_error):
-            vals = self._format_to_exportfile(data)
+            vals = records._format_to_exportfile(data)
             attachment = self.env["attachment.queue"].create(vals)
             records.track_export(attachment)
             attachments |= attachment
