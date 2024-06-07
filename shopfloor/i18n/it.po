@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-22 15:33+0000\n"
+"PO-Revision-Date: 2024-06-07 12:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -141,7 +141,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "%(qty)s %(product_name)s put in %(package_name)s"
-msgstr ""
+msgstr "%(qty)s %(product_name)s messo in %(package_name)s"
 
 #. module: shopfloor
 #. odoo-python
@@ -349,7 +349,7 @@ msgstr "Raccoglie movimenti multipli nello stesso collo destinazione"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Confirm location change from %(location_from)s to %(location_to)s?"
-msgstr ""
+msgstr "Conferma modifica ubicazione da %(location_from)s a %(location_to)s?"
 
 #. module: shopfloor
 #. odoo-python
@@ -363,7 +363,7 @@ msgstr "Tasferimento contenuto a {} completato"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Content transferred from %(location_name)s to %(location_dest_name)s."
-msgstr ""
+msgstr "Contenuto trasferito da %(location_name)s a %(location_dest_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -405,7 +405,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__result_package_id
 msgid "Destination Package"
-msgstr ""
+msgstr "Collo destinazione"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
@@ -458,7 +458,7 @@ msgstr "Merce caricata in {0.name}"
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__result_package_id
 msgid "If set, the operations are packed into this package"
-msgstr ""
+msgstr "Se impostata, le operazioni sono raggruppate in questo collo"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__ignore_no_putaway_available
@@ -510,6 +510,8 @@ msgid ""
 "Last operation of transfer %(picking_names)s. Next operation "
 "(%(next_picking_names)s) is ready to proceed."
 msgstr ""
+"Ultima operazione del trasferimento %(picking_names)s. L'operazione seguente "
+"(%(next_picking_names)s) è pronta all'esecuzione."
 
 #. module: shopfloor
 #. odoo-python
@@ -583,7 +585,7 @@ msgstr "Il lotto %(lot_name)s non è presentenel trasferimento %(picking_name)s"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Lot %(old_lot_name)s replaced by lot %(new_lot_name)s."
-msgstr ""
+msgstr "Lotto %(old_lot_name)s sostituito dal lotto %(new_lot_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -717,7 +719,7 @@ msgstr "Nessuna riga da confezionare trovata."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "No lines to process, set quantities on some"
-msgstr ""
+msgstr "Nessuna riga da elaborare, inserire alcune quantità"
 
 #. module: shopfloor
 #. odoo-python
@@ -903,7 +905,7 @@ msgstr "Collo"
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package %(old_package_name)s replaced by package %(new_package_name)s."
-msgstr ""
+msgstr "Collo %(old_package_name)s sostituito dal collo %(new_package_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -913,13 +915,15 @@ msgid ""
 "Package %(package_name)s cannot be picked, already moved by transfer "
 "%(picking_name)s."
 msgstr ""
+"Il collo %(package_name)s non può essere prelevato, già movimentato dal "
+"trasferimento %(picking_name)s."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package %(package_name)s cannot be used: %(error)s"
-msgstr ""
+msgstr "Il collo %(package_name)s non può essere utilizzato: %(error)s"
 
 #. module: shopfloor
 #. odoo-python
@@ -940,6 +944,8 @@ msgid ""
 "Package %(package_name)s does not contain available product "
 "%(product_name)s, cannot replace package."
 msgstr ""
+"Il collo %(package_name)s non contiene il prodotto disponibile "
+"%(product_name)s, impossibile sostituire il collo."
 
 #. module: shopfloor
 #. odoo-python
@@ -947,6 +953,8 @@ msgstr ""
 #, python-format
 msgid "Package %(package_name)s is not available in transfer %(picking_name)s."
 msgstr ""
+"Il collo %(package_name)s non è disponibile nel traferimento "
+"%(picking_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -1047,6 +1055,8 @@ msgid ""
 "Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s.or "
 "carrier %(carrier_name)s."
 msgstr ""
+"Il collo '%(package_name)s' non è abilitato per il contenitore "
+"%(carrier_name)s. o contenitore %(carrier_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -1096,6 +1106,8 @@ msgstr "Prelievo e collo simultanei"
 #, python-format
 msgid "Pick: stock issue on lot: %(lot_name)s found in %(location_name)s"
 msgstr ""
+"Prelievo: problema di giacenza nel lotto: %(lot_name)s trovato in "
+"%(location_name)s"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_package_level__picking_id
@@ -1328,6 +1340,11 @@ msgid ""
 "%(bad_picking_types)s.\n"
 "Please, adjust your configuration."
 msgstr ""
+"Lo scenario `%(scenario_name)s` richiede(no) che 'Muovi colli interi' sia "
+"abilitato.\n"
+"Questo tipo(i) non soddisfano questa richiesta: \n"
+"%(bad_picking_types)s.\n"
+"Correggere la configurazione."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__date_planned
@@ -1341,7 +1358,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several lots found in %(name)s, please scan the lot."
-msgstr ""
+msgstr "Trovati diversi lotti in %(name)s, leggere un lotto."
 
 #. module: shopfloor
 #. odoo-python
@@ -1378,21 +1395,21 @@ msgstr "Diversi tipi operazione trovati per questo menu e profilo."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several packages found in %(name)s, please scan a package."
-msgstr ""
+msgstr "Diversi colli trovati in %(name)s, scansionare un collo."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several products found in %(name)s, please scan a product."
-msgstr ""
+msgstr "Diversi prodotti trovati in %(name)s, scansionare un prodotto."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several products found in %(name)s, please scan the product."
-msgstr ""
+msgstr "Diversi prodotti trovati in %(name)s, scansionare il prodotto."
 
 #. module: shopfloor
 #. odoo-python
@@ -1599,6 +1616,8 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id="
 "\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
 msgstr ""
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock.picking\""
+" data-oe-id=\"%(new_picking_id)d\">%(new_picking_name)s</a>."
 
 #. module: shopfloor
 #. odoo-python
@@ -1694,7 +1713,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/change_package_lot.py:0
 #, python-format
 msgid "The quantity to do has changed!"
-msgstr ""
+msgstr "La quantità da eseguire è cambiata!"
 
 #. module: shopfloor
 #. odoo-python
@@ -2086,6 +2105,7 @@ msgstr "Non si può rendere quantità supriore di quella inviata inizialmente."
 msgid ""
 "You cannot work on a package (%(barcode)s) outside of locations: %(names)s"
 msgstr ""
+"Non si può lavorare sul collo (%(barcode)s) fuori dall'ubicazione: %(names)s"
 
 #. module: shopfloor
 #. odoo-python
@@ -2119,6 +2139,8 @@ msgstr "Prelievo per area"
 msgid ""
 "{message_code} not found in the current transfer or already in a package."
 msgstr ""
+"{message_code} non trovato nel trasferimento attuale o già presente in un "
+"collo."
 
 #. module: shopfloor
 #. odoo-python
