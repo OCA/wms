@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-01-05 10:34+0000\n"
+"PO-Revision-Date: 2024-06-07 13:39+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -34,7 +34,7 @@ msgstr "Inoltro stoccaggio caotico ABC"
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
 msgid "Add an option to allow only bins for Put-Away rules."
 msgstr ""
-"Aggiungere una opzione per consentire solo contenitri per regole di inoltro."
+"Aggiungere una opzione per consentire solo contenitori per regole di inoltro."
 
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
