@@ -17,7 +17,7 @@ class LocationContentTransfer(Component):
         if any(move_lines.move_id.mapped("is_full_location_reservation")):
             return move_lines
 
-        move_lines |= move_lines.move_id._full_location_reservation().move_line_ids
+        move_lines |= move_lines._full_location_reservation().move_line_ids
         return move_lines.exists()
 
     def _move_lines_cancel_work(self, move_lines):
