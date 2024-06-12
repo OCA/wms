@@ -102,11 +102,12 @@ class UnblockRelease(models.TransientModel):
         # Unset current deliveries (keep track of them to delete empty ones at the end)
         pickings = moves.picking_id
         moves.picking_id = False
-        # Update the scheduled date
+        # Update the scheduled date and date deadline
         date_planned = fields.Datetime.subtract(
             self.date_deadline, days=self.env.company.security_lead
         )
         moves.date = date_planned
+        moves.date_deadline = self.date_deadline
         # Re-assign deliveries: moves sharing the same criteria - like date - will
         # be part of the same delivery.
         # NOTE: this will also leverage stock_picking_group_by_partner_by_carrier
