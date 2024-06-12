@@ -891,29 +891,25 @@ class ZonePicking(Component):
             base_response=response, message=self.msg_store.barcode_not_found()
         )
 
-    def _set_destination_location(
+    def _check_set_destination_location(
         self, move_line, package, quantity, confirmation, location, barcode
     ):
-        location_changed = False
-        response = None
-
         # A valid location is a sub-location of the original destination, or a
         # any sub-location of the picking type's default destination location
         # if `confirmation is equal to the barcode scanned.
         # Ask confirmation to the user if the scanned location is not in the
         # expected ones but is valid (in picking type's default destination)
         if not self.is_dest_location_valid(move_line.move_id, location):
-            response = self._response_for_set_line_destination(
+            return self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.dest_location_not_allowed(),
                 qty_done=quantity,
             )
-            return (location_changed, response)
 
         if confirmation != barcode and self.is_dest_location_to_confirm(
             move_line.location_dest_id, location
         ):
-            response = self._response_for_set_line_destination(
+            return self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.confirm_location_changed(
                     move_line.location_dest_id, location
@@ -921,15 +917,23 @@ class ZonePicking(Component):
                 confirmation_required=barcode,
                 qty_done=quantity,
             )
-            return (location_changed, response)
 
         # If no destination package
         if not move_line.result_package_id:
-            response = self._response_for_set_line_destination(
+            return self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.dest_package_required(),
                 qty_done=quantity,
             )
+
+    def _set_destination_location(
+        self, move_line, package, quantity, confirmation, location, barcode
+    ):
+        location_changed = False
+        response = self._check_set_destination_location(
+            move_line, package, quantity, confirmation, location, barcode
+        )
+        if response:
             return (location_changed, response)
         # destination location set to the scanned one
 
