@@ -12,18 +12,38 @@
           <group>
             <field name="option" />
             <field
-                            name="date_deadline"
-                            attrs="{'invisible': [('option', '=', 'automatic')]}"
+                            name="order_id"
+                            force_save="1"
+                            options="{'no_open': True}"
+                            attrs="{'invisible': [('option', '!=', 'contextual')]}"
                         />
-          </group>
-          <!--
-          <group>
             <field
-                            name="release_channel_id"
-                            attrs="{'invisible': [('option', '=', 'automatic')]}"
+                            name="date_deadline"
+                            attrs="{'invisible': [('option', 'in', ('automatic', 'contextual'))], 'required': [('option', '=', 'manual')]}"
                         />
           </group>
-          -->
+          <group string="Selected deliveries" name="selected_deliveries">
+            <field
+                            name="order_line_ids"
+                            nolabel="1"
+                            colspan="2"
+                            attrs="{'invisible': [('order_line_ids', '=', [])]}"
+                        />
+            <field
+                            name="move_ids"
+                            nolabel="1"
+                            colspan="2"
+                            attrs="{'invisible': [('move_ids', '=', [])]}"
+                        />
+          </group>
+          <div
+                        attrs="{'invisible': [('option', '!=', 'contextual')]}"
+                        class="alert alert-warning"
+                        role="alert"
+                    >
+            Selected delivery moves will be unblocked when the above order is confirmed.
+            Their delivery method, shipping policy and scheduled date will be aligned with the deliveries of the confirmed order.
+          </div>
         </sheet>
         <footer>
           <button name="validate" type="object" string="Validate" class="btn-primary" />

@@ -11,10 +11,12 @@ class UnblockRelease(models.TransientModel):
     order_line_ids = fields.Many2many(
         comodel_name="sale.order.line",
         string="Order Lines",
+        readonly=True,
     )
     move_ids = fields.Many2many(
         comodel_name="stock.move",
         string="Delivery moves",
+        readonly=True,
     )
     option = fields.Selection(
         selection=lambda self: self._selection_option(),
@@ -23,21 +25,11 @@ class UnblockRelease(models.TransientModel):
         help=(
             "- Manual: schedule blocked deliveries at a given date;\n"
             "- Automatic: schedule blocked deliveries as soon as possible;\n"
-            "- Contextual: schedule blocked deliveries based by default on the "
-            "commitment date of the contextual sale order. Commitment date of "
-            "the order will be updated if not yet confirmed.",
+            "- Based on current order: schedule blocked deliveries with the "
+            "contextual sale order."
         ),
-        # help=(
-        #     "- Manual: schedule blocked deliveries at a given date, in the "
-        #     "chosen release channel;\n"
-        #     "- Automatic: schedule blocked deliveries as soon as possible in the "
-        #     "relevant release channel;\n"
-        #     "- Contextual: schedule blocked deliveries based by default on the "
-        #     "commitment date and release channel (if any) of the contextual "
-        #     "sale order. Commitment date and release channel of the order will "
-        #     "be updated if not yet confirmed.\n",
-        # ),
     )
+    order_id = fields.Many2one(comodel_name="sale.order", string="Order", readonly=True)
     date_deadline = fields.Datetime(
         compute="_compute_date_deadline", store=True, readonly=False, required=True
     )
@@ -58,7 +50,7 @@ class UnblockRelease(models.TransientModel):
             ("automatic", "Automatic / As soon as possible"),
         ]
         if self.env.context.get("from_sale_order_id"):
-            options.append(("contextual", "From contextual sale order"))
+            options.append(("contextual", "Based on current order"))
         return options
 
     @api.depends("option")
@@ -79,6 +71,8 @@ class UnblockRelease(models.TransientModel):
         active_ids = self.env.context.get("active_ids")
         from_sale_order_id = self.env.context.get("from_sale_order_id")
         from_sale_order = self.env["sale.order"].browse(from_sale_order_id).exists()
+        if from_sale_order:
+            res["order_id"] = from_sale_order_id
         if active_model == "sale.order.line" and active_ids:
             res["order_line_ids"] = [(6, 0, active_ids)]
         if active_model == "stock.move" and active_ids:
@@ -89,36 +83,49 @@ class UnblockRelease(models.TransientModel):
 
     def validate(self):
         self.ensure_one()
-        move_states = (
-            "draft",
-            "waiting",
-            "confirmed",
-            "partially_available",
-            "assigned",
+        moves = self._filter_moves(self.order_line_ids.move_ids or self.move_ids)
+        if self.option == "contextual":
+            self._plan_moves_for_current_order(moves)
+        else:
+            self._reschedule_moves(moves, self.date_deadline)
+
+    def _filter_moves(self, moves):
+        return moves.filtered_domain(
+            [("state", "=", "waiting"), ("release_blocked", "=", True)]
         )
-        moves = (self.order_line_ids.move_ids or self.move_ids).filtered_domain(
-            [("state", "in", move_states), ("release_blocked", "=", True)]
-        )
+
+    def _plan_moves_for_current_order(self, moves):
+        """Plan moves to be unblocked when the current order is confirmed."""
+        self.order_id.move_to_unblock_ids = moves
+
+    @api.model
+    def _reschedule_moves(self, moves, date_deadline, from_order=None):
+        """Reschedule the moves based on the deadline."""
         # Unset current deliveries (keep track of them to delete empty ones at the end)
         pickings = moves.picking_id
         moves.picking_id = False
+        # If the rescheduling is triggered from a sale order we set a dedicated
+        # procurement group on blocked moves.
+        # This has the side-effect to benefit from other modules like
+        # 'stock_picking_group_by_partner_by_carrier*' to get existing moves
+        # and new ones merged together if they share the same criteria
+        # (picking policy, carrier, scheduled date...).
+        if from_order:
+            group = self.env["procurement.group"].create(
+                fields.first(from_order.order_line)._prepare_procurement_group_vals()
+            )
+            group.name += " BACKORDERS"
+            moves.group_id = group
         # Update the scheduled date and date deadline
+        # TODO: update date_priority to now()?
         date_planned = fields.Datetime.subtract(
-            self.date_deadline, days=self.env.company.security_lead
+            date_deadline, days=self.env.company.security_lead
         )
         moves.date = date_planned
-        moves.date_deadline = self.date_deadline
-        # Re-assign deliveries: moves sharing the same criteria - like date - will
-        # be part of the same delivery.
-        # NOTE: this will also leverage stock_picking_group_by_partner_by_carrier
-        # module if this one is installed for instance
+        moves.date_deadline = date_deadline
+        # Re-assign deliveries
         moves._assign_picking()
         # Unblock release
         moves.action_unblock_release()
         # Clean up empty deliveries
         pickings.filtered(lambda o: not o.move_ids and not o.printed).unlink()
-        # Update commitment date of contextual sale order if any
-        from_sale_order_id = self.env.context.get("from_sale_order_id")
-        from_sale_order = self.env["sale.order"].browse(from_sale_order_id).exists()
-        if from_sale_order.state in ("draft", "sent"):
-            from_sale_order.commitment_date = self.date_deadline

@@ -45,51 +45,96 @@ class TestSaleBlockRelease(common.Common):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
         self.sale.block_release = True
         self.sale.action_confirm()
+        existing_moves = self.sale.order_line.move_ids
         # Unblock deliveries through the wizard, opened from another SO
-        # to define default values
         new_sale = self._create_sale_order()
+        self.env["sale.order.line"].create(
+            {
+                "order_id": new_sale.id,
+                "product_id": self.product.id,
+                "product_uom_qty": 50,
+                "product_uom": self.uom_unit.id,
+            }
+        )
         new_sale.commitment_date = fields.Datetime.add(fields.Datetime.now(), days=1)
+        self.assertIn(existing_moves, new_sale.available_move_to_unblock_ids)
         wiz = self._create_unblock_release_wizard(
             self.sale.order_line, from_order=new_sale
         )
         self.assertEqual(wiz.option, "contextual")
+        self.assertEqual(wiz.order_id, new_sale)
         self.assertEqual(wiz.date_deadline, new_sale.commitment_date)
         self.assertNotEqual(wiz.order_line_ids.move_ids.date, new_sale.commitment_date)
         old_picking = wiz.order_line_ids.move_ids.picking_id
         wiz.validate()
-        # Deliveries have been scheduled to the new date deadline
+        # Deliveries will be unblocked when the new SO is confirmed
+        self.assertFalse(new_sale.available_move_to_unblock_ids)
+        self.assertEqual(new_sale.move_to_unblock_ids, existing_moves)
+        # Confirm the new SO: deliveries have been scheduled to the new date deadline
+        new_sale.action_confirm()
+        new_moves = new_sale.order_line.move_ids
         new_picking = wiz.order_line_ids.move_ids.picking_id
-        self.assertEqual(wiz.order_line_ids.move_ids.date, new_sale.commitment_date)
         self.assertNotEqual(old_picking, new_picking)
         self.assertFalse(old_picking.exists())
+        self.assertTrue(
+            all(
+                m.date == m.date_deadline == new_sale.commitment_date
+                for m in (existing_moves | new_moves)
+            )
+        )
 
-    def test_unblock_release_contextual_update_date(self):
+    def test_unblock_release_contextual_different_shipping_policy(self):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
         self.sale.block_release = True
         self.sale.action_confirm()
-        # Unblock deliveries through the wizard, opened from another SO
-        # to define default values + update the proposed date
+        existing_moves = self.sale.order_line.move_ids
+        # Unblock deliveries through the wizard, opened from another SO with a
+        # different shipping_policy
         new_sale = self._create_sale_order()
+        new_sale.picking_policy = "one"
+        self.env["sale.order.line"].create(
+            {
+                "order_id": new_sale.id,
+                "product_id": self.product.id,
+                "product_uom_qty": 50,
+                "product_uom": self.uom_unit.id,
+            }
+        )
         new_sale.commitment_date = fields.Datetime.add(fields.Datetime.now(), days=1)
+        self.assertIn(existing_moves, new_sale.available_move_to_unblock_ids)
         wiz = self._create_unblock_release_wizard(
             self.sale.order_line, from_order=new_sale
         )
         self.assertEqual(wiz.option, "contextual")
+        self.assertEqual(wiz.order_id, new_sale)
         self.assertEqual(wiz.date_deadline, new_sale.commitment_date)
         self.assertNotEqual(wiz.order_line_ids.move_ids.date, new_sale.commitment_date)
+        self.assertNotEqual(
+            wiz.order_line_ids.move_ids.group_id.move_type, new_sale.picking_policy
+        )
         old_picking = wiz.order_line_ids.move_ids.picking_id
-        new_date_deadline = fields.Datetime.add(fields.Datetime.now(), days=2)
-        wiz.date_deadline = new_date_deadline
         wiz.validate()
-        # Deliveries have been scheduled to the new date deadline
+        # Deliveries will be unblocked when the new SO is confirmed
+        self.assertFalse(new_sale.available_move_to_unblock_ids)
+        self.assertEqual(new_sale.move_to_unblock_ids, existing_moves)
+        # Confirm the new SO: deliveries have been scheduled to the new date deadline
+        # with the same shipping policy
+        new_sale.action_confirm()
+        new_moves = new_sale.order_line.move_ids
         new_picking = wiz.order_line_ids.move_ids.picking_id
-        self.assertEqual(wiz.order_line_ids.move_ids.date, new_sale.commitment_date)
         self.assertNotEqual(old_picking, new_picking)
         self.assertFalse(old_picking.exists())
-        # Commitment date on contextual order has been updated too
-        self.assertEqual(new_sale.commitment_date, new_date_deadline)
+        self.assertTrue(
+            all(
+                m.date == m.date_deadline == new_sale.commitment_date
+                for m in (existing_moves | new_moves)
+            )
+        )
+        self.assertEqual(
+            existing_moves.group_id.move_type, new_moves.group_id.move_type
+        )
 
-    def test_unblock_release_free(self):
+    def test_unblock_release_manual(self):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
         self.sale.block_release = True
         self.sale.action_confirm()
@@ -98,6 +143,7 @@ class TestSaleBlockRelease(common.Common):
         wiz = self._create_unblock_release_wizard(
             self.sale.order_line, date_deadline=new_date_deadline
         )
+        self.assertEqual(wiz.option, "manual")
         self.assertEqual(wiz.date_deadline, new_date_deadline)
         self.assertNotEqual(wiz.order_line_ids.move_ids.date, new_date_deadline)
         old_picking = wiz.order_line_ids.move_ids.picking_id
@@ -116,8 +162,11 @@ class TestSaleBlockRelease(common.Common):
         self.sale.commitment_date = yesterday
         self.sale.action_confirm()
         # Unblock deliveries through the wizard
-        wiz = self._create_unblock_release_wizard(self.sale.order_line, option="automatic")
+        wiz = self._create_unblock_release_wizard(
+            self.sale.order_line, option="automatic"
+        )
         today = wiz.date_deadline
+        self.assertEqual(wiz.option, "automatic")
         self.assertEqual(wiz.date_deadline, today)
         self.assertNotEqual(wiz.order_line_ids.move_ids.date, today)
         old_picking = wiz.order_line_ids.move_ids.picking_id
@@ -157,9 +206,8 @@ class TestSaleBlockRelease(common.Common):
         self.sale.action_confirm()
         # Try to unblock deliveries through the wizard with a scheduled date
         # in the past
-        new_sale = self._create_sale_order()
         yesterday = fields.Datetime.subtract(fields.Datetime.now(), days=1)
         with self.assertRaises(exceptions.ValidationError):
             self._create_unblock_release_wizard(
-                self.sale.order_line, date_deadline=yesterday, from_order=new_sale
+                self.sale.order_line, date_deadline=yesterday
             )
