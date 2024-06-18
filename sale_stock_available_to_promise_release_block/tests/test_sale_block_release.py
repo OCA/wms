@@ -13,6 +13,10 @@ class TestSaleBlockRelease(common.Common):
         super().setUpClass()
         # Ensure there is no security lead during tests
         cls.env.company.security_lead = 0
+        # Deliver in two steps to get a SHIP to release
+        cls.wh = cls.env.ref("stock.warehouse0")
+        cls.wh.delivery_steps = "pick_ship"
+        cls.wh.delivery_route_id.available_to_promise_defer_pull = True
 
     def test_sale_release_not_blocked(self):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
