@@ -43,6 +43,21 @@ msgid "Carrier"
 msgstr "Transportista"
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__delayed_qty
+msgid "Delayed Qty"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__date_expected
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__sale_date_expected
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__sale_date_expected
@@ -54,16 +69,6 @@ msgstr "Fecha de Entrega"
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_tree
 msgid "Delivery Method"
 msgstr "Método de Entrega"
-
-#. module: sale_stock_available_to_promise_release
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__display_name
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_product_product__display_name
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order__display_name
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__display_name
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__display_name
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__display_name
-msgid "Display Name"
-msgstr "Mostrar Nombre"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__expected_availability_date
@@ -79,26 +84,6 @@ msgstr "Totalmente Disponible"
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
 msgid "Further Shipment"
 msgstr "Envío Adicional"
-
-#. module: sale_stock_available_to_promise_release
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__id
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_product_product__id
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order__id
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__id
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__id
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__id
-msgid "ID"
-msgstr "ID"
-
-#. module: sale_stock_available_to_promise_release
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group____last_update
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_product_product____last_update
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order____last_update
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line____last_update
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move____last_update
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
@@ -139,8 +124,8 @@ msgstr "Grupo de Adquisiciones"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_product_product
-msgid "Product"
-msgstr "Producto"
+msgid "Product Variant"
+msgstr ""
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__restock
@@ -158,9 +143,22 @@ msgid "Sales Order Line"
 msgstr "Linea de Pedido de Ventas"
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release.field_res_company__stock_sale_report_display_is_available
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.res_config_settings_view
+msgid "Show Available column in SO and quotation reports"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_move
 msgid "Stock Move"
 msgstr "Movimiento de Inventario"
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_company__stock_sale_report_display_is_available
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
+msgid "Stock Sale Report Display Is Available"
+msgstr ""
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
@@ -181,3 +179,15 @@ msgstr "Peso"
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "Yes"
 msgstr "Si"
+
+#~ msgid "Display Name"
+#~ msgstr "Mostrar Nombre"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
+
+#~ msgid "Product"
+#~ msgstr "Producto"
