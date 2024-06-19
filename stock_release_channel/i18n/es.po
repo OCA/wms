@@ -229,6 +229,11 @@ msgid "Created on"
 msgstr "Creado el"
 
 #. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+msgid "Deliveries"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__display_name
 msgid "Display Name"
 msgstr "Mostrar Nombre"
@@ -297,6 +302,11 @@ msgstr "En curso Transferencias relacionadas"
 msgid ""
 "In release channels dashboard, add link to last done picking and show "
 "transfer date"
+msgstr ""
+
+#. module: stock_release_channel
+#: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_form_view
+msgid "Internal transfers"
 msgstr ""
 
 #. module: stock_release_channel
