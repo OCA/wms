@@ -40,6 +40,16 @@ msgid "Carrier"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model,name:sale_stock_available_to_promise_release.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__delayed_qty
 msgid "Delayed Qty"
 msgstr ""
@@ -130,8 +140,21 @@ msgid "Sales Order Line"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release.field_res_company__stock_sale_report_display_is_available
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.res_config_settings_view
+msgid "Show Available column in SO and quotation reports"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_move
 msgid "Stock Move"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_company__stock_sale_report_display_is_available
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
+msgid "Stock Sale Report Display Is Available"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
