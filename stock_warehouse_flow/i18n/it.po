@@ -1,0 +1,430 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_warehouse_flow
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2023-12-24 18:43+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.17\n"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "<span class=\"text-muted\"> =&gt; </span>"
+msgstr "<span class=\"text-muted\"> =&gt; </span>"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "<span class=\"text-muted\"> to </span>"
+msgstr "<span class=\"text-muted\"> a </span>"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__active
+msgid "Active"
+msgstr "Attivo"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__applicable_flow_ids
+msgid "Applicable Flows"
+msgstr "Flussi applicabili"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+msgid "Archived"
+msgstr "In archivio"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__company_id
+msgid "Company"
+msgstr "Azienda"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.actions.act_window,help:stock_warehouse_flow.stock_warehouse_flow_action
+msgid "Create a new Routing Flow"
+msgstr "Crea nuovo flusso di instradamento"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__ship_only
+msgid "Deliver goods directly (1 step)"
+msgstr "Consegna beni diretta (una fase)"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__delivery_route_id
+msgid "Delivery Route"
+msgstr "Percorso cnsegna"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__move_domain
+msgid ""
+"Domain based on Stock Moves, to define if the routing flow is applicable or "
+"not."
+msgstr ""
+"Dominio basato sui movimenti di magazzino, per definire se il flusso di "
+"inoltro è applicabile o meno."
+
+#. module: stock_warehouse_flow
+#. odoo-python
+#: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
+#, python-format
+msgid "Existing flow '%s' already applies on these kind of moves."
+msgstr "Il flusso '%s' si applica già a qustto tipo di mvimenti."
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Flow Name"
+msgstr "Nome flusso"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse__flow_ids
+msgid "Flows"
+msgstr "Flussi"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "From"
+msgstr "Da"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__from_location_dest_id
+msgid "From Location Dest"
+msgstr "Da ubicazione destinazione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__from_location_src_id
+msgid "From Location Src"
+msgstr "Da ubicazione sorgente"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__from_picking_type_id
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+msgid "From operation type"
+msgstr "Da tipo operazione"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Generate route"
+msgstr "Genera percorso"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+msgid "Group by..."
+msgstr "Raggruppa per..."
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__id
+msgid "ID"
+msgstr "ID"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__qty
+msgid ""
+"If a qty is set the flow can be applied on moves where the move's qty >= the "
+"qty set on the flow\n"
+msgstr ""
+"Se è impostata una quantità il flusso può essere applicato ai movimenti dove "
+"la quantità del movimento è => alla quantità impostata nel flusso\n"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__impacted_route_ids
+msgid "Impacted Routes"
+msgstr "Percorsi coinvolti"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Impacted routes"
+msgstr "Percorsi coinvolti"
+
+#. module: stock_warehouse_flow
+#: model:ir.model,name:stock_warehouse_flow.model_stock_route
+msgid "Inventory Routes"
+msgstr "Percorsi di inventario"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow____last_update
+msgid "Last Modified on"
+msgstr "Ultima modifica il"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Locations"
+msgstr "Ubicazioni"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Max quantity multiple"
+msgstr "Multiplo quantità massima"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__name
+msgid "Name"
+msgstr "Nome"
+
+#. module: stock_warehouse_flow
+#. odoo-python
+#: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
+#, python-format
+msgid "No routing flow available for the move {move} in transfer {picking}."
+msgstr ""
+"Nessun flusso di inoltro disponibile per il movimento {move} nel "
+"trasferimento {picking}."
+
+#. module: stock_warehouse_flow
+#. odoo-python
+#: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
+#, python-format
+msgid ""
+"No rule corresponding to '%(picking_type)s' operation type has been found on "
+"delivery route '%(delivery_route)s'.\n"
+"Please check your configuration."
+msgstr ""
+"Non è stata trovata una regola corrispondente al tipo operazione "
+"'%(picking_type)s' nel percorso di consegna '%(delivery_route)s'.\n"
+"Verificare la configurazione."
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Operation Types"
+msgstr "TIpi di operazione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
+msgid "Out Type"
+msgstr "Tipo uscita"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__delivery_steps
+msgid "Outgoing Shipments"
+msgstr "Spedizioni in uscita"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__delivery_steps
+msgid "Outgoing route to follow"
+msgstr "Percorso in uscita da seguire"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__output_stock_loc_id
+msgid "Output Location"
+msgstr "Ubicazone di uscita"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pack_type_id
+msgid "Pack Type"
+msgstr "Tipo collo"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__pick_pack_ship
+msgid "Pack goods, send goods in output and then deliver (3 steps)"
+msgstr "Imballaggio merce, spedizione merce in uscita e consegna (tre fasi)"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pack_stock_loc_id
+msgid "Packing Location"
+msgstr "Ubicazone imballaggio"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__pick_type_id
+msgid "Pick Type"
+msgstr "Tipo prelievo"
+
+#. module: stock_warehouse_flow
+#. odoo-python
+#: code:addons/stock_warehouse_flow/models/stock_warehouse_flow.py:0
+#, python-format
+msgid "Please set the uom field in addition to the qty field"
+msgstr "Impostare il campo UdM in aggiunta al campo quantità"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__qty
+msgid "Qty"
+msgstr "Q.tà"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__flow_id
+msgid "Routing Flow"
+msgstr "Flusso instradamento"
+
+#. module: stock_warehouse_flow
+#: model:ir.actions.act_window,name:stock_warehouse_flow.stock_warehouse_flow_action
+#: model:ir.ui.menu,name:stock_warehouse_flow.stock_warehouse_flow_menu
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_delivery_carrier_form
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.view_warehouse
+msgid "Routing Flows"
+msgstr "Flussi instradamento"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_delivery_carrier__flow_ids
+msgid "Routing flows"
+msgstr "Flussi instradamento"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__rule_ids
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Rules"
+msgstr "Regole"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__out_type_id
+msgid ""
+"Same than 'To operation type' field, displayed here to get a global overview "
+"of the flow configuration."
+msgstr ""
+"Pari al campo 'A tipo operazione', vsualizzato qui per avere una visione "
+"globale della configurazione del flusso."
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__output_stock_loc_id
+msgid ""
+"Same than 'To output location' field, displayed here to get a global "
+"overview of the flow configuration."
+msgstr ""
+"Pari al campo 'A ubicazione operazione', vsualizzato qui per avere una "
+"visione globale della configurazione del flusso."
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__pick_ship
+msgid "Send goods in output and then deliver (2 steps)"
+msgstr "Spedizione merce in uscita e consegna (due fasi)"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__sequence
+msgid "Sequence"
+msgstr "Sequenza"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__sequence_prefix
+msgid "Sequence Prefix"
+msgstr "Prefisso sequenza"
+
+#. module: stock_warehouse_flow
+#: model:ir.model,name:stock_warehouse_flow.model_delivery_carrier
+msgid "Shipping Methods"
+msgstr "Metodi di spedizione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__split_method__simple
+msgid "Simple"
+msgstr "Semplice"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__split_method
+msgid "Simple => move will be split by the qty of the flow or a multiple of it"
+msgstr ""
+"Semplice => il movimento verrà diviso per la quantità del flusso o un suo "
+"multiplo"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__move_domain
+msgid "Source Routing Domain"
+msgstr "Dominio instradamento origine"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__split_method
+msgid "Split method"
+msgstr "Metodo di divisione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model,name:stock_warehouse_flow.model_stock_move
+msgid "Stock Move"
+msgstr "Movimento di magazzino"
+
+#. module: stock_warehouse_flow
+#: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse_flow
+msgid "Stock Warehouse Routing Flow"
+msgstr "Flusso instradamento giacenza magazzino"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Technical Information"
+msgstr "Informazioni tecniche"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__company_id
+msgid "The company is automatically set from your user preferences."
+msgstr "L'azienda è impostata automaticamente in base alle preferenze utente."
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "To"
+msgstr "A"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_picking_type_id
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+msgid "To operation type"
+msgstr "A tipo operazione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__to_output_stock_loc_id
+msgid "To output location"
+msgstr "A ubicazione uscita"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__uom_id
+msgid "Uom"
+msgstr "UdM"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__sequence_prefix
+msgid ""
+"Used to generate the default prefix of new operation types. (e.g. 'DG' => "
+"'WH/OUT/DG/')"
+msgstr ""
+"Utilizzao per generare il prefisso predefinito del nuovo tipo operazione. "
+"(es. 'DG' => 'WH/OUT/DG/')"
+
+#. module: stock_warehouse_flow
+#: model:ir.model,name:stock_warehouse_flow.model_stock_warehouse
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__warehouse_id
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
+msgid "Warehouse"
+msgstr "Magazzino"
+
+#. module: stock_warehouse_flow
+#: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
+msgid "Warehouse Flow"
+msgstr "Flusso di magazzino"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__warning
+msgid "Warning"
+msgstr "Attenzione"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__carrier_ids
+msgid "With carriers"
+msgstr "Con corrieri"

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="stock_warehouse_flow_delivery_ship_only" model="stock.warehouse.flow">
+    <field name="name">Delivery Ship Only</field>
+    <field name="warehouse_id" ref="stock.warehouse0" />
+    <field name="from_picking_type_id" ref="stock.picking_type_out" />
+    <field name="delivery_steps">ship_only</field>
+    <field name="sequence_prefix">DIRECT</field>
+  </record>
+
+  <record id="stock_warehouse_flow_delivery_pick_ship" model="stock.warehouse.flow">
+    <field name="name">The Poste - Delivery Pick Ship</field>
+    <field name="warehouse_id" ref="stock.warehouse0" />
+    <field name="from_picking_type_id" ref="stock.picking_type_out" />
+    <field name="delivery_steps">pick_ship</field>
+    <field name="sequence_prefix">POST</field>
+    <field name="carrier_ids" eval="[(6, 0, [ref('delivery.delivery_carrier')])]" />
+  </record>
+
+  <record
+        id="stock_warehouse_flow_delivery_pick_pack_ship"
+        model="stock.warehouse.flow"
+    >
+    <field name="name">Normal - Delivery Pick Pack Ship</field>
+    <field name="warehouse_id" ref="stock.warehouse0" />
+    <field name="from_picking_type_id" ref="stock.picking_type_out" />
+    <field name="delivery_steps">pick_pack_ship</field>
+    <field name="sequence_prefix">NORMAL</field>
+    <field
+            name="carrier_ids"
+            eval="[(6, 0, [ref('delivery.delivery_local_delivery')])]"
+        />
+  </record>
+
+</odoo>
