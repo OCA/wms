@@ -164,11 +164,6 @@ msgid "Inventory Routes"
 msgstr "Rutas de Inventario"
 
 #. module: stock_warehouse_flow
-#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
-
-#. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__write_uid
 msgid "Last Updated by"
 msgstr "Actualizado por Última vez por"
@@ -430,3 +425,6 @@ msgstr "Aviso"
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__carrier_ids
 msgid "With carriers"
 msgstr "Con los transportistas"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
