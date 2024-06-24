@@ -1,11 +1,10 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
-
 from .common import ReleaseChannelCase
 
 
-class TestReleaseChannelPartner(ReleaseChannelCase):
+class ReleaseChannelPartnerCommon(ReleaseChannelCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -31,6 +30,8 @@ class TestReleaseChannelPartner(ReleaseChannelCase):
         cls.partner2.stock_release_channel_ids = False
         cls.moves = cls.move + cls.move2
 
+
+class TestReleaseChannelPartner(ReleaseChannelPartnerCommon):
     def test_00(self):
         """partner release channel is higher priority than other channels"""
         self.moves.picking_id.assign_release_channel()

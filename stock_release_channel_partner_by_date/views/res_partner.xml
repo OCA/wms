@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="res_partner_form_view">
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="stock_release_channel.res_partner_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stock_release_channel_ids']" position="after">
+                <label
+                    name="stock_release_channel_by_date_ids"
+                    for="stock_release_channel_by_date_ids"
+                    colspan="2"
+                />
+                <field name="stock_release_channel_by_date_ids" nolabel="1" colspan="2">
+                  <tree editable="top">
+                    <field name="partner_id" invisible="1" force_save="1" />
+                    <field name="release_channel_id" options="{'no_create': True}" />
+                    <field name="date" />
+                  </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
