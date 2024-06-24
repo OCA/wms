@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 13.0+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-07-12 17:07+0000\n"
-"PO-Revision-Date: 2023-12-20 11:39+0000\n"
+"PO-Revision-Date: 2024-06-24 13:35+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: \n"
 "Language: it\n"
@@ -46,17 +46,17 @@ msgstr "Vettore"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_res_company
 msgid "Companies"
-msgstr ""
+msgstr "Aziende"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_res_config_settings
 msgid "Config Settings"
-msgstr ""
+msgstr "Impostazioni configurazione"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order_line__delayed_qty
 msgid "Delayed Qty"
-msgstr ""
+msgstr "Q.tà in ritardo"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__date_expected
@@ -126,7 +126,7 @@ msgstr "Gruppo di approvvigionamento"
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_product_product
 msgid "Product Variant"
-msgstr ""
+msgstr "Variante prodotto"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__restock
@@ -148,7 +148,7 @@ msgstr "Riga ordine di vendita"
 #: model:ir.model.fields,help:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.res_config_settings_view
 msgid "Show Available column in SO and quotation reports"
-msgstr ""
+msgstr "Visualizza colonna disponibilità nell'OV e nei resoconti dei preventivi"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_move
@@ -159,7 +159,7 @@ msgstr "Movimento di magazzino"
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_company__stock_sale_report_display_is_available
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_res_config_settings__stock_sale_report_display_is_available
 msgid "Stock Sale Report Display Is Available"
-msgstr ""
+msgstr "La visualizzazione del resoconto vendita magazzino è disponibile"
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
