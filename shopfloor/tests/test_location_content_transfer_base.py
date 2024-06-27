@@ -98,11 +98,30 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def assert_response_start_single(
-        self, response, pickings, message=None, popup=None
+        self, response, pickings, message=None, popup=None, postponed=False
     ):
+        """
+
+            This will check if the line returned correspond to the
+            next operation to do
+
+        :param response: The response returned by the service
+        :type response: dict
+        :param pickings: Pickings to check (recordset)
+        :type pickings: stock.picking
+        :param message: The message returned in the response, defaults to None
+        :type message: dict, optional
+        :param popup: The popup message returned to the operator, defaults to None
+        :type popup: dict, optional
+        :param postponed: Fill in this in order to check if the returned line
+        should be the first one or the next one, defaults to False
+        :type postponed: bool, optional
+        """
         sorter = self.service._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         location = pickings.mapped("location_id")
+        if postponed:
+            next(sorter)
         self.assert_response(
             response,
             next_state="start_single",
