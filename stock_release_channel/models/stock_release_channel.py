@@ -550,8 +550,6 @@ class StockReleaseChannel(models.Model):
             current = picking
             domain = channel._prepare_domain()
             code = channel.sudo().code
-            if not domain and not code:
-                current.release_channel_id = channel
             if domain:
                 current = picking.filtered_domain(domain)
             if not current:

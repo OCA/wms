@@ -1,8 +1,13 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
+from unittest import mock
 
 from odoo import exceptions
+
+from odoo.addons.stock_release_channel.models.stock_release_channel import (
+    StockReleaseChannel,
+)
 
 from .common import ReleaseChannelCase
 
@@ -48,6 +53,28 @@ class TestReleaseChannel(ReleaseChannelCase):
                 sequence=1,
                 code="pickings = pickings.filtered(",
             )
+
+    def test_filter_assign(self):
+        """
+        Test the filter function don't assign the created channel
+        """
+        channel = self._create_channel(
+            name="No Domain and no code",
+            sequence=1,
+        )
+
+        def _mock_assign_release_channel_additional_filter(chan, pickings):
+            if chan == channel:
+                return pickings.browse()
+            return pickings
+
+        with mock.patch.object(
+            StockReleaseChannel,
+            "_assign_release_channel_additional_filter",
+            autospec=True,
+        ) as mock_filter:
+            mock_filter.side_effect = _mock_assign_release_channel_additional_filter
+            self._test_assign_channels(self.default_channel)
 
     def test_default_sequence(self):
         channel = self._create_channel(name="Test1")
