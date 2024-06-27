@@ -59,3 +59,20 @@ class StockPicking(models.Model):
     def is_shopfloor_packing_pack_to_scan(self):
         self.ensure_one()
         return set(self._get_packages_to_pack().ids) != self._packing_scanned_packs
+
+    def _put_in_pack(self, move_line_ids, create_package_level=True):
+        """
+        Reset the result package after partial put in pack
+        If a new package was created and a move line kept its old package, it means the
+        "put in pack" action created a new line for the done quantity.
+        The original line should be reset.
+        """
+        new_package = super()._put_in_pack(move_line_ids, create_package_level)
+        for move_line in move_line_ids:
+            if (
+                new_package
+                and move_line.result_package_id
+                and move_line.result_package_id != new_package
+            ):
+                move_line.result_package_id = False
+        return new_package
