@@ -340,3 +340,74 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         self.assertFalse(self.service._last_picked_line(line1.picking_id))
         response = self.service._response_for_scan_destination(line1)
         self.assertFalse(response["data"]["scan_destination"]["package_dest"])
+
+    def test_put_in_pack_partial_qty(self):
+        """
+        Special case.
+
+        If a partially available product becomes completely available and the reserved
+        quantity increases after the "put in pack" action, a new move line will be
+        created with the done quantity as a copy of the line that will be packed.
+        The original line will keep the result package, which is the package scanned
+        by the operator, and the remaining quantity to do.
+
+        Since the package is an internal package, the line with the remaining quantity
+        to do will be proposed in the packing process and considered as picked. If the
+        operator don't pay attention, and confirm the packaging, both lines will be set
+        to done.
+        Test:
+            - The new line is correctly packed.
+            - The original line has no result package.
+            - After the "put in pack" of the partial quantity, the scenario returns
+            the unload step.
+        """
+        move_line = self.move_lines[0]
+        picking = move_line.picking_id
+        self.assertEqual(len(picking.move_line_ids), 1)
+        move_line.reserved_uom_qty = 5
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": move_line.id,
+                "barcode": self.bin1.name,
+                # collect half the demanded qty
+                "quantity": 5,
+            },
+        )
+        move_line.reserved_uom_qty = 10
+        self.assertEqual(response["next_state"], "start_line")
+        response = self.service.dispatch(
+            "scan_packing_to_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "picking_id": move_line.picking_id.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        self.assertEqual(response["next_state"], "pack_picking_put_in_pack")
+        response = self.service.dispatch(
+            "put_in_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "picking_id": picking.id,
+                "nbr_packages": 2,
+            },
+        )
+        # after the put in pack, a new line is created with the remaining qty to do
+        self.assertEqual(len(picking.move_line_ids), 2)
+        self.assertFalse(move_line.result_package_id)
+        self.assertTrue((picking.move_line_ids - move_line).result_package_id)
+        self.assertFalse(
+            (picking.move_line_ids - move_line).result_package_id.is_internal
+        )
+        self.assertEqual(response["next_state"], "unload_all")
+        response = self.service.dispatch(
+            "scan_packing_to_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "picking_id": move_line.picking_id.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        self.assertEqual(response["next_state"], "unload_all")

@@ -37,7 +37,7 @@ class ClusterPicking(Component):
         move_lines = move_lines.filtered(
             lambda ml: ml.result_package_id.is_internal
         ).sorted(key=lambda ml: ml.result_package_id.name)
-        return move_lines[0].picking_id
+        return move_lines[0].picking_id if move_lines else move_lines.picking_id
 
     def _response_pack_picking_put_in_pack(self, picking, message=None):
         data = self.data_detail.pack_picking_detail(picking)
@@ -112,6 +112,11 @@ class ClusterPicking(Component):
 
     def _prepare_pack_picking(self, batch, message=None):
         picking = self._get_next_picking_to_pack(batch)
+        if not picking:
+            return self._response_put_in_pack(
+                batch.id,
+                message=self.msg_store.stock_picking_packed_successfully(picking),
+            )
         if picking.is_shopfloor_packing_pack_to_scan():
             return self._response_pack_picking_scan_pack(picking, message=message)
         return self._response_pack_picking_put_in_pack(picking, message=message)
