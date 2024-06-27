@@ -308,3 +308,13 @@ class StockMoveLine(models.Model):
         """
         picking = picking or fields.first(self.picking_id)
         return self.filtered_domain([("picking_id", "=", picking.id)])
+
+    def shopfloor_postpone(self, *recordsets):
+        """
+        Specific behavior for move lines.
+        As we need to reset qty_done.
+
+        """
+        res = super().shopfloor_postpone(*recordsets)
+        self.qty_done = 0.0
+        return res

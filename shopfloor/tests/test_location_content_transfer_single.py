@@ -20,7 +20,25 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
-        products = cls.product_a + cls.product_b + cls.product_c + cls.product_d
+        cls.shelves = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "location_id": cls.stock_location.id,
+                    "name": "Shelves",
+                    "usage": "view",
+                }
+            )
+        )
+        (cls.shelf1 | cls.shelf2 | cls.shelf3).sudo().location_id = cls.shelves
+        products = (
+            cls.product_a
+            + cls.product_b
+            + cls.product_c
+            + cls.product_d
+            + cls.product_e
+        )
         for product in products:
             cls.env["stock.putaway.rule"].sudo().create(
                 {
@@ -37,7 +55,11 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         cls.picking2 = picking2 = cls._create_picking(
             lines=[(cls.product_c, 10), (cls.product_d, 10)]
         )
-        cls.pickings = picking1 | picking2
+        cls.picking3 = cls._create_picking(
+            lines=[(cls.product_e, 10)],
+        )
+        cls.picking3.location_dest_id = cls.shelves
+        cls.pickings = picking1 | picking2 | cls.picking3
         cls._fill_stock_for_moves(
             picking1.move_ids, in_package=True, location=cls.content_loc
         )
@@ -48,6 +70,9 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         cls._fill_stock_for_moves(
             picking2.move_ids[1], location=cls.content_loc, in_lot=cls.product_d_lot
         )
+        # Set Product E in several content locations
+        cls._update_qty_in_location(cls.content_loc, cls.product_e, 5.0)
+        cls._update_qty_in_location(cls.content_loc_1, cls.product_e, 5.0)
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
 
@@ -507,6 +532,53 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             response,
             move_lines.mapped("picking_id"),
         )
+
+    def test_postpone_line_ok_with_two_lines_and_view(self):
+        """
+        Use case:
+            - A stock move with two move lines (e.g.: two different source locations)
+            - A default destination as a view
+            - Postpone the first line
+            - Validate the second line
+            - Only the first quantity should be transfered
+            - The backorder line should be proposed after
+        """
+        move_line = self.picking3.move_line_ids[0]
+        previous_priority = move_line.shopfloor_priority
+        self.assertFalse(move_line.shopfloor_postponed)
+        response = self.service.dispatch(
+            "postpone_line",
+            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+        )
+        self.assertTrue(move_line.shopfloor_postponed)
+        self.assertEqual(move_line.shopfloor_priority, previous_priority + 1)
+
+        self.assert_response_start_single(response, self.picking3, postponed=True)
+
+        # Select the next line
+        move_line = self.picking3.move_line_ids[1]
+        previous_priority = move_line.shopfloor_priority
+        self.assertFalse(move_line.shopfloor_postponed)
+
+        # Set the destination
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "location_id": self.content_loc.id,
+                "move_line_id": move_line.id,
+                "quantity": move_line.reserved_uom_qty,
+                "barcode": self.shelf1.barcode,
+            },
+        )
+        backorder = self.picking3.backorder_ids
+        self.assertTrue(backorder)
+        message = {
+            "body": "Content transfer to Shelf 1 completed",
+            "message_type": "success",
+        }
+
+        # Check the backorder is proposed to operator
+        self.assert_response_start_single(response, backorder, message=message)
 
     def test_stock_out_package_wrong_parameters(self):
         """Wrong 'location_id' and 'package_level_id' parameters, redirect the

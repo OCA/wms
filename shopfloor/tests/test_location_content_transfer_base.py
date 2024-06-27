@@ -20,6 +20,30 @@ class LocationContentTransferCommonCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        cls.product_e = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product E",
+                    "type": "product",
+                    "default_code": "E",
+                    "barcode": "E",
+                    "weight": 3,
+                }
+            )
+        )
+        cls.product_e_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_e.id,
+                    "barcode": "ProductEBox",
+                }
+            )
+        )
         cls.content_loc = (
             cls.env["stock.location"]
             .sudo()
@@ -27,6 +51,19 @@ class LocationContentTransferCommonCase(CommonCase):
                 {
                     "name": "Content Location",
                     "barcode": "Content",
+                    "location_id": cls.picking_type.default_location_src_id.id,
+                }
+            )
+        )
+        # This is an additional content location to manage the cases
+        # where a product can be stored in several locations
+        cls.content_loc_1 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Content Location 1",
+                    "barcode": "Content1",
                     "location_id": cls.picking_type.default_location_src_id.id,
                 }
             )
