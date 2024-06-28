@@ -46,7 +46,9 @@ class TestReleaseChannelLifeCycle(ReleaseChannelCase):
         move = self._create_single_move(self.product1, 10)
         move.picking_id.assign_release_channel()
         self.assertEqual(move.picking_id.release_channel_id, self.default_channel)
-        copy_channel = self.default_channel.copy({"name": "channel copy"})
+        copy_channel = self.default_channel.copy(
+            {"name": "channel copy", "state": "open"}
+        )
         with trap_jobs() as trap:
             self.default_channel.action_sleep()
             trap.perform_enqueued_jobs()
