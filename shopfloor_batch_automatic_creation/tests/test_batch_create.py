@@ -246,3 +246,37 @@ class TestBatchCreate(CommonCase):
             group_by_commercial_partner=True,
         )
         self.assertEqual(batch.picking_ids, self.picking2 | self.picking3)
+
+    def test_specific_device_sort_key(self):
+        self.device.sudo().line_sort_key_code = "key=line.product_id.weight"
+        self.product_a.weight = 1
+        self.product_b.weight = 5
+        self.product_c.weight = 15
+        self.product_d.weight = 20
+
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+        )
+        lines = batch.move_line_ids
+        lines = self.service._lines_for_picking_batch(batch)
+        self.assertEqual(
+            lines.mapped("product_id"),
+            self.product_a + self.product_b + self.product_c + self.product_d,
+        )
+        self.product_a.weight = 25
+        lines = self.service._lines_for_picking_batch(batch)
+        self.assertEqual(
+            lines.mapped("product_id"),
+            self.product_b + self.product_c + self.product_d + self.product_a,
+        )
+        # we can call super method to use the default sorting
+        self.device.sudo().line_sort_key_code = (
+            "key=(line.product_id.weight,) + super(line)"
+        )
+        lines = self.service._lines_for_picking_batch(batch)
+        self.assertEqual(
+            lines.mapped("product_id"),
+            self.product_b + self.product_c + self.product_d + self.product_a,
+        )

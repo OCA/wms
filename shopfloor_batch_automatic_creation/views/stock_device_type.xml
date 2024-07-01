@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record model="ir.ui.view" id="stock_device_type_form_view">
+        <field
+            name="inherit_id"
+            ref="stock_picking_batch_creation.stock_device_type_form_view"
+        />
+        <field name="model">stock.device.type</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group[last()]" position="after">
+                <div style="margin-top: 4px;">
+                    <h3>Custom code to construct the key to sort move lines</h3>
+                    <p>Two variables are available:</p>
+                    <ul>
+                        <li><code
+                            >line</code>: The stock move line Record for with the key must be computed.</li>
+                        <li><code>super</code>: The initial method to compute the key.
+
+                        </li>
+                        <li>To assign the key value: <code
+                            >key = (line.product_id.weight, ) + super(line)</code></li>
+                    </ul>
+                    <p>Leave blank to use the default method.</p>
+                </div>
+                <field name="line_sort_key_code" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo.tools.safe_eval import safe_eval
+
 from odoo.addons.component.core import Component
 
 
@@ -25,3 +27,19 @@ class ClusterPicking(Component):
             stock_device_types=menu.stock_device_type_ids,
             shopfloor_menu=menu,
         )
+
+    def _sort_key_lines(self, line):
+        # we get the device from the batch
+        device = line.batch_id.picking_device_id
+        # the sort key code is protected by the group base.group_system
+        sudo_device = device.sudo()
+        code = sudo_device.line_sort_key_code and sudo_device.line_sort_key_code.strip()
+        if code:
+            context = {
+                "line": line,
+                "super": super()._sort_key_lines,
+                "key": None,
+            }
+            safe_eval(code, context, mode="exec", nocopy=True)
+            return context["key"]
+        return super()._sort_key_lines(line)
