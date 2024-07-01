@@ -12,6 +12,7 @@ def migrate(cr, version):
         FROM
             procurement_group
         WHERE
-            stock_picking.group_id = procurement_group.id
+            stock_picking.state NOT IN ('done', 'cancel')
+        AND stock_picking.group_id = procurement_group.id
     """
     )
