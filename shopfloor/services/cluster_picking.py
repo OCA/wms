@@ -339,8 +339,7 @@ class ClusterPicking(Component):
             return self.prepare_unload(batch.id)
         return self._response_for_start_line(next_line, message=message)
 
-    @staticmethod
-    def _sort_key_lines(line):
+    def _sort_key_lines(self, line):
         return (
             line.shopfloor_priority or 10,
             line.location_id.shopfloor_picking_sequence or "",
