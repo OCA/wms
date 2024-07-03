@@ -27,7 +27,7 @@ class StockPicking(models.Model):
         help="Date/time used to sort moves to deliver first. "
         "Used to calculate the ordered available to promise.",
     )
-    last_release_date = fields.Datetime()
+    last_release_date = fields.Datetime(copy=False)
     release_policy = fields.Selection(
         [("direct", "As soon as possible"), ("one", "When all products are ready")],
         default="direct",
