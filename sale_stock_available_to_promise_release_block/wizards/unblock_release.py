@@ -33,7 +33,6 @@ class UnblockRelease(models.TransientModel):
     date_deadline = fields.Datetime(
         compute="_compute_date_deadline", store=True, readonly=False, required=True
     )
-    # release_channel_id = fields.Many2one("stock.release.channel", required=True)
 
     @api.constrains("date_deadline")
     def _constrains_date_deadline(self):
@@ -88,6 +87,8 @@ class UnblockRelease(models.TransientModel):
             self._plan_moves_for_current_order(moves)
         else:
             self._reschedule_moves(moves, self.date_deadline)
+            # Unblock release
+            moves.action_unblock_release()
 
     def _filter_moves(self, moves):
         return moves.filtered_domain(
@@ -101,6 +102,8 @@ class UnblockRelease(models.TransientModel):
     @api.model
     def _reschedule_moves(self, moves, date_deadline, from_order=None):
         """Reschedule the moves based on the deadline."""
+        # Filter out moves that don't need to be released
+        moves = moves.filtered("need_release")
         # Unset current deliveries (keep track of them to delete empty ones at the end)
         pickings = moves.picking_id
         moves.picking_id = False
@@ -117,7 +120,6 @@ class UnblockRelease(models.TransientModel):
             group.name += " BACKORDERS"
             moves.group_id = group
         # Update the scheduled date and date deadline
-        # TODO: update date_priority to now()?
         date_planned = fields.Datetime.subtract(
             date_deadline, days=self.env.company.security_lead
         )
@@ -125,7 +127,5 @@ class UnblockRelease(models.TransientModel):
         moves.date_deadline = date_deadline
         # Re-assign deliveries
         moves._assign_picking()
-        # Unblock release
-        moves.action_unblock_release()
         # Clean up empty deliveries
         pickings.filtered(lambda o: not o.move_ids and not o.printed).unlink()
