@@ -304,7 +304,11 @@ export class WMSUtils {
         options = _.defaults({}, options, {
             main: true,
             key_title: "product.display_name",
-            title_action_field: {action_val_path: "product.barcode"},
+            title_action_field: {
+                action_val_path: line.product.barcode
+                    ? "product.barcode"
+                    : "product.default_code",
+            },
             fields_blacklist: [],
             fields_extend_default: true,
         });
