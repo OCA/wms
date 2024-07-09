@@ -455,14 +455,14 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         )
         destination_ids = lot_lines.mapped("location_dest_id.id")
         # Check if the destinations are all different
-        self.assertAlmostEqual(
-            list(set(destination_ids)),
-            destination_ids,
+        self.assertEqual(
+            len(set(destination_ids)),
+            len(destination_ids),
         )
 
         lot_ids = lot_lines.mapped("lot_id.id")
         # Check if the lots are all different
-        self.assertAlmostEqual(
-            list(set(lot_ids)),
-            lot_ids,
+        self.assertEqual(
+            len(set(lot_ids)),
+            len(lot_ids),
         )
