@@ -622,9 +622,11 @@ class StockMove(models.Model):
         The loop into the iterator is the current moves.
         """
         moves = self
+        visited_moves = self.browse()
         while moves:
             yield moves
-            moves = moves.mapped(chain_field)
+            visited_moves += moves
+            moves = moves.mapped(chain_field) - visited_moves
 
     def _return_quantity_in_stock(self, qty_to_return_per_move):
         """Return a quantity from a list of moves.
