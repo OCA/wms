@@ -14,4 +14,5 @@ class StockReleaseChannelDeliverCheckWizard(models.TransientModel):
     def action_deliver(self):
         self.ensure_one()
         self.release_channel_id.unrelease_picking()
-        return self.release_channel_id.action_deliver()
+        self.release_channel_id._action_deliver()
+        return {"type": "ir.actions.act_window_close"}

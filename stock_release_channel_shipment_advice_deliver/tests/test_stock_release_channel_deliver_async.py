@@ -21,7 +21,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         with trap_jobs() as trap_rc:
             self.channel.action_deliver()
             self.assertEqual(self.channel.state, "delivering")
-            trap_rc.assert_enqueued_job(self.channel._action_deliver)
+            trap_rc.assert_enqueued_job(self.channel._process_shipments)
             with trap_jobs() as trap_sa:
                 trap_rc.perform_enqueued_jobs()
                 advices = self.channel.shipment_advice_ids.filtered(
@@ -62,7 +62,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         with trap_jobs() as trap_rc:
             self.channel.action_deliver()
             self.assertEqual(self.channel.state, "delivering")
-            trap_rc.assert_enqueued_job(self.channel._action_deliver)
+            trap_rc.assert_enqueued_job(self.channel._process_shipments)
             with trap_jobs() as trap_sa:
                 trap_rc.perform_enqueued_jobs()
                 shipment_advice = self.channel.shipment_advice_ids
@@ -142,7 +142,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         with trap_jobs() as trap_rc:
             wizard.action_deliver()
             self.assertEqual(self.channel.state, "delivering")
-            trap_rc.assert_enqueued_job(self.channel._action_deliver)
+            trap_rc.assert_enqueued_job(self.channel._process_shipments)
             with trap_jobs() as trap_sa:
                 trap_rc.perform_enqueued_jobs()
                 advices = self.channel.shipment_advice_ids.filtered(
@@ -166,7 +166,7 @@ class TestStockReleaseChannelDeliverAsync(TestStockReleaseChannelDeliverCommon):
         with trap_jobs() as trap_rc:
             self.channel.action_deliver()
             self.assertEqual(self.channel.state, "delivering")
-            trap_rc.assert_enqueued_job(self.channel._action_deliver)
+            trap_rc.assert_enqueued_job(self.channel._process_shipments)
             with trap_jobs() as trap_sa:
                 trap_rc.perform_enqueued_jobs()
                 advices = self.channel.shipment_advice_ids.filtered(

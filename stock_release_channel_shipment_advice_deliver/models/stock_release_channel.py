@@ -197,11 +197,14 @@ class StockReleaseChannel(models.Model):
                 "target": "new",
                 "context": {"default_release_channel_id": self.id, **self.env.context},
             }
+        self._action_deliver()
+        return {}
+
+    def _action_deliver(self):
         self.write({"state": "delivering", "delivering_error": False})
         self.with_delay(
             description=_("Delivering release channel %(name)s.", name=self.name)
-        )._action_deliver()
-        return {}
+        )._process_shipments()
 
     def action_delivering_error(self):
         self._check_is_action_delivering_error_allowed()
@@ -230,7 +233,7 @@ class StockReleaseChannel(models.Model):
             sticky=True,
         )
 
-    def _action_deliver(self):
+    def _process_shipments(self):
         self.ensure_one()
         shipment_advice = self.in_process_shipment_advice_ids.filtered(
             lambda s: s.state in ("in_progress", "error")
