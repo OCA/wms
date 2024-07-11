@@ -170,14 +170,16 @@ class TestStockReleaseChannelDeliver(TestStockReleaseChannelDeliverCommon):
         not_done_picking = self.internal_pickings.filtered(
             lambda p: p.state == "assigned"
         )
-        not_done_picking.move_ids[0].product_uom_qty = 4
-        with self.assertRaises(
-            UserError,
-            msg="There are some preparations that have not been completed."
-            "If you choose to proceed, these preparations need to be unreleased."
-            " Please handle them manually before proceeding with the delivery.",
-        ):
+        not_done_picking.printed = True
+        channel_name = self.channel.name
+        message = (
+            f"One of the delivery for channel {channel_name} is waiting on another transfer."
+            f" \nPlease finish it manually or cancel its start and done quantities to be able "
+            f"to deliver.\n{not_done_picking.name}"
+        )
+        with self.assertRaises(UserError) as exc:
             self.channel.action_deliver()
+        self.assertEqual(message, exc.exception.args[0])
 
     def test_deliver_partial_pick_without_bo(self):
         """Partial picking without backorder creation.
