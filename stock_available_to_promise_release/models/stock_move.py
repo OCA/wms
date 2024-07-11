@@ -61,8 +61,10 @@ class StockMove(models.Model):
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
                 for origin_moves in iterator:
-                    unrelease_allowed = move._is_unrelease_allowed_on_origin_moves(
-                        origin_moves
+                    unrelease_allowed = not origin_moves._in_progress_for_unrelease()
+                    unrelease_allowed = (
+                        unrelease_allowed
+                        and move._is_unrelease_allowed_on_origin_moves(origin_moves)
                     )
                     if not unrelease_allowed:
                         break
@@ -85,6 +87,25 @@ class StockMove(models.Model):
             and self.rule_id.available_to_promise_defer_pull
         )
 
+    def _in_progress_for_unrelease(self) -> bool:
+        """
+        This method will return True if a move :
+
+        - is not done or canceled
+        - and if the move's picking is not printed
+        - and the move has no quantity done.
+
+        """
+        moves = self.filtered(lambda m: m.state not in ("done", "cancel"))
+        if not moves:
+            return False
+        picking_ids = moves.mapped("picking_id")
+        if picking_ids.filtered("printed"):
+            return True
+        if any(move.quantity_done for move in moves):
+            return False
+        return False
+
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
         """We check that the origin moves are in a state that allows the unrelease
         of the current move. At this stage, a move can't be unreleased if
@@ -94,17 +115,6 @@ class StockMove(models.Model):
           * the processed origin moves is not consumed by the dest moves.
         """
         self.ensure_one()
-        open_origin_moves = origin_moves.filtered(
-            lambda m: m.state not in ("done", "cancel")
-        )
-        pickings = open_origin_moves.mapped("picking_id")
-        if pickings.filtered("printed"):
-            # The picking is printed, we can't unrelease the move
-            # because the processing of the origin moves is started.
-            return False
-        if any(m.quantity_done for m in open_origin_moves):
-            # The origin move is being processed, we can't unrelease the move
-            return False
         origin_done_moves = origin_moves.filtered(lambda m: m.state == "done")
         origin_qty_done = sum(
             m.product_uom._compute_quantity(
