@@ -49,10 +49,10 @@ class MoveLineSearch(Component):
         if lot:
             domain += [("lot_id", "=", lot.id)]
         if match_user:
+            # we only want to see the lines assigned to the current user
             domain += [
-                "|",
-                ("shopfloor_user_id", "=", False),
-                ("shopfloor_user_id", "=", self.env.uid),
+                ("shopfloor_user_id", "in", (False, self.env.uid)),
+                ("picking_id.user_id", "in", (False, self.env.uid)),
             ]
         if picking_ready:
             domain += [("picking_id.state", "=", "assigned")]

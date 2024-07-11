@@ -32,7 +32,7 @@ class TestActionsSearchMoveLine(CommonCase):
         cls.picking_no_user.user_id = False
         cls.picking_user1.user_id = cls.user1.id
         cls.picking_user2.move_line_ids.write({"shopfloor_user_id": cls.user2.id})
-        cls.picking_user2.user_id = False
+        cls.picking_user2.user_id = cls.user2.id
 
     @contextmanager
     def work_on_actions(self, user=None, **params):
@@ -92,3 +92,31 @@ class TestActionsSearchMoveLine(CommonCase):
         self.assertFalse(move_lines[1].shopfloor_user_id)
         self.assertFalse(move_lines[1].picking_id.user_id)
         self.assertTrue(move_lines[2].picking_id.user_id)
+
+    def test_search_move_line_match_user(self):
+        with self.search_move_line() as move_line_search:
+            move_lines = move_line_search.search_move_lines_by_location(
+                locations=self.picking_type.default_location_src_id,
+                match_user=True,
+            )
+        # we must only get picking not assigned to a user
+        self.assertFalse(move_lines.picking_id.user_id)
+        self.assertFalse(move_lines.shopfloor_user_id)
+
+        with self.search_move_line(user=self.user1) as move_line_search:
+            move_lines = move_line_search.search_move_lines_by_location(
+                locations=self.picking_type.default_location_src_id,
+                match_user=True,
+            )
+        # we must only get picking assigned to user1 or not assigned to any user
+        self.assertEqual(move_lines.picking_id.user_id, self.user1)
+        self.assertFalse(move_lines.shopfloor_user_id)
+
+        with self.search_move_line(user=self.user2) as move_line_search:
+            move_lines = move_line_search.search_move_lines_by_location(
+                locations=self.picking_type.default_location_src_id,
+                match_user=True,
+            )
+        # we must only get picking assigned to user2
+        self.assertEqual(move_lines.picking_id.user_id, self.user2)
+        self.assertEqual(move_lines.shopfloor_user_id, self.user2)
