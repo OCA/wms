@@ -110,10 +110,16 @@ class MoveLineSearch(Component):
 
     def counters_for_lines(self, lines):
         # Not using mapped/filtered to support simple lists and generators
-        priority_lines = [x for x in lines if int(x.picking_id.priority or "0") > 0]
+        priority_lines = set()
+        priority_pickings = set()
+        for line in lines:
+            if int(line.move_id.priority or "0") > 0:
+                priority_lines.add(line)
+            if int(line.picking_id.priority or "0") > 0:
+                priority_pickings.add(line.picking_id)
         return {
             "lines_count": len(lines),
             "picking_count": len({x.picking_id.id for x in lines}),
             "priority_lines_count": len(priority_lines),
-            "priority_picking_count": len({x.picking_id.id for x in priority_lines}),
+            "priority_picking_count": len(priority_pickings),
         }
