@@ -3,6 +3,7 @@ from . import test_openapi
 from . import test_actions_change_package_lot
 from . import test_actions_data
 from . import test_actions_data_detail
+from . import test_actions_search_move_line
 from . import test_actions_search
 from . import test_actions_stock
 from . import test_single_pack_transfer

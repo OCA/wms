@@ -88,25 +88,38 @@ class MoveLineSearch(Component):
         move_lines = move_lines.sorted(sort_keys_func)
         return move_lines
 
-    @staticmethod
-    def _sort_key_move_lines(order):
+    def _sort_key_assigned_to_current_user(self, line):
+        user_id = line.shopfloor_user_id.id or line.picking_id.user_id.id or None
+        # Determine sort priority
+        # Priority 0: Assigned to the current user
+        # Priority 1: Not assigned to any user
+        # Priority 2: Assigned to a different user
+        if user_id == self.env.uid:
+            priority = 0
+        elif user_id is None:
+            priority = 1
+        else:
+            priority = 2
+        return (priority,)
+
+    def _sort_key_move_lines(self, order=None):
         """Return a sorting function to order lines."""
 
         if order == "priority":
             # make prority negative to keep sorting ascending
-            return lambda line: (
+            return lambda line: self._sort_key_assigned_to_current_user(line) + (
                 -int(line.move_id.priority or "0"),
                 line.move_id.date,
                 line.move_id.id,
             )
         elif order == "location":
-            return lambda line: (
+            return lambda line: self._sort_key_assigned_to_current_user(line) + (
                 line.location_id.shopfloor_picking_sequence or "",
                 line.location_id.name,
                 line.move_id.date,
                 line.move_id.id,
             )
-        return lambda line: line
+        return self._sort_key_assigned_to_current_user
 
     def counters_for_lines(self, lines):
         # Not using mapped/filtered to support simple lists and generators
