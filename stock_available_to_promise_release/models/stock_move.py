@@ -11,6 +11,8 @@ from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare, float_round, groupby
 
+from odoo.addons.stock.models.stock_move import StockMove as StockMoveBase
+
 _logger = logging.getLogger(__name__)
 
 
@@ -87,24 +89,24 @@ class StockMove(models.Model):
             and self.rule_id.available_to_promise_defer_pull
         )
 
-    def _in_progress_for_unrelease(self) -> bool:
+    def _in_progress_for_unrelease(self) -> StockMoveBase:
         """
-        This method will return True if a move :
+        This method will return the moves not done or canceled that :
 
-        - is not done or canceled
-        - and if the move's picking is not printed
-        - and the move has no quantity done.
+        - have their picking printed
+        - have a quantity done != 0
 
         """
         moves = self.filtered(lambda m: m.state not in ("done", "cancel"))
         if not moves:
-            return False
-        picking_ids = moves.mapped("picking_id")
-        if picking_ids.filtered("printed"):
-            return True
-        if any(move.quantity_done for move in moves):
-            return False
-        return False
+            return moves
+        moves_printed = moves.filtered("picking_id.printed")
+        if moves_printed:
+            return moves_printed
+        moves_done = moves.filtered("quantity_done")
+        if moves_done:
+            return moves_done
+        return moves.browse()
 
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
         """We check that the origin moves are in a state that allows the unrelease
