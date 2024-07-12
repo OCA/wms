@@ -7,10 +7,8 @@ from odoo.addons.component.core import Component
 class LocationContentTransfer(Component):
     _inherit = "shopfloor.location.content.transfer"
 
-    def _find_location_move_lines_from_scan_location(self, *args, **kwargs):
-        move_lines = super()._find_location_move_lines_from_scan_location(
-            *args, **kwargs
-        )
+    def _select_move_lines_first_location(self, move_lines):
+        move_lines = super()._select_move_lines_first_location(move_lines)
         if not self.work.menu.full_location_reservation:
             return move_lines
 
