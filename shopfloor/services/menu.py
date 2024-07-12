@@ -21,8 +21,7 @@ class ShopfloorMenu(Component):
         move_line_search = self._actions_for(
             "search_move_line", picking_types=record.picking_type_ids
         )
-        locations = record.picking_type_ids.mapped("default_location_src_id")
-        lines_per_menu = move_line_search.search_move_lines_by_location(locations)
+        lines_per_menu = move_line_search.search_move_lines()
         return move_line_search.counters_for_lines(lines_per_menu)
 
     def _one_record_parser(self, record):

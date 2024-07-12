@@ -315,7 +315,7 @@ class ZonePicking(Component):
         return self.search_move_line.counters_for_lines(zone_lines)
 
     def _picking_type_zone_lines(self, zone_location, picking_type):
-        return self.search_move_line.search_move_lines_by_location(
+        return self.search_move_line.search_move_lines(
             zone_location, picking_type=picking_type
         )
 
@@ -429,7 +429,7 @@ class ZonePicking(Component):
         enforce_empty_package=False,
     ):
         """Find lines that potentially need work in given locations."""
-        return self.search_move_line.search_move_lines_by_location(
+        return self.search_move_line.search_move_lines(
             locations or self.zone_location,
             picking_type=picking_type or self.picking_type,
             order=self.lines_order,

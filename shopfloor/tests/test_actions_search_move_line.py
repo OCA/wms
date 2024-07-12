@@ -95,7 +95,7 @@ class TestActionsSearchMoveLine(CommonCase):
 
     def test_search_move_line_match_user(self):
         with self.search_move_line() as move_line_search:
-            move_lines = move_line_search.search_move_lines_by_location(
+            move_lines = move_line_search.search_move_lines(
                 locations=self.picking_type.default_location_src_id,
                 match_user=True,
             )
@@ -104,7 +104,7 @@ class TestActionsSearchMoveLine(CommonCase):
         self.assertFalse(move_lines.shopfloor_user_id)
 
         with self.search_move_line(user=self.user1) as move_line_search:
-            move_lines = move_line_search.search_move_lines_by_location(
+            move_lines = move_line_search.search_move_lines(
                 locations=self.picking_type.default_location_src_id,
                 match_user=True,
             )
@@ -113,7 +113,7 @@ class TestActionsSearchMoveLine(CommonCase):
         self.assertFalse(move_lines.shopfloor_user_id)
 
         with self.search_move_line(user=self.user2) as move_line_search:
-            move_lines = move_line_search.search_move_lines_by_location(
+            move_lines = move_line_search.search_move_lines(
                 locations=self.picking_type.default_location_src_id,
                 match_user=True,
             )
