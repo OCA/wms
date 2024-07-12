@@ -2,7 +2,7 @@
 # Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _, fields
+from odoo import _
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -208,24 +208,6 @@ class LocationContentTransfer(Component):
         response = self._recover_started_picking()
         return response or self._response_for_start()
 
-    def _find_location_move_lines_domain(self, location):
-        return [
-            ("location_id", "=", location.id),
-            ("qty_done", "=", 0),
-            ("state", "in", ("assigned", "partially_available")),
-            ("picking_id.user_id", "in", (False, self.env.uid)),
-            ("picking_id.state", "=", "assigned"),
-        ]
-
-    def _find_location_move_lines_from_scan_location(self, *args, **kwargs):
-        return self._find_location_move_lines(*args, **kwargs)
-
-    def _find_location_move_lines(self, location):
-        """Find lines that potentially are to move in the location"""
-        return self.env["stock.move.line"].search(
-            self._find_location_move_lines_domain(location)
-        )
-
     def _create_moves_from_location(self, location):
         # get all quants from the scanned location
         quants = self.env["stock.quant"].search(
@@ -252,23 +234,15 @@ class LocationContentTransfer(Component):
 
     def _find_location_to_work_from(self):
         location = self.env["stock.location"]
-        pickings = self.env["stock.picking"].search(
-            [
-                ("picking_type_id", "in", self.picking_types.ids),
-                ("state", "=", "assigned"),
-                ("user_id", "in", (False, self.env.user.id)),
-            ],
-            order="user_id, priority desc, scheduled_date asc, id desc",
-        )
-
-        for next_picking in pickings:
-            move_lines = next_picking.move_line_ids.filtered(
-                lambda line: line.qty_done < line.reserved_uom_qty
-            )
-            location = fields.first(move_lines).location_id
-            if location:
-                break
+        move_lines = self.search_move_line.search_move_lines(match_user=True)
+        for move_line in move_lines:
+            if move_line.location_id:
+                return move_line.location_id
         return location
+
+    def _select_move_lines_first_location(self, move_lines):
+        location = move_lines[0].location_id
+        return move_lines.filtered(lambda line: line.location_id == location)
 
     def find_work(self):
         """Find the next location to work from, for a user.
@@ -285,14 +259,15 @@ class LocationContentTransfer(Component):
         response = self._recover_started_picking()
         if response:
             return response
+
         self._actions_for("lock").advisory(self._advisory_lock_find_work)
-        location = self._find_location_to_work_from()
-        if not location:
+        move_lines = self.search_move_line.search_move_lines(match_user=True)
+        if not move_lines:
             return self._response_for_start(message=self.msg_store.no_work_found())
-        move_lines = self._find_location_move_lines(location)
+        move_lines = self._select_move_lines_first_location(move_lines)
         stock = self._actions_for("stock")
         stock.mark_move_line_as_picked(move_lines, quantity=0)
-        return self._response_for_scan_location(location=location)
+        return self._response_for_scan_location(location=move_lines.location_id)
 
     def _find_move_lines_to_cancel_work(self, location):
         unreserve = self._actions_for("stock.unreserve")
@@ -356,7 +331,9 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.cannot_move_something_in_picking_type()
             )
 
-        move_lines = self._find_location_move_lines_from_scan_location(location)
+        move_lines = self.search_move_line.search_move_lines(
+            locations=location, match_user=True, enforce_picking_types=False
+        )
 
         savepoint = self._actions_for("savepoint").new()
         unreserve = self._actions_for("stock.unreserve")
