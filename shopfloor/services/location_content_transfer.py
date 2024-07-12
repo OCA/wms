@@ -233,12 +233,8 @@ class LocationContentTransfer(Component):
         return self.env["stock.move"].create(move_vals_list)
 
     def _find_location_to_work_from(self):
-        location = self.env["stock.location"]
         move_lines = self.search_move_line.search_move_lines(match_user=True)
-        for move_line in move_lines:
-            if move_line.location_id:
-                return move_line.location_id
-        return location
+        return first(move_lines).location_id
 
     def _select_move_lines_first_location(self, move_lines):
         location = move_lines[0].location_id

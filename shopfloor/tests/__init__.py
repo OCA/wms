@@ -1,4 +1,5 @@
 from . import test_menu_counters
+from . import test_menu_contrains
 from . import test_openapi
 from . import test_actions_change_package_lot
 from . import test_actions_data

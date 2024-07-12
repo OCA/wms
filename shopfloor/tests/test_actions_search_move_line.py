@@ -57,7 +57,9 @@ class TestActionsSearchMoveLine(CommonCase):
 
     def test_search_move_line_sorter(self):
         with self.search_move_line() as move_line_search:
-            move_lines = self.move_lines.sorted(move_line_search._sort_key_move_lines())
+            move_lines = self.move_lines.sorted(
+                move_line_search._sort_key_move_lines(order="assigned_to_current_user")
+            )
         # we must get operations in the following order:
         #  * no shopfloor user and not user assigned to picking
         #  * no shopfloor user and user assigned to picking
@@ -70,7 +72,9 @@ class TestActionsSearchMoveLine(CommonCase):
         self.assertTrue(move_lines[2].shopfloor_user_id)
 
         with self.search_move_line(user=self.user1) as move_line_search:
-            move_lines = self.move_lines.sorted(move_line_search._sort_key_move_lines())
+            move_lines = self.move_lines.sorted(
+                move_line_search._sort_key_move_lines(order="assigned_to_current_user")
+            )
         # user1 is only assigned at picking level
         # we must get operations in the following order:
         # * no shopfloor user but user assigned to picking
@@ -82,7 +86,9 @@ class TestActionsSearchMoveLine(CommonCase):
         self.assertTrue(move_lines[2].shopfloor_user_id)
 
         with self.search_move_line(user=self.user2) as move_line_search:
-            move_lines = self.move_lines.sorted(move_line_search._sort_key_move_lines())
+            move_lines = self.move_lines.sorted(
+                move_line_search._sort_key_move_lines(order="assigned_to_current_user")
+            )
         # user2 is only assigned at move level
         # we must get operations in the following order:
         # * shopfloor user or user assigned to picking

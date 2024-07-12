@@ -110,3 +110,62 @@ class TestMenuCountersCommonCase(MenuCountersCommonCase):
             expected_menu_items.sorted("sequence"),
             expected_counters=expected_counters,
         )
+
+    def test_menu_search_additional_domain(self):
+        self.menu1.sudo().move_line_search_additional_domain = [
+            ("picking_id.priority", "=", "1")
+        ]
+
+        expected_counters = {
+            self.menu1.id: {
+                "lines_count": 0,
+                "picking_count": 0,
+                "priority_lines_count": 0,
+                "priority_picking_count": 0,
+            },
+            self.menu2.id: {
+                "lines_count": 6,
+                "picking_count": 3,
+                "priority_lines_count": 0,
+                "priority_picking_count": 0,
+            },
+        }
+        expected_menu_items = (
+            self.env["shopfloor.menu"]
+            .sudo()
+            .search([("profile_id", "=", self.wms_profile.id)])
+        )
+        # ensures expected counters are in the expected menu items
+        self.assertIn(self.menu1, expected_menu_items)
+        self.assertIn(self.menu2, expected_menu_items)
+        service = self.get_service("menu", profile=self.wms_profile)
+        response = service.dispatch("search")
+        self._assert_menu_response(
+            response,
+            expected_menu_items.sorted("sequence"),
+            expected_counters=expected_counters,
+        )
+
+        self.menu1.sudo().move_line_search_additional_domain = [
+            ("picking_id.priority", "=", "0")
+        ]
+        expected_counters = {
+            self.menu1.id: {
+                "lines_count": 2,
+                "picking_count": 2,
+                "priority_lines_count": 0,
+                "priority_picking_count": 0,
+            },
+            self.menu2.id: {
+                "lines_count": 6,
+                "picking_count": 3,
+                "priority_lines_count": 0,
+                "priority_picking_count": 0,
+            },
+        }
+        response = service.dispatch("search")
+        self._assert_menu_response(
+            response,
+            expected_menu_items.sorted("sequence"),
+            expected_counters=expected_counters,
+        )

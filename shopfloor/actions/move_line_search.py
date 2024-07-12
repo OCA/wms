@@ -1,5 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2024 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo.tools import safe_eval
+
 from odoo.addons.component.core import Component
 
 
@@ -19,6 +22,39 @@ class MoveLineSearch(Component):
         return getattr(
             self.work, "picking_types", self.env["stock.picking.type"].browse()
         )
+
+    @property
+    def additional_domain(self):
+        return getattr(self.work, "additional_domain", [])
+
+    @property
+    def sort_order(self):
+        return getattr(self.work, "sort_order", "priority")
+
+    @property
+    def sort_order_custom_code(self):
+        return getattr(self.work, "sort_order_custom_code", None)
+
+    def _get_additional_domain_eval_context(self):
+        """Prepare the context used when evaluating the additional domain
+        :returns: dict -- evaluation context given to safe_eval
+        """
+        return {
+            "datetime": safe_eval.datetime,
+            "dateutil": safe_eval.dateutil,
+            "time": safe_eval.time,
+            "uid": self.env.uid,
+            "user": self.env.user,
+        }
+
+    def _sort_key_custom_code_eval_context(self, line):
+        return {
+            "line": line,
+            "key": None,
+            "get_sort_key_priority": self._sort_key_move_lines_priority,
+            "get_sort_key_location": self._sort_key_move_lines_location,
+            "get_sort_key_assigned_to_current_user": self._sort_key_assigned_to_current_user,
+        }
 
     def _search_move_lines_domain(
         self,
@@ -61,6 +97,9 @@ class MoveLineSearch(Component):
             ]
         if picking_ready:
             domain += [("picking_id.state", "=", "assigned")]
+        if self.additional_domain:
+            eval_context = self._get_additional_domain_eval_context()
+            domain += safe_eval.safe_eval(self.additional_domain, eval_context)
         return domain
 
     def search_move_lines(
@@ -70,7 +109,7 @@ class MoveLineSearch(Component):
         package=None,
         product=None,
         lot=None,
-        order="priority",
+        order=None,
         match_user=False,
         sort_keys_func=None,
         picking_ready=True,
@@ -91,9 +130,45 @@ class MoveLineSearch(Component):
                 enforce_picking_types=enforce_picking_types,
             )
         )
+        order = order or self.sort_order
         sort_keys_func = sort_keys_func or self._sort_key_move_lines(order)
         move_lines = move_lines.sorted(sort_keys_func)
         return move_lines
+
+    def _sort_key_move_lines(self, order=None):
+        """Return a sorting function to order lines."""
+        if order is None:
+            return lambda line: tuple()
+
+        if order == "priority":
+            return self._sort_key_move_lines_priority
+
+        if order == "location":
+            return self._sort_key_move_lines_location
+
+        if order == "custom_code":
+            return self._sort_key_custom_code
+
+        if order == "assigned_to_current_user":
+            return self._sort_key_assigned_to_current_user
+
+        raise ValueError(f"Unknown order '{order}'")
+
+    def _sort_key_move_lines_priority(self, line):
+        # make prority negative to keep sorting ascending
+        return self._sort_key_assigned_to_current_user(line) + (
+            -int(line.move_id.priority or "0"),
+            line.move_id.date,
+            line.move_id.id,
+        )
+
+    def _sort_key_move_lines_location(self, line):
+        return self._sort_key_assigned_to_current_user(line) + (
+            line.location_id.shopfloor_picking_sequence or "",
+            line.location_id.name,
+            line.move_id.date,
+            line.move_id.id,
+        )
 
     def _sort_key_assigned_to_current_user(self, line):
         user_id = line.shopfloor_user_id.id or line.picking_id.user_id.id or None
@@ -109,24 +184,12 @@ class MoveLineSearch(Component):
             priority = 2
         return (priority,)
 
-    def _sort_key_move_lines(self, order=None):
-        """Return a sorting function to order lines."""
-
-        if order == "priority":
-            # make prority negative to keep sorting ascending
-            return lambda line: self._sort_key_assigned_to_current_user(line) + (
-                -int(line.move_id.priority or "0"),
-                line.move_id.date,
-                line.move_id.id,
-            )
-        elif order == "location":
-            return lambda line: self._sort_key_assigned_to_current_user(line) + (
-                line.location_id.shopfloor_picking_sequence or "",
-                line.location_id.name,
-                line.move_id.date,
-                line.move_id.id,
-            )
-        return self._sort_key_assigned_to_current_user
+    def _sort_key_custom_code(self, line):
+        context = self._sort_key_custom_code_eval_context(line)
+        safe_eval.safe_eval(
+            self.sort_order_custom_code, context, mode="exec", nocopy=True
+        )
+        return context["key"]
 
     def counters_for_lines(self, lines):
         # Not using mapped/filtered to support simple lists and generators

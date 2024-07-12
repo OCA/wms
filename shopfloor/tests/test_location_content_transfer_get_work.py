@@ -105,6 +105,47 @@ class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
         )
         self.assertEqual(response["next_state"], "scan_destination_all")
 
+    def test_find_work_additional_domain(self):
+        next_location = self.service._find_location_to_work_from()
+        self.assertTrue(next_location)
+        self.menu.sudo().move_line_search_additional_domain = [
+            ("picking_id.id", "not in", self.pickings.ids)
+        ]
+        next_location = self.service._find_location_to_work_from()
+        self.assertFalse(next_location)
+        response = self.service.dispatch("find_work", params={})
+        self.assert_response(
+            response,
+            next_state="get_work",
+            data={},
+            message=self.service.msg_store.no_work_found(),
+        )
+
+    def test_find_work_custom_sort_key(self):
+        # fmt: off
+        self.menu.sudo().write(
+            {
+                "move_line_search_sort_order": "custom_code",
+                "move_line_search_sort_order_custom_code":
+                    f"key = (-1 if line.location_id.id == {self.content_loc.id} else 10, )",
+            }
+        )
+        # fmt: on
+
+        next_location = self.service._find_location_to_work_from()
+        self.assertEqual(next_location, self.content_loc)
+        self.menu.sudo().move_line_search_sort_order_custom_code = (
+            f"key = (-1 if line.location_id.id == {self.content_loc2.id} else 10, )"
+        )
+        next_location = self.service._find_location_to_work_from()
+        self.assertEqual(next_location, self.content_loc2)
+        self.menu.sudo().move_line_search_sort_order_custom_code = f"""
+key = (-1 if line.location_id.id == {self.content_loc2.id} else 10, ) + \
+    get_sort_key_assigned_to_current_user(line)
+        """
+        next_location = self.service._find_location_to_work_from()
+        self.assertEqual(next_location, self.content_loc2)
+
     def test_cancel_work(self):
         next_location = self.service._find_location_to_work_from()
         stock = self.service._actions_for("stock")

@@ -169,6 +169,60 @@
                     />
                     <field name="allow_alternative_destination_package" />
                 </group>
+                <group
+                    name="search_move_line"
+                    attrs="{'invisible': [('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_additional_domain_is_possible', '=', False)]}"
+                >
+                <field
+                        name="move_line_search_additional_domain_is_possible"
+                        invisible="1"
+                    />
+                  <field
+                        name="move_line_search_additional_domain"
+                        widget="domain"
+                        options="{'model': 'stock.move.line'}"
+                        attrs="{'invisible': [('move_line_search_additional_domain_is_possible', '=', False)]}"
+                    />
+                  <field name="move_line_search_sort_order_is_possible" invisible="1" />
+                  <field
+                        name="move_line_search_sort_order"
+                        attrs="{'invisible': [('move_line_search_sort_order_is_possible', '=', False)]}"
+                    />
+                  <div
+                        class="o_cell o_wrap_label"
+                        style="margin-top: 4px;"
+                        colspan="2"
+                        attrs="{'invisible': ['|', ('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_sort_order', '!=', 'custom_code')]}"
+                    >
+                    <label
+                            class="text-900"
+                            for="move_line_search_sort_order_custom_code"
+                        >Custom code to construct the key to sort move lines</label>
+                    <p>Three variables are available:</p>
+                    <ul>
+                        <li><code
+                                >line</code>: The move line for with the key must be computed.
+                        </li>
+                        <li><code
+                                >get_sort_key_priority</code>: Return sort key to sort by priority. (return a tuple)
+                        </li>
+                        <li><code
+                                >get_sort_key_location</code>: Return sort key to sort by location. (return a tuple)
+                        </li>
+                        <li><code
+                                >get_sort_key_assigned_to_current_user</code>: Return sort key to get line assigned to current user first. (return a tuple)
+                        </li>
+                        <li>To assign the key value: <code
+                                >key = get_sort_key_assigned_to_current_user(line) + (line.x, )</code></li>
+                    </ul>
+                    <field
+                            name="move_line_search_sort_order_custom_code"
+                            attrs="{'invisible': ['|', ('move_line_search_sort_order_is_possible', '=', False), ('move_line_search_sort_order', '!=', 'custom_code')]}"
+                            nolabel="1"
+                        />
+                  </div>
+
+            </group>
             </group>
         </field>
     </record>
