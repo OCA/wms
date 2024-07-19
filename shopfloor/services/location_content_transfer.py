@@ -3,6 +3,7 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
+from odoo.fields import first
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -237,7 +238,7 @@ class LocationContentTransfer(Component):
         return first(move_lines).location_id
 
     def _select_move_lines_first_location(self, move_lines):
-        location = move_lines[0].location_id
+        location = first(move_lines).location_id
         return move_lines.filtered(lambda line: line.location_id == location)
 
     def find_work(self):
@@ -330,6 +331,7 @@ class LocationContentTransfer(Component):
         move_lines = self.search_move_line.search_move_lines(
             locations=location, match_user=True, enforce_picking_types=False
         )
+        move_lines = self._select_move_lines_first_location(move_lines)
 
         savepoint = self._actions_for("savepoint").new()
         unreserve = self._actions_for("stock.unreserve")
