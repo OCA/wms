@@ -14,7 +14,6 @@
         "stock_move_auto_assign_auto_release",
     ],
     "data": [
-        "data/queue_job_data.xml",
         "views/stock_release_channel.xml",
     ],
     "demo": [],
