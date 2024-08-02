@@ -86,6 +86,9 @@ class TestSaleBlockRelease(common.Common):
                 for m in (existing_moves | new_moves)
             )
         )
+        self.assertTrue(
+            all(not m.release_blocked for m in (existing_moves | new_moves))
+        )
 
     def test_unblock_release_contextual_different_shipping_policy(self):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
@@ -133,6 +136,9 @@ class TestSaleBlockRelease(common.Common):
                 m.date == m.date_deadline == new_sale.commitment_date
                 for m in (existing_moves | new_moves)
             )
+        )
+        self.assertTrue(
+            all(not m.release_blocked for m in (existing_moves | new_moves))
         )
         self.assertEqual(
             existing_moves.group_id.move_type, new_moves.group_id.move_type

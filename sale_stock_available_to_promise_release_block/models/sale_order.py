@@ -100,4 +100,7 @@ class SaleOrder(models.Model):
                 self.env["unblock.release"]._reschedule_moves(
                     order.move_to_unblock_ids, date_deadline, from_order=order
                 )
+                # Unblock the release
+                if not order.block_release:
+                    order.move_to_unblock_ids.action_unblock_release()
         return super().action_confirm()
