@@ -43,12 +43,20 @@ class UnblockRelease(models.TransientModel):
                     _("You cannot reschedule deliveries in the past.")
                 )
 
+    def _get_contextual_order(self):
+        """Return the current and eligible sale order from the context."""
+        from_sale_order_id = self.env.context.get("from_sale_order_id")
+        order = self.env["sale.order"].browse(from_sale_order_id).exists()
+        if order and order.state not in ("sale", "done", "cancel"):
+            return order
+
     def _selection_option(self):
         options = [
             ("manual", "Manual"),
             ("automatic", "Automatic / As soon as possible"),
         ]
-        if self.env.context.get("from_sale_order_id"):
+        order = self._get_contextual_order()
+        if order:
             options.append(("contextual", "Based on current order"))
         return options
 
@@ -68,10 +76,9 @@ class UnblockRelease(models.TransientModel):
         res = super().default_get(fields_list)
         active_model = self.env.context.get("active_model")
         active_ids = self.env.context.get("active_ids")
-        from_sale_order_id = self.env.context.get("from_sale_order_id")
-        from_sale_order = self.env["sale.order"].browse(from_sale_order_id).exists()
+        from_sale_order = self._get_contextual_order()
         if from_sale_order:
-            res["order_id"] = from_sale_order_id
+            res["order_id"] = from_sale_order.id
         if active_model == "sale.order.line" and active_ids:
             res["order_line_ids"] = [(6, 0, active_ids)]
         if active_model == "stock.move" and active_ids:

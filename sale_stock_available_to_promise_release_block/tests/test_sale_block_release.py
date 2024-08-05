@@ -90,6 +90,28 @@ class TestSaleBlockRelease(common.Common):
             all(not m.release_blocked for m in (existing_moves | new_moves))
         )
 
+    def test_unblock_release_contextual_order_not_eligible(self):
+        self._set_stock(self.line.product_id, self.line.product_uom_qty)
+        self.sale.block_release = True
+        self.sale.action_confirm()
+        # Unblock deliveries through the wizard, opened from another SO
+        new_sale = self._create_sale_order()
+        self.env["sale.order.line"].create(
+            {
+                "order_id": new_sale.id,
+                "product_id": self.product.id,
+                "product_uom_qty": 50,
+                "product_uom": self.uom_unit.id,
+            }
+        )
+        new_sale.action_cancel()
+        wiz = self._create_unblock_release_wizard(
+            self.sale.order_line,
+            from_order=new_sale,
+            date_deadline=fields.Datetime.now(),
+        )
+        self.assertEqual(wiz.option, "manual")
+
     def test_unblock_release_contextual_different_shipping_policy(self):
         self._set_stock(self.line.product_id, self.line.product_uom_qty)
         self.sale.block_release = True
