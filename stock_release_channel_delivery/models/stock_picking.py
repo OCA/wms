@@ -8,8 +8,8 @@ class StockPicking(models.Model):
 
     _inherit = "stock.picking"
 
-    def _get_release_channel_possible_candidate_domain(self):
-        domain = super()._get_release_channel_possible_candidate_domain()
+    def _get_release_channel_possible_candidate_domain_picking(self):
+        domain = super()._get_release_channel_possible_candidate_domain_picking()
         if self.carrier_id:
             domain.extend(
                 [
