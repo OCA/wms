@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from odoo import _, exceptions, fields, models
+from odoo.osv import expression
 
 from odoo.addons.queue_job.job import identity_exact
 
@@ -106,18 +107,43 @@ class StockPicking(models.Model):
             .sorted(key=lambda r: (not bool(r.partner_ids), r.sequence))
         )
 
-    def _get_release_channel_possible_candidate_domain(self):
-        self.ensure_one()
+    def _get_release_channel_possible_candidate_domain_channel(self):
         return [
             ("is_manual_assignment", "=", False),
             ("state", "!=", "asleep"),
+        ]
+
+    def _get_release_channel_possible_candidate_domain_picking(self):
+        return [
             "|",
             ("picking_type_ids", "=", False),
             ("picking_type_ids", "in", self.picking_type_id.ids),
             "|",
             ("warehouse_id", "=", False),
             ("warehouse_id", "=", self.picking_type_id.warehouse_id.id),
+        ]
+
+    def _get_release_channel_possible_candidate_domain_partner(self):
+        return [
             "|",
             ("partner_ids", "=", False),
             ("partner_ids", "in", self.partner_id.ids),
         ]
+
+    def _inject_possible_candidate_domain_partner(self):
+        """Hooks that could be overridden.
+
+        Return a boolean.
+        """
+        return True
+
+    def _get_release_channel_possible_candidate_domain(self):
+        self.ensure_one()
+        domain_channel = self._get_release_channel_possible_candidate_domain_channel()
+        domain_picking = self._get_release_channel_possible_candidate_domain_picking()
+        domain = expression.AND([domain_channel, domain_picking])
+        if self._inject_possible_candidate_domain_partner():
+            domain = expression.AND(
+                [domain, self._get_release_channel_possible_candidate_domain_partner()]
+            )
+        return domain
