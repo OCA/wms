@@ -17,13 +17,6 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel_auto_release
-#. odoo-python
-#: code:addons/stock_release_channel_auto_release/models/stock_picking.py:0
-#, python-format
-msgid "Auto release available to promise %(name)s"
-msgstr "Rilascio automatico disponibile alla promessa %(name)s"
-
-#. module: stock_release_channel_auto_release
 #: model:ir.model.fields.selection,name:stock_release_channel_auto_release.selection__stock_release_channel__release_mode__auto
 msgid "Automatic"
 msgstr "Automatico"
@@ -57,3 +50,7 @@ msgstr "Canali rilascio magazzino"
 #: model:ir.model,name:stock_release_channel_auto_release.model_stock_picking
 msgid "Transfer"
 msgstr "Trasferimento"
+
+#, python-format
+#~ msgid "Auto release available to promise %(name)s"
+#~ msgstr "Rilascio automatico disponibile alla promessa %(name)s"
