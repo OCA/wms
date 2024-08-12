@@ -12,6 +12,7 @@ class StockMove(models.Model):
     )
     last_move_line_lot_id = fields.Many2one(
         comodel_name="stock.production.lot",
+        index=True,
     )
     vendor_code = fields.Char(compute="_compute_vendor_code")
 
