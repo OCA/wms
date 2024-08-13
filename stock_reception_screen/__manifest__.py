@@ -3,7 +3,7 @@
 {
     "name": "Stock - Reception screen",
     "summary": "Dedicated screen to receive/scan goods.",
-    "version": "14.0.1.0.2",
+    "version": "14.0.1.1.0",
     "category": "Stock",
     "license": "AGPL-3",
     "author": "Camptocamp, Odoo Community Association (OCA)",
