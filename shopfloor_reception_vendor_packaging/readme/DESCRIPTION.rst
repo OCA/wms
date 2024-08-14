@@ -1,0 +1,1 @@
+Add reception-specific logic and data after the implementation of shopfloor_vendor_packaging.
