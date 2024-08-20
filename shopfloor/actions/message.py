@@ -591,8 +591,10 @@ class MessageAction(Component):
         return {
             "message_type": "success",
             "body": _(
-                "Content transferred from %(location_name)s to %(location_dest_name)s."
-            ).format(location_src.name, location_dest.name),
+                "Content transferred from %(location_name)s to %(location_dest_name)s.",
+                location_name=location_src.name,
+                location_dest_name=location_dest.name,
+            ),
         }
 
     def location_content_unable_to_transfer(self, location_dest):
