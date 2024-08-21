@@ -14,6 +14,7 @@
                     attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
                 >
                     <field name="pack_pickings" />
+                    <field name="default_pack_pickings_action" />
                 </group>
             </group>
         </field>

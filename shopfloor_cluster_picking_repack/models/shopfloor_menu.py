@@ -13,3 +13,11 @@ class ShopfloorMenu(models.Model):
         help="If you tick this box, all the picked item will be put in pack"
         " before the transfer.",
     )
+
+    default_pack_pickings_action = fields.Selection(
+        [
+            ("nbr_packages", "Enter the number of packages"),
+            ("package_type", "Scan the package type"),
+        ],
+        default="nbr_packages",
+    )
