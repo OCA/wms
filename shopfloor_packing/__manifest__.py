@@ -12,6 +12,7 @@
         "shopfloor",
         "internal_stock_quant_package",
         "delivery_package_type_number_parcels",
+        "stock_picking_delivery_package_type_domain",
     ],
     "data": ["views/shopfloor_menu.xml", "views/stock_picking.xml"],
     "installable": True,
