@@ -581,10 +581,14 @@ class MessageAction(Component):
             "body": _("Transfer {} complete").format(picking.name),
         }
 
-    def location_content_transfer_item_complete(self, location_dest):
+    def location_content_transfer_item_complete(self, location_src, location_dest):
         return {
             "message_type": "success",
-            "body": _("Content transfer to {} completed").format(location_dest.name),
+            "body": _(
+                "Content line transferred from %(location_name)s to %(location_dest_name)s",
+                location_name=location_src.name,
+                location_dest_name=location_dest.name,
+            ),
         }
 
     def location_content_transfer_complete(self, location_src, location_dest):
