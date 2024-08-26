@@ -12,11 +12,30 @@
             <form string="Stock Release Channel Deliver Check">
                 <field name="release_channel_id" invisible="1" />
                 <p>
-                    There are some preparations that have not been completed.
-                    If you choose to proceed, these preparations will be unreleased.<br
-                    />
-                    Are you sure you want to proceed with the delivery?
+                    There are some preparations that have not been completed.<br />
+                    If you choose to proceed, these preparations will be unreleased and won't be delivered.<br
+                    /><br />
+                    <b>Are you sure you want to proceed with the delivery?</b>
                 </p>
+                <group>
+                    <field name="allowed_to_unrelease_picking_ids">
+                        <tree edit="false">
+                            <field name="name" />
+                            <field name="origin" />
+                            <field name="partner_id" />
+                            <field
+                                name="state"
+                                optional="show"
+                                widget="badge"
+                                decoration-danger="state=='cancel'"
+                                decoration-info="state== 'assigned'"
+                                decoration-muted="state == 'draft'"
+                                decoration-success="state == 'done'"
+                                decoration-warning="state not in ('draft','cancel','done','assigned')"
+                            />
+                        </tree>
+                    </field>
+                </group>
                 <footer>
                     <button
                         string="Cancel the deliver"
