@@ -24,7 +24,7 @@ class StockReleaseChannelDeliverCheckWizard(models.TransientModel):
         """
         for wizard in self:
             moves_to_unrelease = (
-                wizard.release_channel_id._shipping_moves_to_unrelease()
+                wizard.release_channel_id.at_deliver_to_unrelease_shipping_move_ids
             )
             wizard.allowed_to_unrelease_picking_ids = moves_to_unrelease.filtered(
                 "unrelease_allowed"
