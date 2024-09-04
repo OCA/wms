@@ -15,7 +15,7 @@ class LocationContentTransfer(Component):
             return super()._select_move_lines_first_location(move_lines)
 
         move_lines = super()._select_move_lines_first_location(move_lines)
-        move_lines |= move_lines._full_location_reservation().move_line_ids
+        move_lines |= move_lines._full_location_reservation(strict=True).move_line_ids
 
         # As lines should concern only one source location and as lines
         # can have been split, we need to retrieve only those with first location
