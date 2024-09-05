@@ -12,15 +12,24 @@
         <field name="arch" type="xml">
             <button name="button_next_pack" position="after">
                 <field name="package_has_missing_dimensions" invisible="1" />
+                <field name="smaller_package_has_missing_dimensions" invisible="1" />
+                <field name="scan_requested" invisible="1" />
                 <button
                     name="measure_current_packaging"
                     type="object"
                     string="Measure Current Packaging"
                     icon="fa-tachometer"
                     class="btn btn-secondary"
-                    attrs="{'invisible': [('package_has_missing_dimensions', '=', False)]}"
+                    attrs="{'invisible': ['|', ('package_has_missing_dimensions', '=', False), ('scan_requested', '=', True)]}"
                 />
-                <field name="scan_requested" invisible="1" />
+                <button
+                    name="measure_smaller_packaging"
+                    type="object"
+                    string="Measure Smaller Packaging"
+                    icon="fa-tachometer"
+                    class="btn btn-secondary"
+                    attrs="{'invisible': ['|', '|', ('package_has_missing_dimensions', '=', True), ('smaller_package_has_missing_dimensions', '=', False), ('scan_requested', '=', True)]}"
+                />
                 <button
                     name="cancel_measure_current_packaging"
                     type="object"
