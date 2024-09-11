@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="view_order_form" model="ir.ui.view">
+    <field name="name">sale.order.form.inherit</field>
+    <field name="model">sale.order</field>
+    <field
+            name="inherit_id"
+            ref="sale_stock_release_channel_partner_by_date.view_order_form"
+        />
+    <field name="arch" type="xml">
+      <field name="release_channel_id" position="before">
+        <field name="carrier_id" readonly="1" invisible="1" />
+      </field>
+    </field>
+  </record>
+
+</odoo>

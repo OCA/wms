@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record model="ir.model.access" id="stock_release_channel_partner_date_access_sale">
+        <field name="name">stock.release.channel.partner.date sale users</field>
+        <field
+            name="model_id"
+            ref="stock_release_channel_partner_by_date.model_stock_release_channel_partner_date"
+        />
+        <field name="group_id" ref="sales_team.group_sale_salesman" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+</odoo>

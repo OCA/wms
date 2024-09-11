@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="view_order_form" model="ir.ui.view">
+    <field name="name">sale.order.form.inherit</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock" />
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='delivery_status']" position="before">
+        <field name="release_channel_partner_date_id" invisible="1" />
+        <div
+                    name="warning_release_channel_partner_date"
+                    class="alert alert-warning mb-0"
+                    colspan="2"
+                    role="alert"
+                    attrs="{'invisible': [('release_channel_partner_date_id', '=', False)]}"
+                >
+          <span
+                    >A specific release channel is set for this delivery address and delivery date.</span>
+        </div>
+        <field
+                    name="release_channel_id"
+                    attrs="{'readonly': ['|', ('state', 'in', ['sale', 'done']), ('release_channel_partner_date_id', '!=', False)]}"
+                    force_save="1"
+                    options="{'no_create': True}"
+                />
+      </xpath>
+    </field>
+  </record>
+
+</odoo>
