@@ -3,7 +3,7 @@
 {
     "name": "Stock Release Channels with Sales - Delivery",
     "summary": "Filters channels on sales based on selected carrier.",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",

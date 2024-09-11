@@ -3,7 +3,7 @@
 {
     "name": "Stock Release Channels with Sales",
     "summary": "Release channels integration with Sales",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
