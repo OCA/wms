@@ -6,107 +6,109 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2024-09-16 12:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.constraint,message:stock_release_channel_partner_by_date.constraint_stock_release_channel_partner_date_uniq
 msgid "A release channel for this date is already set."
-msgstr ""
+msgstr "Un canale di rilascio per questa data è già stato impostato."
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__active
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_res_partner__stock_release_channel_by_date_ids
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_res_users__stock_release_channel_by_date_ids
 msgid "Additional Release Channels"
-msgstr ""
+msgstr "Canali rilascio aggiuntivi"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,help:stock_release_channel_partner_by_date.field_res_partner__stock_release_channel_by_date_ids
 #: model:ir.model.fields,help:stock_release_channel_partner_by_date.field_res_users__stock_release_channel_by_date_ids
 msgid "Additional release channels for a specific delivery date."
-msgstr ""
+msgstr "Canali di rilascio aggiuntivi per una data di consegna specifica."
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model,name:stock_release_channel_partner_by_date.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contatto"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__date
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__partner_id
 msgid "Delivery Address"
-msgstr ""
+msgstr "Indirizzo di consegna"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel__release_channel_partner_date_ids
 msgid "Delivery addresses by specific date"
-msgstr ""
+msgstr "Indirizzi di consegna per data specifica"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:stock_release_channel_partner_by_date.field_stock_release_channel_partner_date__release_channel_id
 msgid "Release Channel"
-msgstr ""
+msgstr "Canale rilascio"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model,name:stock_release_channel_partner_by_date.model_stock_release_channel_partner_date
 msgid "Release Channel for a specific delivery address and date"
-msgstr ""
+msgstr "Canale di rilascio per un indirizzo e una data di consegna specifici"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model,name:stock_release_channel_partner_by_date.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canali rilascio magazzino"
 
 #. module: stock_release_channel_partner_by_date
 #: model:ir.model,name:stock_release_channel_partner_by_date.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Trasferimento"
