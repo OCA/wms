@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2024-09-16 12:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. module: sale_stock_release_channel_partner_by_date
 #: model_terms:ir.ui.view,arch_db:sale_stock_release_channel_partner_by_date.view_order_form
@@ -20,21 +22,23 @@ msgid ""
 "<span>A specific release channel is set for this delivery address and "
 "delivery date.</span>"
 msgstr ""
+"<span>Per questo indirizzo di consegna e questa data di consegna è impostato "
+"un canale di rilascio specifico.</span>"
 
 #. module: sale_stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:sale_stock_release_channel_partner_by_date.field_sale_order__release_channel_id
 msgid "Release Channel"
-msgstr ""
+msgstr "Canale rilascio"
 
 #. module: sale_stock_release_channel_partner_by_date
 #: model:ir.model.fields,field_description:sale_stock_release_channel_partner_by_date.field_sale_order__release_channel_partner_date_id
 msgid "Release Channel Partner Date"
-msgstr ""
+msgstr "Data partner canale rilascio"
 
 #. module: sale_stock_release_channel_partner_by_date
 #: model:ir.model,name:sale_stock_release_channel_partner_by_date.model_sale_order
 msgid "Sales Order"
-msgstr ""
+msgstr "Ordine di vendita"
 
 #. module: sale_stock_release_channel_partner_by_date
 #: model:ir.model.fields,help:sale_stock_release_channel_partner_by_date.field_sale_order__release_channel_id
@@ -42,3 +46,5 @@ msgid ""
 "Specific release channel for the current delivery address based on expected "
 "delivery date."
 msgstr ""
+"Canale di rilascio specifico per l'indirizzo di consegna corrente in base "
+"alla data di consegna prevista."
