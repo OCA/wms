@@ -21,8 +21,8 @@ msgstr "Code"
 
 #. module: stock_service_level
 #: model:ir.model.constraint,message:stock_service_level.constraint_stock_service_level_book_format_code_uniq
-msgid "Code must be uniq."
-msgstr "Le code doit-être unique."
+msgid "Code must be unique."
+msgstr ""
 
 #. module: stock_service_level
 #: model_terms:ir.actions.act_window,help:stock_service_level.action_stock_service_level
@@ -96,3 +96,6 @@ msgstr "Règle de stock"
 #: model:ir.model,name:stock_service_level.model_stock_service_level
 msgid "Stock Service level"
 msgstr "Prestation / Offre / Niveau de service"
+
+#~ msgid "Code must be uniq."
+#~ msgstr "Le code doit-être unique."
