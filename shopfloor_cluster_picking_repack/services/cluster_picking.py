@@ -114,9 +114,6 @@ class ClusterPicking(Component):
         # Call the specific put in pack with package type filled in
         return self._put_in_pack(self, picking, package_type_id=package_type_id)
 
-    def _data_for_move_lines(self, lines, **kw):
-        return self.data.move_lines(lines, **kw)
-
     @property
     def default_pick_pack_action(self):
         return self.work.menu.default_pack_pickings_action
@@ -334,20 +331,10 @@ class ClusterPicking(Component):
         # TODO: This could be avoided if included in the picking parser.
         return ""
 
-    def _data_response_for_select_package(self, picking, lines):
-        return {
-            "selected_move_lines": self._data_for_move_lines(lines.sorted()),
-            "picking": self.data.picking(picking),
-            "packing_info": self._data_for_packing_info(picking),
-            # "no_package_enabled": not self.options.get("checkout__disable_no_package"),
-            # Used by inheriting module
-            "package_allowed": True,
-        }
-
     def _response_for_select_package(self, picking, lines, message=None):
         return self._response(
             next_state="select_package",
-            data=self._data_response_for_select_package(picking, lines),
+            data=self.data.select_package(picking, lines),
             message=message,
         )
 

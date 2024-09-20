@@ -1,4 +1,4 @@
-# Copyright 2021 ACSONE SA/NV
+# Copyright 2024 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from .common import ClusterPickingUnloadPackingCommonCase
 
@@ -34,6 +34,9 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             next_state="pack_picking_scan_pack",
             data=data,
         )
+        lines = picking.move_line_ids.filtered(
+            lambda ml: ml.result_package_id.is_internal
+        ).sorted(key=lambda ml: ml.result_package_id.name)
         # we scan the pack
         response = self.service.dispatch(
             "scan_packing_to_pack",
@@ -43,7 +46,8 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin1.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+
+        data = self.data.select_package(picking, lines)
         self.assert_response(
             response,
             next_state="select_package",
@@ -69,6 +73,9 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         self.assert_response(
             response, next_state="pack_picking_scan_pack", data=data, message=message
         )
+        lines = picking.move_line_ids.filtered(
+            lambda ml: ml.result_package_id.is_internal
+        ).sorted(key=lambda ml: ml.result_package_id.name)
         # we scan the pack
         response = self.service.dispatch(
             "scan_packing_to_pack",
@@ -78,10 +85,10 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin2.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.select_package(picking, lines)
         self.assert_response(
             response,
-            next_state="pack_picking_put_in_pack",
+            next_state="select_package",
             data=data,
         )
         # we process to the put in pack
