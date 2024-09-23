@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2024-09-23 16:06+0000\n"
+"Last-Translator: Bastian Günther <mail@bastian-guenther.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_route
@@ -238,12 +240,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__menu_ids
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_menu
 msgid "Menus"
-msgstr ""
+msgstr "Menüs"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_profile__menu_ids
 msgid "Menus visible for this profile"
-msgstr ""
+msgstr "Für dieses Profil sichtbare Menüs"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__name
@@ -303,12 +305,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_ids
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_profile
 msgid "Profiles"
-msgstr ""
+msgstr "Profile"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Profiles and menu items"
-msgstr ""
+msgstr "Profile und Menüeinträge"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__profile_ids
