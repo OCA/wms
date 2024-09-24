@@ -19,20 +19,20 @@ msgstr ""
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid ""
-"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
-"\"Automatic Release\"/>"
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
+"title=\"Automatic Release\"/>"
 msgstr ""
-"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" title="
-"\"Automatic Release\"/>"
+"<i class=\"fa fa-dropbox fa-4x\" role=\"img\" aria-label=\"Release\" "
+"title=\"Automatic Release\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
 msgid ""
-"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
-"\"Details\"/>"
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" "
+"title=\"Details\"/>"
 msgstr ""
-"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" title="
-"\"Details\"/>"
+"<i class=\"fa fa-ellipsis-v\" role=\"img\" aria-label=\"Details\" "
+"title=\"Details\"/>"
 
 #. module: stock_release_channel
 #: model_terms:ir.ui.view,arch_db:stock_release_channel.stock_release_channel_kanban_view
@@ -206,6 +206,11 @@ msgstr "Color"
 #. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_res_company
 msgid "Companies"
+msgstr ""
+
+#. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__company_id
+msgid "Company"
 msgstr ""
 
 #. module: stock_release_channel
