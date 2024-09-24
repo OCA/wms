@@ -5,7 +5,7 @@
     "name": "Stock Release Channel Shipment Advice Toursolver",
     "summary": """
         Use TourSolver to plan shipment advices for ready and released pickings""",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.1",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
