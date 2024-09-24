@@ -4,7 +4,7 @@
 {
     "name": "Stock Release Channel Shipment Advice",
     "summary": """Plan shipment advices for ready and released pickings""",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.2.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux"],
