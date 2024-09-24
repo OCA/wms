@@ -46,6 +46,18 @@ class TestReleaseChannel(ReleaseChannelCase):
         )
         self._test_assign_channels(channel)
 
+    def test_assign_channel_invalid_company(self):
+        # Create a channel for high priority moves but for another company
+        self._create_channel(
+            name="Test Domain",
+            sequence=1,
+            rule_domain=[("priority", "=", "1")],
+            company_id=self.company2.id,
+        )
+        # This move with high priority is then put in a transfer belonging to
+        # the default channel (default company)
+        self._test_assign_channels(self.default_channel)
+
     def test_invalid_code(self):
         with self.assertRaises(exceptions.ValidationError):
             self._create_channel(
