@@ -198,6 +198,11 @@ msgid "Companies"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__company_id
+msgid "Company"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model,name:stock_release_channel.model_res_config_settings
 msgid "Config Settings"
 msgstr ""
