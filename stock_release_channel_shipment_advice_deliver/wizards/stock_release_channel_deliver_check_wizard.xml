@@ -13,12 +13,12 @@
                 <field name="release_channel_id" invisible="1" />
                 <p>
                     There are some preparations that have not been completed.<br />
-                    If you choose to proceed, these preparations will be unreleased and won't be delivered.<br
+                    If you choose to proceed, these preparations will be unreleased and won't be delivered or delivered partially.<br
                     /><br />
                     <b>Are you sure you want to proceed with the delivery?</b>
                 </p>
                 <group>
-                    <field name="allowed_to_unrelease_picking_ids">
+                    <field name="allowed_to_unrelease_picking_ids" nolabel="1">
                         <tree edit="false">
                             <field name="name" />
                             <field name="origin" />
