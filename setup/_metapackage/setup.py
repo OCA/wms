@@ -68,6 +68,7 @@ setuptools.setup(
         'odoo14-addon-stock_reception_screen_qty_by_packaging',
         'odoo14-addon-stock_release_channel',
         'odoo14-addon-stock_service_level',
+        'odoo14-addon-stock_service_level_route',
         'odoo14-addon-stock_storage_type',
         'odoo14-addon-stock_storage_type_buffer',
         'odoo14-addon-stock_storage_type_putaway_abc',
