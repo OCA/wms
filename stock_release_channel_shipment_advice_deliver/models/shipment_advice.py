@@ -78,13 +78,17 @@ class ShipmentAdvice(models.Model):
 
     def _postprocess_action_done(self):
         res = super()._postprocess_action_done()
+        if not self.release_channel_id:
+            return res
         if self.state == "error":
             return self.release_channel_id._shipment_advice_auto_process_notify_error(
                 self.error_message
             )
-        if self.state != "done":
-            return res
-        return self.release_channel_id._shipment_advice_auto_process_notify_success()
+        if self.state == "done":
+            return (
+                self.release_channel_id._shipment_advice_auto_process_notify_success()
+            )
+        return res
 
     def action_done(self):
         # If the channel is in error and we try to validate its shipment
