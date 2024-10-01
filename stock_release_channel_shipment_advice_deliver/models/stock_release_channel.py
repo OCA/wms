@@ -115,11 +115,7 @@ class StockReleaseChannel(models.Model):
         )
 
     def _shipping_moves_to_unrelease(self):
-        moves = self.picking_ids.move_ids.filtered(
-            lambda m: m.picking_type_id.code == "outgoing"
-            and not m.need_release
-            and m.state in ("waiting", "partially_available")
-        )
+        moves = self.open_picking_ids.move_ids.filtered(lambda m: m._is_unreleaseable())
         # The internal operation could have been processed without backorder.
         # In this case, we don't have something to unrelease
         for move in moves:
