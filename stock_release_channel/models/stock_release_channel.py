@@ -102,6 +102,12 @@ class StockReleaseChannel(models.Model):
         inverse_name="release_channel_id",
         check_company=True,
     )
+    open_picking_ids = fields.One2many(
+        string="Open Transfers",
+        related="picking_ids",
+        readonly=True,
+        domain=[("state", "not in", ("done", "cancel"))],
+    )
 
     # beware not to store any value which can be changed by concurrent
     # stock.picking (e.g. the state cannot be stored)
