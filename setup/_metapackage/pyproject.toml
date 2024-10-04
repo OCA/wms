@@ -1,7 +1,8 @@
 [project]
 name = "odoo-addons-oca-wms"
-version = "17.0.20240621.0"
+version = "17.0.20241004.0"
 dependencies = [
+    "odoo-addon-stock_picking_type_shipping_policy>=17.0dev,<17.1dev",
     "odoo-addon-stock_warehouse_flow>=17.0dev,<17.1dev",
 ]
 classifiers=[

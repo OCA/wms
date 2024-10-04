@@ -21,6 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
+[stock_picking_type_shipping_policy](stock_picking_type_shipping_policy/) | 17.0.1.0.0 |  | Define different shipping policies according to picking type
 [stock_warehouse_flow](stock_warehouse_flow/) | 17.0.1.0.0 |  | Configure routing flow for stock moves
 
 [//]: # (end addons)
