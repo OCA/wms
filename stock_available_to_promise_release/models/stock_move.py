@@ -63,9 +63,8 @@ class StockMove(models.Model):
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
                 for origin_moves in iterator:
-                    unrelease_allowed = not origin_moves._in_progress_for_unrelease()
                     unrelease_allowed = (
-                        unrelease_allowed
+                        not origin_moves._in_progress_for_unrelease()
                         and move._is_unrelease_allowed_on_origin_moves(origin_moves)
                     )
                     if not unrelease_allowed:
@@ -144,14 +143,11 @@ class StockMove(models.Model):
             <= 0
         )
 
-    def _check_unrelease_allowed(self):
-        forbidden_moves = self.filtered(lambda m: not m.unrelease_allowed)
-        if not forbidden_moves:
-            return
+    def _unrelease_not_allowed_error(self):
         message = _("You are not allowed to unrelease those deliveries:\n")
 
         for picking, forbidden_moves_by_picking in groupby(
-            forbidden_moves, lambda m: m.picking_id
+            self, lambda m: m.picking_id
         ):
             forbidden_moves_by_picking = self.browse().concat(
                 *forbidden_moves_by_picking
@@ -678,7 +674,7 @@ class StockMove(models.Model):
             moves = moves.mapped(chain_field) - visited_moves
 
     def unrelease(self, safe_unrelease=False):
-        """Unrelease unreleasavbe moves
+        """Unrelease unreleasable moves
 
         If safe_unrelease is True, the unreleasaable moves for which the
         processing has already started will be ignored
@@ -686,7 +682,9 @@ class StockMove(models.Model):
         moves_to_unrelease = self.filtered(lambda m: m._is_unreleaseable())
         if safe_unrelease:
             moves_to_unrelease = self.filtered("unrelease_allowed")
-        moves_to_unrelease._check_unrelease_allowed()
+        forbidden_moves = moves_to_unrelease.filtered(lambda m: not m.unrelease_allowed)
+        if forbidden_moves:
+            forbidden_moves._unrelease_not_allowed_error()
         moves_to_unrelease.write({"need_release": True})
         impacted_picking_ids = set()
 
