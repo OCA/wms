@@ -20,6 +20,30 @@ class LocationContentTransferCommonCase(CommonCase):
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
+        cls.product_e = (
+            cls.env["product.product"]
+            .sudo()
+            .create(
+                {
+                    "name": "Product E",
+                    "type": "product",
+                    "default_code": "E",
+                    "barcode": "E",
+                    "weight": 3,
+                }
+            )
+        )
+        cls.product_e_packaging = (
+            cls.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "Box",
+                    "product_id": cls.product_e.id,
+                    "barcode": "ProductEBox",
+                }
+            )
+        )
         cls.content_loc = (
             cls.env["stock.location"]
             .sudo()
@@ -27,6 +51,19 @@ class LocationContentTransferCommonCase(CommonCase):
                 {
                     "name": "Content Location",
                     "barcode": "Content",
+                    "location_id": cls.picking_type.default_location_src_id.id,
+                }
+            )
+        )
+        # This is an additional content location to manage the cases
+        # where a product can be stored in several locations
+        cls.content_loc_1 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Content Location 1",
+                    "barcode": "Content1",
                     "location_id": cls.picking_type.default_location_src_id.id,
                 }
             )
@@ -98,11 +135,30 @@ class LocationContentTransferCommonCase(CommonCase):
         )
 
     def assert_response_start_single(
-        self, response, pickings, message=None, popup=None
+        self, response, pickings, message=None, popup=None, postponed=False
     ):
+        """
+
+            This will check if the line returned correspond to the
+            next operation to do
+
+        :param response: The response returned by the service
+        :type response: dict
+        :param pickings: Pickings to check (recordset)
+        :type pickings: stock.picking
+        :param message: The message returned in the response, defaults to None
+        :type message: dict, optional
+        :param popup: The popup message returned to the operator, defaults to None
+        :type popup: dict, optional
+        :param postponed: Fill in this in order to check if the returned line
+        should be the first one or the next one, defaults to False
+        :type postponed: bool, optional
+        """
         sorter = self.service._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         location = pickings.mapped("location_id")
+        if postponed:
+            next(sorter)
         self.assert_response(
             response,
             next_state="start_single",
