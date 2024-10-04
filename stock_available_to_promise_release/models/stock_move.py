@@ -671,9 +671,11 @@ class StockMove(models.Model):
         The loop into the iterator is the current moves.
         """
         moves = self
+        visited_moves = self.browse()
         while moves:
             yield moves
-            moves = moves.mapped(chain_field)
+            visited_moves += moves
+            moves = moves.mapped(chain_field) - visited_moves
 
     def unrelease(self, safe_unrelease=False):
         """Unrelease unreleasavbe moves
