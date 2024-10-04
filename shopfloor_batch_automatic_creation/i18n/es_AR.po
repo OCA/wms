@@ -17,6 +17,18 @@ msgstr ""
 "X-Generator: Weblate 4.3.2\n"
 
 #. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid ""
+"<code>line</code>: The stock move line Record for with the key must be "
+"computed."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "<code>super</code>: The initial method to compute the key."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
 msgid "Automatic Batch Creation"
 msgstr "Creación Automática de Lotes"
@@ -40,19 +52,29 @@ msgstr ""
 "las 2 transferencias prioritarias."
 
 #. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__display_name
-msgid "Display Name"
-msgstr "Mostrar Nombre"
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.shopfloor_menu_form_view
+msgid "Batch Creation"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Custom code to construct the key to sort move lines"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__stock_device_type_ids
+msgid "Default device types"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__stock_device_type_ids
+msgid "Default list of eligible device types when creating a batch transfer"
+msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
 msgid "Group by commercial entity"
 msgstr "Agrupar por entidad comercial"
-
-#. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__id
-msgid "ID"
-msgstr "ID"
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_group_by_commercial_partner
@@ -64,52 +86,89 @@ msgstr ""
 "Esto podría mezclar prioridades e ignorar las restricciones para aplicar."
 
 #. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu____last_update
-msgid "Last Modified on"
-msgstr "Última Modificación el"
-
-#. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
-msgid "Max Weight (kg)"
-msgstr "Peso Máximo (kg)"
-
-#. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
-msgid "Max transfers"
-msgstr "Transferencias máximas"
-
-#. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
-msgid "Max volume (m³)"
-msgstr "Volumen máximo (m³)"
-
-#. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_picking
-msgid ""
-"Maximum number of transfers to add in an automatic batch. 0 means no limit."
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Leave blank to use the default method."
 msgstr ""
-"Número máximo de transferencias para agregar en un lote automático. 0 "
-"significa sin límite."
 
 #. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_volume
-msgid ""
-"Maximum volume in cubic meters of goods in transfers to add in an automatic "
-"batch. 0 means no limit."
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_stock_device_type__line_sort_key_code
+msgid "Line sort key method"
 msgstr ""
-"Volumen máximo en metros cúbicos de mercadería en transferencias para "
-"agregar en un lote automático. 0 significa sin límite."
 
 #. module: shopfloor_batch_automatic_creation
-#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create_max_weight
-msgid ""
-"Maximum weight in kg of goods in transfers to add in an automatic batch. 0 "
-"means no limit."
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_maximum_number_of_preparation_lines
+msgid "Maximum number of preparation lines for the batch"
 msgstr ""
-"Peso máximo en kg de mercancía en transferencias para agregar en un lote "
-"automático. 0 significa sin límite."
 
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model,name:shopfloor_batch_automatic_creation.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
 msgstr "Menú mostrado en la aplicación de escaner"
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_stock_device_type__line_sort_key_code
+msgid ""
+"Python code to sort the lines in the batch.\n"
+"\n"
+"        The 'line' will be a recordset of stock.move.line.\n"
+"        and the method must assign a value to the variable 'key'\n"
+"        that will be used to sort the lines. You can also call\n"
+"        the super method to get the default behavior.\n"
+"        "
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model,name:shopfloor_batch_automatic_creation.model_stock_device_type
+msgid "Stock Device Type"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid ""
+"To assign the key value: <code>key = (line.product_id.weight, ) + "
+"super(line)</code>"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Two variables are available:"
+msgstr ""
+
+#~ msgid "Display Name"
+#~ msgstr "Mostrar Nombre"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificación el"
+
+#~ msgid "Max Weight (kg)"
+#~ msgstr "Peso Máximo (kg)"
+
+#~ msgid "Max transfers"
+#~ msgstr "Transferencias máximas"
+
+#~ msgid "Max volume (m³)"
+#~ msgstr "Volumen máximo (m³)"
+
+#~ msgid ""
+#~ "Maximum number of transfers to add in an automatic batch. 0 means no "
+#~ "limit."
+#~ msgstr ""
+#~ "Número máximo de transferencias para agregar en un lote automático. 0 "
+#~ "significa sin límite."
+
+#~ msgid ""
+#~ "Maximum volume in cubic meters of goods in transfers to add in an "
+#~ "automatic batch. 0 means no limit."
+#~ msgstr ""
+#~ "Volumen máximo en metros cúbicos de mercadería en transferencias para "
+#~ "agregar en un lote automático. 0 significa sin límite."
+
+#~ msgid ""
+#~ "Maximum weight in kg of goods in transfers to add in an automatic batch. "
+#~ "0 means no limit."
+#~ msgstr ""
+#~ "Peso máximo en kg de mercancía en transferencias para agregar en un lote "
+#~ "automático. 0 significa sin límite."
