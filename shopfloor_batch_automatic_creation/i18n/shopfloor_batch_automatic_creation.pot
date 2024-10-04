@@ -14,6 +14,18 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid ""
+"<code>line</code>: The stock move line Record for with the key must be "
+"computed."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "<code>super</code>: The initial method to compute the key."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_create
 msgid "Automatic Batch Creation"
 msgstr ""
@@ -32,6 +44,11 @@ msgstr ""
 #. module: shopfloor_batch_automatic_creation
 #: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.shopfloor_menu_form_view
 msgid "Batch Creation"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Custom code to construct the key to sort move lines"
 msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
@@ -57,6 +74,16 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Leave blank to use the default method."
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_stock_device_type__line_sort_key_code
+msgid "Line sort key method"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
 #: model:ir.model.fields,field_description:shopfloor_batch_automatic_creation.field_shopfloor_menu__batch_maximum_number_of_preparation_lines
 msgid "Maximum number of preparation lines for the batch"
 msgstr ""
@@ -64,4 +91,33 @@ msgstr ""
 #. module: shopfloor_batch_automatic_creation
 #: model:ir.model,name:shopfloor_batch_automatic_creation.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model.fields,help:shopfloor_batch_automatic_creation.field_stock_device_type__line_sort_key_code
+msgid ""
+"Python code to sort the lines in the batch.\n"
+"\n"
+"        The 'line' will be a recordset of stock.move.line.\n"
+"        and the method must assign a value to the variable 'key'\n"
+"        that will be used to sort the lines. You can also call\n"
+"        the super method to get the default behavior.\n"
+"        "
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model:ir.model,name:shopfloor_batch_automatic_creation.model_stock_device_type
+msgid "Stock Device Type"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid ""
+"To assign the key value: <code>key = (line.product_id.weight, ) + "
+"super(line)</code>"
+msgstr ""
+
+#. module: shopfloor_batch_automatic_creation
+#: model_terms:ir.ui.view,arch_db:shopfloor_batch_automatic_creation.stock_device_type_form_view
+msgid "Two variables are available:"
 msgstr ""
