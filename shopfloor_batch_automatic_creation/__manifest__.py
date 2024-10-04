@@ -14,6 +14,7 @@
     "depends": ["shopfloor", "stock_picking_batch_creation"],
     "data": [
         "views/shopfloor_menu_views.xml",
+        "views/stock_device_type.xml",
     ],
     "installable": True,
 }
