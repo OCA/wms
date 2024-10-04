@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-23 15:46+0000\n"
-"PO-Revision-Date: 2024-01-23 15:46+0000\n"
+"POT-Creation-Date: 2024-10-04 12:08+0000\n"
+"PO-Revision-Date: 2024-10-04 12:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: stock_release_channel_shipment_advice_deliver
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_kanban_view
+msgid "<span class=\"ms-2\">Deliver</span>"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -34,7 +39,8 @@ msgstr "L'action 'Livré' n'est pas autorisée pour le canal %(name)s."
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Delivering Error' is not allowed for channel %(name)s."
-msgstr "L'action 'Erreur de livraison' n'est pas autorisée pour le canal %(name)s."
+msgstr ""
+"L'action 'Erreur de livraison' n'est pas autorisée pour le canal %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -58,6 +64,11 @@ msgstr ""
 "- %(related_object_name)s: %(error)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__auto_deliver
+msgid "Auto Deliver"
+msgstr "Livraison automatique"
+
+#. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/shipment_advice.py:0
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
@@ -66,7 +77,7 @@ msgid "Automatically process the shipment advice %(name)s."
 msgstr "Traiter automatiquement l'avis d'expédition %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_shipment_advice_deliver_check_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Cancel the deliver"
 msgstr "Annuler la livraison"
 
@@ -78,14 +89,14 @@ msgid "Confirm delivery"
 msgstr "Confirmer la livraison"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__create_uid
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__create_uid
 msgid "Created by"
-msgstr "Créé par"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__create_date
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__create_date
 msgid "Created on"
-msgstr "Créé le"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_form_view
@@ -93,9 +104,9 @@ msgid "Deliver"
 msgstr "Livrer"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_shipment_advice_deliver_check_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Deliver any way"
-msgstr "Livrer quand même"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice_deliver.selection__stock_release_channel__state__delivered
@@ -122,12 +133,12 @@ msgid "Delivering release channel %(name)s."
 msgstr "Livraison du canal de livraison %(name)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__display_name
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__id
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__id
 msgid "ID"
 msgstr ""
 
@@ -157,19 +168,19 @@ msgid "Is Action Delivering Error Allowed"
 msgstr "Action Erreur de livraison Permise"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard____last_update
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard____last_update
 msgid "Last Modified on"
-msgstr "Dernière modification le"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__write_uid
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__write_uid
 msgid "Last Updated by"
-msgstr "Dernière modification par"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__write_date
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__write_date
 msgid "Last Updated on"
-msgstr "Dernière modification le"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -183,18 +194,18 @@ msgstr "Aucun picking à livrer pour le canal %(name)s."
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid ""
-"One of the delivery for channel %(name)s is waiting on another printed transfer. \n"
-"Please finish it manually or cancel its start to be able to deliver.\n"
+"One of the delivery for channel %(name)s is waiting on another transfer. \n"
+"Please finish it manually or cancel its start and done quantities to be able to deliver.\n"
 "%(pickings)s"
 msgstr ""
-"Une des livraison pour le canal %(name)s est en attente d'un autre transfert imprimé.\n"
-"Veuillez le terminer manuellement ou annuler son démarrage pour pouvoir livrer.\n"
+"Une des livraison du canal %(name)s est en attente d'un autre transfert. \n"
+"Veuillez le finaliser manuellement ou annuler son démarrage et les quantités faites afin de pouvoir le livrer.\n"
 "%(pickings)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_shipment_advice_deliver_check_wizard__release_channel_id
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__release_channel_id
 msgid "Release Channel"
-msgstr "Canaux de livraison"
+msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_shipment_advice
@@ -220,12 +231,7 @@ msgid "State"
 msgstr "État"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_picking
-msgid "Stock Picking"
-msgstr ""
-
-#. module: stock_release_channel_shipment_advice_deliver
-#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_shipment_advice_deliver_check_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Stock Release Channel Deliver Check"
 msgstr ""
 
@@ -246,44 +252,42 @@ msgstr ""
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "The delivery background task is done for the channel %(name)s"
-msgstr "La tâche d'arrière-plan de livraison est effectuée pour le canal %(name)s."
+msgstr ""
+"La tâche d'arrière-plan de livraison est effectuée pour le canal %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,help:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__state
 msgid ""
 "The state allows you to control the availability of the release channel.\n"
 "* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
-" * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
+"* Locked: Release operations are forbidden. (Assignement processes are still working)\n"
 "* Delivering: A background task is running to automatically deliver ready shipments\n"
 "* Delivering Error: An error occurred in the delivery background task\n"
 "* Delivered: Ready transfers are delivered\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
 msgstr ""
 "L'état vous permet de contrôler la disponibilité du canal de livraison.\n"
-"* Ouvert: l'affectation manuelle et automatique des transferts au canal de "
-"livraison est effective et les opérations de préparation sont autorisées.\n"
-"* Verrouillé: les opérations de préparation sont interdites. (Les processus "
-"d'affectation fonctionnent toujours)\n"
-"* Livraison : une tâche en arrière-plan est en cours d'exécution pour livrer "
-"automatiquement les transferts\n"
-"* Erreur de livraison: une erreur s'est produite dans la tâche d'arrière-"
-"plan de livraison\n"
+"* Ouvert: l'affectation manuelle et automatique des transferts au canal de livraison est effective et les opérations de préparation sont autorisées.\n"
+"* Verrouillé: les opérations de préparation sont interdites. (Les processus d'affectation fonctionnent toujours)\n"
+"* Livraison : une tâche en arrière-plan est en cours d'exécution pour livrer automatiquement les transferts\n"
+"* Erreur de livraison: une erreur s'est produite dans la tâche d'arrière-plan de livraison\n"
 "* Livré: les transferts prêts sont livrés\n"
-"* Endormi: les transferts affectés non traités sont désaffectés du canal de "
-"livraison.\n"
+"* Endormi: les transferts affectés non traités sont désaffectés du canal de livraison.\n"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_shipment_advice_deliver_check_wizard_form_view
+#: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid ""
 "There are some preparations that have not been completed.\n"
 "                    If you choose to proceed, these preparations will be unreleased.<br/>\n"
 "                    Are you sure you want to proceed with the delivery?"
 msgstr ""
-"Il y a des transferts qui n'ont pas été finalisés.\n
-"                    Si vous choisissez de continuer, ces transferts vont être délibérés.<br/>\n"
-"                    Etes-vous sûr de vouloir lancer la livraison?"
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_release_channel_shipment_advice_deliver_check_wizard
+#: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: stock_release_channel_shipment_advice_deliver
+#: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_release_channel_deliver_check_wizard
 msgid "stock release channel deliver check wizard"
 msgstr ""
