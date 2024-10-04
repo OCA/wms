@@ -981,13 +981,8 @@ class Reception(Component):
             return self._response_for_select_move(
                 picking, message=self.msg_store.transfer_no_qty_done()
             )
-        if not confirmation:
-            # Do not create a backorder if this is a shopfloor return.
-            if picking.is_shopfloor_created and self.work.menu.allow_return:
-                picking.with_context(cancel_backorder=True)._action_done()
-                return self._response_for_select_document(
-                    message=self.msg_store.transfer_done_success(picking)
-                )
+        cancel_backorder = picking.is_shopfloor_created and self.work.menu.allow_return
+        if not confirmation and not cancel_backorder:
             to_backorder = picking._check_backorder()
             if to_backorder:
                 # Not all lines are fully done, ask the user to confirm the
@@ -999,18 +994,21 @@ class Reception(Component):
             return self._response_for_confirm_done(
                 picking, message=self.msg_store.need_confirmation()
             )
-        self._handle_backorder(picking)
+        self._handle_backorder(picking, cancel_backorder)
         return self._response_for_select_document(
             message=self.msg_store.transfer_done_success(picking)
         )
 
-    def _handle_backorder(self, picking):
+    def _handle_backorder(self, picking, cancel_backorder=False):
         """This method handles backorders that could be created at picking confirm."""
+        if cancel_backorder:
+            picking = picking.with_context(cancel_backorder=True)
         backorders_before = picking.backorder_ids
         picking._action_done()
-        backorders_after = picking.backorder_ids - backorders_before
-        # Remove user_id on the backorder, if any
-        backorders_after.user_id = False
+        if not cancel_backorder:
+            backorders_after = picking.backorder_ids - backorders_before
+            # Remove user_id on backorder, if any
+            backorders_after.user_id = False
 
     def set_lot(
         self, picking_id, selected_line_id, lot_name=None, expiration_date=None
