@@ -635,6 +635,7 @@ class StockMove(models.Model):
                 move_names=move_names,
             )
             picking.message_post(body=body)
+            picking.last_release_date = False
 
     def _split_origins(self, origins):
         """Split the origins of the move according to the quantity into the
