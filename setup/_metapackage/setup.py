@@ -27,6 +27,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_delivery_shipment',
         'odoo14-addon-shopfloor_delivery_shipment_mobile',
         'odoo14-addon-shopfloor_example',
+        'odoo14-addon-shopfloor_location_content_transfer_force_package',
         'odoo14-addon-shopfloor_manual_product_transfer',
         'odoo14-addon-shopfloor_manual_product_transfer_mobile',
         'odoo14-addon-shopfloor_mobile',
