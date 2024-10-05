@@ -462,6 +462,11 @@ msgid "Open"
 msgstr ""
 
 #. module: stock_release_channel
+#: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__open_picking_ids
+msgid "Open Transfers"
+msgstr ""
+
+#. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_type_ids
 msgid "Operation Types"
 msgstr ""
@@ -682,6 +687,9 @@ msgid ""
 "The state allows you to control the availability of the release channel.\n"
 "* Open: Manual and automatic picking assignment to the release is effective and release operations are allowed.\n"
 " * Locked: Release operations are forbidden. (Assignement processes are still working)\n"
+"* Delivering: A background task is running to automatically deliver ready shipments\n"
+"* Delivering Error: An error occurred in the delivery background task\n"
+"* Delivered: Ready transfers are delivered\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
 msgstr ""
 
