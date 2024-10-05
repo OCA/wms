@@ -18,6 +18,7 @@
   "location_content_transfer.scan_destination_all.title": "Scannez l'emplacement de destination pour tous les produits",
   "location_content_transfer.scan_location.title": "Commencez en scannant un emplacement",
   "location_content_transfer.start_single.scan_placeholder": "Scannez une boite / un produit / un lot",
+  "location_content_transfer.scan_destination.scan_placeholder": "Scannez un emplacement / pack",
   "misc.btn_get_work": "Obtenir du travail",
   "misc.btn_manual_selection": "Sélection manuelle",
   "misc.lines_count": "Nombre de lignes",

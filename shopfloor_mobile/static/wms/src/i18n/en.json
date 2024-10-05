@@ -21,6 +21,7 @@
   "location_content_transfer.scan_destination_all.title": "Scan destination location for all items",
   "location_content_transfer.scan_location.title": "Start by scanning a location",
   "location_content_transfer.start_single.scan_placeholder": "Scan pack / product / lot",
+  "location_content_transfer.scan_destination.scan_placeholder": "Scan location / pack",
   "misc.actions_popup.btn_action": "Action",
   "misc.btn_get_work": "Get work",
   "misc.btn_manual_selection": "Manual Selection",

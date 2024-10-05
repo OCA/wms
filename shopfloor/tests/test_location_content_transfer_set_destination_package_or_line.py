@@ -96,7 +96,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             package_level,
-            message=self.service.msg_store.no_location_found(),
+            message=self.service.msg_store.barcode_not_found(),
         )
         # Destination location not allowed
         customer_location = self.env.ref("stock.stock_location_customers")
@@ -280,7 +280,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             move_line,
-            message=self.service.msg_store.no_location_found(),
+            message=self.service.msg_store.barcode_not_found(),
         )
         # Destination location not allowed
         customer_location = self.env.ref("stock.stock_location_customers")

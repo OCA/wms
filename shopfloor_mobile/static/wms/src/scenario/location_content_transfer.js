@@ -266,17 +266,21 @@ const LocationContentTransfer = {
                         title: this.$t(
                             "location_content_transfer.scan_destination_all.title"
                         ),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t(
+                            "location_content_transfer.scan_destination.scan_placeholder"
+                        ),
                     },
                     on_scan: (scanned) => {
                         const data = this.state.data;
-                        this.wait_call(
-                            this.odoo.call("set_destination_all", {
-                                location_id: data.location.id,
-                                barcode: scanned.text,
-                                confirmation: data.confirmation_required || "",
-                            })
-                        );
+                        const payload = {
+                            location_id: data.location.id,
+                            barcode: scanned.text,
+                            confirmation: data.confirmation_required || "",
+                        };
+                        if (this.state.data.package) {
+                            payload.package_id = this.state.data.package.id;
+                        }
+                        this.wait_call(this.odoo.call("set_destination_all", payload));
                     },
                     on_split_by_line: () => {
                         const location = this.state.data.location;
@@ -320,7 +324,9 @@ const LocationContentTransfer = {
                         title: this.$t(
                             "location_content_transfer.scan_destination.title"
                         ),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t(
+                            "location_content_transfer.scan_destination.scan_placeholder"
+                        ),
                     },
                     events: {
                         qty_edit: "on_qty_update",
@@ -348,6 +354,9 @@ const LocationContentTransfer = {
                                 confirmation: data.confirmation_required || "",
                                 quantity: this.scan_destination_qty,
                             };
+                        }
+                        if (this.state.data.package) {
+                            endpoint_data.package_id = this.state.data.package.id;
                         }
                         this.wait_call(this.odoo.call(endpoint, endpoint_data));
                     },
