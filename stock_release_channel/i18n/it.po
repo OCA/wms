@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-26 09:06+0000\n"
+"PO-Revision-Date: 2024-10-05 17:06+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -480,7 +480,7 @@ msgstr "Aperto"
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__open_picking_ids
 msgid "Open Transfers"
-msgstr ""
+msgstr "Trasferimenti aperti"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,field_description:stock_release_channel.field_stock_release_channel__picking_type_ids
@@ -712,6 +712,18 @@ msgid ""
 "* Asleep: Assigned pickings not processed are unassigned from the release "
 "channel.\n"
 msgstr ""
+"Lo stato consente di controllare la disponibilità del canale di rilascio.\n"
+"* Apri: l'assegnazione manuale e automatica di raccolta al rilascio è "
+"efficace e sono consentite operazioni di rilascio.\n"
+"* Bloccato: le operazioni di rilascio sono vietate. (I processi di "
+"assegnazione stanno ancora funzionando)\n"
+"* Consegna: un'attività di fondo è in esecuzione per consegnare "
+"automaticamente le spedizioni pronte\n"
+"* Errore di consegna: si è verificato un errore nell'attività di background "
+"di consegna\n"
+"* Consegnato: vengono consegnati trasferimenti pronti\n"
+"* Dormienti: i prelievi assegnati non elaborati non sono assegnati dal "
+"canale di rilascio.\n"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state_at_wakeup
