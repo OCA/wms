@@ -908,7 +908,19 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "Package {} is empty, scan a location."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Package {} is not available in transfer {}."
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Package {} is not empty anmyore."
 msgstr ""
 
 #. module: shopfloor
@@ -1446,8 +1458,8 @@ msgstr ""
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id=\"%d"
-"\">%s</a> has been created."
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
+"id=\"%d\">%s</a> has been created."
 msgstr ""
 
 #. module: shopfloor
@@ -1933,8 +1945,8 @@ msgid "{} {} put in {}"
 msgstr ""
 
 #~ msgid ""
-#~ "Created from backorder <a href=# data-oe-model=stock.picking data-oe-id="
-#~ "%d>%s</a>."
+#~ "Created from backorder <a href=# data-oe-model=stock.picking data-oe-"
+#~ "id=%d>%s</a>."
 #~ msgstr ""
 #~ "Creat des de comanda pendent <a href=# data-oe-model=stock.picking data-"
 #~ "oe-id=%d>%s</a>."
