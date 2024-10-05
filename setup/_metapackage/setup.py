@@ -43,6 +43,7 @@ setuptools.setup(
         'odoo-addon-stock_release_channel_process_end_time>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_propagate_channel_picking>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_shipment_advice>=16.0dev,<16.1dev',
+        'odoo-addon-stock_release_channel_shipment_advice_deliver>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_shipment_advice_process_end_time>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_shipment_advice_toursolver>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_shipment_lead_time>=16.0dev,<16.1dev',
