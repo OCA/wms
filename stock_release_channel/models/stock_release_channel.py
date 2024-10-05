@@ -102,6 +102,12 @@ class StockReleaseChannel(models.Model):
         inverse_name="release_channel_id",
         check_company=True,
     )
+    open_picking_ids = fields.One2many(
+        string="Open Transfers",
+        related="picking_ids",
+        readonly=True,
+        domain=[("state", "not in", ("done", "cancel"))],
+    )
 
     # beware not to store any value which can be changed by concurrent
     # stock.picking (e.g. the state cannot be stored)
@@ -187,7 +193,7 @@ class StockReleaseChannel(models.Model):
         selection=[("open", "Open"), ("locked", "Locked"), ("asleep", "Asleep")],
         help="The state allows you to control the availability of the release channel.\n"
         "* Open: Manual and automatic picking assignment to the release is effective "
-        "and release operations are allowed.\n "
+        "and release operations are allowed.\n"
         "* Locked: Release operations are forbidden. (Assignement processes are "
         "still working)\n"
         "* Asleep: Assigned pickings not processed are unassigned from the release "

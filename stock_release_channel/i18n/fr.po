@@ -685,11 +685,15 @@ msgid ""
 "The state allows you to control the availability of the release channel.\n"
 "* Open: Manual and automatic picking assignment to the release is effective "
 "and release operations are allowed.\n"
-" * Locked: Release operations are forbidden. (Assignement processes are "
+"* Locked: Release operations are forbidden. (Assignement processes are "
 "still working)\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release "
 "channel.\n"
 msgstr ""
+"L'état vous permet de contrôler la disponibilité du canal de livraison.\n"
+"* Ouvert: l'affectation manuelle et automatique des transferts au canal de livraison est effective et les opérations de préparation sont autorisées.\n"
+"* Verrouillé: les opérations de préparation sont interdites. (Les processus d'affectation fonctionnent toujours)\n"
+"* Endormi: les transferts affectés non traités sont désaffectés du canal de livraison.\n"
 
 #. module: stock_release_channel
 #: model:ir.model.fields,help:stock_release_channel.field_stock_release_channel__state_at_wakeup

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="is_action_deliver_allowed" invisible="1" />
+                    <button
+                    name="action_deliver"
+                    string="Deliver"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-truck"
+                    attrs="{'invisible': [('is_action_deliver_allowed', '=', False)]}"
+                />
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div
+                    class="alert alert-danger mb-0"
+                    role="alert"
+                    attrs="{'invisible': [('state', '!=', 'delivering_error')]}"
+                >
+                    <field name="delivering_error" />
+                    </div>
+            </xpath>
+            <field name="release_forbidden" position="after">
+                <field name="auto_deliver" />
+            </field>
+            <button name="button_plan_shipments" position="attributes">
+                <attribute
+                    name="attrs"
+                >{'invisible': ['|', ('can_plan_shipment', '=', False), ('auto_deliver', '=', True)]}</attribute>
+            </button>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="stock_release_channel_search_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_search_view"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_locked']" position="after">
+                <filter
+                    string="Delivering"
+                    name="filter_delivering"
+                    domain="[('state','in', ('delivering', 'delivering_error', 'delivered'))]"
+                />
+            </xpath>
+       </field>
+    </record>
+
+    <record
+        model="ir.actions.act_window"
+        id="stock_release_channel.stock_release_channel_act_window"
+    >
+        <field
+            name="context"
+        >{'search_default_filter_open': True, 'search_default_filter_locked': True, 'search_default_filter_delivering': True}</field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_kanban_view">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//div[hasclass('o_kanban_card_manage_title')]"
+                position="after"
+            >
+                <field name="is_action_deliver_allowed" invisible="1" />
+                <t t-if="record.is_action_deliver_allowed.raw_value">
+                    <div role="menuitem">
+                        <a name="action_deliver" type="object" icon="fa-truck"><span
+                                class="ms-2"
+                            >Deliver</span></a>
+                    </div>
+                </t>
+            </xpath>
+       </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_release_channel_kanban_view_2">
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_shipment_advice.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <field name="can_plan_shipment" position="after">
+                <field name="auto_deliver" invisible="1" />
+            </field>
+            <xpath
+                expr="//t[@t-if='record.can_plan_shipment.raw_value']"
+                position="attributes"
+            >
+                <attribute
+                    name="t-if"
+                >record.can_plan_shipment.raw_value and !record.auto_deliver.raw_value</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
