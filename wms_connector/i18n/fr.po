@@ -1,0 +1,405 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* wms_connector
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__active
+msgid "Active"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__active_wms_sync
+msgid "Active Wms Sync"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_attachment_queue
+msgid "Attachment Queue"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_attachment_synchronize_task
+msgid "Attachment synchronize task"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_form_view
+msgid ""
+"Before cancelling, ensure that your have cancelled the picking in the"
+"                              external WMS"
+msgstr "Avant d'annuler, veuillez vous s'assurer que le transfert à été annulé dans le WMS externe"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_synchronize_task__file_type__wms_delivery_confirmed
+msgid "Delivery confirmed"
+msgstr "Confirmation de livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_synchronize_task__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_product_product__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_importable_mixin__display_name
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_form_view
+msgid "Synchronisation error"
+msgstr "Erreur de Synchronisation"
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_synchronize_task__file_type__export
+msgid "Export"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_form_view
+msgid "Export to WMS"
+msgstr "Exporter au WMS"
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_tree_view
+msgid "Exported at"
+msgstr "Exporté le"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__file_type
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_synchronize_task__file_type
+msgid "File Type"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_form_view
+msgid "Force Cancel"
+msgstr "Forcer l'annulation"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__id
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_synchronize_task__id
+#: model:ir.model.fields,field_description:wms_connector.field_product_product__id
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__id
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__id
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin__id
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_importable_mixin__id
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__id
+msgid "ID"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_importable_mixin__import_date
+msgid "Import Date"
+msgstr "Date d'import"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_importable_mixin__import_file_id
+msgid "Import File"
+msgstr "Ficher importé"
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_synchronize_task__file_type__wms_update_inventory
+msgid "Inventory update"
+msgstr "Mise à jour d'inventaire"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__is_wms_exportable
+msgid "Is Wms Exportable"
+msgstr "Exportable dans le WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_synchronize_task____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_product_product____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_importable_mixin____last_update
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.attachment_queue_view_form
+msgid "Picking"
+msgstr "Transfert"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__picking_imported_ids
+msgid "Picking Imported"
+msgstr "Transfert Importé"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__picking_imported_count
+msgid "Picking Imported Count"
+msgstr "Nbre de Transfert"
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_product_product
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_synchronize_task__file_type__wms_reception_confirmed
+msgid "Reception confirmed"
+msgstr "Récéption confirmé"
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_warehouse_form_view
+msgid "Refresh WMS products"
+msgstr "Rafraichir les produits WMS"
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_synchronize_exportable_mixin
+msgid "Synchronizable export mixin"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_synchronize_importable_mixin
+msgid "Synchronizable import mixin"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_warehouse_form_view
+msgid "Synchronization"
+msgstr "Synchronisation"
+
+#. module: wms_connector
+#: model:ir.model.fields,help:wms_connector.field_attachment_queue__file_type
+msgid ""
+"The file type determines an import method to be used to parse and transform "
+"data before their import in ERP or an export"
+msgstr ""
+
+#. module: wms_connector
+#: code:addons/wms_connector/models/stock_picking.py:0
+#, python-format
+msgid ""
+"The picking %s can not be deleted as it have been sent to the WMS, ask your "
+"manager to force the cancellation"
+msgstr "Le transfert %s ne peut pas être supprimé car il à été envoyé à votre responsable "
+"pour qu'il force l'annulation"
+
+#. module: wms_connector
+#: code:addons/wms_connector/models/stock_picking.py:0
+#, python-format
+msgid "The picking %s have been exported and can not be modified"
+msgstr "Le transfert %s à été exporté et ne peut pas être modifié"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__to_export
+msgid "To Export"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_picking_search
+msgid "To export"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.wms_product_sync_form_view
+msgid "Trigger export"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields,help:wms_connector.field_attachment_synchronize_task__file_type
+msgid ""
+"Used to fill the 'File Type' field in the imported 'Attachments Queues'.\n"
+"Further operations will be realized on these Attachments Queues depending on their 'File Type' value."
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_queue__file_type__wms_delivery_confirmed
+msgid "WMS Delivery confirmed"
+msgstr "Confirmation de livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_queue__file_type__wms_reception_confirmed
+msgid "WMS Reception confirmed"
+msgstr "Confirmation de réception"
+
+#. module: wms_connector
+#: model:ir.model.fields.selection,name:wms_connector.selection__attachment_queue__file_type__wms_update_inventory
+msgid "WMS inventory update"
+msgstr "Mise à jour d'inventaire"
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_warehouse_form_view
+msgid "WMS sync pickings in"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_warehouse_form_view
+msgid "WMS sync pickings out"
+msgstr ""
+
+#. module: wms_connector
+#: model_terms:ir.ui.view,arch_db:wms_connector.stock_warehouse_form_view
+msgid "WMS sync products"
+msgstr ""
+
+#. module: wms_connector
+#: model:ir.model,name:wms_connector.model_stock_warehouse
+#: model:ir.model.fields,field_description:wms_connector.field_attachment_queue__warehouse_id
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__warehouse_id
+msgid "Warehouse"
+msgstr "Entrepôt"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__wms_export_attachment_id
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin__wms_export_attachment_id
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__wms_export_attachment_id
+msgid "Wms Export Attachment"
+msgstr "Fichier export WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__wms_export_date
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin__wms_export_date
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__wms_export_date
+msgid "Wms Export Date"
+msgstr "Date d'export WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__wms_export_error
+#: model:ir.model.fields,field_description:wms_connector.field_synchronize_exportable_mixin__wms_export_error
+#: model:ir.model.fields,field_description:wms_connector.field_wms_product_sync__wms_export_error
+msgid "Wms Export Error"
+msgstr "Erreur export WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_picking_in_cron_id
+msgid "Wms Export Picking In Cron"
+msgstr "Tâche planifiée export réception"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_picking_in_filter_id
+msgid "Wms Export Picking In Filter"
+msgstr "Filtre export réception"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_picking_out_cron_id
+msgid "Wms Export Picking Out Cron"
+msgstr "Tâche planifiée export livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_picking_out_filter_id
+msgid "Wms Export Picking Out Filter"
+msgstr "Filtre export livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_product_cron_id
+msgid "Wms Export Product Cron"
+msgstr "Tâche planifiée export produit"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_product_filter_id
+msgid "Wms Export Product Filter"
+msgstr "Filtre export produit"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_export_task_id
+msgid "Wms Export Task"
+msgstr "Tâche d'export"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__wms_import_attachment_id
+msgid "Wms Import Attachment"
+msgstr "Fichier import WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_confirm_delivery_cron_id
+msgid "Wms Import Confirm Delivery Cron"
+msgstr "Tâche plannifié import confirmation de livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_confirm_delivery_task_id
+msgid "Wms Import Confirm Delivery Task"
+msgstr "Tâche d'import confirmation de livraison"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_confirm_reception_cron_id
+msgid "Wms Import Confirm Reception Cron"
+msgstr "Tâche plannifié import des confirmations de réception"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_confirm_reception_task_id
+msgid "Wms Import Confirm Reception Task"
+msgstr "Tâche d'import confirmation de récéption"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_update_inventory_cron_id
+msgid "Wms Import Update Inventory Cron"
+msgstr "Tâche plannifié import d'inventaire"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_import_update_inventory_task_id
+msgid "Wms Import Update Inventory Task"
+msgstr "Tâche d'import d'inventaire"
+
+#. module: wms_connector
+#: model:ir.actions.act_window,name:wms_connector.wms_product_sync_act_window
+#: model:ir.model,name:wms_connector.model_wms_product_sync
+#: model:ir.model.fields,field_description:wms_connector.field_stock_warehouse__wms_product_sync_ids
+#: model:ir.ui.menu,name:wms_connector.wms_product_sync_menu
+msgid "Wms Product Sync"
+msgstr "Lien synchronisation produit"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_product_product__wms_sync_ids
+msgid "Wms Sync"
+msgstr "Synchronisation WMS"
+
+#. module: wms_connector
+#: model:ir.model.fields,field_description:wms_connector.field_stock_picking__wms_sync_cancel_supported
+msgid "Wms Sync Cancel Supported"
+msgstr "Synchronisation WMS de l'annulation supporté"
+
+#. module: wms_connector
+#: code:addons/wms_connector/models/stock_picking.py:0
+#, python-format
+msgid "You are not allowed to cancel this picking"
+msgstr "Vous n'êtes pas authorisé à annulé ce transfert"
