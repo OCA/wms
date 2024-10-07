@@ -713,6 +713,8 @@ class StockMove(models.Model):
         for picking, moves in itertools.groupby(
             moves_to_unrelease, lambda m: m.picking_id
         ):
+            if not picking:
+                continue
             move_names = "\n".join([m.display_name for m in moves])
             body = _(
                 "The following moves have been un-released: \n%(move_names)s",

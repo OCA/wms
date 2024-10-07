@@ -194,3 +194,26 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertTrue(
             all(m.procure_method == "make_to_order" for m in backorder_ship.move_ids)
         )
+
+    def test_cancel_procurement(self):
+        """
+        Simulate a quantity cancel
+        """
+        values = {
+            "group_id": self.group,
+            "warehouse_id": self.wh,
+        }
+        self.env["procurement.group"].run(
+            [
+                self.env["procurement.group"].Procurement(
+                    self.product1,
+                    -5.0,
+                    self.product1.uom_id,
+                    self.loc_customer,
+                    "TEST",
+                    "TEST",
+                    self.env.company,
+                    values,
+                )
+            ]
+        )

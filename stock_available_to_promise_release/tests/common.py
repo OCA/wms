@@ -40,6 +40,16 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         )
 
     @classmethod
+    def _create_procurement_group(cls, move_type="direct"):
+        cls.group = cls.env["procurement.group"].create(
+            {
+                "name": "TEST",
+                "move_type": move_type,
+                "partner_id": cls.partner_delta.id,
+            }
+        )
+
+    @classmethod
     def _create_picking_chain(cls, wh, products=None, date=None, move_type="direct"):
         """Create picking chain
 
@@ -55,16 +65,10 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         if products is None:
             products = []
 
-        group = cls.env["procurement.group"].create(
-            {
-                "name": "TEST",
-                "move_type": move_type,
-                "partner_id": cls.partner_delta.id,
-            }
-        )
+        cls._create_procurement_group(move_type=move_type)
         values = {
             "company_id": wh.company_id,
-            "group_id": group,
+            "group_id": cls.group,
             "date_planned": date or fields.Datetime.now(),
             "warehouse_id": wh,
         }
@@ -94,7 +98,7 @@ class PromiseReleaseCommonCase(common.TransactionCase):
                     )
                 ]
             )
-        pickings = cls._pickings_in_group(group)
+        pickings = cls._pickings_in_group(cls.group)
         pickings.mapped("move_ids").write(
             {"date_priority": date or fields.Datetime.now()}
         )
