@@ -49,10 +49,11 @@
     "data": [
         "data/shopfloor_scenario_data.xml",
         "security/groups.xml",
+        "views/product_packaging_type.xml",
         "views/shopfloor_menu.xml",
-        "views/stock_picking_type.xml",
         "views/stock_location.xml",
         "views/stock_move_line.xml",
+        "views/stock_picking_type.xml",
     ],
     "demo": [
         "demo/stock_picking_type_demo.xml",

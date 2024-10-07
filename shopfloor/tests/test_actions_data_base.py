@@ -148,8 +148,16 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             "code": record.packaging_type_id.code,
             "qty": record.qty,
         }
+        data["shopfloor_icon"] = self._expected_packaging_shopfloor_icon(record)
         data.update(kw)
         return data
+
+    def _expected_packaging_shopfloor_icon(self, record):
+        shopfloor_icon_data = {"alt_text": record.packaging_type_id.name}
+        shopfloor_icon = record.packaging_type_id.shopfloor_icon
+        if shopfloor_icon:
+            shopfloor_icon_data["url"] = shopfloor_icon
+        return shopfloor_icon_data
 
     def _expected_delivery_packaging(self, record, **kw):
         data = {

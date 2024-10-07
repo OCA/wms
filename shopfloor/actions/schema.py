@@ -136,6 +136,14 @@ class ShopfloorSchemaAction(Component):
             "name": {"type": "string", "nullable": False, "required": True},
             "code": {"type": "string", "nullable": True, "required": True},
             "qty": {"type": "float", "required": True},
+            "shopfloor_icon": {
+                "type": "dict",
+                "required": False,
+                "schema": {
+                    "url": {"type": "string", "required": False},
+                    "alt_text": {"type": "string", "required": False},
+                },
+            },
         }
 
     def delivery_packaging(self):
