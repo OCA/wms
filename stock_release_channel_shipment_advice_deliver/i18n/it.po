@@ -6,39 +6,41 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2024-10-08 10:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_kanban_view
 msgid "<span class=\"ms-2\">Deliver</span>"
-msgstr ""
+msgstr "<span class=\"ms-2\">Consegna</span>"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Deliver' is not allowed for the channel %(name)s."
-msgstr ""
+msgstr "L'azione 'Consegna' non è consentita per il canale %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Delivered' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "L'azione 'Consegnato' non è consentita per il canale %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Action 'Delivering Error' is not allowed for channel %(name)s."
-msgstr ""
+msgstr "L'azione 'Errore consegna' non è consentita per il canale %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -47,6 +49,8 @@ msgstr ""
 msgid ""
 "An error occurred in the delivery background task for the channel %(name)s"
 msgstr ""
+"Si è verificato un errore nel lavoro di consegna in background per il canale "
+"%(name)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -56,11 +60,13 @@ msgid ""
 "An error occurred while processing the delivery automatically:\n"
 "- %(related_object_name)s: %(error)s"
 msgstr ""
+"Si è verificato un errore nell'elaborazione della consegna automatica:\n"
+"- %(related_object_name)s: %(error)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__auto_deliver
 msgid "Auto Deliver"
-msgstr ""
+msgstr "Auto consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -68,120 +74,120 @@ msgstr ""
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Automatically process the shipment advice %(name)s."
-msgstr ""
+msgstr "Elabora automaticamente l'avviso di spedizione: %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Cancel the deliver"
-msgstr ""
+msgstr "Annulla la consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Confirm delivery"
-msgstr ""
+msgstr "Conferma la consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Creato da"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Creato il"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_form_view
 msgid "Deliver"
-msgstr ""
+msgstr "Consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Deliver any way"
-msgstr ""
+msgstr "Consegna comunque"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice_deliver.selection__stock_release_channel__state__delivered
 msgid "Delivered"
-msgstr ""
+msgstr "Consegnato"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice_deliver.selection__stock_release_channel__state__delivering
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_search_view
 msgid "Delivering"
-msgstr ""
+msgstr "In consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__delivering_error
 #: model:ir.model.fields.selection,name:stock_release_channel_shipment_advice_deliver.selection__stock_release_channel__state__delivering_error
 msgid "Delivering Error"
-msgstr ""
+msgstr "Errore consegna"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "Delivering release channel %(name)s."
-msgstr ""
+msgstr "Canale rilascio consegna %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__in_process_shipment_advice_ids
 msgid "In Process Shipment Advice"
-msgstr ""
+msgstr "Avviso spedizione in corso"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_shipment_advice__in_release_channel_auto_process
 msgid "In Release Channel Auto Process"
-msgstr ""
+msgstr "Nel processo automatico del canale di rilascio"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__is_action_deliver_allowed
 msgid "Is Action Deliver Allowed"
-msgstr ""
+msgstr "L'azione di consegna è consentita"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__is_action_delivered_allowed
 msgid "Is Action Delivered Allowed"
-msgstr ""
+msgstr "L'azione consegnata è consentita"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__is_action_delivering_error_allowed
 msgid "Is Action Delivering Error Allowed"
-msgstr ""
+msgstr "L'azione errore in consegna è consentita"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Ultimo aggiornamento di"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Ultimo aggiornamento il"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
 #: code:addons/stock_release_channel_shipment_advice_deliver/models/stock_release_channel.py:0
 #, python-format
 msgid "No picking to deliver for channel %(name)s."
-msgstr ""
+msgstr "Nessun prelievo da consegnare per il canale %(name)s."
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -192,16 +198,21 @@ msgid ""
 "Please finish it manually or cancel its start and done quantities to be able to deliver.\n"
 "%(pickings)s"
 msgstr ""
+"Una delle consegne per il canale %(name)s è in attesa di un altro "
+"trasferimento.\n"
+"Si prega di terminarla manualmente o annullare le quantità di avvio e di "
+"completamento per poter effettuare la consegna.\n"
+"%(pickings)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel_deliver_check_wizard__release_channel_id
 msgid "Release Channel"
-msgstr ""
+msgstr "Canale rilascio"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_shipment_advice
 msgid "Shipment Advice"
-msgstr ""
+msgstr "Avviso spedizione"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -212,21 +223,24 @@ msgid ""
 "\n"
 "%(shipping)s"
 msgstr ""
+"Alcune consegne non sono state preparate ma non possono essere annullate.\n"
+"\n"
+"%(shipping)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__state
 msgid "State"
-msgstr ""
+msgstr "Stato"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
 msgid "Stock Release Channel Deliver Check"
-msgstr ""
+msgstr "Controllo consegna canale rilascio magazzino"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_release_channel
 msgid "Stock Release Channels"
-msgstr ""
+msgstr "Canali rilascio magazzino"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,help:stock_release_channel_shipment_advice_deliver.field_shipment_advice__in_release_channel_auto_process
@@ -234,6 +248,8 @@ msgid ""
 "Technical field to flag shipment advice that are in a release channel auto-"
 "process"
 msgstr ""
+"Campo tecnico per segnalare gli avvisi di spedizione che si trovano in un "
+"processo automatico del canale di rilascio"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #. odoo-python
@@ -241,6 +257,7 @@ msgstr ""
 #, python-format
 msgid "The delivery background task is done for the channel %(name)s"
 msgstr ""
+"Il lavoro di consegna in background è stato eseguito per il canale %(name)s"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model.fields,help:stock_release_channel_shipment_advice_deliver.field_stock_release_channel__state
@@ -253,6 +270,18 @@ msgid ""
 "* Delivered: Ready transfers are delivered\n"
 "* Asleep: Assigned pickings not processed are unassigned from the release channel.\n"
 msgstr ""
+"Lo stato consente di controllare la disponibilità del canale di rilascio.\n"
+"* Apri: l'assegnazione manuale e automatica di raccolta al rilascio è "
+"efficace e sono consentite operazioni di rilascio.\n"
+"* Bloccato: le operazioni di rilascio sono vietate. (I processi di "
+"assegnazione stanno ancora funzionando)\n"
+"* Consegna: un'attività di fondo è in esecuzione per consegnare "
+"automaticamente le spedizioni pronte\n"
+"* Errore di consegna: si è verificato un errore nell'attività di background "
+"di consegna\n"
+"* Consegnato: vengono consegnati trasferimenti pronti\n"
+"* Dormienti: i prelievi assegnati non elaborati non sono assegnati dal "
+"canale di rilascio.\n"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_shipment_advice_deliver.stock_release_channel_deliver_check_wizard_form_view
@@ -261,13 +290,17 @@ msgid ""
 "                    If you choose to proceed, these preparations will be unreleased.<br/>\n"
 "                    Are you sure you want to proceed with the delivery?"
 msgstr ""
+"Ci sono alcuni preparativi che non sono stati completati.\n"
+"                    Se si sceglie di procedere, questi preparativi non "
+"saranno pubblicati.<br/>\n"
+"                    Si è sicuri di voler procedere con la consegna?"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Trasferimento"
 
 #. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_release_channel_deliver_check_wizard
 msgid "stock release channel deliver check wizard"
-msgstr ""
+msgstr "procedura guidata controllo consegna canale rilascio magazzino"
