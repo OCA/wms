@@ -1,2 +1,5 @@
 vcrpy-unittest
 odoo_test_helper
+
+# stock-logistics-tracking
+odoo-addon-internal-stock-quant-package @ git+https://github.com/OCA/stock-logistics-tracking.git@refs/pull/34/head#subdirectory=setup/internal_stock_quant_package
