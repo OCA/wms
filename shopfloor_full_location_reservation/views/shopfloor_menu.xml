@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <group name="options" position="inside">
+                <group
+                    name="full_location_reservation_group"
+                    attrs="{'invisible': [('full_location_reservation_is_possible', '=', False)]}"
+                >
+                <field name="full_location_reservation_is_possible" invisible="1" />
+                <field name="full_location_reservation" />
+            </group>
+        </group>
+    </field>
+</record>
+</odoo>
