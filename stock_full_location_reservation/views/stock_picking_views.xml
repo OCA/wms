@@ -1,0 +1,27 @@
+<odoo>
+    <record id="stock_picking_form_view" model="ir.ui.view">
+        <field name="name">stock.picking full location reservation</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="arch" type="xml">
+            <button name="action_confirm" position="before">
+                <field name="is_full_location_reservation_visible" invisible="1" />
+                <field name="has_full_location_reservations" invisible="1" />
+                <button
+                    name="do_full_location_reservation"
+                    type="object"
+                    string="Do Full location reservation"
+                    attrs="{'invisible': ['|', ('is_full_location_reservation_visible', '=', False), ('state', '!=', 'assigned')]}"
+                    groups="stock_full_location_reservation.group_user"
+                />
+                <button
+                    name="undo_full_location_reservation"
+                    type="object"
+                    string="Undo Full location reservation"
+                    attrs="{'invisible': ['|', '|', ('is_full_location_reservation_visible', '=', False), ('state', '!=', 'assigned'), ('has_full_location_reservations', '=', False)]}"
+                    groups="stock_full_location_reservation.group_user"
+                />
+            </button>
+        </field>
+    </record>
+</odoo>
