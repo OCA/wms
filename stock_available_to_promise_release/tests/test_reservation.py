@@ -7,10 +7,17 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
+from odoo.tests import tagged
+
 from .common import PromiseReleaseCommonCase
 
 
+@tagged("post_install", "-at_install")
 class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
+
+    at_install = False
+    post_install = True
+
     def test_horizon_date(self):
         move = self.env["stock.move"].create(
             {

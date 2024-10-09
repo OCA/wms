@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 ACSONE SA/NV
+      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="stock_release_channel_kanban_view" model="ir.ui.view">
+        <field
+            name="name"
+        >stock.release.channel.kanban (in stock_release_channel_auto_release)</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel.stock_release_channel_kanban_view"
+        />
+        <field name="arch" type="xml">
+            <button name="release_next_batch" position="after">
+                <field name="is_auto_release_allowed" invisible="1" />
+                <div
+                    style="text-align: center"
+                    attrs="{'invisible': [('release_mode', '!=', 'auto')]}"
+                >
+                    <i
+                        t-att-class="'fa fa-4x fa-cog ' + (record.is_auto_release_allowed.raw_value ? 'fa-spin': '')"
+                        role="img"
+                        aria-label="Release mode auto"
+                        title="Automatic Release mode"
+                    />
+                </div>
+            </button>
+        </field>
+    </record>
+</odoo>
