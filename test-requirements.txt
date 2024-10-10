@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-stock-picking-putaway-recompute @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/1740/head#subdirectory=setup/stock_picking_putaway_recompute
