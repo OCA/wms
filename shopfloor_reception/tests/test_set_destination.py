@@ -199,3 +199,42 @@ class TestSetDestination(CommonCase):
         self.assertEqual(picking.state, "assigned")
         # So the quantity left to do on the current move has decreased
         self.assertEqual(move.product_uom_qty, 9)
+
+    def test_auto_posting_partial_new_pack(self):
+        self.menu.sudo().auto_post_line = True
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        package_name = "FooBar"
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "barcode": package_name,
+                "confirmation": "",
+                "picking_id": picking.id,
+                "quantity": 8,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "barcode": package_name,
+                "confirmation": package_name,
+                "picking_id": picking.id,
+                "quantity": 8,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        self.service.dispatch(
+            "set_destination",
+            params={
+                "confirmation": True,
+                "location_name": self.dispatch_location.name,
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        move = picking.move_lines.filtered(lambda m: m.product_id == self.product_a)
+        self.assertEqual(move.state, "assigned")
