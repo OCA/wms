@@ -67,19 +67,24 @@ class MoveLineSearch(Component):
         picking_ready=True,
         # When True, adds the package in the domain even if the package is False
         enforce_empty_package=False,
-        enforce_picking_types=True,
     ):
+        """Return a domain to search move lines.
+
+        Be careful on the use of the picking_type parameter. This paramater can take
+        a recordset or None as value. The interpretation of the value is as follows:
+        * If picking_type is None, the domain will be filtered on all picking types
+            defined in the work. (most probably those defined on the menu)
+        * If picking_type is a recordset, the domain will be filtered on the given
+            picking types if the recordset is not empty. If the recordset is empty,
+            the domain will not be filtered on any picking type.
+        """
         domain = [
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
         ]
-        picking_types = (
-            picking_type or self.picking_types
-            if enforce_picking_types
-            else picking_type
-        )
+        picking_types = picking_type if picking_type is not None else self.picking_types
         if picking_types:
-            domain += [("picking_id.picking_type_id", "in", self.picking_types.ids)]
+            domain += [("picking_id.picking_type_id", "in", picking_types.ids)]
         locations = locations or picking_types.default_location_src_id
         if locations:
             domain += [("location_id", "child_of", locations.ids)]
@@ -114,7 +119,6 @@ class MoveLineSearch(Component):
         sort_keys_func=None,
         picking_ready=True,
         enforce_empty_package=False,
-        enforce_picking_types=True,
     ):
         """Find lines that potentially need work in given locations."""
         move_lines = self.env["stock.move.line"].search(
@@ -127,7 +131,6 @@ class MoveLineSearch(Component):
                 match_user=match_user,
                 picking_ready=picking_ready,
                 enforce_empty_package=enforce_empty_package,
-                enforce_picking_types=enforce_picking_types,
             )
         )
         order = order or self.sort_order
