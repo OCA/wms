@@ -17,25 +17,23 @@
                     /><br />
                     <b>Are you sure you want to proceed with the delivery?</b>
                 </p>
-                <group>
-                    <field name="allowed_to_unrelease_picking_ids" nolabel="1">
-                        <tree edit="false">
-                            <field name="name" />
-                            <field name="origin" />
-                            <field name="partner_id" />
-                            <field
-                                name="state"
-                                optional="show"
-                                widget="badge"
-                                decoration-danger="state=='cancel'"
-                                decoration-info="state== 'assigned'"
-                                decoration-muted="state == 'draft'"
-                                decoration-success="state == 'done'"
-                                decoration-warning="state not in ('draft','cancel','done','assigned')"
-                            />
-                        </tree>
-                    </field>
-                </group>
+                <field name="allowed_to_unrelease_picking_ids" nolabel="1">
+                    <tree edit="false">
+                        <field name="name" />
+                        <field name="origin" />
+                        <field name="partner_id" />
+                        <field
+                            name="state"
+                            optional="show"
+                            widget="badge"
+                            decoration-danger="state=='cancel'"
+                            decoration-info="state== 'assigned'"
+                            decoration-muted="state == 'draft'"
+                            decoration-success="state == 'done'"
+                            decoration-warning="state not in ('draft','cancel','done','assigned')"
+                        />
+                    </tree>
+                </field>
                 <footer>
                     <button
                         string="Cancel the deliver"
