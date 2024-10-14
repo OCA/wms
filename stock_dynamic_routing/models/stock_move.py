@@ -20,6 +20,29 @@ class StockMove(models.Model):
         "rule push_original_destination",
     )
 
+    def _create_savepoint(self):
+        savepoint_name = uuid.uuid1().hex
+        self.env.flush_all()
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+        return savepoint_name
+
+    def _release_savepoint(self, savepoint_name):
+        self.env.flush_all()
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+
+    def _rollback_to_savepoint(self, savepoint_name):
+        self.env.clear()
+        # pylint: disable=sql-injection
+        self.env.cr.execute(
+            sql.SQL("ROLLBACK TO SAVEPOINT {}").format(sql.Identifier(savepoint_name))
+        )
+
     def _no_routing_details(self):
         return self.RoutingDetails(
             rule=self.env["stock.routing.rule"].browse(),
@@ -112,12 +135,7 @@ class StockMove(models.Model):
         if not self:
             return self
 
-        savepoint_name = uuid.uuid1().hex
-        self.env.flush_all()
-        # pylint: disable=sql-injection
-        self.env.cr.execute(
-            sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
-        )
+        savepoint_name = self._create_savepoint()
         super()._action_assign()
 
         moves_routing = self._routing_compute_rules()
@@ -126,19 +144,11 @@ class StockMove(models.Model):
         ):
             # no routing to apply, so the reservations done by _action_assign
             # are valid and we can resolve to a normal flow
-            self.env.flush_all()
-            # pylint: disable=sql-injection
-            self.env.cr.execute(
-                sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
-            )
+            self._release_savepoint(savepoint_name)
             return {}
 
         # rollback _action_assign, it'll be called again after the routing
-        self.env.clear()
-        # pylint: disable=sql-injection
-        self.env.cr.execute(
-            sql.SQL("ROLLBACK TO SAVEPOINT {}").format(sql.Identifier(savepoint_name))
-        )
+        self._rollback_to_savepoint(savepoint_name)
         return moves_routing
 
     def _routing_compute_rules(self):
@@ -194,6 +204,32 @@ class StockMove(models.Model):
                 moves_routing[move][routing_details] += missing_reserved_quantity
         return moves_routing
 
+    def _get_excluded_locations(self, routing_quantities):
+        """Given a routing_quantities object, returns all the given locations and
+        their children in a recordset of the stock.location model.
+        """
+        exclude_locations_ids = [
+            routing_details.rule.location_src_id.id
+            for routing_details, qty in routing_quantities.items()
+            if routing_details.rule._name == "stock.routing.rule"
+        ]
+        locations = self.env["stock.location"].browse(exclude_locations_ids)
+        parent_locations = locations
+        child_locations = parent_locations.mapped("child_ids")
+        location_child = self.env["stock.location"]
+        while child_locations:
+            location_child |= child_locations
+            parent_locations = child_locations
+            child_locations = parent_locations.mapped("child_ids")
+
+        exclude_locations_ids += location_child.ids
+        location_recs = self.env["stock.location"].search(
+            [
+                ("id", "in", exclude_locations_ids),
+            ]
+        )
+        return location_recs
+
     def _routing_splits(self, moves_routing):
         """Split moves according to routing rules
 
@@ -218,6 +254,31 @@ class StockMove(models.Model):
                 # these.
                 new_move_vals = move._split(qty)
                 if new_move_vals:
+                    # In case the move is split, to ensure that the new move,
+                    # which is going to search in the same location hierarchy,
+                    # does not reserve stock stored in unused locations for
+                    # dynamic routing and does not generate unnecessary splits,
+                    # we try to reserve the existing move.
+                    # We check if the reservation has been made in a dynamically
+                    # routed location, and if it has,
+                    # we rollback to undo any possible splits.
+
+                    savepoint_name = self._create_savepoint()
+                    move.with_context(
+                        exclude_apply_dynamic_routing=True,
+                    )._action_assign()
+                    locations_excluded = self._get_excluded_locations(
+                        routing_quantities
+                    )
+                    rollback = False
+                    for move_line in move.move_line_ids:
+                        if move_line.location_id in locations_excluded:
+                            rollback = True
+                            break
+                    if rollback:
+                        self._rollback_to_savepoint(savepoint_name)
+                    else:
+                        self._release_savepoint(savepoint_name)
                     new_move = self.env["stock.move"].create(new_move_vals)
                     new_move._action_confirm(merge=False)
                 else:
