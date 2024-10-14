@@ -149,6 +149,32 @@ msgstr ""
 "paquete en destino'."
 
 #. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_assigned_to_current_user</code>: Return sort key to get "
+"line assigned to current user first. (return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_location</code>: Return sort key to sort by location. "
+"(return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_priority</code>: Return sort key to sort by priority. "
+"(return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "<code>line</code>: The move line for with the key must be computed."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
 msgid "A Shopfloor application"
 msgstr "Una Aplicación de Taller"
@@ -164,6 +190,11 @@ msgstr "Un paquete de destino es requerido."
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
 msgstr "Activar Verificación Cero"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain
+msgid "Additional domain used when searching move lines"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
@@ -365,6 +396,35 @@ msgid "Creation of moves is not allowed for menu {}."
 msgstr "La creación de movimientos no está permitida para el menú {}."
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__custom_code
+msgid "Custom code"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "Custom code to construct the key to sort move lines"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
+msgid "Custom sort key code"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid "Custom sort key code is only allowed when 'Custom code' is selected."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid "Custom sort key code is required when 'Custom code' is selected."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
 msgid "Date Scheduled"
 msgstr "Fecha Planificada"
@@ -511,6 +571,11 @@ msgid "Lines have different destination location."
 msgstr "La líneas tiene diferente ubicación de destino."
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__location
+msgid "Location"
+msgstr ""
+
+#. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
@@ -636,6 +701,16 @@ msgstr "Línea de Movimiento"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__move_line_count
 msgid "Move Line Count"
 msgstr "Cuenta de Línea de Movimiento"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain_is_possible
+msgid "Move Line Search Additional Domain Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_is_possible
+msgid "Move Line Search Sort Order Is Possible"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -1157,6 +1232,11 @@ msgid "Prepackaged Product Is Possible"
 msgstr "Producto PreEmpaquetado Es Posible"
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__priority
+msgid "Priority"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
 msgid "Process as pre-packaged"
 msgstr "Procesar como pre-empaquetado"
@@ -1218,6 +1298,11 @@ msgstr ""
 #, python-format
 msgid "Product(s) processed as raw product(s)"
 msgstr "Producto(s) procesado(s) como producto(s) crudo(s)"
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
+msgid "Python code to sort move lines. "
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
@@ -1512,6 +1597,11 @@ msgid "Someone is already working on these transfers"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order
+msgid "Sort method used when searching move lines"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__source_move_line_ids
 msgid "Source Move Line"
 msgstr "Recurso del Movimiento de Línea"
@@ -1595,8 +1685,8 @@ msgstr ""
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id="
-"\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
+"id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
 msgstr ""
 
 #. module: shopfloor
@@ -1837,6 +1927,18 @@ msgstr ""
 #, python-format
 msgid "This transfer does not exist or is not available anymore."
 msgstr "Esta transferencia no existe o ya no está disponible."
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "Three variables are available:"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"To assign the key value: <code>key = "
+"get_sort_key_assigned_to_current_user(line) + (line.x, )</code>"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__total_weight
@@ -2173,8 +2275,8 @@ msgstr "{} no es un paquete de destino válido."
 
 #, python-format
 #~ msgid ""
-#~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-id="
-#~ "\"%d\">%s</a> has been created."
+#~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
+#~ "id=\"%d\">%s</a> has been created."
 #~ msgstr ""
 #~ "Se ha creado el pedido pendiente <a href=\"#\" data-oe-model=\"stock."
 #~ "picking\" data-oe-id=\"%d\">%s</a>."
@@ -2263,8 +2365,8 @@ msgstr "{} no es un paquete de destino válido."
 #~ "Producto no encontrado en la transferencia actual o ya en un paquete."
 
 #~ msgid ""
-#~ "Created from backorder <a href=# data-oe-model=stock.picking data-oe-id="
-#~ "%d>%s</a>."
+#~ "Created from backorder <a href=# data-oe-model=stock.picking data-oe-"
+#~ "id=%d>%s</a>."
 #~ msgstr ""
 #~ "Creado desde pedido pendiente <a href=# data-oe-model=stock.picking data-"
 #~ "oe-id=%d>%s</a>."
