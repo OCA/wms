@@ -103,7 +103,6 @@ class Checkout(Component):
         return {
             "selected_move_lines": self._data_for_move_lines(lines.sorted()),
             "picking": self.data.picking(picking),
-            "packing_info": self._data_for_packing_info(picking),
             "no_package_enabled": not self.options.get("checkout__disable_no_package"),
             # Used by inheriting module
             "package_allowed": True,
@@ -115,14 +114,6 @@ class Checkout(Component):
             data=self._data_response_for_select_package(picking, lines),
             message=message,
         )
-
-    def _data_for_packing_info(self, picking):
-        """Return the packing information
-
-        Intended to be extended.
-        """
-        # TODO: This could be avoided if included in the picking parser.
-        return ""
 
     def _response_for_select_dest_package(self, picking, move_lines, message=None):
         packages = picking.mapped("move_line_ids.result_package_id").filtered(
