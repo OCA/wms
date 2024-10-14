@@ -111,6 +111,32 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_assigned_to_current_user</code>: Return sort key to get "
+"line assigned to current user first. (return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_location</code>: Return sort key to sort by location. "
+"(return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"<code>get_sort_key_priority</code>: Return sort key to sort by priority. "
+"(return a tuple)"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "<code>line</code>: The move line for with the key must be computed."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
 msgid "A Shopfloor application"
 msgstr ""
@@ -125,6 +151,11 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
 msgid "Activate Zero Check"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain
+msgid "Additional domain used when searching move lines"
 msgstr ""
 
 #. module: shopfloor
@@ -325,6 +356,35 @@ msgid "Creation of moves is not allowed for menu {}."
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__custom_code
+msgid "Custom code"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "Custom code to construct the key to sort move lines"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
+msgid "Custom sort key code"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid "Custom sort key code is only allowed when 'Custom code' is selected."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/models/shopfloor_menu.py:0
+#, python-format
+msgid "Custom sort key code is required when 'Custom code' is selected."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
 msgid "Date Scheduled"
 msgstr ""
@@ -461,6 +521,11 @@ msgid "Lines have different destination location."
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__location
+msgid "Location"
+msgstr ""
+
+#. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
@@ -583,6 +648,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__move_line_count
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_batch__move_line_count
 msgid "Move Line Count"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain_is_possible
+msgid "Move Line Search Additional Domain Is Possible"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_is_possible
+msgid "Move Line Search Sort Order Is Possible"
 msgstr ""
 
 #. module: shopfloor
@@ -1087,6 +1162,11 @@ msgid "Prepackaged Product Is Possible"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__priority
+msgid "Priority"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
 msgid "Process as pre-packaged"
 msgstr ""
@@ -1145,6 +1225,11 @@ msgstr ""
 #: code:addons/shopfloor/services/checkout.py:0
 #, python-format
 msgid "Product(s) processed as raw product(s)"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
+msgid "Python code to sort move lines. "
 msgstr ""
 
 #. module: shopfloor
@@ -1419,6 +1504,11 @@ msgstr ""
 #: code:addons/shopfloor/actions/stock.py:0
 #, python-format
 msgid "Someone is already working on these transfers"
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order
+msgid "Sort method used when searching move lines"
 msgstr ""
 
 #. module: shopfloor
@@ -1733,6 +1823,18 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "This transfer does not exist or is not available anymore."
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid "Three variables are available:"
+msgstr ""
+
+#. module: shopfloor
+#: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
+msgid ""
+"To assign the key value: <code>key = "
+"get_sort_key_assigned_to_current_user(line) + (line.x, )</code>"
 msgstr ""
 
 #. module: shopfloor
