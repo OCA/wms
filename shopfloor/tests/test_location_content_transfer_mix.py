@@ -370,8 +370,8 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
         )
         picking_before = pack_second_pallet.picking_id
-        move_lines = self.service._find_location_move_lines(
-            pack_second_pallet.location_id
+        move_lines = self.service.search_move_line.search_move_lines(
+            locations=pack_second_pallet.location_id
         )
         response = self._location_content_transfer_process_line(pack_second_pallet)
         response_packages = response["data"]["scan_destination_all"]["package_levels"]

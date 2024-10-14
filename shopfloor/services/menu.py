@@ -19,10 +19,13 @@ class ShopfloorMenu(Component):
         # TODO: maybe to be improved w/ raw SQL as this run for each menu item
         # and it's called every time the menu is opened/gets refreshed
         move_line_search = self._actions_for(
-            "search_move_line", picking_types=record.picking_type_ids
+            "search_move_line",
+            picking_types=record.picking_type_ids,
+            additional_domain=record.move_line_search_additional_domain,
+            sort_order=record.move_line_search_sort_order,
+            sort_order_custom_code=record.move_line_search_sort_order_custom_code,
         )
-        locations = record.picking_type_ids.mapped("default_location_src_id")
-        lines_per_menu = move_line_search.search_move_lines_by_location(locations)
+        lines_per_menu = move_line_search.search_move_lines()
         return move_line_search.counters_for_lines(lines_per_menu)
 
     def _one_record_parser(self, record):

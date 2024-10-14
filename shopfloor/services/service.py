@@ -15,7 +15,15 @@ class BaseShopfloorService(AbstractComponent):
     @property
     def search_move_line(self):
         # TODO: propagating `picking_types` should probably be default
-        return self._actions_for("search_move_line", propagate_kwargs=["picking_types"])
+        return self._actions_for(
+            "search_move_line",
+            propagate_kwargs=[
+                "picking_types",
+                "additional_domain",
+                "sort_order",
+                "sort_order_custom_code",
+            ],
+        )
 
 
 class BaseShopfloorProcess(AbstractComponent):
@@ -39,12 +47,30 @@ class BaseShopfloorProcess(AbstractComponent):
         return self.work.picking_types
 
     @property
+    def additional_domain(self):
+        return self.work.menu.move_line_search_additional_domain
+
+    @property
+    def sort_order(self):
+        return self.work.menu.move_line_search_sort_order
+
+    @property
+    def sort_order_custom_code(self):
+        return self.work.menu.move_line_search_sort_order_custom_code
+
+    @property
     def search_move_line(self):
         # TODO: picking types should be set somehow straight in the work context
         # by `_validate_headers_update_work_context` in this way
         # we can remove this override and the need to call `_get_process_picking_types`
         # every time.
-        return self._actions_for("search_move_line", picking_types=self.picking_types)
+        return self._actions_for(
+            "search_move_line",
+            picking_types=self.picking_types,
+            additional_domain=self.additional_domain,
+            sort_order=self.sort_order,
+            sort_order_custom_code=self.sort_order_custom_code,
+        )
 
     def _check_picking_status(self, pickings, states=("assigned",)):
         """Check if given pickings can be processed.

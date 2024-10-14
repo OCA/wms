@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2024 ACSONE SA/NV (http://www.acsone.eu)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, exceptions, fields, models
+from odoo.tools.safe_eval import test_python_expr
 
 PICK_PACK_SAME_TIME_HELP = """
 If you tick this box, while picking goods from a location
@@ -225,6 +227,28 @@ class ShopfloorMenu(models.Model):
     )
     allow_alternative_destination_package_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_package_is_possible"
+    )
+
+    move_line_search_additional_domain_is_possible = fields.Boolean(
+        compute="_compute_move_line_search_additional_domain_is_possible"
+    )
+    move_line_search_additional_domain = fields.Char(
+        string="Additional domain used when searching move lines"
+    )
+    move_line_search_sort_order_is_possible = fields.Boolean(
+        compute="_compute_move_line_search_sort_order_is_possible"
+    )
+    move_line_search_sort_order = fields.Selection(
+        selection=[
+            ("priority", "Priority"),
+            ("location", "Location"),
+            ("custom_code", "Custom code"),
+        ],
+        string="Sort method used when searching move lines",
+        default="priority",
+    )
+    move_line_search_sort_order_custom_code = fields.Text(
+        string="Custom sort key code", help="Python code to sort move lines. "
     )
 
     @api.onchange("unload_package_at_destination")
@@ -458,3 +482,64 @@ class ShopfloorMenu(models.Model):
             menu.allow_alternative_destination_package_is_possible = (
                 menu.scenario_id.has_option("allow_alternative_destination_package")
             )
+
+    @api.depends("scenario_id")
+    def _compute_move_line_search_additional_domain_is_possible(self):
+        for menu in self:
+            menu.move_line_search_additional_domain_is_possible = (
+                menu.scenario_id.has_option("allow_move_line_search_additional_domain")
+            )
+
+    @api.depends("scenario_id")
+    def _compute_move_line_search_sort_order_is_possible(self):
+        for menu in self:
+            menu.move_line_search_sort_order_is_possible = menu.scenario_id.has_option(
+                "allow_move_line_search_sort_order"
+            )
+
+    @api.constrains(
+        "move_line_search_sort_order", "move_line_search_sort_order_custom_code"
+    )
+    def _check_move_line_search_sort_order_custom_code(self):
+        for menu in self:
+            if (
+                menu.move_line_search_sort_order == "custom_code"
+                and not menu.move_line_search_sort_order_custom_code
+            ):
+                raise exceptions.ValidationError(
+                    _(
+                        "Custom sort key code is required when 'Custom code' is selected."
+                    )
+                )
+            if (
+                menu.move_line_search_sort_order != "custom_code"
+                and menu.move_line_search_sort_order_custom_code
+            ):
+                raise exceptions.ValidationError(
+                    _(
+                        "Custom sort key code is only allowed when 'Custom code' is selected."
+                    )
+                )
+            code = (
+                menu.move_line_search_sort_order_custom_code
+                and menu.move_line_search_sort_order_custom_code.strip()
+            )
+            if code:
+                msg = test_python_expr(code, mode="exec")
+                if msg:
+                    raise exceptions.ValidationError(msg)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("move_line_search_sort_order", "") != "custom_code":
+                vals["move_line_search_sort_order_custom_code"] = ""
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if (
+            "move_line_search_sort_order" in vals
+            and vals["move_line_search_sort_order"] != "custom_code"
+        ):
+            vals["move_line_search_sort_order_custom_code"] = ""
+        return super().write(vals)
