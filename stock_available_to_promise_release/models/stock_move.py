@@ -57,8 +57,9 @@ class StockMove(models.Model):
 
     @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
     def _compute_unrelease_allowed(self):
+        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
         for move in self:
-            unrelease_allowed = move._is_unreleaseable()
+            unrelease_allowed = user_is_allowed and move._is_unreleaseable()
             if unrelease_allowed:
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
@@ -79,10 +80,8 @@ class StockMove(models.Model):
         _is_unrelease_allowed_on_origin_moves.
         """
         self.ensure_one()
-        user_is_allowed = self.env.user.has_group("stock.group_stock_user")
         return (
-            user_is_allowed
-            and not self.need_release
+            not self.need_release
             and self.state not in ("done", "cancel")
             and self.picking_type_id.code == "outgoing"
             and self.rule_id.available_to_promise_defer_pull
@@ -787,7 +786,7 @@ class StockMove(models.Model):
     def _is_mergeable(self):
         self.ensure_one()
         return self.state not in ("done", "cancel") and (
-            self.picking_type_id.code != "outgoing" or self.unrelease_allowed
+            not self._is_unreleaseable() or self.unrelease_allowed
         )
 
     def _update_candidate_moves_list(self, candidate_moves):

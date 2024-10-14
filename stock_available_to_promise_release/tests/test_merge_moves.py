@@ -136,3 +136,17 @@ class TestMergeMoves(PromiseReleaseCommonCase):
         self.assertEqual(1, len(move))
         self.assertEqual(2 + original_qty_1 + original_qty_2, move.product_uom_qty)
         self.assertEqual(2, move.move_line_ids.qty_done)
+
+    def test_default_merge(self):
+        # check that the merge is still working when the available_to_promise_defer_pull
+        # is False
+        self.wh.delivery_route_id.write(
+            {
+                "available_to_promise_defer_pull": False,
+            }
+        )
+        original_qty = self.shipping1.move_ids.product_uom_qty
+        # run a new procurement for the same product in the shipment 1
+        self._procure(2)
+        self.assertEqual(1, len(self.shipping1.move_ids))
+        self.assertEqual(original_qty + 2, self.shipping1.move_ids.product_uom_qty)
