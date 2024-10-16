@@ -8,5 +8,6 @@ class LocationContentTransfer(Component):
     _inherit = "shopfloor.location.content.transfer"
 
     def _select_move_lines_first_location(self, move_lines):
-        move_lines._recompute_putaways()
-        return super()._select_move_lines_first_location(move_lines)
+        result = super()._select_move_lines_first_location(move_lines=move_lines)
+        result._recompute_putaways()
+        return result
