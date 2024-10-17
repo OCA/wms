@@ -8,6 +8,40 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button
+                    name="action_open_available_move_to_unblock"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-lock"
+                    help="Deliveries that could be unblocked at order confirmation."
+                    attrs="{'invisible': [
+                      '|',
+                      ('available_move_to_unblock_count', '=', 0),
+                      ('state', 'in', ('sale', 'done'))
+                    ]}"
+                >
+                    <field
+                        name="available_move_to_unblock_count"
+                        widget="statinfo"
+                        string="Backorders"
+                    />
+                </button>
+                <button
+                    name="action_open_move_to_unblock"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-unlock"
+                    help="Deliveries that will be unblocked at order confirmation."
+                    attrs="{'invisible': [('move_to_unblock_count', '=', 0)]}"
+                >
+                    <field
+                        name="move_to_unblock_count"
+                        widget="statinfo"
+                        string="Backorders"
+                    />
+                </button>
+            </div>
             <field name="payment_term_id" position="after">
                 <field name="block_release" />
             </field>

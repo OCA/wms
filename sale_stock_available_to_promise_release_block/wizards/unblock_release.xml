@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2024 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record id="unblock_release_view_form" model="ir.ui.view">
+    <field name="name">unblock.release.form</field>
+    <field name="model">unblock.release</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="option" />
+            <field
+                            name="order_id"
+                            force_save="1"
+                            options="{'no_open': True}"
+                            attrs="{'invisible': [('option', '!=', 'contextual')]}"
+                        />
+            <field
+                            name="date_deadline"
+                            attrs="{'invisible': [('option', 'in', ('automatic', 'contextual'))], 'required': [('option', '=', 'manual')]}"
+                        />
+          </group>
+          <group string="Selected deliveries" name="selected_deliveries">
+            <field
+                            name="order_line_ids"
+                            nolabel="1"
+                            colspan="2"
+                            attrs="{'invisible': [('order_line_ids', '=', [])]}"
+                        />
+            <field
+                            name="move_ids"
+                            nolabel="1"
+                            colspan="2"
+                            attrs="{'invisible': [('move_ids', '=', [])]}"
+                        />
+          </group>
+          <div
+                        attrs="{'invisible': [('option', '!=', 'contextual')]}"
+                        class="alert alert-warning"
+                        role="alert"
+                    >
+            Selected delivery moves will be unblocked when the above order is confirmed.
+            Their delivery method, shipping policy and scheduled date will be aligned with the deliveries of the confirmed order.
+          </div>
+        </sheet>
+        <footer>
+          <button name="validate" type="object" string="Validate" class="btn-primary" />
+          <button special="cancel" string="Cancel" class="btn-default" />
+        </footer>
+      </form>
+    </field>
+  </record>
+
+</odoo>
