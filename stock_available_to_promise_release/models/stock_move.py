@@ -576,7 +576,7 @@ class StockMove(models.Model):
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
                     move.product_id,
-                    move.product_uom_qty,
+                    move.product_uom_qty - move.reserved_availability,
                     move.product_uom,
                     move.location_id,
                     move.rule_id and move.rule_id.name or "/",
