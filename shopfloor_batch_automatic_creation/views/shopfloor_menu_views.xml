@@ -21,6 +21,10 @@
                         name="batch_maximum_number_of_preparation_lines"
                         attrs="{'invisible': [('batch_create', '=', False)]}"
                     />
+                    <field
+                        name="batch_split_picking_exceeding_limits"
+                        attrs="{'invisible': [('batch_create', '=', False)]}"
+                    />
 
                     <label
                         for="stock_device_type_ids"
