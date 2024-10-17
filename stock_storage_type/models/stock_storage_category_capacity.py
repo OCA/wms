@@ -1,6 +1,7 @@
 # Copyright 2022 ACSONE SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, api, fields, models
+from odoo.osv.expression import AND, OR
 
 
 class StorageCategoryProductCapacity(models.Model):
@@ -95,7 +96,34 @@ class StorageCategoryProductCapacity(models.Model):
         ]
         # Build the domain using the 'allow_new_product' field
         if self.allow_new_product == "empty":
-            location_domain.append(("location_is_empty", "=", True))
+            # We should include the destination location of the current
+            # stock move line to avoid excluding it if already selected
+            # Indeed, if the current move line point to the last void location,
+            # calling the putaway apply will recompute the destination location
+            # to the related stock.move destination as the rules consider
+            # there is no more room available (which is not true).
+            exclude_sml_ids = self.env.context.get("exclude_sml_ids")
+            if exclude_sml_ids:
+                lines_locations = (
+                    self.env["stock.move.line"].browse(exclude_sml_ids).location_dest_id
+                )
+                if lines_locations:
+                    location_domain = AND(
+                        [
+                            location_domain,
+                            OR(
+                                [
+                                    [
+                                        ("location_is_empty", "=", False),
+                                        ("id", "in", lines_locations.ids),
+                                    ],
+                                    [("location_is_empty", "=", True)],
+                                ]
+                            ),
+                        ]
+                    )
+            else:
+                location_domain.append(("location_is_empty", "=", True))
         elif self.allow_new_product == "same":
             location_domain += self._get_product_location_domain(products)
         elif self.allow_new_product == "same_lot":
