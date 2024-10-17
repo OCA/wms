@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-08-22 10:06+0000\n"
+"PO-Revision-Date: 2024-10-17 15:06+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -171,6 +171,9 @@ msgid ""
 "<code>get_sort_key_assigned_to_current_user</code>: Return sort key to get "
 "line assigned to current user first. (return a tuple)"
 msgstr ""
+"<code>get_sort_key_assigned_to_current_user</code>: restituisce la chiave di "
+"ordinamento per ottenere prima la riga assegnata all'utente attuale. ("
+"restituisce una tupla)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
@@ -178,6 +181,8 @@ msgid ""
 "<code>get_sort_key_location</code>: Return sort key to sort by location. "
 "(return a tuple)"
 msgstr ""
+"<code>get_sort_key_location</code>: restituisce la chiave di ordinamento "
+"ordinata per ubicazione. (restituisce una tupla)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
@@ -185,11 +190,15 @@ msgid ""
 "<code>get_sort_key_priority</code>: Return sort key to sort by priority. "
 "(return a tuple)"
 msgstr ""
+"<code>get_sort_key_priority</code>: restituisce la chiave di ordinamento per "
+"ordinare per priorità. (restituisce una tupla)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid "<code>line</code>: The move line for with the key must be computed."
 msgstr ""
+"<code>line</code>: la riga movimento per la quale la chiave deve essere "
+"calcolata."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
@@ -211,7 +220,7 @@ msgstr "Attiva zero controlli"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain
 msgid "Additional domain used when searching move lines"
-msgstr ""
+msgstr "Dominio addizionale utilizzato quando si cercano le righe movimento"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
@@ -413,17 +422,18 @@ msgstr "La creazione di movimenti non è consentita per il menu {}."
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__custom_code
 msgid "Custom code"
-msgstr ""
+msgstr "Codice personalizzato"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid "Custom code to construct the key to sort move lines"
 msgstr ""
+"Codice personalizzato per costruire la chiave per ordinare le righe movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
 msgid "Custom sort key code"
-msgstr ""
+msgstr "Codice chiave ordinamento personalizzato"
 
 #. module: shopfloor
 #. odoo-python
@@ -431,6 +441,8 @@ msgstr ""
 #, python-format
 msgid "Custom sort key code is only allowed when 'Custom code' is selected."
 msgstr ""
+"Il codice chiave ordinamento personalizzato è consentito quanto è "
+"selezionato 'Codice personalizzato'."
 
 #. module: shopfloor
 #. odoo-python
@@ -438,6 +450,8 @@ msgstr ""
 #, python-format
 msgid "Custom sort key code is required when 'Custom code' is selected."
 msgstr ""
+"Il codice chiave ordinamento personaliazzato è richiesto quando è "
+"selezionato 'Codice personalizzato'."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__date_planned
@@ -590,7 +604,7 @@ msgstr "Le righe hano ubicazioni destinazione differenti."
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__location
 msgid "Location"
-msgstr ""
+msgstr "Ubicazione"
 
 #. module: shopfloor
 #. odoo-python
@@ -722,12 +736,12 @@ msgstr "Conteggio righe movimenti"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain_is_possible
 msgid "Move Line Search Additional Domain Is Possible"
-msgstr ""
+msgstr "È consentita la ricerca dominio addizionale riga movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order_is_possible
 msgid "Move Line Search Sort Order Is Possible"
-msgstr ""
+msgstr "È consentito l'ordine di ordinamento ricerca riga movimento"
 
 #. module: shopfloor
 #. odoo-python
@@ -1255,7 +1269,7 @@ msgstr "È possibile avere pre-colli prodotto"
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__priority
 msgid "Priority"
-msgstr ""
+msgstr "Priorità"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_prepackaged_product
@@ -1324,7 +1338,7 @@ msgstr "Prodotto elaborato come prodotto grezzo"
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__move_line_search_sort_order_custom_code
 msgid "Python code to sort move lines. "
-msgstr ""
+msgstr "Codice Python per ordinare le righe movimento. "
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant
@@ -1617,7 +1631,7 @@ msgstr "Qualcuno sta già lavorando su questi trasferimenti"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order
 msgid "Sort method used when searching move lines"
-msgstr ""
+msgstr "Metodo ordinamento utilizzato quando si cercano le righe movimento"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__source_move_line_ids
@@ -1954,7 +1968,7 @@ msgstr "Questo trasferimento non esiste più o non è più disponibile."
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid "Three variables are available:"
-msgstr ""
+msgstr "Sono disponibili tre variabili:"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
@@ -1962,6 +1976,8 @@ msgid ""
 "To assign the key value: <code>key = "
 "get_sort_key_assigned_to_current_user(line) + (line.x, )</code>"
 msgstr ""
+"Per assegnare il valore della chiave: <code>key = "
+"get_sort_key_assigned_to_current_user(line) + (line.x, )</code>"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__total_weight
