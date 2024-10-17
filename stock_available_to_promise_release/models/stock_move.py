@@ -562,12 +562,16 @@ class StockMove(models.Model):
 
         # Pull the released moves
         for move in released_moves:
+            qty_to_release = move._get_qty_to_release()
+            rounding = move.product_uom.rounding
+            if float_compare(qty_to_release, 0, precision_rounding=rounding) <= 0:
+                continue
             move._before_release()
             values = move._prepare_procurement_values()
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
                     move.product_id,
-                    move.product_uom_qty,
+                    qty_to_release,
                     move.product_uom,
                     move.location_id,
                     move.rule_id and move.rule_id.name or "/",
@@ -582,6 +586,34 @@ class StockMove(models.Model):
         released_moves._after_release_update_chain()
 
         return released_moves
+
+    def _get_qty_to_release(self):
+        """Return the qty to release for the move
+
+        The qty to release is the move qty minus the qty released for this move
+        minus the the qty already reserved for the move.
+
+        This qty will never exceed the ordered available to promise qty.
+        """
+        self.ensure_one()
+        released_moves = self.move_orig_ids.filtered(
+            lambda m: m.state not in ("done", "cancel")
+        )
+        all_released_qty = sum(released_moves.mapped("product_uom_qty"))
+        others_requesting_moves = (
+            released_moves.move_dest_ids.filtered(
+                lambda m: m.state not in ("done", "cancel")
+            )
+            - self
+        )
+        others_moves_requested_qty = sum(
+            others_requesting_moves.mapped("product_uom_qty")
+        ) - sum(others_requesting_moves.mapped("reserved_availability"))
+        current_released_qty = all_released_qty - others_moves_requested_qty
+        to_release = (
+            self.product_uom_qty - self.reserved_availability - current_released_qty
+        )
+        return min(to_release, self.ordered_available_to_promise_qty)
 
     def _before_release(self):
         """Hook that aims to be overridden."""
