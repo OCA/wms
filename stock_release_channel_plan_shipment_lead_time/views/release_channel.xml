@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="stock_release_channel_form_view">
+        <field name="name">stock.release.channel.form</field>
+        <field name="model">stock.release.channel</field>
+        <field
+            name="inherit_id"
+            ref="stock_release_channel_shipment_lead_time.stock_release_channel_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="shipment_lead_time" position="after">
+                <field name="delivery_weekday_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+</odoo>
