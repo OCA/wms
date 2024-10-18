@@ -690,7 +690,7 @@ class LocationContentTransfer(Component):
         stock.validate_moves(package_moves)
         move_lines = self._find_transfer_move_lines(location)
         message = self.msg_store.location_content_transfer_item_complete(
-            scanned_location
+            location, scanned_location
         )
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(package_moves.move_line_ids)
@@ -757,7 +757,7 @@ class LocationContentTransfer(Component):
         else:
             move_lines = self._find_transfer_move_lines(move_line.location_id)
         message = self.msg_store.location_content_transfer_item_complete(
-            scanned_location
+            location, scanned_location
         )
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
