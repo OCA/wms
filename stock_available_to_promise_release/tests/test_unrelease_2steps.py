@@ -113,3 +113,50 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.picking1.printed = True
         with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
             self.shipping1.move_ids._action_cancel()
+
+    def test_cancel_pick(self):
+        """
+        if we manually cancel one of picking chain we set the dest moves
+        to need_release so they can be released again
+        """
+        self.assertFalse(self.shipping1.need_release)
+        self.picking1.action_cancel()
+        self.assertTrue(self.shipping1.need_release)
+
+    def test_cancel_partial_pick(self):
+        # In this tests we partially process a picking then confirm it.
+        # We cancel the backorder and check that the shippings is set to need_release
+        # We then release the shippings again and check that the backorder is created
+        # for the remaining qty only
+        self.assertFalse(self.shipping1.need_release)
+        self.assertFalse(self.shipping2.need_release)
+        original_qty = self.picking1.move_ids.product_uom_qty
+        self.assertGreater(original_qty, 1)
+        self.picking1.move_line_ids[0].qty_done = 1
+        self.picking1._action_done()
+        self.assertEqual(self.shipping1.move_ids.state, "partially_available")
+        # get the backorder
+        backorder_pick = self._prev_picking(self.shipping1).filtered(
+            lambda p: p.state == "assigned"
+        )
+        self.assertTrue(backorder_pick)
+        backorder_pick.action_assign()
+        self.assertEqual(backorder_pick.move_ids.state, "assigned")
+        # the backorder should have only one move for the remaining qty
+        self.assertEqual(backorder_pick.move_ids.product_uom_qty, original_qty - 1)
+        # we cancel the backorder
+        backorder_pick.action_cancel()
+        # the shipping should be set to need_release
+        self.assertTrue(self.shipping1.need_release)
+        self.assertTrue(self.shipping2.need_release)
+        # the shipping move should still be partially available
+        self.assertEqual(self.shipping1.move_ids.state, "partially_available")
+        self.assertEqual(self.shipping2.move_ids.state, "waiting")
+        # and if we release it again, the backorder should be created
+        # for the remaining qty
+        self.deliveries.release_available_to_promise()
+        backorder_pick = self._prev_picking(self.shipping1).filtered(
+            lambda p: p.state == "assigned"
+        )
+        self.assertTrue(backorder_pick)
+        self.assertEqual(backorder_pick.move_ids.product_uom_qty, original_qty - 1)

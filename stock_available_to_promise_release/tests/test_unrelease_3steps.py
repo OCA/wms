@@ -68,3 +68,22 @@ class TestAvailableToPromiseRelease3steps(PromiseReleaseCommonCase):
         # self.assertFalse(move_cancel.move_dest_ids)
         self.assertFalse(move_cancel.move_orig_ids)
         self.assertEqual(self.ship2.move_ids.move_orig_ids, self.pack2.move_ids)
+
+    def test_cancel_pick(self):
+        """
+        if we manually cancel one of picking chain we set the dest moves
+        to need_release so they can be released again
+        """
+        self.assertFalse(self.ship1.move_ids.need_release)
+        self.pick1.action_cancel()
+        self.assertTrue(self.pack1.move_ids.need_release)
+        self.assertTrue(self.ship1.move_ids.need_release)
+
+    def test_cancel_pack(self):
+        """
+        if we manually cancel one of picking chain we set the dest moves
+        to need_release so they can be released again
+        """
+        self.assertFalse(self.ship1.move_ids.need_release)
+        self.pack1.action_cancel()
+        self.assertTrue(self.ship1.move_ids.need_release)
