@@ -141,6 +141,13 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             self.pallets_bin_1_location | self.pallets_bin_3_location,
         )
 
+        # Try to re-apply the putaways to check the same destinations are selected
+        int_picking.move_line_ids._apply_putaway_strategy()
+        self.assertEqual(
+            int_picking.move_line_ids.mapped("location_dest_id"),
+            self.pallets_bin_1_location | self.pallets_bin_3_location,
+        )
+
     def test_storage_strategy_max_weight_ordered_locations_pallets(self):
         # Add a category for max_weight 50
         category_50 = self.env["stock.storage.category"].create(
