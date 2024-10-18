@@ -187,15 +187,15 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             move qty 10 (assigned):
                 -> move_line qty 10 from location X
 
-        Then the operator move 6 qty on 10, we get:
-
-            an error because we can move only full qty by location
-            and only a package barcode is allowed on scan.
+        Then the operator move 6 qty on 10:
+            -> move_line qty 6 from location X (done)
+            -> move_line qty 4 from location X (assigned)
         """
         zone_location = self.zone_location
         picking_type = self.picking3.picking_type_id
         barcode = self.packing_location.barcode
         moves_before = self.picking3.move_ids
+        self.assertEqual(moves_before.product_uom_qty, 10)
         self.assertEqual(len(moves_before), 1)
         self.assertEqual(len(moves_before.move_line_ids), 1)
         move_line = moves_before.move_line_ids
@@ -210,14 +210,21 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "confirmation": None,
             },
         )
-        self.assert_response_set_line_destination(
+        move_lines = self.service._find_location_move_lines()
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
             response,
             zone_location,
             picking_type,
-            move_line,
-            qty_done=6,
-            message=self.service.msg_store.package_not_found_for_barcode(barcode),
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
+        done_move = move_line.move_id
+        assigned_move = moves_before
+        self.assertEqual(done_move.state, "done")
+        self.assertEqual(done_move.product_uom_qty, 6)
+        self.assertEqual(assigned_move.state, "assigned")
+        self.assertEqual(assigned_move.product_uom_qty, 4)
 
     def test_set_destination_location_several_move_line_full_qty(self):
         """Scanned barcode is the destination location.
@@ -297,8 +304,8 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
 
         Then the operator move 4 qty on 6 (from the first move line), we get:
 
-            an error because we can move only full qty by location
-            and only a package barcode is allowed on scan.
+            -> move_line qty 6 from location X (assigned)
+            -> move_line qty 4 from location Y (done)
         """
         zone_location = self.zone_location
         picking_type = self.picking4.picking_type_id
@@ -318,14 +325,22 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
                 "confirmation": None,
             },
         )
-        self.assert_response_set_line_destination(
+        # Check response
+        move_lines = self.service._find_location_move_lines()
+        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        self.assert_response_select_line(
             response,
             zone_location,
             picking_type,
-            move_line,
-            qty_done=4,
-            message=self.service.msg_store.package_not_found_for_barcode(barcode),
+            move_lines,
+            message=self.service.msg_store.confirm_pack_moved(),
         )
+        done_move = move_line.move_id
+        assigned_move = moves_before
+        self.assertEqual(done_move.state, "done")
+        self.assertEqual(done_move.product_uom_qty, 4)
+        self.assertEqual(assigned_move.state, "assigned")
+        self.assertEqual(assigned_move.product_uom_qty, 6)
 
     def test_set_destination_location_zero_check(self):
         """Scanned barcode is the destination location.

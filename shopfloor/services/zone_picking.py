@@ -161,6 +161,9 @@ class ZonePicking(Component):
     def _pick_pack_same_time(self):
         return self.work.menu.pick_pack_same_time
 
+    def _packing_required(self):
+        return self.work.menu.require_destination_package
+
     def _handle_complete_mix_pack(self, package):
         packaging = self._actions_for("packaging")
         return (
@@ -924,7 +927,7 @@ class ZonePicking(Component):
             return (location_changed, response)
 
         # If no destination package
-        if not move_line.result_package_id:
+        if self._packing_required() and not move_line.result_package_id:
             response = self._response_for_set_line_destination(
                 move_line,
                 message=self.msg_store.dest_package_required(),
@@ -1169,43 +1172,40 @@ class ZonePicking(Component):
             )
 
         extra_message = ""
-        if moving_full_quantity:
-            # When the barcode is a location,
-            # only allow it if moving the full qty.
-            location = search.location_from_scan(barcode)
-            if location:
-                package = None
-                if handle_complete_mix_pack:
-                    package = move_line.package_id
-                if self._pick_pack_same_time():
-                    (
-                        good_for_packing,
-                        message,
-                    ) = self._handle_pick_pack_same_time_for_location(move_line)
-                    # TODO: we should append the msg instead.
-                    # To achieve this, we should refactor `response.message` to a list
-                    # or, to no break backward compat, we could add `extra_messages`
-                    # to allow backend to send a main message and N additional messages.
-                    extra_message = message
-                    if not good_for_packing:
-                        return self._response_for_set_line_destination(
-                            move_line, message=message, qty_done=quantity
-                        )
-                pkg_moved, response = self._set_destination_location(
-                    move_line,
-                    package,
-                    quantity,
-                    confirmation,
-                    location,
-                    barcode,
-                )
-                if response:
-                    if extra_message:
-                        if response.get("message"):
-                            response["message"]["body"] += "\n" + extra_message["body"]
-                        else:
-                            response["message"] = extra_message
-                    return response
+        location = search.location_from_scan(barcode)
+        if location:
+            package = None
+            if handle_complete_mix_pack:
+                package = move_line.package_id
+            if self._pick_pack_same_time():
+                (
+                    good_for_packing,
+                    message,
+                ) = self._handle_pick_pack_same_time_for_location(move_line)
+                # TODO: we should append the msg instead.
+                # To achieve this, we should refactor `response.message` to a list
+                # or, to no break backward compat, we could add `extra_messages`
+                # to allow backend to send a main message and N additional messages.
+                extra_message = message
+                if not good_for_packing:
+                    return self._response_for_set_line_destination(
+                        move_line, message=message, qty_done=quantity
+                    )
+            pkg_moved, response = self._set_destination_location(
+                move_line,
+                package,
+                quantity,
+                confirmation,
+                location,
+                barcode,
+            )
+            if response:
+                if extra_message:
+                    if response.get("message"):
+                        response["message"]["body"] += "\n" + extra_message["body"]
+                    else:
+                        response["message"] = extra_message
+                return response
 
         # When the barcode is a package
         package = search.package_from_scan(barcode)
