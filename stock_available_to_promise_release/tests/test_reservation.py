@@ -1242,3 +1242,84 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         picking.release_available_to_promise()
         new_picking = self._pickings_in_group(picking.group_id) - picking
         self.assertEqual(new_picking.move_type, "one")
+
+    def test_release_available_multiple_calls(self):
+        self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
+        # put some qty in output location
+        self._update_qty_in_location(self.wh.lot_stock_id, self.product1, 5.0)
+        ship = self._create_picking_chain(self.wh, [(self.product1, 10)])
+
+        ship.release_available_to_promise()
+        pick_pick = ship.move_ids.move_orig_ids.picking_id
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 5.0)
+
+        ship_backorder = ship.backorder_ids
+        self.assertTrue(ship_backorder)
+        self.assertEqual(ship_backorder.move_ids.product_uom_qty, 5.0)
+        self.assertFalse(ship_backorder.move_ids.move_orig_ids.picking_id)
+        ships = ship + ship_backorder
+
+        # the same call to release_available_to_promise should not create a new picking
+        # nor change the qty of the existing one
+        ships.release_available_to_promise()
+        self.assertEqual(pick_pick, ship.move_ids.move_orig_ids.picking_id)
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 5.0)
+        self.assertEqual(ship_backorder.move_ids.product_uom_qty, 5.0)
+        self.assertFalse(ship_backorder.move_ids.move_orig_ids.picking_id)
+
+        # put more qty in output location
+        # and force release
+        self._update_qty_in_location(self.wh.lot_stock_id, self.product1, 10.0)
+        ships.move_ids.need_release = True
+
+        # the release should update the qty of the existing picking to the new qty
+        # available
+        ships.release_available_to_promise()
+        self.assertEqual(pick_pick, ship.move_ids.move_orig_ids.picking_id)
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 10.0)
+        self.assertEqual(ship_backorder.move_ids.move_orig_ids.picking_id, pick_pick)
+
+        # partially process the picking
+        pick_pick.action_assign()
+        pick_pick.move_line_ids.qty_done = 3.0
+        pick_pick._action_done()
+
+        # the pick should still contain the remaining qty
+        pick_pick = ship.move_ids.move_orig_ids.filtered(
+            lambda p: p.state not in ("done", "cancel")
+        ).picking_id
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 7.0)
+
+        # force release again
+        ship.move_ids.need_release = True
+        ship.release_available_to_promise()
+
+        # release should take into account already processed qty
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 7.0)
+
+        # force release of backorder
+        ship_backorder.move_ids.need_release = True
+        ship_backorder.release_available_to_promise()
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 7.0)
+
+        # if we release the two ships at same time, it's without effect
+        ships.move_ids.need_release = True
+        ships.release_available_to_promise()
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 7.0)
+
+        # if we cancel the remaining pick and release again, the new
+        # picking must be for the remaining qty
+        pick_pick.action_cancel()
+        ship.move_ids.need_release = True
+        ship.release_available_to_promise()
+
+        pick_pick = ship.move_ids.move_orig_ids.picking_id.filtered(
+            lambda p: p.state not in ("done", "cancel")
+        )
+        # only the first picking is released -> 5.0 - 3.0 = 2.0
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 2.0)
+
+        ship_backorder.move_ids.need_release = True
+        ship_backorder.release_available_to_promise()
+        # the backorder is for all the remaining qty
+        self.assertEqual(pick_pick.move_ids.product_uom_qty, 7.0)
