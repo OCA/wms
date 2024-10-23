@@ -1,6 +1,6 @@
 # Copyright 2021 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-
+import logging
 import math
 import threading
 from collections import defaultdict
@@ -13,7 +13,10 @@ from ..exceptions import (
     NoPickingCandidateError,
     NoSuitableDeviceError,
     PickingCandidateNumberLineExceedError,
+    PickingSplitNotPossibleError,
 )
+
+_logger = logging.getLogger(__name__)
 
 
 class MakePickingBatch(models.TransientModel):
@@ -279,7 +282,29 @@ class MakePickingBatch(models.TransientModel):
         ).action_apply()
         return picking
 
-    def _get_first_picking(self, no_limit=False):
+    def _is_picking_exceeding_limits(self, picking):
+        """Check if the picking exceeds the limits of the available devices.
+
+        :param picking: the picking to check
+        """
+        nbr_lines, volume, weight = self._get_picking_max_dimensions()
+        return (
+            picking.nbr_picking_lines > nbr_lines
+            or picking.volume > volume
+            or picking.weight > weight
+        )
+
+    def _get_first_picking(self, raise_if_not_found=False):
+        """Get the first picking to add to the batch.
+
+        If the split_picking_exceeding_limits is set, we try to find the first picking
+        without taking into account the limit on the number of lines and we split it
+        if it exceeds the limits. If the split is not possible, we raise an error.
+
+        Otherwise, we try to find the first picking taking into account the limit on the
+        number of lines.
+        """
+        no_limit = self.split_picking_exceeding_limits
         domain = self._get_picking_domain_for_first(no_nbr_lines_limit=no_limit)
         if not no_limit:
             device_domains = []
@@ -287,11 +312,21 @@ class MakePickingBatch(models.TransientModel):
                 device_domains.append(self._get_picking_domain_for_device(device))
             domain = AND([domain, OR(device_domains)])
         picking = self._execute_search_pickings(domain, limit=1)
-        if self.split_picking_exceeding_limits:
-            if not no_limit and not picking:
-                return self._get_first_picking(no_limit=True)
-            if no_limit and picking:
-                return self._split_first_picking_for_limit(picking)
+        if not picking and not no_limit and raise_if_not_found:
+            self._raise_create_batch_not_possible()
+        # at this stage we have the first picking to add to the batch but it could
+        # exceed the limits of the available devices. In this case we split the
+        # picking and return the picking to add to the batch. The split is done only
+        # if the split_picking_exceeding_limits is set to True.
+        if (
+            picking
+            and self.split_picking_exceeding_limits
+            and self._is_picking_exceeding_limits(picking)
+        ):
+            split_picking = self._split_first_picking_for_limit(picking)
+            if not split_picking and raise_if_not_found:
+                raise PickingSplitNotPossibleError(picking)
+            picking = split_picking
         return picking
 
     def _get_additional_picking(self):
@@ -376,22 +411,22 @@ class MakePickingBatch(models.TransientModel):
         candidates = self.env["stock.picking"].search(domain, limit=limit)
         if candidates:
             pickings = candidates if self.add_picking_list_in_error else None
-            raise NoSuitableDeviceError(pickings=pickings)
-        raise NoPickingCandidateError()
+            raise NoSuitableDeviceError(self.env, pickings=pickings)
+        raise NoPickingCandidateError(self.env)
 
     def _create_batch(self, raise_if_not_possible=False):
         """Create a batch transfer."""
         self._reset_counters()
         # first we try to get the first picking for the user
-        first_picking = self._get_first_picking()
+        first_picking = self._get_first_picking(
+            raise_if_not_found=raise_if_not_possible
+        )
         if not first_picking:
-            if raise_if_not_possible:
-                self._raise_create_batch_not_possible()
             return self.env["stock.picking.batch"].browse()
         device = self._compute_device_to_use(first_picking)
         if not device:
             if raise_if_not_possible:
-                raise NoSuitableDeviceError(pickings=first_picking)
+                raise NoSuitableDeviceError(self.env, pickings=first_picking)
             return self.env["stock.picking.batch"].browse()
         self._init_counters(first_picking, device)
         self._apply_limits()
