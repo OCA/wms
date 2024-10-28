@@ -1,0 +1,1 @@
+When the user or the system split a stock picking, the system will create a new stock picking. If this process occurs while the picking is linked to a release channel, you expect the new picking to be linked to the same release channel as the original picking.
