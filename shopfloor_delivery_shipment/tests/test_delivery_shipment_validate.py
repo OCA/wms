@@ -15,7 +15,7 @@ class DeliveryShipmentValidateCase(DeliveryShipmentCommonCase):
     def test_validate_shipment_planned_partially_loaded(self):
         """Validate a planned shipment with part of it loaded."""
         # Plan 3 deliveries in the shipment
-        self._plan_records_in_shipment(self.shipment, self.pickings.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.pickings.move_ids)
         self.shipment.action_confirm()
         self.shipment.action_in_progress()
         # Load a part of it
@@ -63,7 +63,7 @@ class DeliveryShipmentValidateCase(DeliveryShipmentCommonCase):
     def test_validate_shipment_planned_fully_loaded(self):
         """Validate a planned shipment fully loaded."""
         # Plan 3 deliveries in the shipment
-        self._plan_records_in_shipment(self.shipment, self.pickings.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.pickings.move_ids)
         self.shipment.action_confirm()
         self.shipment.action_in_progress()
         # Load everything

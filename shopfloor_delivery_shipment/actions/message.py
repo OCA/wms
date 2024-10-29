@@ -26,91 +26,131 @@ class MessageAction(Component):
     def picking_not_planned_in_shipment(self, picking, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Transfer {} has not been planned in the shipment {}.").format(
-                picking.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Transfer %(picking_name)s has not been planned in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "picking_name": picking.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def package_not_planned_in_shipment(self, package, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Package {} has not been planned in the shipment {}.").format(
-                package.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Package %(package_name)s has not been planned in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "package_name": package.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def lot_not_planned_in_shipment(self, lot, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Lot {} has not been planned in the shipment {}.").format(
-                lot.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Lot %(lot_name)s has not been planned in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "lot_name": lot.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def product_not_planned_in_shipment(self, product, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Product {} has not been planned in the shipment {}.").format(
-                product.barcode,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Product %(product_barcode)s has not been planned in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "product_barcode": product.barcode,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def unable_to_load_package_in_shipment(self, package, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Package {} can not been loaded in the shipment {}.").format(
-                package.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Package %(package_name)s can not been loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "package_name": package.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def unable_to_load_lot_in_shipment(self, lot, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Lot {} can not been loaded in the shipment {}.").format(
-                lot.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Lot %(lot_name)s can not been loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "lot_name": lot.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def unable_to_load_product_in_shipment(self, product, shipment_advice):
         return {
             "message_type": "error",
-            "body": _("Product {} can not been loaded in the shipment {}.").format(
-                product.barcode,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Product %(product_barcode)s can not been loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "product_barcode": product.barcode,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def package_already_loaded_in_shipment(self, package, shipment_advice):
         return {
             "message_type": "warning",
-            "body": _("Package {} is already loaded in the shipment {}.").format(
-                package.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Package %(package_name)s is already loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "package_name": package.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def lot_already_loaded_in_shipment(self, lot, shipment_advice):
         return {
             "message_type": "warning",
-            "body": _("Lot {} is already loaded in the shipment {}.").format(
-                lot.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Lot %(lot_name)s is already loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "lot_name": lot.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def product_already_loaded_in_shipment(self, product, shipment_advice):
         return {
             "message_type": "warning",
-            "body": _("Product {} is already loaded in the shipment {}.").format(
-                product.name,
-                shipment_advice.name,
-            ),
+            "body": _(
+                "Product %(product_name)s is already loaded in the shipment "
+                "%(shipment_name)s."
+            )
+            % {
+                "product_name": product.name,
+                "shipment_name": shipment_advice.name,
+            },
         }
 
     def carrier_not_allowed_by_shipment(self, picking):

@@ -731,13 +731,13 @@ class DeliveryShipment(Component):
         # Shipment with planned content
         if shipment_advice.planned_move_ids:
             # Restrict to delivery planned moves
-            moves = (shipment_advice.planned_move_ids & picking.move_lines).filtered(
+            moves = (shipment_advice.planned_move_ids & picking.move_ids).filtered(
                 lambda m: m.state in ("assigned", "partially_available")
             )
         # Shipment without planned content
         else:
             # Restrict to delivery moves not planned
-            moves = picking.move_lines.filtered(lambda m: not m.shipment_advice_id)
+            moves = picking.move_ids.filtered(lambda m: not m.shipment_advice_id)
         return moves.move_line_ids.filtered(
             lambda ml: not ml.shipment_advice_id
             or shipment_advice & ml.shipment_advice_id

@@ -12,7 +12,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        self._plan_records_in_shipment(self.shipment, self.picking1.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.picking1.move_ids)
         scanned_lot = self.picking2.move_ids_without_package.move_line_ids.lot_id
         response = self.service.dispatch(
             "scan_document",
@@ -93,7 +93,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         #   'move_lines' key contains the planned content including the lot scanned
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(planned_moves.move_line_ids),
+            self.service.data.move_ids(planned_moves.move_line_ids),
         )
         #   'package_levels' key doesn't exist (not planned for this shipment)
         self.assertNotIn("package_levels", content[location_src])
@@ -122,11 +122,11 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         location_src = self.picking_type.default_location_src_id.name
         content = response["data"]["scan_document"]["content"]
         self.assertIn(location_src, content)
-        #   'move_lines' key contains the lot scanned and other lines not yet
+        #   'move_ids' key contains the lot scanned and other lines not yet
         # loaded from the same delivery
         self.assertEqual(
-            content[location_src]["move_lines"],
-            self.service.data.move_lines(
+            content[location_src]["move_ids"],
+            self.service.data.move_ids(
                 self.picking1.move_ids_without_package.move_line_ids
             ),
         )
@@ -181,7 +181,7 @@ class DeliveryShipmentScanDocumentLotCase(DeliveryShipmentCommonCase):
         # loaded from the same delivery
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
+            self.service.data.move_ids(
                 self.picking1.move_ids_without_package.move_line_ids
             ),
         )

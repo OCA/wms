@@ -66,7 +66,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         #   'move_lines' key contains the only one product without package
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(self.picking1.move_line_ids_without_package),
+            self.service.data.move_ids(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key contains the packages
         self.assertEqual(
@@ -103,7 +103,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         #   'move_lines' key contains the only one product without package
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(self.picking1.move_line_ids_without_package),
+            self.service.data.move_ids(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key doesn't exist (not planned for this shipment)
         self.assertNotIn("package_levels", content[location_src])
@@ -116,7 +116,7 @@ class DeliveryShipmentScanDocumentPickingCase(DeliveryShipmentCommonCase):
         """
         self.picking1.carrier_id = self.env.ref("delivery.delivery_carrier")
         self.picking1.carrier_id.sudo().delivery_type = "base_on_rule"
-        self.picking2.carrier_id = self.env.ref("delivery.normal_delivery_carrier")
+        self.picking2.carrier_id = self.env.ref("delivery.delivery_local_delivery")
         self.picking2.carrier_id.sudo().delivery_type = "fixed"
         # Load the first delivery in the shipment
         self.picking1._load_in_shipment(self.shipment)

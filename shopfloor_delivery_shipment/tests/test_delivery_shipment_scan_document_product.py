@@ -11,7 +11,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
 
         Returns an error telling the user to first scan an operation.
         """
-        planned_move = self.picking1.move_lines.filtered(
+        planned_move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
         self._plan_records_in_shipment(self.shipment, planned_move)
@@ -35,7 +35,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        planned_move = self.picking1.move_lines.filtered(
+        planned_move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
         self._plan_records_in_shipment(self.shipment, planned_move)
@@ -121,7 +121,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         # yet loaded from the same delivery
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
+            self.service.data.move_ids(
                 self.picking1.move_ids_without_package.move_line_ids
             ),
         )
@@ -178,7 +178,7 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         # yet loaded from the same delivery
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(
+            self.service.data.move_ids(
                 self.picking1.move_ids_without_package.move_line_ids
             ),
         )
@@ -254,14 +254,14 @@ class DeliveryShipmentScanDocumentProductCase(DeliveryShipmentCommonCase):
         self.pickings.do_unreserve()
         scanned_product = self.product_d
         scanned_product.tracking = "lot"
-        move = self.picking1.move_lines.filtered(
+        move = self.picking1.move_ids.filtered(
             lambda m: m.product_id == scanned_product
         )
         # Put two lots in stock
-        lot1 = self.env["stock.production.lot"].create(
+        lot1 = self.env["stock.lot"].create(
             {"product_id": scanned_product.id, "company_id": self.env.company.id}
         )
-        lot2 = self.env["stock.production.lot"].create(
+        lot2 = self.env["stock.lot"].create(
             {"product_id": scanned_product.id, "company_id": self.env.company.id}
         )
         self.env["stock.quant"]._update_available_quantity(

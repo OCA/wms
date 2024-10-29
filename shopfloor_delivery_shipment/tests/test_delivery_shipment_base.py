@@ -8,7 +8,7 @@ from odoo.addons.shopfloor.tests import common
 class DeliveryShipmentCommonCase(common.CommonCase):
     @classmethod
     def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
+        result = super().setUpClassVars(*args, **kwargs)
         cls.menu = cls.env.ref(
             "shopfloor_delivery_shipment.shopfloor_menu_delivery_shipment"
         )
@@ -20,10 +20,11 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.dock = cls.env.ref("shipment_advice.stock_dock_demo")
         cls.dock.sudo().barcode = "DOCK"
         cls.dock2 = cls.dock.sudo().copy({"barcode": "DOCK2"})
+        return result
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
-        super().setUpClassBaseData(*args, **kwargs)
+        result = super().setUpClassBaseData(*args, **kwargs)
         # Create 3 deliveries
         cls.product_c.tracking = "lot"
         cls.pickings = cls.env["stock.picking"]
@@ -42,9 +43,9 @@ class DeliveryShipmentCommonCase(common.CommonCase):
             )
             cls.pickings |= picking
             setattr(cls, f"picking{i}", picking)
-            pack_moves = picking.move_lines[:2]
-            lot_move = picking.move_lines[2]
-            raw_move = picking.move_lines[3]
+            pack_moves = picking.move_ids[:2]
+            lot_move = picking.move_ids[2]
+            raw_move = picking.move_ids[3]
             cls._fill_stock_for_moves(pack_moves, in_package=True)
             cls._fill_stock_for_moves(lot_move, in_lot=True)
             # For raw move, add stock to the current one (if any)
@@ -55,11 +56,13 @@ class DeliveryShipmentCommonCase(common.CommonCase):
             picking.action_assign()
         # Create a shipment advice
         cls.shipment = cls._create_shipment()
+        return result
 
     @classmethod
     def setUpShopfloorApp(cls):
-        super().setUpShopfloorApp()
+        result = super().setUpShopfloorApp()
         cls.shopfloor_app.sudo().profile_ids += cls.profile
+        return result
 
     def setUp(self):
         super().setUp()

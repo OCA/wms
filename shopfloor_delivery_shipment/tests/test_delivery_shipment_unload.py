@@ -26,7 +26,7 @@ class DeliveryShipmentUnloadCase(DeliveryShipmentCommonCase):
 
     def test_unload_move_line_ok(self):
         """Unload a move line and returns the content of the related delivery."""
-        move_line = self.picking1.move_lines.filtered(
+        move_line = self.picking1.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         ).move_line_ids
         # Load the move line at first

@@ -12,7 +12,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         The shipment advice has some content planned but the user scans an
         unrelated one, returning an error.
         """
-        self._plan_records_in_shipment(self.shipment, self.picking1.move_lines)
+        self._plan_records_in_shipment(self.shipment, self.picking1.move_ids)
         scanned_package = self.picking2.package_level_ids.package_id
         response = self.service.dispatch(
             "scan_document",
@@ -88,7 +88,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         #   'move_lines' key contains the lines available from the same delivery
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(self.picking1.move_line_ids_without_package),
+            self.service.data.move_ids(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key contains the package which has been loaded
         self.assertEqual(
@@ -138,7 +138,7 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         #   'move_lines' key contains the only one product without package
         self.assertEqual(
             content[location_src]["move_lines"],
-            self.service.data.move_lines(self.picking1.move_line_ids_without_package),
+            self.service.data.move_ids(self.picking1.move_line_ids_without_package),
         )
         #   'package_levels' key contains the package which has been loaded
         self.assertEqual(
