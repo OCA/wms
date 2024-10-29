@@ -391,7 +391,9 @@ class ClusterPicking(Component):
                 return self._response_for_select_package(
                     picking,
                     lines,
-                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(),
+                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(
+                        line
+                    ),
                 )
 
 
