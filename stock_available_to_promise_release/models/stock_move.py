@@ -401,30 +401,30 @@ class StockMove(models.Model):
             item["product_id"][0]: item["quantity"] for item in location_quants
         }
         for move in self:
-            product_uom = move.product_id.uom_id
-            previous_promised_qty = move.previous_promised_qty
-
-            rounding = product_uom.rounding
-            available_qty = float_round(
-                quants_available.get(move.product_id.id, 0.0),
-                precision_rounding=rounding,
-            )
-
-            real_promised = available_qty - previous_promised_qty
-            uom_promised = product_uom._compute_quantity(
-                real_promised,
-                move.product_uom,
-                rounding_method="HALF-UP",
-            )
-            res[move] = {
-                "ordered_available_to_promise_uom_qty": max(
-                    min(uom_promised, move.product_uom_qty), 0.0
-                ),
-                "ordered_available_to_promise_qty": max(
-                    min(real_promised, move.product_qty), 0.0
-                ),
-            }
+            available_qty = quants_available.get(move.product_id.id, 0.0)
+            res[move] = move._get_ordered_available_to_promise_qty(available_qty)
         return res
+
+    def _get_ordered_available_to_promise_qty(self, available_qty):
+        self.ensure_one()
+        product_uom = self.product_id.uom_id
+        rounding = product_uom.rounding
+        previous_promised_qty = self.previous_promised_qty
+        available_qty = float_round(available_qty, precision_rounding=rounding)
+        real_promised = available_qty - previous_promised_qty
+        uom_promised = product_uom._compute_quantity(
+            real_promised,
+            self.product_uom,
+            rounding_method="HALF-UP",
+        )
+        return {
+            "ordered_available_to_promise_uom_qty": max(
+                min(uom_promised, self.product_uom_qty), 0.0
+            ),
+            "ordered_available_to_promise_qty": max(
+                min(real_promised, self.product_qty), 0.0
+            ),
+        }
 
     def _get_ordered_available_to_promise(self):
         res = {}
