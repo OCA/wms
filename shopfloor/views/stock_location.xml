@@ -5,12 +5,11 @@
         <field name="model">stock.location</field>
         <field name="inherit_id" ref="stock.view_location_form" />
         <field name="arch" type="xml">
-            <!-- show barcode because it's handy -->
-            <xpath expr="//field[@name='location_id']/.." position="after">
-                <label for="barcode" />
-                <field name="barcode" />
-            </xpath>
             <xpath expr="//group[@name='additional_info']/.." position="inside">
+                <!-- show barcode because it's handy -->
+                <group name="barcode" string="Barcode">
+                    <field name="barcode" />
+                </group>
                 <group string="Shopfloor">
                     <field name="shopfloor_picking_sequence" />
                 </group>
