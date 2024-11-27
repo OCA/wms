@@ -1,6 +1,8 @@
 # Copyright 2024 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import fields
 
 from .common import SaleReleaseChannelCase
@@ -37,6 +39,28 @@ class TestSaleReleaseChannel(SaleReleaseChannelCase):
         order.with_context(disable_cancel_warning=True).action_cancel()
         channel_date = order._get_release_channel_partner_date()
         self.assertFalse(channel_date)
+
+    def test_sale_force_release_channel_on_create(self):
+        order = self._create_sale_order()
+        order_release_channel_id = {order.id: self.test_channel.id}
+        order = order.with_context(order_release_channel_id=order_release_channel_id)
+        # Write delivery date to trigger the channel assignment
+        order.commitment_date = fields.Date.today() + relativedelta(month=1)
+        channel_date = order._get_release_channel_partner_date()
+        self.assertFalse(channel_date)
+        # No channel can be proposed by the assignment mechanism.
+        # Then current release channel should be kept.
+        self.assertEqual(order.release_channel_id, self.test_channel)
+
+        order = self._create_sale_order()
+        # Force the channel on order
+        order.release_channel_id = self.default_channel
+        # Assign commitment date to trigger the channel assignment
+        order_release_channel_id = {order.id: self.test_channel.id}
+        order = order.with_context(order_release_channel_id=order_release_channel_id)
+        order.commitment_date = fields.Datetime.now()
+        # Specific release channel is set by the channel assignment mechanism
+        self.assertEqual(order.release_channel_id, self.test_channel)
 
     def test_sale_computed_release_channel(self):
         # Create a specific channel entry from an order, and check if it is
