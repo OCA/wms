@@ -1,4 +1,5 @@
 # Copyright 2022 ACSONE SA/NV
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import logging
 
@@ -28,7 +29,9 @@ class StockStorageLocationSequenceCond(models.Model):
         * condition
         * putaway_location
         * quant (recordset)
+        * package
         * product
+        * quantity
         * env
         * datetime
         * dateutil
@@ -41,7 +44,13 @@ class StockStorageLocationSequenceCond(models.Model):
         """
 
     def _get_code_snippet_eval_context(
-        self, storage_location_sequence, putaway_location, quant, product
+        self,
+        storage_location_sequence,
+        putaway_location,
+        quant,
+        package,
+        product,
+        quantity,
     ):
         """Prepare the context used when evaluating python code
         :returns: dict -- evaluation context given to safe_eval
@@ -53,7 +62,9 @@ class StockStorageLocationSequenceCond(models.Model):
             "condition": self,
             "putaway_location": putaway_location,
             "quant": quant,
+            "package": package,
             "product": product,
+            "quantity": quantity,
             "datetime": safe_eval.datetime,
             "dateutil": safe_eval.dateutil,
             "time": safe_eval.time,
@@ -63,12 +74,25 @@ class StockStorageLocationSequenceCond(models.Model):
             ),
         }
 
-    def _exec_code(self, storage_location_sequence, putaway_location, quant, product):
+    def _exec_code(
+        self,
+        storage_location_sequence,
+        putaway_location,
+        quant,
+        package,
+        product,
+        quantity,
+    ):
         self.ensure_one()
         if not self._code_snippet_valued():
             return False
         eval_ctx = self._get_code_snippet_eval_context(
-            storage_location_sequence, putaway_location, quant, product
+            storage_location_sequence,
+            putaway_location,
+            quant,
+            package,
+            product,
+            quantity,
         )
         snippet = self.code_snippet
         safe_eval.safe_eval(snippet, eval_ctx, mode="exec", nocopy=True)
@@ -83,22 +107,50 @@ class StockStorageLocationSequenceCond(models.Model):
                 "* putaway sequence: %s\n"
                 "* putaway location: %s\n"
                 "* quants: %s\n"
+                "* package: %s\n"
                 "* product: %s\n"
+                "* quantity: %s\n"
                 % (
                     self.name,
                     storage_location_sequence.id,
                     putaway_location.name,
                     quant.ids,
+                    package.display_name,
                     product.display_name,
+                    quantity,
                 )
             )
         return result
 
-    def evaluate(self, storage_location_sequence, putaway_location, quant, product):
+    def _code_snippet_valued(self):
+        self.ensure_one()
+        snippet = self.code_snippet or ""
+        return bool(
+            [
+                not line.startswith("#")
+                for line in (snippet.splitlines())
+                if line.strip("")
+            ]
+        )
+
+    def evaluate(
+        self,
+        storage_location_sequence,
+        putaway_location,
+        quant,
+        package,
+        product,
+        quantity,
+    ):
         self.ensure_one()
         if self.condition_type == "code":
             return self._exec_code(
-                storage_location_sequence, putaway_location, quant, product
+                storage_location_sequence,
+                putaway_location,
+                quant,
+                package,
+                product,
+                quantity,
             )
         condition_type = self.condition_type
         raise exceptions.UserError(
