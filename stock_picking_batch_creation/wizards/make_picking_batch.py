@@ -91,6 +91,11 @@ class MakePickingBatch(models.TransientModel):
         "picking for the sole case where a device is suitable for the picking but the "
         "picking has more lines than the maximum number of lines.",
     )
+    use_maximum_capacity_priority_grouping = fields.Boolean(
+        help="Enable to prioritize stock picking groups based on their total weight and"
+        "number of picking lines, ensuring the highest priority groups are processed"
+        "first.",
+    )
 
     __slots__ = (
         "_volume_by_partners",
@@ -268,6 +273,8 @@ class MakePickingBatch(models.TransientModel):
         for device in self.stock_device_type_ids:
             device_domains.append(self._get_picking_domain_for_device(device))
         domain = AND([domain, OR(device_domains)])
+        if self.use_maximum_capacity_priority_grouping:
+            domain = self._get_domain_for_highest_priority_picking_group(domain)
         return self._execute_search_pickings(domain, limit=1)
 
     def _get_additional_picking(self):
@@ -466,3 +473,59 @@ class MakePickingBatch(models.TransientModel):
             "batch_nbr_bins": self._device.nbr_bins - self._remaining_nbr_bins,
             "batch_nbr_lines": sum(selected_pickings.mapped("nbr_picking_lines")),
         }
+
+    def _get_group_by_for_highest_priority_picking_group(self):
+        """
+        Retrieves the fields used for grouping stock pickings in order to determine
+        the highest priority picking group.
+        """
+        res = []
+        if self.restrict_to_same_priority:
+            res.append("priority")
+        if self.restrict_to_same_partner:
+            res.append("partner_id")
+        return res
+
+    @api.model
+    def _get_comparison_fields_for_highest_priority_picking_group(self):
+        """This method can be overwritten to add more comparison fields or change the
+        comparison order"""
+        return ["weight", "nbr_picking_lines"]
+
+    def _get_domain_for_highest_priority_picking_group(self, domain):
+        """
+        This method retrieves the domain for the group of stock pickings that has the
+        highest priority, based on the sum of weight, number of picking lines, and the
+        count of pickings.
+        It first groups the stock pickings by specified fields, then sorts the groups
+        in descending order of weight, number of picking lines, and count.
+        The method returns the domain for the group with the highest priority or
+        original domain if no groups are found.
+
+        Args:
+            domain (list): The original domain to filter the stock pickings.
+
+        Returns:
+            list: The domain corresponding to the group of stock pickings with the
+                  highest priority, or the original domain.
+        """
+        group_by_fields = self._get_group_by_for_highest_priority_picking_group()
+        comparison_fields = (
+            self._get_comparison_fields_for_highest_priority_picking_group()
+        )
+        items = self.env["stock.picking"].read_group(
+            domain,
+            groupby=group_by_fields,
+            fields=[f"{f}:sum" for f in comparison_fields],
+            lazy=False,
+        )
+        sorted_items = sorted(
+            items,
+            key=lambda x: [x[f] for f in comparison_fields + ["__count"]],
+            reverse=True,
+        )
+        # Return the first item, which has the highest priority
+        item = sorted_items[0] if sorted_items else None
+        if item and item.get("__domain"):
+            return item.get("__domain")
+        return domain

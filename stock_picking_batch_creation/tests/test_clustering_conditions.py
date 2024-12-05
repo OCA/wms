@@ -432,6 +432,27 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         batch2 = self.make_picking_batch._create_batch()
         self.assertEqual(self.pick1 | self.pick2, batch2.picking_ids)
 
+    def test_pickings_with_different_partners_max_capacity_enabled(self):
+        """same as previous test but this time use_maximum_capacity_priority_grouping
+        is enabled"""
+        partner1 = self.env["res.partner"].create({"name": "partner 1"})
+        partner2 = self.env["res.partner"].create({"name": "partner 2"})
+        self._set_quantity_in_stock(self.stock_location, self.p5)
+        self._create_picking_pick_and_assign(self.picking_type_1.id, products=self.p5)
+        (self.pick1 | self.pick2).write({"partner_id": partner1.id})
+        self.pick3.write({"partner_id": partner2.id})
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 10,
+                "restrict_to_same_partner": True,
+                "use_maximum_capacity_priority_grouping": True,
+            }
+        )
+        batch = self.make_picking_batch._create_batch()
+        self.assertEqual(self.pick1 | self.pick2, batch.picking_ids)
+        batch2 = self.make_picking_batch._create_batch()
+        self.assertEqual(self.pick3, batch2.picking_ids)
+
     def test_picking_with_maximum_number_of_lines_exceed(self):
         # pick 3 has 2 lines
         # create a batch picking with maximum number of lines = 1
