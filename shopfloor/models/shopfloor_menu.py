@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, api, exceptions, fields, models
+from odoo.tools.safe_eval import test_python_expr
 
 PICK_PACK_SAME_TIME_HELP = """
 If you tick this box, while picking goods from a location
@@ -52,6 +53,30 @@ a destination location.
 If enabled, they will also be allowed
 to scan a destination package.
 """
+
+MOVE_LINE_PROCESSING_SORT_ORDER_HELP = (
+    "By priority & location:\n"
+    "> each line is sorted by priority and then by location to perform a smart path in"
+    " the warehouse.\n"
+    "By location grouped by product:\n"
+    "> in case of multiple move lines for the same product, break the sorting to"
+    " finalize a started product by processing all other move lines for that product"
+    " in order to group a product on a picking device. When stacking products on a"
+    " pallet, this prevents to spread a same product at different level on the stack."
+)
+
+CUSTOM_CODE_DEFAULT = (
+    "# Available variables:\n"
+    "#  - env: Odoo Environment on which the action is triggered\n"
+    "#  - time, datetime, dateutil, timezone: useful Python libraries\n"
+    "#  - records: lines to sort\n"
+    "#  - default_filter_func: default filtering function\n"
+    "#\n"
+    "# To provide the order for stock.move.line records to be processed, define eg.:\n"
+    "# move_lines = records.filtered(default_filter_func).sorted()\n"
+    "\n"
+    "\n"
+)
 
 
 class ShopfloorMenu(models.Model):
@@ -225,6 +250,26 @@ class ShopfloorMenu(models.Model):
     )
     allow_alternative_destination_package_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_package_is_possible"
+    )
+    move_line_processing_sort_order_is_possible = fields.Boolean(
+        compute="_compute_move_line_processing_sort_order_is_possible"
+    )
+    move_line_processing_sort_order = fields.Selection(
+        selection=[
+            ("location", "Location"),
+            ("location_grouped_product", "Location Grouping products"),
+            ("custom_code", "Custom code"),
+        ],
+        string="Sort method used when processing move lines",
+        default="location",
+        required=True,
+        help=MOVE_LINE_PROCESSING_SORT_ORDER_HELP,
+    )
+
+    move_line_processing_sort_order_custom_code = fields.Text(
+        string="Custom sort key code",
+        default=CUSTOM_CODE_DEFAULT,
+        help="Python code to sort move lines.",
     )
 
     @api.onchange("unload_package_at_destination")
@@ -455,3 +500,20 @@ class ShopfloorMenu(models.Model):
             menu.allow_alternative_destination_package_is_possible = (
                 menu.scenario_id.has_option("allow_alternative_destination_package")
             )
+
+    @api.depends("scenario_id")
+    def _compute_move_line_processing_sort_order_is_possible(self):
+        for menu in self:
+            menu.move_line_processing_sort_order_is_possible = (
+                menu.scenario_id.has_option("allow_move_line_processing_sort_order")
+            )
+
+    @api.constrains("move_line_processing_sort_order_custom_code")
+    def _check_python_code(self):
+        for menu in self.sudo().filtered("move_line_processing_sort_order_custom_code"):
+            msg = test_python_expr(
+                expr=menu.move_line_processing_sort_order_custom_code.strip(),
+                mode="exec",
+            )
+            if msg:
+                raise exceptions.ValidationError(msg)

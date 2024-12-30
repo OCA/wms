@@ -169,6 +169,26 @@
                     />
                     <field name="allow_alternative_destination_package" />
                 </group>
+                <group
+                    name="move_line_processing_sort_order"
+                    attrs="{'invisible': [('move_line_processing_sort_order_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="move_line_processing_sort_order_is_possible"
+                        invisible="1"
+                    />
+                    <field name="move_line_processing_sort_order" />
+                </group>
+            </group>
+            <group name="options" position="after">
+                <group name="move_line_processing_sort_order_custom_code">
+                    <field
+                        name="move_line_processing_sort_order_custom_code"
+                        attrs="{'invisible': [('move_line_processing_sort_order', '!=', 'custom_code')]}"
+                        widget="ace"
+                        options="{'mode': 'python'}"
+                    />
+                </group>
             </group>
         </field>
     </record>

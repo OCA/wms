@@ -2,8 +2,16 @@
 # Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _, fields
+from pytz import timezone
+
+from odoo import _, exceptions, fields
 from odoo.osv import expression
+from odoo.tools.safe_eval import (
+    datetime as safe_datetime,
+    dateutil as safe_dateutil,
+    safe_eval,
+    time as safe_time,
+)
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -362,17 +370,80 @@ class ClusterPicking(Component):
         # after ALL the other lines in the batch are processed.
         return lines.sorted(key=self._sort_key_lines)
 
+    @staticmethod
+    def _lines_filtering(line):
+        return (
+            line.state in ("assigned", "partially_available")
+            # On 'StockPicking.action_assign()', result_package_id is set to
+            # the same package as 'package_id'. Here, we need to exclude lines
+            # that were already put into a bin, i.e. the destination package
+            # is different.
+            and (
+                not line.result_package_id or line.result_package_id == line.package_id
+            )
+        )
+
+    def _group_by_product(self, lines):
+        grouped_line_ids = []
+        product_ids_checked = set()
+        for line in lines:
+            if line.product_id.id not in product_ids_checked:
+                same_product_line_ids = lines.filtered(
+                    lambda x: x.product_id == line.product_id
+                ).ids
+                grouped_line_ids.extend(same_product_line_ids)
+                product_ids_checked.add(line.product_id.id)
+        lines = self.env["stock.move.line"].browse(grouped_line_ids)
+        return lines
+
     def _lines_to_pick(self, picking_batch):
-        return self._lines_for_picking_batch(
-            picking_batch,
-            filter_func=lambda l: (
-                l.state in ("assigned", "partially_available")
-                # On 'StockPicking.action_assign()', result_package_id is set to
-                # the same package as 'package_id'. Here, we need to exclude lines
-                # that were already put into a bin, i.e. the destination package
-                # is different.
-                and (not l.result_package_id or l.result_package_id == l.package_id)
-            ),
+        order = self.work.menu.move_line_processing_sort_order
+        if order == "location":
+            lines = self._lines_for_picking_batch(
+                picking_batch, filter_func=self._lines_filtering
+            )
+        elif order == "location_grouped_product":
+            # we need to call _lines_for_picking_batch
+            # without passing a filter_func so that the ordering is computed
+            # taking into account all lines in the batch,
+            # including those that have already been processed.
+            lines = self._lines_for_picking_batch(
+                picking_batch,
+                filter_func=lambda x: x,
+            )
+            lines = self._group_by_product(lines).filtered(self._lines_filtering)
+        elif order == "custom_code":
+            lines = self._eval_custom_code(picking_batch)
+        return lines
+
+    def _eval_context(self, move_lines):
+        return {
+            "uid": self.env.uid,
+            "user": self.env.user,
+            "time": safe_time,
+            "datetime": safe_datetime,
+            "dateutil": safe_dateutil,
+            "timezone": timezone,
+            # orm
+            "env": self.env,
+            # record
+            "records": move_lines,
+            # filter
+            "default_filter_func": self._lines_filtering,
+        }
+
+    def _eval_custom_code(self, picking_batch):
+        expr = self.work.menu.move_line_processing_sort_order_custom_code
+        move_lines = picking_batch.mapped("picking_ids.move_line_ids")
+        eval_context = self._eval_context(move_lines)
+        try:
+            safe_eval(expr, eval_context, mode="exec", nocopy=True)
+        except Exception as err:
+            raise exceptions.UserError(
+                _("Error when evaluating the move lines sorting code:\n %s") % (err)
+            )
+        return eval_context.get(
+            "move_lines", move_lines.filtered(self._lines_filtering)
         )
 
     def _last_picked_line(self, picking):
