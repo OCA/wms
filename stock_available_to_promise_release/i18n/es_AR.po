@@ -338,11 +338,6 @@ msgid "Release based on Available to Promise"
 msgstr "Liberación basada en Disponibilidad a Prometer"
 
 #. module: stock_available_to_promise_release
-#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
-msgid "Shipment date"
-msgstr "Fecha de envío"
-
-#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
 msgid "Stock Allocations Release"
@@ -380,8 +375,8 @@ msgstr "Regla de Inventario"
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=# data-oe-model=stock.picking data-oe-id=%(id)s>"
-"%(name)s</a> has been created."
+"The backorder <a href=# data-oe-model=stock.picking data-oe-"
+"id=%(id)s>%(name)s</a> has been created."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -544,6 +539,9 @@ msgstr "días"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minutos"
+
+#~ msgid "Shipment date"
+#~ msgstr "Fecha de envío"
 
 #~ msgid "City"
 #~ msgstr "Ciudad"

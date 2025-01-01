@@ -133,8 +133,8 @@ msgstr "Client"
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking__date_priority
 #, fuzzy
 msgid ""
-"Date/time used to sort moves to deliver first. Used to calculate the ordered"
-" available to promise."
+"Date/time used to sort moves to deliver first. Used to calculate the ordered "
+"available to promise."
 msgstr ""
 "Date/heure utilisée pour trier les mouvements à livrer en premier. Utilisé "
 "pour calculer la quantité disponible à engager."
@@ -166,8 +166,8 @@ msgstr "ID"
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__prevent_new_move_after_release
 msgid ""
-"If checked, once a delivery picking has been released, no more moves will be"
-" added to it. For example, if you add lines in the origin sales order, the "
+"If checked, once a delivery picking has been released, no more moves will be "
+"added to it. For example, if you add lines in the origin sales order, the "
 "new moves will be added to a new delivery."
 msgstr ""
 "Si cette option est cochée, une fois qu'un picking été libéré, aucun "
@@ -180,9 +180,9 @@ msgstr ""
 msgid ""
 "If checked, when a backorder is created (i.e. at the validation of the "
 "delivery), the moves into the backorder are unreleased as long as they came "
-"from a route configured to manually release moves. This means that the moves"
-" that were not delivered are put back in need for release and the "
-"unprocessed internal pulled moves are canceled."
+"from a route configured to manually release moves. This means that the moves "
+"that were not delivered are put back in need for release and the unprocessed "
+"internal pulled moves are canceled."
 msgstr ""
 "Si cochée, lorsqu'un reliquat est créé (c'est-à-dire à la validation de la "
 "livraison), les mouvements liés aux reliquats ne seront pas libérés tant "
@@ -299,8 +299,8 @@ msgstr "Variante de produit"
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__previous_promised_qty
 msgid ""
-"Quantities promised to moves with higher priority than this move (in default"
-" UoM of the product)."
+"Quantities promised to moves with higher priority than this move (in default "
+"UoM of the product)."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -341,11 +341,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__available_to_promise_defer_pull
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__available_to_promise_defer_pull
 msgid "Release based on Available to Promise"
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
-msgid "Shipment date"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -417,7 +412,8 @@ msgstr "Les enregistrements suivants seront libérés."
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
 msgid ""
 "This menu gives you the full traceability of inventory\n"
-"                operations on a specific product. You can filter on the product\n"
+"                operations on a specific product. You can filter on the "
+"product\n"
 "                to see all the past or future movements for the product."
 msgstr ""
 "Ce menu vous offre une traçabilité complète des opérations\n"
@@ -471,7 +467,6 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "Unsupported operator %s"
@@ -508,9 +503,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid ""
 "When your release transfers, their expected date\n"
-"                                is rescheduled to now + this preparation time (in minutes).\n"
-"                                Their scheduled date represents the latest the\n"
-"                                transfers should be done, and therefore, past\n"
+"                                is rescheduled to now + this preparation "
+"time (in minutes).\n"
+"                                Their scheduled date represents the latest "
+"the\n"
+"                                transfers should be done, and therefore, "
+"past\n"
 "                                this timestamp, considered late."
 msgstr ""
 "Lors de la libération de vos transferts, leur date prévue\n"

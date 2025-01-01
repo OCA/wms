@@ -346,11 +346,6 @@ msgid "Release based on Available to Promise"
 msgstr "Rilascio in base alla disponibilità alle promesse"
 
 #. module: stock_available_to_promise_release
-#: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
-msgid "Shipment date"
-msgstr "Data spedizione"
-
-#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
 msgid "Stock Allocations Release"
@@ -388,8 +383,8 @@ msgstr "Regola di giacenza"
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid ""
-"The backorder <a href=# data-oe-model=stock.picking data-oe-id=%(id)s>"
-"%(name)s</a> has been created."
+"The backorder <a href=# data-oe-model=stock.picking data-oe-"
+"id=%(id)s>%(name)s</a> has been created."
 msgstr ""
 "È stato creato l'ordine residuo <a href=# data-oe-model=stock.picking data-"
 "oe-id=%(id)s>%(name)s</a>."
@@ -557,6 +552,9 @@ msgstr "giorni"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minuti"
+
+#~ msgid "Shipment date"
+#~ msgstr "Data spedizione"
 
 #, python-format
 #~ msgid ""
