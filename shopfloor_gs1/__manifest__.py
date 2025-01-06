@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor GS1",
     "summary": "Integrate GS1 barcode scan into Shopfloor app",
-    "version": "14.0.1.0.0",
+    "version": "16.0.1.0.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
@@ -18,8 +18,7 @@
             # >= 2.3.0 required to use 'GS1Message.parse_hri' method
             # and next version 3.0.0 has been refactored bringing
             # incompatibility issues (to check later).
-            "biip==2.3.0"
+            "biip"
         ]
     },
-    "data": [],
 }

@@ -57,3 +57,18 @@ class TestUtils(BaseCase):
         self.assertEqual(res[0].ai, "01")
         self.assertEqual(res[1].ai, "11")
         self.assertEqual(res[2].ai, "10")
+
+    def test_barcode(self):
+        code = "(01)09506000117843(11)141231(10)1234AB"
+        res = GS1Barcode.parse(code)
+        res_2 = GS1Barcode.parse(code)
+
+        self.assertTrue(res[0] == res_2[0])
+
+        self.assertFalse(res[0] == res_2[1])
+        self.assertFalse(res[0] == list())
+
+        self.assertTrue(res[0])
+        self.assertFalse(GS1Barcode())
+
+        self.assertEqual(str(res[0]), "<GS1Barcode: ai=01>")

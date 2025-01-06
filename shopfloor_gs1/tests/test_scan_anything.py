@@ -33,7 +33,7 @@ class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
     def test_find_location(self):
         record = self.stock_location
         rec_type = "location"
-        gs1_barcode = GS1_GTIN_BARCODE_1 + "(254)" + record.name
+        gs1_barcode = GS1_GTIN_BARCODE_1 + "\x1d254" + record.name
         data = self.data_detail.location_detail(record)
         for identifier in (gs1_barcode, record.name):
             self._test_response_ok(rec_type, data, identifier)
@@ -47,7 +47,7 @@ class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
 
     def test_scan_lot(self):
         record = (
-            self.env["stock.production.lot"]
+            self.env["stock.lot"]
             .sudo()
             .create(
                 {

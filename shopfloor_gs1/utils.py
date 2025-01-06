@@ -23,7 +23,7 @@ class GS1Barcode:
         return f"<{self.__class__.__name__}: ai={self.ai}>"
 
     def __bool__(self):
-        return self.type != "none" or bool(self.record)
+        return bool(self.ai)
 
     def __eq__(self, other):
         for k in self.__slots__:
@@ -41,16 +41,19 @@ class GS1Barcode:
         :param ai_whitelist: ordered list of AI to look for
         :param safe: break or not if barcode is invalid
 
-        :return: an instance of `GS1Barcode`.
+        :return: a list of `GS1Barcode` instances.
         """
         res = []
         try:
             # TODO: we might not get an HRI...
             parsed = GS1Message.parse_hri(barcode)
         except ParseError:
-            if not safe:
-                raise
-            parsed = None
+            try:
+                parsed = GS1Message.parse(barcode)
+            except ParseError:
+                if not safe:
+                    raise
+                parsed = None
         if not parsed:
             return res
         # Use whitelist if given, to respect a specific order

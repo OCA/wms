@@ -3,15 +3,15 @@
 from odoo.addons.shopfloor.tests.test_actions_search import TestSearchBaseCase
 
 from .common import (
-    GS1_GTIN_BARCODE_1,
-    GS1_MANUF_BARCODE,
+    GS1_GTIN_BARCODE_1_HRI,
+    GS1_MANUF_BARCODE_HRI,
     LOT1,
     MANUF_CODE,
     PROD_BARCODE,
 )
 
 
-class TestFind(TestSearchBaseCase):
+class TestFindHri(TestSearchBaseCase):
     @classmethod
     def setUpClassBaseData(cls):
         # pylint: disable=missing-return
@@ -26,7 +26,7 @@ class TestFind(TestSearchBaseCase):
 
     def test_find_location(self):
         rec = self.customer_location
-        barcode = GS1_GTIN_BARCODE_1 + "\x1d254" + rec.name
+        barcode = GS1_GTIN_BARCODE_1_HRI + "(254)" + rec.name
         res = self.search.find(barcode, types=("location",))
         self.assertEqual(res.record, rec)
         res = self.search.find(rec.name, types=("location",))
@@ -39,10 +39,10 @@ class TestFind(TestSearchBaseCase):
 
     def test_find_product(self):
         rec = self.product_a
-        res = self.search.find(GS1_GTIN_BARCODE_1, types=("product",))
+        res = self.search.find(GS1_GTIN_BARCODE_1_HRI, types=("product",))
         self.assertEqual(res.record, rec)
         rec.barcode = MANUF_CODE
-        res = self.search.find(GS1_MANUF_BARCODE, types=("product",))
+        res = self.search.find(GS1_MANUF_BARCODE_HRI, types=("product",))
         self.assertEqual(res.record, rec)
 
     def test_find_lot(self):
@@ -58,7 +58,7 @@ class TestFind(TestSearchBaseCase):
             )
         )
         res = self.search.find(
-            GS1_GTIN_BARCODE_1,
+            GS1_GTIN_BARCODE_1_HRI,
             types=("lot",),
             handler_kw=dict(lot=dict(products=self.product_a)),
         )
