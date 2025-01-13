@@ -1,3 +1,4 @@
+from . import barcode_parser
 from . import change_package_lot
 from . import data
 from . import data_detail
