@@ -22,11 +22,23 @@ class SaleOrder(models.Model):
 
     def _get_release_channel_partner_date_domain(self):
         domain = super()._get_release_channel_partner_date_domain()
-        if domain and self.carrier_id:
-            carrier_domain = [
-                "|",
-                ("release_channel_id.carrier_ids", "in", self.carrier_id.ids),
-                ("release_channel_id.carrier_ids", "=", False),
-            ]
+        if domain:
+            if self.carrier_id:
+                carrier_domain = [
+                    ("release_channel_id.carrier_ids", "in", self.carrier_id.ids),
+                ]
+            else:
+                carrier_domain = [
+                    ("release_channel_id.carrier_ids", "=", False),
+                ]
             domain = expression.AND([domain, carrier_domain])
         return domain
+
+    def _compute_release_channel_id(self):
+        # pylint: disable=missing-return
+        super()._compute_release_channel_id()
+        for rec in self:
+            # Selected release channel and carrier have to be compatible
+            if rec.release_channel_id.carrier_ids and rec.carrier_id:
+                if rec.carrier_id not in rec.release_channel_id.carrier_ids:
+                    rec.release_channel_id = False
