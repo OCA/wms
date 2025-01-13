@@ -9,7 +9,7 @@ import operator as py_operator
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.osv import expression
-from odoo.tools import date_utils, float_compare, float_round, groupby
+from odoo.tools import date_utils, float_compare, float_is_zero, float_round, groupby
 
 _logger = logging.getLogger(__name__)
 
@@ -100,8 +100,14 @@ class StockMove(models.Model):
             # The picking is printed, we can't unrelease the move
             # because the processing of the origin moves is started.
             return False
+        # If allow_unrelease_on_cancel is not checked, only release assigned/waiting
+        # moves. If checked, also unrelease done moves.
+        if self.rule_id.allow_unrelease_return_done_move:
+            unreleasable_states = ("cancel",)
+        else:
+            unreleasable_states = ("done", "cancel")
         origin_moves = origin_moves.filtered(
-            lambda m: m.state not in ("done", "cancel")
+            lambda m: m.state not in unreleasable_states
         )
         origin_qty_todo = sum(origin_moves.mapped("product_qty"))
         return (
@@ -591,6 +597,39 @@ class StockMove(models.Model):
             yield moves
             moves = moves.mapped(chain_field)
 
+    def _return_quantity_in_stock(self, quantity_to_return):
+        picking = self.picking_id
+        picking.ensure_one()
+
+        returned_quantity = 0
+        # create return
+        return_type = picking.picking_type_id.return_picking_type_id
+        wiz_values = {
+            "picking_id": picking.id,
+            "original_location_id": picking.location_dest_id.id,
+            "location_id": return_type.default_location_dest_id.id,
+        }
+        product_return_moves = []
+        for move in self:
+            if not move.state == "done":
+                continue
+            move_qty = min(quantity_to_return - returned_quantity, move.quantity_done)
+            return_move_vals = {
+                "product_id": move.product_id.id,
+                "quantity": move_qty,
+                "uom_id": move.product_id.uom_id.id,
+                "move_id": move.id,
+            }
+            product_return_moves.append((0, 0, return_move_vals))
+            returned_quantity += move_qty
+            if returned_quantity == quantity_to_return:
+                break
+        if product_return_moves:
+            wiz_values["product_return_moves"] = product_return_moves
+            return_wiz = self.env["stock.return.picking"].create(wiz_values)
+            return_wiz.create_returns()
+        return returned_quantity
+
     def unrelease(self, safe_unrelease=False):
         """Unrelease unreleasavbe moves
 
@@ -605,24 +644,66 @@ class StockMove(models.Model):
         impacted_picking_ids = set()
 
         for move in moves_to_unrelease:
+            rounding = move.product_id.uom_id.rounding
+            # When a move is returned, it is going straight to WH/Stock,
+            # skipping all intermediate zones (pick/pack).
+            # That is why we need to keep track of qty returned along the way.
+            # We do not want to return the same goods at each step.
+            # At a given step (pick/pack/ship), qty to return is
+            # move.product_uom_qty - cancelled_qty_at_step - already returned qties
+            qty_to_unrelease = move.product_qty
+            qty_returned_for_move = 0
             iterator = move._get_chained_moves_iterator("move_orig_ids")
-            moves_to_cancel = self.env["stock.move"]
+            moves_to_cancel_for_move = self.env["stock.move"]
             # backup procure_method as when you don't propagate cancel, the
             # destination move is forced to make_to_stock
             procure_method = move.procure_method
             next(iterator)  # skip the current move
             for origin_moves in iterator:
+                done_moves = origin_moves.filtered(lambda m: m.state == "done")
                 origin_moves = origin_moves.filtered(
                     lambda m: m.state not in ("done", "cancel")
                 )
+                qty_cancelled_at_step = 0
                 if origin_moves:
-                    origin_moves = move._split_origins(origin_moves)
-                    impacted_picking_ids.update(origin_moves.mapped("picking_id").ids)
+                    qty_to_split = qty_to_unrelease - qty_returned_for_move
+                    # TODO find new name
+                    moves_to_cancel = move._split_origins(
+                        origin_moves, qty=qty_to_split
+                    )
+                    impacted_picking_ids.update(
+                        moves_to_cancel.mapped("picking_id").ids
+                    )
                     # avoid to propagate cancel to the original move
-                    origin_moves.write({"propagate_cancel": False})
+                    moves_to_cancel.write({"propagate_cancel": False})
                     # origin_moves._action_cancel()
-                    moves_to_cancel |= origin_moves
-            moves_to_cancel._action_cancel()
+                    moves_to_cancel_for_move |= moves_to_cancel
+                    qty_cancelled_at_step = sum(moves_to_cancel.mapped("product_qty"))
+                # checking that for the current step (pick/pack/ship)
+                # move.product_uom_qty == step.cancelled_qty + move.returned_quanty
+                # If not the case, we have to move back goods in stock.
+                qty_to_return_at_step = (
+                    qty_to_unrelease - qty_cancelled_at_step - qty_returned_for_move
+                )
+                if float_is_zero(qty_to_return_at_step, precision_rounding=rounding):
+                    continue
+                # Multiple pickings can satisfy a move
+                # -> len(move.move_orig_ids.picking_id) > 1
+                # Group done_moves per picking, and create returns
+                groups_iterator = groupby(done_moves, key=lambda m: m.picking_id)
+                for __, moves_list in groups_iterator:
+                    moves_to_return = self.browse([move.id for move in moves_list])
+                    returned_qty = moves_to_return._return_quantity_in_stock(
+                        qty_to_return_at_step
+                    )
+                    qty_returned_for_move += returned_qty
+                    qty_to_return_at_step -= returned_qty
+                    if float_is_zero(
+                        qty_to_return_at_step, precision_rounding=rounding
+                    ):
+                        break
+
+            moves_to_cancel_for_move._action_cancel()
             # restore the procure_method overwritten by _action_cancel()
             move.procure_method = procure_method
         moves_to_unrelease.write({"need_release": True})
@@ -637,14 +718,15 @@ class StockMove(models.Model):
             picking.message_post(body=body)
             picking.last_release_date = False
 
-    def _split_origins(self, origins):
+    def _split_origins(self, origins, qty=None):
         """Split the origins of the move according to the quantity into the
         move and the quantity in the origin moves.
 
         Return the origins for the move's quantity.
         """
         self.ensure_one()
-        qty = self.product_qty
+        if not qty:
+            qty = self.product_qty
         # Unreserve goods before the split
         origins._do_unreserve()
         rounding = self.product_uom.rounding
