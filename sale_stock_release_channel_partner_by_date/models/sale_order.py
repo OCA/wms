@@ -61,7 +61,11 @@ class SaleOrder(models.Model):
         self.ensure_one()
         model = self.env["stock.release.channel.partner.date"]
         domain = self._get_release_channel_partner_date_domain()
-        return domain and model.search(domain, limit=1) or model
+        return (
+            domain
+            and model.with_context(active_test=False).search(domain, limit=1)
+            or model
+        )
 
     def _get_release_channel_partner_date_domain(self):
         self.ensure_one()
