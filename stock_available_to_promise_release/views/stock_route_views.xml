@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group/field[@name='company_id']" position="after">
                 <field name="available_to_promise_defer_pull" />
+                <field name="allow_unrelease_return_done_move" />
                 <field name="no_backorder_at_release" />
             </xpath>
         </field>
