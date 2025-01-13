@@ -15,7 +15,8 @@
                     colspan="2"
                 />
                 <field name="stock_release_channel_by_date_ids" nolabel="1" colspan="2">
-                  <tree editable="top">
+                  <tree editable="top" decoration-muted="active == False">
+                    <field name="active" invisible="1" />
                     <field name="partner_id" invisible="1" force_save="1" />
                     <field name="release_channel_id" options="{'no_create': True}" />
                     <field name="date" />
