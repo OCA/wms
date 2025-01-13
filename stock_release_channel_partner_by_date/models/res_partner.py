@@ -13,4 +13,5 @@ class ResPartner(models.Model):
         inverse_name="partner_id",
         string="Additional Release Channels",
         help="Additional release channels for a specific delivery date.",
+        context={"active_test": False},
     )
