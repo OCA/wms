@@ -42,7 +42,8 @@ class SaleOrder(models.Model):
             if not rec._check_release_channel_partner_date_requirements():
                 continue
             channel_date = rec.release_channel_partner_date_id
-            rec.release_channel_id = channel_date.release_channel_id
+            if channel_date:
+                rec.release_channel_id = channel_date.release_channel_id
 
     @api.depends(
         "state",
