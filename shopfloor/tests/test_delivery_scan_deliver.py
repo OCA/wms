@@ -12,6 +12,20 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
+        cls.out_location = cls.env.ref("stock.stock_location_output")
+        cls.cleanup_type = (
+            cls.env["stock.picking.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Cancel Cleanup",
+                    "default_location_src_id": cls.out_location.id,
+                    "default_location_dest_id": cls.stock_location.id,
+                    "sequence_code": "CCP",
+                    "code": "internal",
+                }
+            )
+        )
         cls.product_e.tracking = "lot"
         cls.picking = picking = cls._create_picking(
             lines=[
@@ -454,6 +468,126 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         self.assert_response_deliver(
             response,
             message=self.service.msg_store.transfer_canceled(),
+        )
+
+    def test_scan_deliver_return_partial_package(self):
+        move_a = self.picking.move_ids.filtered(
+            lambda m: m.product_id == self.product_a
+        )
+        move_a._action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_a, 1)]
+        )
+        package_vals = [(self.product_a, 1, None)]
+        cleanup_package = self._create_package_in_location(
+            cleanup_picking.location_id, package_vals
+        )
+        cleanup_package.name = "CLEANUP_PACKAGE"
+        cleanup_picking.action_assign()
+        cleanup_picking.move_line_ids.package_id = cleanup_package
+        params = {"barcode": "CLEANUP_PACKAGE"}
+        response = self.service.dispatch("scan_deliver", params=params)
+        type_name = cleanup_picking.picking_type_id.name
+        pick_name = cleanup_picking.name
+        expected_body = f"Reserved for {type_name} {pick_name}"
+        self.assertEqual(response.get("message").get("body"), expected_body)
+
+    def test_scan_deliver_return_package(self):
+        self.picking.action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_a, 1)]
+        )
+        package_vals = [(self.product_a, 1, None)]
+        cleanup_package = self._create_package_in_location(
+            cleanup_picking.location_id, package_vals
+        )
+        cleanup_package.name = "CLEANUP_PACKAGE"
+        cleanup_picking.action_assign()
+        cleanup_picking.move_line_ids.package_id = cleanup_package
+        params = {"barcode": "CLEANUP_PACKAGE"}
+        response = self.service.dispatch("scan_deliver", params=params)
+        expected_body = (
+            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
+        )
+        self.assertEqual(response.get("message").get("body"), expected_body)
+
+    def test_scan_deliver_return_product(self):
+        self.picking.action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_a, 1)]
+        )
+        cleanup_picking.action_assign()
+        params = {"barcode": self.product_a.barcode}
+        response = self.service.dispatch("scan_deliver", params=params)
+        expected_body = (
+            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
+        )
+        self.assertEqual(response.get("message").get("body"), expected_body)
+
+    def test_scan_deliver_return_packaging(self):
+        self.picking.action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_a, 1)],
+        )
+        cleanup_picking.action_assign()
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "CLEANUP PACKAGING",
+                    "product_id": self.product_a.id,
+                    "qty": 1,
+                    "product_uom_id": self.product_a.id,
+                    "barcode": "CLEANUP_PACKAGING",
+                }
+            )
+        )
+        params = {"barcode": "CLEANUP_PACKAGING"}
+        response = self.service.dispatch("scan_deliver", params=params)
+        expected_body = (
+            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
+        )
+        self.assertEqual(response.get("message").get("body"), expected_body)
+
+    def test_scan_deliver_return_lot(self):
+        self.picking.action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_a, 1)]
+        )
+        # Create move lines and set lot
+        cleanup_picking.action_assign()
+        cleanup_lot = self.env["stock.lot"].create(
+            {
+                "product_id": self.product_a.id,
+                "company_id": self.env.company.id,
+                "name": "CLEANUP_LOT",
+                "ref": "CLEANUP_LOT",
+            }
+        )
+        # Re-force qty to 1, as setting the lot resets qty to 0
+        cleanup_picking.move_line_ids.lot_id = cleanup_lot
+        cleanup_picking.move_line_ids.reserved_uom_qty = 1.0
+        params = {"barcode": "CLEANUP_LOT"}
+        response = self.service.dispatch("scan_deliver", params=params)
+        expected_body = (
+            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
+        )
+        self.assertEqual(response.get("message").get("body"), expected_body)
+
+    def test_scan_delivery_return_picking(self):
+        self.picking.action_cancel()
+        cleanup_picking = self._create_picking(
+            picking_type=self.cleanup_type, lines=[(self.product_c, 1)]
+        )
+        cleanup_picking.action_assign()
+        params = {"barcode": cleanup_picking.name}
+        response = self.service.dispatch("scan_deliver", params=params)
+        self.assert_response_deliver(
+            response,
+            message=self.service.msg_store.reserved_for_other_picking_type(
+                cleanup_picking
+            ),
         )
 
     def test_scan_deliver_picking_done(self):
