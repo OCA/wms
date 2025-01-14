@@ -147,47 +147,54 @@ class Delivery(Component):
         if picking_id:
             picking = self.env["stock.picking"].browse(picking_id)
 
-        # Validate picking anyway
         if not barcode_valid:
-            package = search.package_from_scan(barcode)
-            if package:
-                return self._deliver_package(picking, package, location)
+            handlers_by_type = {
+                "package": self._scan_deliver__by_package,
+                "product": self._scan_deliver__by_product,
+                "packaging": self._scan_deliver__by_packaging,
+                "lot": self._scan_deliver__by_lot,
+                "location": self._scan_deliver__by_location,
+            }
+            search_result = search.find(barcode, handlers_by_type.keys())
+            handler = handlers_by_type.get(search_result.type)
+            if handler:
+                result = handler(search_result.record, picking, location)
+                if result:
+                    return result
+        return self._scan_deliver__fallback(picking, location, barcode_valid)
 
-        if not barcode_valid:
-            product = search.product_from_scan(barcode)
-            if product:
-                return self._deliver_product(
-                    picking, product, product_qty=1, location=location
-                )
+    def _scan_deliver__by_package(self, package, picking, location):
+        return self._deliver_package(picking, package, location)
 
-        if not barcode_valid:
-            packaging = search.packaging_from_scan(barcode)
-            if packaging:
-                # By scanning a packaging, we want to process
-                # the full quantity of the packaging
-                packaging_qty = packaging.product_uom_id._compute_quantity(
-                    packaging.qty, packaging.product_id.uom_id
-                )
-                return self._deliver_product(
-                    picking,
-                    packaging.product_id,
-                    product_qty=packaging_qty,
-                    location=location,
-                )
+    def _scan_deliver__by_product(self, product, picking, location):
+        return self._deliver_product(picking, product, product_qty=1, location=location)
 
-        if not barcode_valid:
-            lot = search.lot_from_scan(barcode)
-            if lot:
-                return self._deliver_lot(picking, lot, product_qty=1, location=location)
+    def _scan_deliver__by_packaging(self, packaging, picking, location):
+        # By scanning a packaging, we want to process
+        # the full quantity of the packaging
+        packaging_qty = packaging.product_uom_id._compute_quantity(
+            packaging.qty, packaging.product_id.uom_id
+        )
+        return self._deliver_product(
+            picking,
+            packaging.product_id,
+            product_qty=packaging_qty,
+            location=location,
+        )
 
-        if not barcode_valid:
-            sublocation = search.location_from_scan(barcode)
-            if sublocation and sublocation.is_sublocation_of(
-                self.picking_types.mapped("default_location_src_id")
-            ):
-                message = self.msg_store.location_src_set_to_sublocation(sublocation)
-                return self._response_for_deliver(location=sublocation, message=message)
+    def _scan_deliver__by_lot(self, lot, picking, location):
+        return self._deliver_lot(picking, lot, product_qty=1, location=location)
 
+    def _scan_deliver__by_location(self, scanned_location, picking, location):
+        if scanned_location.is_sublocation_of(
+            self.picking_types.mapped("default_location_src_id")
+        ):
+            message = self.msg_store.location_src_set_to_sublocation(scanned_location)
+            return self._response_for_deliver(
+                location=scanned_location, message=message
+            )
+
+    def _scan_deliver__fallback(self, picking, location, barcode_valid):
         message = self.msg_store.barcode_not_found() if not barcode_valid else None
         return self._response_for_deliver(
             picking=picking, location=location, message=message
