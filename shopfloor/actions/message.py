@@ -961,3 +961,13 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("Unable to find a line with the same product but different lot."),
         }
+
+    def picking_type_is_return(self, picking):
+        body = _("Reserved for %(picking_type)s %(picking_name)s") % {
+            "picking_type": picking.picking_type_id.name,
+            "picking_name": picking.name,
+        }
+        return {
+            "message_type": "error",
+            "body": body,
+        }
