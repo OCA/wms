@@ -255,11 +255,20 @@ class Delivery(Component):
         return self._response_for_deliver(picking=new_picking, location=location)
 
     def _lines_base_domain(self, no_qty_done=True):
+        # we added auto_join for this, otherwise, the ORM would search all pickings
+        # in the picking type, and then use IN (ids)
         domain = [
-            # we added auto_join for this, otherwise, the ORM would search all pickings
-            # in the picking type, and then use IN (ids)
+            # Accepting return_picking_types in order to display meaningful
+            # messages when trying to process a return move.
+            # Those returns are blocked later in `_check_picking_status`
+            "|",
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("picking_id.state", "not in", ("done", "cancel")),
+            (
+                "picking_id.picking_type_id",
+                "in",
+                self.picking_types.return_picking_type_id.ids,
+            ),
+            ("picking_id.state", "not in", ("done",)),
         ]
         if no_qty_done:
             domain.append(("qty_done", "=", 0))

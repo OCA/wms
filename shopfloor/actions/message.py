@@ -216,6 +216,15 @@ class MessageAction(Component):
     def already_done(self):
         return {"message_type": "info", "body": _("Operation already processed.")}
 
+    def transfer_cancelled(self):
+        return {
+            "message_type": "info",
+            "body": _(
+                "Transfer has been cancelled. "
+                "This cannot be processed using this scenario"
+            ),
+        }
+
     def move_already_done(self):
         return {"message_type": "warning", "body": _("Move already processed.")}
 
