@@ -447,6 +447,15 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         move_lines = pick.move_ids.mapped("move_line_ids")
         self._test_scan_set_done_ok(move_lines, self.product_c.barcode, [1])
 
+    def test_scan_deliver_picking_canceled(self):
+        self.picking.action_cancel()
+        params = {"barcode": self.picking.name}
+        response = self.service.dispatch("scan_deliver", params=params)
+        self.assert_response_deliver(
+            response,
+            message=self.service.msg_store.transfer_canceled(),
+        )
+
     def test_scan_deliver_picking_done(self):
         # Set qty done for all lines (packages/raw product/lot...), picking is
         # automatically set to done when the last line is completed

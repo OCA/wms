@@ -83,6 +83,8 @@ class BaseShopfloorProcess(AbstractComponent):
                 return self.msg_store.stock_picking_not_found()
             if picking.state == "done":
                 return self.msg_store.already_done()
+            if picking.state == "cancel":
+                return self.msg_store.transfer_cancelled()
             if picking.state not in states:  # the picking must be ready
                 return self.msg_store.stock_picking_not_available(picking)
             if picking.picking_type_id not in self.picking_types:
