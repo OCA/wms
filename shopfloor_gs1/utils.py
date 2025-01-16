@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from biip import ParseError
-from biip.gs1 import GS1Message
+from biip.gs1 import GS1ElementString, GS1Message
 
 from .config import MAPPING_AI_TO_TYPE
 
@@ -34,11 +34,25 @@ class GS1Barcode:
         return True
 
     @classmethod
+    def _get_value(cls, ai_value: GS1ElementString):
+        """
+        We must return the date value if set
+        We must return the formatted GTIN if set
+        as the library will transform the GTIN 14 into
+        a GTIN 13 one. That one is the barcode
+        set in Odoo.
+        """
+        value = ai_value.date or ai_value.value
+        if ai_value.gtin and ai_value.gtin.payload:
+            value = ai_value.gtin.payload + str(ai_value.gtin.check_digit)
+        return value
+
+    @classmethod
     def parse(cls, barcode, ai_whitelist=None, safe=True):
         """Parse given barcode
 
         :param barcode: valid GS1 barcode
-        :param ai_whitelist: ordered list of AI to look for
+        :param ai_whitelist: ordered list of AI to look for()
         :param safe: break or not if barcode is invalid
 
         :return: a list of `GS1Barcode` instances.
@@ -63,7 +77,7 @@ class GS1Barcode:
             if found:
                 # when value is a date the datetime obj is in `date`
                 # TODO: other types have their own special key
-                value = found.date or found.value
+                value = cls._get_value(found)
                 info = cls(
                     ai=ai,
                     code=barcode,
