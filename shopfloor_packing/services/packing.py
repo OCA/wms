@@ -8,9 +8,12 @@ from odoo.addons.component.core import Component
 from odoo.addons.stock.models.stock_picking import Picking
 
 
-class PackagingAction(Component):
+class PackingAction(Component):
 
-    _inherit = "shopfloor.packaging.action"
+    _name = "shopfloor.packing.action"
+    _inherit = "shopfloor.process.action"
+    _usage = "packing"
+    _description = "This is the service to put products in pack"
 
     def _check_put_in_pack(
         self,

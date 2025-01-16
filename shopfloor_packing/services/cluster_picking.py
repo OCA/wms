@@ -6,14 +6,14 @@ from odoo import fields
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-from .packaging import PackagingAction
+from .packing import PackingAction
 
 
 class ClusterPicking(Component):
 
     _inherit = "shopfloor.cluster.picking"
 
-    def _get_available_delivery_packaging(self, picking):
+    def _get_available_delivery_package_type(self, picking):
         model = self.env["stock.package.type"]
         carrier = picking.ship_carrier_id or picking.carrier_id
         wizard_obj = self.env["choose.delivery.package"]
@@ -45,7 +45,7 @@ class ClusterPicking(Component):
         if message:
             return self._response_for_start(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        delivery_packaging = self._get_available_delivery_packaging(picking)
+        delivery_packaging = self._get_available_delivery_package_type(picking)
         if not delivery_packaging:
             return self._response_for_select_package(
                 picking,
@@ -88,15 +88,15 @@ class ClusterPicking(Component):
         * summary: if there is no other lines, go to the summary screen to be able
         to close the stock picking
         """
-        packaging_action: PackagingAction = self._actions_for("packaging")
+        packing_action: PackingAction = self._actions_for("packing")
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
         if message:
             return self._response_for_select_document(message=message)
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        search_result = packaging_action._scan_package_find(picking, barcode)
-        message = packaging_action._check_scan_package_find(picking, search_result)
+        search_result = packing_action._scan_package_find(picking, barcode)
+        message = packing_action._check_scan_package_find(picking, search_result)
         if message:
             return self._response_for_select_package(
                 picking,
@@ -262,8 +262,8 @@ class ClusterPicking(Component):
         )
 
         # Check if parameters are correct
-        packaging_action: PackagingAction = self._actions_for("packaging")
-        result = packaging_action._check_put_in_pack(
+        packing_action: PackingAction = self._actions_for("packing")
+        result = packing_action._check_put_in_pack(
             picking_batch_id,
             picking,
             self._response_put_in_pack,
