@@ -4,7 +4,6 @@ from odoo import _, api, fields, models
 
 
 class StorageCategoryProductCapacity(models.Model):
-
     _inherit = "stock.storage.category.capacity"
 
     allow_new_product = fields.Selection(

@@ -10,7 +10,6 @@ _logger = logging.getLogger(__name__)
 
 
 class StockStorageLocationSequenceCond(models.Model):
-
     _name = "stock.storage.location.sequence.cond"
     _description = "Stock Storage Location Sequence Condition"
 

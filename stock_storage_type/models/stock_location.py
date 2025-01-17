@@ -16,7 +16,6 @@ OUT_MOVE_LINE_DOMAIN = [
 
 
 class StockLocation(models.Model):
-
     _inherit = "stock.location"
 
     computed_storage_category_id = fields.Many2one(

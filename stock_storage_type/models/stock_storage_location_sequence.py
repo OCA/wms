@@ -4,7 +4,6 @@ from odoo import _, fields, models
 
 
 class StockStorageLocationSequence(models.Model):
-
     _name = "stock.storage.location.sequence"
     _description = "Sequence of locations to put-away the package storage type"
     _order = "sequence"
@@ -73,7 +72,7 @@ class StockStorageLocationSequence(models.Model):
         xmlid = "stock.action_location_form"
         action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["domain"] = [
-            ("parent_path", "=ilike", "{}%".format(self.location_id.parent_path)),
+            ("parent_path", "=ilike", f"{self.location_id.parent_path}%"),
             (
                 "computed_storage_capacity_ids",
                 "in",
