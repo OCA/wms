@@ -1,0 +1,3 @@
+odoo-addon-stock-move-line-reserved-quant @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1691/head#subdirectory=stock_move_line_reserved_quant
+odoo-addon-stock-putaway-hook @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1842/head#subdirectory=stock_putaway_hook
+odoo-addon-stock-storage-category-capacity-name @ git+https://github.com/OCA/stock-logistics-warehouse.git@refs/pull/2240/head#subdirectory=stock_storage_category_capacity_name

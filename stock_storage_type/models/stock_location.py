@@ -24,8 +24,8 @@ class StockLocation(models.Model):
         compute="_compute_computed_storage_category_id",
         store=True,
         recursive=True,
-        help="This represents the Storage Category that will be used. It depends either "
-        "on the category set on the location or on one of its parent.",
+        help="This represents the Storage Category that will be used. It depends "
+        "either on the category set on the location or on one of its parent.",
     )
     computed_storage_capacity_ids = fields.One2many(
         related="computed_storage_category_id.capacity_ids",
@@ -233,7 +233,8 @@ class StockLocation(models.Model):
 
     @api.depends("child_ids.leaf_location_ids", "child_ids.active")
     def _compute_leaf_location_ids(self):
-        """Compute all children leaf locations. Current location is excluded (not a child)"""
+        """Compute all children leaf locations.
+        Current location is excluded (not a child)"""
         query = """
             SELECT parent.id, ARRAY_AGG(sub.id) AS leaves
             FROM stock_location parent
@@ -310,7 +311,7 @@ class StockLocation(models.Model):
 
     @api.depends(
         "quant_ids.quantity",
-        "out_move_line_ids.qty_done",
+        "out_move_line_ids.quantity",
         "in_move_ids",
         "in_move_line_ids",
         "only_empty",
@@ -320,7 +321,7 @@ class StockLocation(models.Model):
         # locations and we don't need to compute is empty
         # if there is no limit on the location
         only_empty_locations = self.filtered(
-            lambda l: not l._should_compute_location_is_empty()
+            lambda location: not location._should_compute_location_is_empty()
         )
         only_empty_locations.update({"location_is_empty": True})
         records = self - only_empty_locations
@@ -331,11 +332,11 @@ class StockLocation(models.Model):
         qty_by_location = {}
         for group in self.env["stock.move.line"].read_group(
             OUT_MOVE_LINE_DOMAIN + location_domain,
-            fields=["qty_done:sum"],
+            fields=["quantity:sum"],
             groupby=["location_id"],
         ):
             location_id = group["location_id"][0]
-            out_qty_by_location[location_id] = group["qty_done"]
+            out_qty_by_location[location_id] = group["quantity"]
         for group in self.env["stock.quant"].read_group(
             location_domain, fields=["quantity:sum"], groupby=["location_id"]
         ):
@@ -370,7 +371,8 @@ class StockLocation(models.Model):
             putaway_location, product, quantity, package, packaging, additional_qty
         )
         if package:
-            # If package provided, the product is not set (in the get_putaway_strategy() method)
+            # If package provided, the product is not set
+            # (in the get_putaway_strategy() method)
             product = package.single_product_id or product
         return self._get_package_type_putaway_strategy(
             putaway_location, package, product, quantity
@@ -382,15 +384,15 @@ class StockLocation(models.Model):
         if package:
             package_type = package.package_type_id
             _logger.debug(
-                "Computing putaway for package %s of package type %s"
-                % (package, package_type)
+                f"Computing putaway for package {package} "
+                f"of package type {package_type}"
             )
         elif product.package_type_id:
-            # Get default package type on product if defined
+            # Get the default package type on product if defined
             package_type = product.package_type_id
             _logger.debug(
-                "Computing putaway for product %s of package type %s"
-                % (product, product.package_type_id)
+                f"Computing putaway for product {product} "
+                f"of package type {package_type}"
             )
         return package_type
 
@@ -437,8 +439,9 @@ class StockLocation(models.Model):
                     "Applied putaway strategy to location %s"
                     % allowed_location.complete_name
                 )
-                # Reapply putaway strategy if particular rules have been put on product level
-                # Check if the allowed location is not self to avoid recursive computations
+                # Reapply putaway strategy if particular rules have been put on
+                # product level and check if the allowed location is not self to
+                # avoid recursive computations
                 if allowed_location != self:
                     final_location = allowed_location._get_putaway_strategy(
                         product, quantity, package

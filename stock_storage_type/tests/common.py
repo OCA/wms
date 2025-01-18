@@ -106,8 +106,8 @@ class TestStorageTypeCommon(TransactionCase):
         cls.internal_picking_type.write({"show_entire_packs": True})
         # show_reserved must be set here because it changes the behaviour of
         # put_in_pack operation:
-        # if show_reserved: qty_done must be set on stock.picking.move_line_ids
-        # if not show_reserved: qty_done must be set on
+        # if show_reserved: quantity must be set on stock.picking.move_line_ids
+        # if not show_reserved: quantity must be set on
         # stock.picking.move_line_nosuggest_ids
         cls.receipts_picking_type.write(
             {"show_entire_packs": True, "show_reserved": True}

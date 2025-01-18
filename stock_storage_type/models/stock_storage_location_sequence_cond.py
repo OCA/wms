@@ -46,7 +46,8 @@ class StockStorageLocationSequenceCond(models.Model):
             if not rec._code_snippet_valued():
                 raise exceptions.UserError(
                     _(
-                        "Condition type is set to `Code`: you must provide a piece of code"
+                        "Condition type is set to `Code`: "
+                        "you must provide a piece of code"
                     )
                 )
 
@@ -108,18 +109,11 @@ class StockStorageLocationSequenceCond(models.Model):
             )
         if not result:
             _logger.debug(
-                "Condition %s not met:\n"
-                "* putaway sequence: %s\n"
-                "* putaway location: %s\n"
-                "* quants: %s\n"
-                "* product: %s\n"
-                % (
-                    self.name,
-                    storage_location_sequence.id,
-                    putaway_location.name,
-                    quant.ids,
-                    product.display_name,
-                )
+                f"Condition {self.name} not met:\n"
+                f"* putaway sequence: {storage_location_sequence.id}\n"
+                f"* putaway location: {putaway_location.name}\n"
+                f"* quants: {quant.ids}\n"
+                f"* product: {product.display_name}\n"
             )
         return result
 

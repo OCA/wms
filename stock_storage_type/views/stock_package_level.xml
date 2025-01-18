@@ -23,7 +23,7 @@
         <field name="inherit_id" ref="stock.package_level_tree_view_picking" />
         <field name="arch" type="xml">
             <field name="location_dest_id" position="before">
-                <field name="allowed_location_dest_ids" invisible="1" />
+                <field name="allowed_location_dest_ids" column_invisible="True" />
             </field>
             <field name="location_dest_id" position="attributes">
                 <attribute

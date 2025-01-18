@@ -27,8 +27,10 @@ class StockStorageLocationSequence(models.Model):
         self.ensure_one()
         # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
-            lambda l: self.package_type_id
-            in l.computed_storage_category_id.capacity_ids.mapped("package_type_id")
+            lambda location: self.package_type_id
+            in location.computed_storage_category_id.capacity_ids.mapped(
+                "package_type_id"
+            )
         )
         if type_matching_locations:
             # Get the selection description

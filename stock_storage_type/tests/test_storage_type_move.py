@@ -96,7 +96,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 48.0
+        in_picking.move_line_ids.quantity = 48.0
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
@@ -104,7 +104,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: not ml.result_package_id
         )
-        ml_without_package.qty_done = 48.0
+        ml_without_package.quantity = 48.0
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
@@ -145,7 +145,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             ]
         )
         only_empty_possible_locations = possible_locations.filtered(
-            lambda l: not l.quant_ids
+            lambda location: not location.quant_ids
         )
 
         for level in int_picking.package_level_ids:
@@ -164,7 +164,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             self.product, self.pallets_bin_3_location, 1.0
         )
         only_empty_possible_locations_2 = possible_locations.filtered(
-            lambda l: not l.quant_ids
+            lambda location: not location.quant_ids
         )
         self.assertEqual(
             only_empty_possible_locations,
@@ -242,7 +242,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Put in pack
         in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
-        ).qty_done = 48.0
+        ).quantity = 48.0
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
@@ -250,7 +250,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         product_ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product and not ml.result_package_id
         )
-        product_ml_without_package.qty_done = 4.0
+        product_ml_without_package.quantity = 4.0
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging
@@ -272,7 +272,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Put in pack lot product
         in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_lot
-        ).write({"qty_done": 5.0, "lot_id": lot_a0001.id})
+        ).write({"quantity": 5.0, "lot_id": lot_a0001.id})
         third_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         third_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
@@ -280,7 +280,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         product_lot_ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_lot and not ml.result_package_id
         )
-        product_lot_ml_without_package.write({"qty_done": 5.0, "lot_id": lot_a0002.id})
+        product_lot_ml_without_package.write({"quantity": 5.0, "lot_id": lot_a0002.id})
         fourth_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         fourth_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
@@ -288,7 +288,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         product_lot_ml_without_package = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_lot and not ml.result_package_id
         )
-        product_lot_ml_without_package.write({"qty_done": 5.0, "lot_id": lot_a0002.id})
+        product_lot_ml_without_package.write({"quantity": 5.0, "lot_id": lot_a0002.id})
         fifth_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         fifth_pack.product_packaging_id = self.product_lot_cardbox_product_packaging
@@ -368,7 +368,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
 
             # Set the quantities done in order to avoid immediate transfer wizard
             for move_line in pack_level.move_line_ids:
-                move_line.qty_done = move_line.reserved_qty
+                move_line.quantity = move_line.reserved_qty
 
         second_level.location_dest_id = third_level.location_dest_id
         with self.assertRaises(ValidationError):
@@ -437,14 +437,14 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         product_lot_ml = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_lot
         )
-        product_lot_ml.write({"qty_done": 5.0, "lot_name": "A0001"})
-        product_lot_ml.copy({"qty_done": 3.0, "lot_name": "A0002"})
+        product_lot_ml.write({"quantity": 5.0, "lot_name": "A0001"})
+        product_lot_ml.copy({"quantity": 3.0, "lot_name": "A0002"})
 
         product_ml = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
         )
 
-        product_ml.write({"qty_done": 8.0})
+        product_ml.write({"quantity": 8.0})
 
         in_picking._action_done()
 
