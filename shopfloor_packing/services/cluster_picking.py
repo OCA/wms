@@ -63,7 +63,7 @@ class ClusterPicking(Component):
         When a lot is scanned, it does the same as for the products but based
         on the lot.
 
-        When a packaging type (one without related product) is scanned, a new
+        When a package type is scanned, a new
         package is created and set as destination of the lines to pack.
 
         Lines to pack are move lines in the list of ``selected_line_ids``
