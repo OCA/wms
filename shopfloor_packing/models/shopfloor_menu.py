@@ -10,8 +10,8 @@ class ShopfloorMenu(models.Model):
     pack_pickings = fields.Boolean(
         string="Pack pickings",
         default=False,
-        help="If you tick this box, all the picked item will be put in pack"
-        " before the transfer.",
+        help="If you tick this box, all the picked items will be put in a new pack"
+        " at the end of the picking process.",
     )
 
     default_pack_pickings_action = fields.Selection(
