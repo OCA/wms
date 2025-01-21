@@ -1,10 +1,14 @@
 # Copyright 2021 ACSONE SA/NV (https://www.acsone.eu)
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.stock.models.stock_move_line import StockMoveLine
+from odoo.addons.stock.models.stock_package_type import PackageType
+from odoo.addons.stock.models.stock_picking import Picking
+from odoo.addons.stock.models.stock_quant import QuantPackage
 
 from .packing import PackingAction
 
@@ -13,32 +17,17 @@ class ClusterPicking(Component):
 
     _inherit = "shopfloor.cluster.picking"
 
-    def _get_available_delivery_package_type(self, picking):
-        model = self.env["stock.package.type"]
-        carrier = picking.ship_carrier_id or picking.carrier_id
-        wizard_obj = self.env["choose.delivery.package"]
-        delivery_type = (
-            carrier.delivery_type
-            if carrier.delivery_type not in ("fixed", False)
-            else "none"
-        )
-        wizard = wizard_obj.with_context(
-            current_package_carrier_type=delivery_type
-        ).new({"picking_id": picking.id})
-        if not carrier:
-            return model.browse()
-        return model.search(
-            wizard.package_type_domain,
-            order="number_of_parcels,name",
-        )
+    # PUBLIC METHODS - ENDPOINTS
 
-    def list_delivery_packaging(self, picking_batch_id, picking_id, selected_line_ids):
-        """List available delivery packaging for given picking.
+    def list_delivery_package_types(
+        self, picking_batch_id, picking_id, selected_line_ids
+    ) -> dict:
+        """List available delivery package types for given picking.
 
         Transitions:
-        * select_delivery_packaging: list available delivery packaging, the
+        * select_delivery_package_types: list available delivery package types, the
         user has to choose one to create the new package
-        * select_package: when no delivery packaging is available
+        * select_package: when no delivery package types are available
         """
         picking = self.env["stock.picking"].browse(picking_id)
         message = self._check_picking_status(picking)
@@ -55,9 +44,11 @@ class ClusterPicking(Component):
         response = self._check_allowed_qty_done(picking, selected_lines)
         if response:
             return response
-        return self._response_for_select_delivery_packaging(picking, delivery_packaging)
+        return self._response_for_select_delivery_package_type(
+            picking, delivery_packaging
+        )
 
-    def scan_package_action(self, picking_id, selected_line_ids, barcode):
+    def scan_package_action(self, picking_id, selected_line_ids, barcode) -> dict:
         """Scan a package, a lot, a product or a package to handle a line
 
         When a package is scanned (only delivery ones), if the package is known
@@ -112,54 +103,13 @@ class ClusterPicking(Component):
                 message=self.msg_store.package_not_found_for_barcode(barcode),
             )
         # Call the specific put in pack with package type filled in
-        return self._put_in_pack(self, picking, package_type_id=package_type_id)
-
-    @property
-    def default_pick_pack_action(self):
-        return self.work.menu.default_pack_pickings_action
-
-    def _last_picked_line(self, picking):
-        # a complete override to add a condition on internal package
-        return fields.first(
-            picking.move_line_ids.filtered(
-                lambda l: l.qty_done > 0
-                and l.result_package_id.is_internal
-                # if we are moving the entire package, we shouldn't
-                # add stuff inside it, it's not a new package
-                and l.package_id != l.result_package_id
-            ).sorted(key="write_date", reverse=True)
+        return self.put_in_pack(
+            picking.batch_id.id, picking.id, package_type_id=package_type_id
         )
 
-    def _get_next_picking_to_pack(self, batch):
-        """
-        Return a picking not yet packed.
-
-        The returned picking is the first
-        one into the list of picking not yet packed (is_shopfloor_packing_todo=True).
-         nbr_packages
-        """
-        pickings_to_pack = batch.picking_ids.filtered(
-            lambda p: p.is_shopfloor_packing_todo
-        )
-        move_lines = pickings_to_pack.mapped("move_line_ids")
-        move_lines = move_lines.filtered(
-            lambda ml: ml.result_package_id.is_internal
-        ).sorted(key=lambda ml: ml.result_package_id.name)
-        return move_lines[0].picking_id if move_lines else move_lines.picking_id
-
-    def _response_pack_picking_put_in_pack(self, picking, message=None):
-        data = self.data_detail.pack_picking_detail(picking)
-        return self._response(
-            next_state="pack_picking_put_in_pack", data=data, message=message
-        )
-
-    def _response_pack_picking_scan_pack(self, picking, message=None):
-        data = self.data_detail.pack_picking_detail(picking)
-        return self._response(
-            next_state="pack_picking_scan_pack", data=data, message=message
-        )
-
-    def scan_destination_pack(self, picking_batch_id, move_line_id, barcode, quantity):
+    def scan_destination_pack(
+        self, picking_batch_id, move_line_id, barcode, quantity
+    ) -> dict:
         search = self._actions_for("search")
         bin_package = search.package_from_scan(barcode)
 
@@ -179,7 +129,7 @@ class ClusterPicking(Component):
             picking_batch_id, move_line_id, barcode, quantity
         )
 
-    def scan_packing_to_pack(self, picking_batch_id, picking_id, barcode):
+    def scan_packing_to_pack(self, picking_batch_id, picking_id, barcode) -> dict:
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
@@ -218,30 +168,7 @@ class ClusterPicking(Component):
             batch,
         )
 
-    def _get_move_lines_to_pack(self, picking):
-        return picking.move_line_ids.filtered(
-            lambda ml: ml.result_package_id.is_internal
-        ).sorted(key=lambda ml: ml.result_package_id.name)
-
-    def _prepare_pack_picking(self, batch, message=None):
-        picking = self._get_next_picking_to_pack(batch)
-        move_lines = self._get_move_lines_to_pack(picking)
-        if not picking:
-            return self._response_put_in_pack(
-                batch.id,
-                message=self.msg_store.stock_picking_packed_successfully(picking),
-            )
-        if picking.is_shopfloor_packing_pack_to_scan():
-            return self._response_pack_picking_scan_pack(picking, message=message)
-        if self.default_pick_pack_action == "nbr_packages":
-            return self._response_pack_picking_put_in_pack(picking, message=message)
-        else:
-            return self._response_for_select_package(
-                picking, move_lines, message=message
-            )
-        # return self._response_pack_picking_put_in_pack(picking, message=message)
-
-    def prepare_unload(self, picking_batch_id):
+    def prepare_unload(self, picking_batch_id) -> dict:
         # before initializing the unloading phase we put picking in pack if
         # required by the scenario
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
@@ -253,7 +180,7 @@ class ClusterPicking(Component):
 
     def put_in_pack(
         self, picking_batch_id, picking_id, nbr_packages=None, package_type_id=None
-    ):
+    ) -> dict:
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
@@ -288,12 +215,105 @@ class ClusterPicking(Component):
             message=self.msg_store.stock_picking_packed_successfully(picking),
         )
 
+    # HELPER METHODS
+
+    @property
+    def default_pick_pack_action(self):
+        return self.work.menu.default_pack_pickings_action
+
+    def _get_available_delivery_package_type(self, picking) -> PackageType:
+        """
+        This returns available packages types for the carrier if defined
+        or package types that have "none" delivery type.
+
+        The returned package types are ordered by number of parcels then
+        by name.
+        """
+        model = self.env["stock.package.type"]
+        carrier = picking.ship_carrier_id or picking.carrier_id
+        wizard_obj = self.env["choose.delivery.package"]
+        delivery_type = (
+            carrier.delivery_type
+            if carrier.delivery_type not in ("fixed", False)
+            else "none"
+        )
+        wizard = wizard_obj.with_context(
+            current_package_carrier_type=delivery_type
+        ).new({"picking_id": picking.id})
+        if not carrier:
+            return model.browse()
+        return model.search(
+            wizard.package_type_domain,
+            order="number_of_parcels,name",
+        )
+
+    def _last_picked_line(self, picking) -> StockMoveLine:
+        # a complete override to add a condition on internal package
+        # TODO: Add a hook to avoid re-writing this
+        return fields.first(
+            picking.move_line_ids.filtered(
+                lambda l: l.qty_done > 0
+                and l.result_package_id.is_internal
+                # if we are moving the entire package, we shouldn't
+                # add stuff inside it, it's not a new package
+                and l.package_id != l.result_package_id
+            ).sorted(key="write_date", reverse=True)
+        )
+
+    def _get_next_picking_to_pack(self, batch) -> Picking:
+        """
+        Return a picking not yet packed.
+
+        The returned picking is the first
+        one into the list of picking not yet packed (is_shopfloor_packing_todo=True).
+         nbr_packages
+        """
+        pickings_to_pack = batch.picking_ids.filtered(
+            lambda p: p.is_shopfloor_packing_todo
+        )
+        move_lines = pickings_to_pack.mapped("move_line_ids")
+        move_lines = move_lines.filtered(
+            lambda ml: ml.result_package_id.is_internal
+        ).sorted(key=lambda ml: ml.result_package_id.name)
+        return fields.first(move_lines).picking_id
+
+    def _get_move_lines_to_pack(self, picking) -> StockMoveLine:
+        """
+        This returns the lines that have an internal package
+        """
+        return picking.move_line_ids.filtered(
+            lambda ml: ml.result_package_id.is_internal
+        ).sorted(key=lambda ml: ml.result_package_id.name)
+
+    def _prepare_pack_picking(self, batch, message=None) -> dict:
+        picking = self._get_next_picking_to_pack(batch)
+        move_lines = self._get_move_lines_to_pack(picking)
+        if not picking:
+            return self._response_put_in_pack(
+                batch.id,
+                message=self.msg_store.stock_picking_packed_successfully(picking),
+            )
+        if picking.is_shopfloor_packing_pack_to_scan():
+            return self._response_pack_picking_scan_pack(picking, message=message)
+        if self.default_pick_pack_action == "nbr_packages":
+            return self._response_pack_picking_put_in_pack(picking, message=message)
+        else:
+            return self._response_for_select_package(
+                picking, move_lines, message=message
+            )
+
     def _postprocess_put_in_pack(self, picking, pack):
         """Override this method to include post-processing logic for the new package,
         such as printing.."""
         return
 
-    def _put_in_pack(self, picking, number_of_parcels=None, package_type_id=None):
+    def _put_in_pack(
+        self, picking, number_of_parcels=None, package_type_id=None
+    ) -> QuantPackage:
+        """
+        This will enhance the put in pack flow by adding the number
+        of parcels or the package type to the generated package.
+        """
         move_lines_to_pack = picking.move_line_ids.filtered(
             lambda l: l.result_package_id and l.result_package_id.is_internal
         )
@@ -314,15 +334,6 @@ class ClusterPicking(Component):
                 )
         return pack
 
-    def _response_put_in_pack(self, picking_batch_id, message=None):
-        """
-        Fallback to prepare_unload
-        """
-        res = self.prepare_unload(picking_batch_id)
-        if message:
-            res["message"] = message
-        return res
-
     def _data_for_packing_info(self, picking):
         """Return the packing information
 
@@ -331,14 +342,45 @@ class ClusterPicking(Component):
         # TODO: This could be avoided if included in the picking parser.
         return ""
 
-    def _response_for_select_package(self, picking, lines, message=None):
+    def _data_for_delivery_package_type(self, packaging, **kw):
+        return self.data.delivery_packaging_list(packaging, **kw)
+
+    def _check_allowed_qty_done(self, picking, lines) -> dict:
+        for line in lines:
+            # Do not allow to proceed if the qty_done of
+            # any of the selected lines
+            # is higher than the quantity to do.
+            if line.qty_done > line.reserved_uom_qty:
+                return self._response_for_select_package(
+                    picking,
+                    lines,
+                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(
+                        line
+                    ),
+                )
+
+    # RESPONSES
+
+    def _response_pack_picking_put_in_pack(self, picking, message=None) -> dict:
+        data = self.data_detail.pack_picking_detail(picking)
+        return self._response(
+            next_state="pack_picking_put_in_pack", data=data, message=message
+        )
+
+    def _response_pack_picking_scan_pack(self, picking, message=None) -> dict:
+        data = self.data_detail.pack_picking_detail(picking)
+        return self._response(
+            next_state="pack_picking_scan_pack", data=data, message=message
+        )
+
+    def _response_for_select_package(self, picking, lines, message=None) -> dict:
         return self._response(
             next_state="select_package",
             data=self.data.select_package(picking, lines),
             message=message,
         )
 
-    def _response_for_select_dest_package(self, picking, message=None):
+    def _response_for_select_dest_package(self, picking, message=None) -> dict:
         packages = picking.mapped("move_line_ids.result_package_id").filtered(
             "package_type_id"
         )
@@ -369,32 +411,26 @@ class ClusterPicking(Component):
             message=message,
         )
 
-    def _data_for_delivery_packaging(self, packaging, **kw):
-        return self.data.delivery_packaging_list(packaging, **kw)
-
-    def _response_for_select_delivery_packaging(self, picking, packaging, message=None):
+    def _response_for_select_delivery_package_type(
+        self, picking, packaging, message=None
+    ) -> dict:
         return self._response(
             next_state="select_delivery_packaging",
             data={
                 "picking": self.data.picking(picking),
-                "packaging": self._data_for_delivery_packaging(packaging),
+                "packaging": self._data_for_delivery_package_type(packaging),
             },
             message=message,
         )
 
-    def _check_allowed_qty_done(self, picking, lines):
-        for line in lines:
-            # Do not allow to proceed if the qty_done of
-            # any of the selected lines
-            # is higher than the quantity to do.
-            if line.qty_done > line.reserved_uom_qty:
-                return self._response_for_select_package(
-                    picking,
-                    lines,
-                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(
-                        line
-                    ),
-                )
+    def _response_put_in_pack(self, picking_batch_id, message=None) -> dict:
+        """
+        Fallback to prepare_unload
+        """
+        res = self.prepare_unload(picking_batch_id)
+        if message:
+            res["message"] = message
+        return res
 
 
 class ShopfloorClusterPickingValidator(Component):
@@ -402,7 +438,7 @@ class ShopfloorClusterPickingValidator(Component):
 
     _inherit = "shopfloor.cluster_picking.validator"
 
-    def put_in_pack(self):
+    def put_in_pack(self) -> dict:
         return {
             "picking_batch_id": {
                 "coerce": to_int,
@@ -414,7 +450,7 @@ class ShopfloorClusterPickingValidator(Component):
             "package_type_id": {"coerce": to_int, "required": False, "type": "integer"},
         }
 
-    def scan_packing_to_pack(self):
+    def scan_packing_to_pack(self) -> dict:
         return {
             "picking_batch_id": {
                 "coerce": to_int,
@@ -425,7 +461,7 @@ class ShopfloorClusterPickingValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
-    def list_delivery_packaging(self) -> dict:
+    def list_delivery_package_types(self) -> dict:
         return {
             "picking_batch_id": {
                 "coerce": to_int,
@@ -440,7 +476,7 @@ class ShopfloorClusterPickingValidator(Component):
             },
         }
 
-    def scan_package_action(self):
+    def scan_package_action(self) -> dict:
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_ids": {
@@ -466,46 +502,46 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         return states
 
     @property
-    def _schema_pack_picking(self):
+    def _schema_pack_picking(self) -> dict:
         schema = self.schemas_detail.pack_picking_detail()
         return {"type": "dict", "nullable": True, "schema": schema}
 
     @property
-    def _schema_select_package(self):
+    def _schema_select_package(self) -> dict:
         schema = self.schemas.select_package()
         return {"type": "dict", "nullable": True, "schema": schema}
 
-    def prepare_unload(self):
+    def prepare_unload(self) -> dict:
         res = super().prepare_unload()
         res["data"]["schema"]["pack_picking_put_in_pack"] = self._schema_pack_picking
         res["data"]["schema"]["pack_picking_scan_pack"] = self._schema_pack_picking
         res["data"]["schema"]["select_package"] = self._schema_select_package
         return res
 
-    def put_in_pack(self):
+    def put_in_pack(self) -> dict:
         return self.prepare_unload()
 
-    def confirm_start(self):
+    def confirm_start(self) -> dict:
         res = super().confirm_start()
         res["data"]["schema"]["pack_picking_put_in_pack"] = self._schema_pack_picking
         res["data"]["schema"]["pack_picking_scan_pack"] = self._schema_pack_picking
         res["data"]["schema"]["select_package"] = self._schema_select_package
         return res
 
-    def select_package(self):
+    def select_package(self) -> dict:
         res = self._response_schema(
             next_states={"select_delivery_packaging", "select_package"}
         )
         res["data"]["schema"]["select_package"] = self._schema_select_package
         return res
 
-    def scan_destination_pack(self):
+    def scan_destination_pack(self) -> dict:
         res = super().scan_destination_pack()
         res["data"]["schema"]["pack_picking_put_in_pack"] = self._schema_pack_picking
         res["data"]["schema"]["pack_picking_scan_pack"] = self._schema_pack_picking
         return res
 
-    def scan_packing_to_pack(self):
+    def scan_packing_to_pack(self) -> dict:
         return self._response_schema(
             next_states={
                 "unload_all",
@@ -516,13 +552,13 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             }
         )
 
-    def list_delivery_packaging(self):
+    def list_delivery_package_types(self) -> dict:
         return self._response_schema(
             next_states={"select_delivery_packaging", "select_package"}
         )
 
     @property
-    def _schema_select_delivery_packaging(self):
+    def _schema_select_delivery_packaging(self) -> dict:
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "packaging": self.schemas._schema_list_of(
@@ -530,5 +566,5 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             ),
         }
 
-    def scan_package_action(self):
-        return self.select_package()
+    def scan_package_action(self) -> dict:
+        return self.prepare_unload()
