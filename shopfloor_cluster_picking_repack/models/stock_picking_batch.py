@@ -9,7 +9,7 @@ class StockPickingBatch(models.Model):
 
     is_shopfloor_packing_todo = fields.Boolean(
         "Operations need to be packed",
-        help="If set, some operations need to be packed by the shopdloor operator",
+        help="If set, some operations need to be packed by the shopfloor operator",
         compute="_compute_is_shopfloor_packing_todo",
     )
 
