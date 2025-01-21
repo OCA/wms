@@ -258,8 +258,8 @@ let data = function () {
         },
         on_new_pack: () => {
             /**
-             * Trigger the call to list delivery packaging types
-             * as user wants to put porducts in a new pack.
+             * Trigger the call to list delivery package types
+             * as user wants to put products in a new pack.
              */
             let endpoint, endpoint_data;
             const data = this.state.data;
