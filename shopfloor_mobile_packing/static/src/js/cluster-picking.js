@@ -263,7 +263,7 @@ let data = function () {
              */
             let endpoint, endpoint_data;
             const data = this.state.data;
-            endpoint = "list_delivery_packaging";
+            endpoint = "list_delivery_package_types";
             endpoint_data = {
                 picking_batch_id: this.current_batch().id,
                 picking_id: data.picking.id,
