@@ -48,13 +48,13 @@ class Reception(Component):
     _usage = "reception"
     _description = __doc__
 
-    def _check_picking_status(self, pickings):
+    def _check_picking_processible(self, pickings):
         # When returns are allowed,
         # the created picking might be empty and cannot be assigned.
         states = ["assigned"]
         if self.work.menu.allow_return:
             states.append("draft")
-        return super()._check_picking_status(pickings, states=states)
+        return super()._check_picking_processible(pickings, states=states)
 
     def _move_line_by_product(self, product):
         return self.env["stock.move.line"].search(
@@ -328,7 +328,7 @@ class Reception(Component):
                 message=self.msg_store.cannot_move_something_in_picking_type()
             )
         if reception_pickings:
-            message = self._check_picking_status(reception_pickings)
+            message = self._check_picking_processible(reception_pickings)
             if message:
                 return self._response_for_select_document(
                     pickings=reception_pickings, message=message
@@ -939,7 +939,7 @@ class Reception(Component):
           - set_quantity: Packaging / Product has been scanned. Not tracked product
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_move(picking, message=message)
         handlers_by_type = {
@@ -973,7 +973,7 @@ class Reception(Component):
           - select_document: Mark as done
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_move(picking, message=message)
         if all(line.qty_done == 0 for line in picking.move_line_ids):
@@ -1029,7 +1029,7 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
         if not selected_line.exists():
@@ -1060,7 +1060,7 @@ class Reception(Component):
 
     def set_lot_confirm_action(self, picking_id, selected_line_id):
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
@@ -1145,7 +1145,7 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
@@ -1174,7 +1174,7 @@ class Reception(Component):
     def set_quantity__cancel_action(self, picking_id, selected_line_id):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
@@ -1212,7 +1212,7 @@ class Reception(Component):
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
@@ -1227,7 +1227,7 @@ class Reception(Component):
     def process_with_new_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
@@ -1243,7 +1243,7 @@ class Reception(Component):
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
@@ -1337,7 +1337,7 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_destination(
                 picking, selected_line, message=message
@@ -1399,7 +1399,7 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_dest_package(
                 picking, selected_line, message=message

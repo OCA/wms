@@ -38,7 +38,7 @@ class Checkout(Component):
     ):
         """Set measurements on a package."""
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
