@@ -117,7 +117,7 @@ class DeliveryShipment(Component):
                 return self._response_for_scan_document(
                     shipment_advice, message=self.msg_store.stock_picking_not_found()
                 )
-            message = self._check_picking_status(picking, shipment_advice)
+            message = self._check_picking_processible(picking, shipment_advice)
             if message:
                 return self._response_for_scan_document(
                     shipment_advice, message=message
@@ -181,7 +181,7 @@ class DeliveryShipment(Component):
         If the shipment advice had planned content and that the scanned delivery
         is not part of it, returns an error message.
         """
-        message = self._check_picking_status(picking, shipment_advice)
+        message = self._check_picking_processible(picking, shipment_advice)
         if message:
             return self._response_for_scan_document(shipment_advice, message=message)
         else:
@@ -208,7 +208,9 @@ class DeliveryShipment(Component):
         )
         if move_lines:
             # Check transfer status
-            message = self._check_picking_status(move_lines.picking_id, shipment_advice)
+            message = self._check_picking_processible(
+                move_lines.picking_id, shipment_advice
+            )
             if message:
                 return self._response_for_scan_document(
                     shipment_advice,
@@ -262,7 +264,9 @@ class DeliveryShipment(Component):
         )
         if move_lines:
             # Check transfer status
-            message = self._check_picking_status(move_lines.picking_id, shipment_advice)
+            message = self._check_picking_processible(
+                move_lines.picking_id, shipment_advice
+            )
             if message:
                 return self._response_for_scan_document(
                     shipment_advice, location=location, message=message
@@ -327,7 +331,9 @@ class DeliveryShipment(Component):
         )
         if move_lines:
             # Check transfer status
-            message = self._check_picking_status(move_lines.picking_id, shipment_advice)
+            message = self._check_picking_processible(
+                move_lines.picking_id, shipment_advice
+            )
             if message:
                 return self._response_for_scan_document(
                     shipment_advice, message=message
@@ -841,9 +847,9 @@ class DeliveryShipment(Component):
             )
         return pickings_not_loaded
 
-    def _check_picking_status(self, pickings, shipment_advice):
+    def _check_picking_processible(self, pickings, shipment_advice):
         # Overloaded to add checks against a shipment advice
-        message = super()._check_picking_status(pickings)
+        message = super()._check_picking_processible(pickings)
         if message:
             return message
         for picking in pickings:
