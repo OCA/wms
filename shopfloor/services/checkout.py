@@ -402,7 +402,7 @@ class Checkout(Component):
           lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_manual_selection(message=message)
         return self._select_picking(picking, "manual_selection")
@@ -451,7 +451,7 @@ class Checkout(Component):
         screen to change the qty done and destination pack if needed
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -774,7 +774,7 @@ class Checkout(Component):
         assert package_id or move_line_id
 
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -793,7 +793,7 @@ class Checkout(Component):
         self, picking_id, selected_line_ids, move_line_ids, quantity_func
     ):
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1031,7 +1031,7 @@ class Checkout(Component):
         to close the stock picking
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1186,7 +1186,7 @@ class Checkout(Component):
         * select_package: when no delivery packaging is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1216,7 +1216,7 @@ class Checkout(Component):
         * select_line: goes back to selection of lines to work on next lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         packaging = None
@@ -1238,7 +1238,7 @@ class Checkout(Component):
         if self.options.get("checkout__disable_no_package"):
             raise BadRequest("`checkout.no_package` endpoint is not enabled")
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1270,7 +1270,7 @@ class Checkout(Component):
         * select_package: when no package is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1320,7 +1320,7 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1347,7 +1347,7 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1374,7 +1374,7 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         return self._response_for_summary(picking)
@@ -1393,7 +1393,7 @@ class Checkout(Component):
         * summary: if the package_id no longer exists
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
@@ -1408,7 +1408,7 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1445,7 +1445,7 @@ class Checkout(Component):
         * select_line: when package or line has been canceled
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1490,7 +1490,7 @@ class Checkout(Component):
         * select_child_location: there are child destination locations
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = picking.move_line_ids
@@ -1533,7 +1533,7 @@ class Checkout(Component):
         * select_child_location: in case of error
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         search = self._actions_for("search")

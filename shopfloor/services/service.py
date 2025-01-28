@@ -2,7 +2,7 @@
 # Copyright 2020 Akretion (http://www.akretion.com)
 # Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _, exceptions
+from odoo import _, exceptions, fields
 
 from odoo.addons.component.core import AbstractComponent
 
@@ -72,25 +72,41 @@ class BaseShopfloorProcess(AbstractComponent):
             sort_order_custom_code=self.sort_order_custom_code,
         )
 
-    def _check_picking_status(self, pickings, states=("assigned",)):
-        """Check if given pickings can be processed.
+    def _check_picking_consistency(self, pickings):
+        if not pickings.exists():
+            return self.msg_store.stock_picking_not_found()
 
-        If the picking is already done, canceled or didn't belong to the
-        expected picking type, a message is returned.
-        """
-        for picking in pickings:
-            if not picking.exists():
-                return self.msg_store.stock_picking_not_found()
-            if picking.state == "done":
-                return self.msg_store.already_done()
-            if picking.state == "cancel":
-                return self.msg_store.transfer_cancelled()
-            if picking.state not in states:  # the picking must be ready
-                return self.msg_store.stock_picking_not_available(picking)
-            if picking.picking_type_id in self.picking_types.return_picking_type_id:
-                return self.msg_store.picking_type_is_return()
-            if picking.picking_type_id not in self.picking_types:
-                return self.msg_store.cannot_move_something_in_picking_type()
+    def _check_picking_type(self, pickings):
+        """Check if the pickings have the right expected type."""
+        if not any(
+            picking.picking_type_id in self.picking_types for picking in pickings
+        ):
+            return self.msg_store.reserved_for_other_picking_type(
+                fields.first(pickings)
+            )
+
+    def _check_picking_status(self, pickings, states=("assigned",)):
+        """Checks if the picking exists, is already done or canceled."""
+        if not any(picking.state != "done" for picking in pickings):
+            return self.msg_store.already_done()
+        if not any(picking.state != "cancel" for picking in pickings):
+            return self.msg_store.transfer_canceled()
+        if not any(
+            picking.state in states for picking in pickings
+        ):  # the picking must be ready
+            return self.msg_store.stock_picking_not_available(fields.first(pickings))
+
+    def _check_picking_processible(self, pickings, states=("assigned",)):
+        """Check if given pickings can be processed"""
+        message = self._check_picking_consistency(pickings)
+        if message:
+            return message
+        message = self._check_picking_type(pickings)
+        if message:
+            return message
+        message = self._check_picking_status(pickings, states=states)
+        if message:
+            return message
 
     def is_src_location_valid(self, location):
         """Check the source location is valid for given process.

@@ -506,9 +506,9 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         cleanup_picking.move_line_ids.package_id = cleanup_package
         params = {"barcode": "CLEANUP_PACKAGE"}
         response = self.service.dispatch("scan_deliver", params=params)
-        expected_body = (
-            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
-        )
+        type_name = cleanup_picking.picking_type_id.name
+        pick_name = cleanup_picking.name
+        expected_body = f"Reserved for {type_name} {pick_name}"
         self.assertEqual(response.get("message").get("body"), expected_body)
 
     def test_scan_deliver_return_product(self):
@@ -519,35 +519,34 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         cleanup_picking.action_assign()
         params = {"barcode": self.product_a.barcode}
         response = self.service.dispatch("scan_deliver", params=params)
-        expected_body = (
-            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
-        )
+        type_name = cleanup_picking.picking_type_id.name
+        pick_name = cleanup_picking.name
+        expected_body = f"Reserved for {type_name} {pick_name}"
         self.assertEqual(response.get("message").get("body"), expected_body)
 
     def test_scan_deliver_return_packaging(self):
         self.picking.action_cancel()
         cleanup_picking = self._create_picking(
-            picking_type=self.cleanup_type, lines=[(self.product_a, 1)],
+            picking_type=self.cleanup_type,
+            lines=[(self.product_a, 1)],
         )
         cleanup_picking.action_assign()
-        packaging = (
-            self.env["product.packaging"]
-            .sudo()
-            .create(
-                {
-                    "name": "CLEANUP PACKAGING",
-                    "product_id": self.product_a.id,
-                    "qty": 1,
-                    "product_uom_id": self.product_a.id,
-                    "barcode": "CLEANUP_PACKAGING",
-                }
-            )
+
+        packaging_model = self.env["product.packaging"].sudo()
+        packaging_model.create(
+            {
+                "name": "CLEANUP PACKAGING",
+                "product_id": self.product_a.id,
+                "qty": 1,
+                "product_uom_id": self.product_a.id,
+                "barcode": "CLEANUP_PACKAGING",
+            }
         )
         params = {"barcode": "CLEANUP_PACKAGING"}
         response = self.service.dispatch("scan_deliver", params=params)
-        expected_body = (
-            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
-        )
+        type_name = cleanup_picking.picking_type_id.name
+        pick_name = cleanup_picking.name
+        expected_body = f"Reserved for {type_name} {pick_name}"
         self.assertEqual(response.get("message").get("body"), expected_body)
 
     def test_scan_deliver_return_lot(self):
@@ -570,9 +569,9 @@ class DeliveryScanDeliverCase(DeliveryCommonCase):
         cleanup_picking.move_line_ids.reserved_uom_qty = 1.0
         params = {"barcode": "CLEANUP_LOT"}
         response = self.service.dispatch("scan_deliver", params=params)
-        expected_body = (
-            f"Reserved for {cleanup_picking.picking_type_id.name} {cleanup_picking.name}"
-        )
+        type_name = cleanup_picking.picking_type_id.name
+        pick_name = cleanup_picking.name
+        expected_body = f"Reserved for {type_name} {pick_name}"
         self.assertEqual(response.get("message").get("body"), expected_body)
 
     def test_scan_delivery_return_picking(self):
@@ -668,7 +667,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
             response,
             message={
                 "message_type": "error",
-                "body": "You cannot move this using this menu.",
+                "body": f"Reserved for {picking.picking_type_id.name} {picking.name}",
             },
         )
 
