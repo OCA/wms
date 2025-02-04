@@ -41,7 +41,10 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={"message_type": "error", "body": "Barcode not found"},
+            message={
+                "message_type": "error",
+                "body": "No transfer found for barcode A",
+            },
             data={"restrict_scan_first": True},
         )
 
@@ -56,7 +59,10 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={"message_type": "error", "body": "Barcode not found"},
+            message={
+                "message_type": "error",
+                "body": "No transfer found for barcode NOPE",
+            },
             data={"restrict_scan_first": False},
         )
 
@@ -117,12 +123,14 @@ class CheckoutScanCase(CheckoutCommonCase):
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
+        picking_name = picking.name
+        type_name = picking.picking_type_id.name
         self.assert_response(
             response,
             next_state="select_document",
             message={
                 "message_type": "error",
-                "body": "You cannot move this using this menu.",
+                "body": f"Reserved for {type_name} {picking_name}",
             },
             data={"restrict_scan_first": False},
         )

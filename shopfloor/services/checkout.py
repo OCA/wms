@@ -214,25 +214,29 @@ class Checkout(Component):
         * summary: stock.picking is selected and all its lines have a
           destination pack set
         """
-        search_result = self._scan_document_find(barcode)
-        result_handler = getattr(self, "_select_document_from_" + search_result.type)
-        return result_handler(search_result.record)
+        handlers = {
+            "picking": self._select_document_from_picking,
+            "location": self._select_document_from_location,
+            "package": self._select_document_from_package,
+            "packaging": self._select_document_from_packaging,
+            "product": self._select_document_from_product,
+            "none": self._select_document_from_none,
+        }
+        if self.work.menu.scan_location_or_pack_first:
+            handlers.pop("product")
+        search_result = self._scan_document_find(barcode, handlers.keys())
+        # Keep track of what has been initially scan, and forward it through kwargs
+        kwargs = {
+            "barcode": barcode,
+            "current_state": "select_document",
+            "scanned_record": search_result.record,
+        }
+        handler = handlers.get(search_result.type, self._select_document_from_none)
+        return handler(search_result.record, **kwargs)
 
-    def _scan_document_find(self, barcode, search_types=None):
+    def _scan_document_find(self, barcode, search_types):
         search = self._actions_for("search")
-        search_types = (
-            "picking",
-            "location",
-            "package",
-            "packaging",
-        ) + (("product",) if not self.work.menu.scan_location_or_pack_first else ())
-        return search.find(
-            barcode,
-            types=search_types,
-        )
-
-    def _select_document_from_picking(self, picking, **kw):
-        return self._select_picking(picking, "select_document")
+        return search.find(barcode, types=search_types)
 
     def _select_document_from_location(self, location, **kw):
         if not self.is_src_location_valid(location):
@@ -251,7 +255,9 @@ class Checkout(Component):
                     ),
                 }
             )
-        return self._select_picking(pickings, "select_document")
+        # Keep track of what has been initially scan, and forward it through kwargs
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(pickings, **kwargs)
 
     def _select_document_from_package(self, package, **kw):
         pickings = package.move_line_ids.filtered(
@@ -260,14 +266,15 @@ class Checkout(Component):
         if len(pickings) > 1:
             # Filter only if we find several pickings to narrow the
             # selection to one of the good type. If we have one picking
-            # of the wrong type, it will be caught in _select_picking
+            # of the wrong type, it will be caught in _select_document_from_picking
             # with the proper error message.
             # Side note: rather unlikely to have several transfers ready
             # and moving the same things
             pickings = pickings.filtered(
                 lambda p: p.picking_type_id in self.picking_types
             )
-        return self._select_picking(fields.first(pickings), "select_document")
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(fields.first(pickings), **kwargs)
 
     def _select_document_from_product(self, product, line_domain=None, **kw):
         line_domain = line_domain or []
@@ -287,7 +294,8 @@ class Checkout(Component):
             order="priority desc, scheduled_date asc, id desc",
             limit=1,
         )
-        return self._select_picking(picking, "select_document")
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(picking, **kwargs)
 
     def _select_document_from_packaging(self, packaging, **kw):
         # And retrieve its product
@@ -298,35 +306,33 @@ class Checkout(Component):
         line_domain = [("reserved_uom_qty", ">=", packaging.qty)]
         return self._select_document_from_product(product, line_domain=line_domain)
 
-    def _select_document_from_none(self, picking, **kw):
+    def _select_document_from_none(self, *args, barcode=None, **kwargs):
         """Handle result when no record is found."""
-        return self._select_picking(picking, "select_document")
+        return self._response_for_select_document(
+            message=self.msg_store.transfer_not_found_for_barcode(barcode)
+        )
 
-    def _select_picking(self, picking, state_for_error):
+    def _select_document_from_picking(
+        self, picking, current_state=None, barcode=None, **kwargs
+    ):
+        # Get origin record to give more context to the user when raising an error
+        # as we got picking from product/package/packaging/...
+        scanned_record = kwargs.get("scanned_record")
         if not picking:
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.stock_picking_not_found()
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.barcode_not_found()
-            )
+            message = self.msg_store.transfer_not_found_for_record(scanned_record)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         if picking.picking_type_id not in self.picking_types:
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.cannot_move_something_in_picking_type()
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.cannot_move_something_in_picking_type()
-            )
+            message = self.msg_store.reserved_for_other_picking_type(picking)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         if picking.state != "assigned":
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.stock_picking_not_available(picking)
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_available(picking)
-            )
+            message = self.msg_store.stock_picking_not_available(picking)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         return self._response_for_select_line(picking)
 
     def _data_for_move_lines(self, lines, **kw):
@@ -405,7 +411,14 @@ class Checkout(Component):
         message = self._check_picking_processible(picking)
         if message:
             return self._response_for_manual_selection(message=message)
-        return self._select_picking(picking, "manual_selection")
+        # Because _select_document_from_picking expects some context
+        # to give meaningful infos to the user, add some here.
+        kwargs = {
+            "current_state": "manual_selection",
+            "barcode": picking.name,
+            "scanned_record": picking,
+        }
+        return self._select_document_from_picking(picking, **kwargs)
 
     def _select_lines(self, lines, prefill_qty=0, related_lines=None):
         for i, line in enumerate(lines):
@@ -1049,7 +1062,7 @@ class Checkout(Component):
         )
         return result_handler(picking, selected_lines, search_result.record)
 
-    def _scan_package_find(self, picking, barcode, search_types=None):
+    def _scan_package_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
         search_types = (
             "package",
