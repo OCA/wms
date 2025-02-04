@@ -468,6 +468,30 @@ class MessageAction(Component):
             "body": _("No transfer found for this product."),
         }
 
+    def transfer_not_found_for_barcode(self, barcode):
+        body = _("No transfer found for barcode {}").format(barcode)
+        return {
+            "message_type": "error",
+            "body": body,
+        }
+
+    def transfer_not_found_for_record(self, record):
+        model_mapping = {
+            "product.product": "product",
+            "stock.picking": "transfer",
+            "stock.quant.package": "package",
+            "product.packaging": "packaging",
+            "stock.location": "location",
+            "stock.production.lot": "lot",
+            "stock.move": "move",
+        }
+        model_name = model_mapping.get(record._name)
+        body = _("No transfer found for {} {}").format(model_name, record.name)
+        return {
+            "message_type": "error",
+            "body": body,
+        }
+
     def product_not_found_in_location_or_transfer(self, product, location, picking):
         return {
             "message_type": "error",
