@@ -28,7 +28,7 @@ Repository | Description
 [stock-logistics-shopfloor](https://github.com/OCA/stock-logistics-shopfloor) | Shopfloor. Warehouse barcode applications to support operators in the warehouse
 [stock-logistics-tracking](https://github.com/OCA/stock-logistics-tracking) | Enhance packages (stock.quant.package)
 [stock-logistics-transport](https://github.com/OCA/stock-logistics-transport) | Manage incoming and outgoing transports
-[stock-logistics-warehouse](https://github.com/OCA/stock-logistics-warehouse) | Extend the stock related models (warehouse, location, picking, move...) but without impact flows and processes. It's mainly adding fields or buttons.
+[stock-logistics-warehouse](https://github.com/OCA/stock-logistics-warehouse) | Extend the stock related models (warehouse, location, picking, move...) but without impacting flows and processes. It's mainly adding fields or buttons.
 [stock-logistics-workflow](https://github.com/OCA/stock-logistics-workflow) | Enhance the way flows and processes are working. Modules that do not have their place in the other more specialized repositories
 [stock-weighing](https://github.com/OCA/stock-weighing) | Support products managed by weight
 [wms](https://github.com/OCA/wms) | Bundle modules for a complete WMS solution
