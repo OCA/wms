@@ -412,7 +412,7 @@ class Reception(Component):
         # If we have an origin picking but no origin move, then user
         # scanned a wrong product. Warn him about this.
         if origin_moves and not origin_moves_for_product:
-            message = self.msg_store.product_not_found_in_current_picking()
+            message = self.msg_store.product_not_found_in_current_picking(product)
             return self._response_for_select_move(picking, message=message)
         if origin_moves_for_product:
             return_move = self._scan_line__create_return_move(

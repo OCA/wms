@@ -3,6 +3,7 @@
 # Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, exceptions, fields
+from odoo.osv.expression import AND
 
 from odoo.addons.component.core import AbstractComponent
 
@@ -33,6 +34,22 @@ class BaseShopfloorProcess(AbstractComponent):
     def _get_process_picking_types(self):
         """Return picking types for the menu"""
         return self.work.menu.picking_type_ids
+
+    def _get_pickings_base_domain(self):
+        return [
+            ("state", "not in", ("done", "cancel")),
+            ("location_id", "child_of", self.picking_types.default_location_src_id.ids),
+        ]
+
+    def _get_pickings_for_package(self, package, **kwargs):
+        domain = self._get_pickings_base_domain()
+        package_domain = [("move_line_ids.package_id", "=", package.id)]
+        return self.env["stock.picking"].search(AND([domain, package_domain]), **kwargs)
+
+    def _get_pickings_for_product(self, product, **kwargs):
+        domain = self._get_pickings_base_domain()
+        product_domain = [("move_line_ids.product_id", "=", product.id)]
+        return self.env["stock.picking"].search(AND([domain, product_domain]), **kwargs)
 
     @property
     def picking_types(self):

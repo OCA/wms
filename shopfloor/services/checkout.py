@@ -473,21 +473,31 @@ class Checkout(Component):
             return self._response_for_summary(picking)
 
         # Search of the destination package
-        search_result = self._scan_line_find(picking, barcode)
-        result_handler = getattr(self, "_select_lines_from_" + search_result.type)
-        kw = {"confirm_pack_all": confirm_pack_all, "confirm_lot": confirm_lot}
-        return result_handler(picking, selection_lines, search_result.record, **kw)
+        handlers = {
+            "package": self._select_lines_from_package,
+            "product": self._select_lines_from_product,
+            "packaging": self._select_lines_from_packaging,
+            "lot": self._select_lines_from_lot,
+            "serial": self._select_lines_from_serial,
+            "delivery_packaging": self._select_lines_from_delivery_packaging,
+            "none": self._select_lines_from_none,
+        }
+        search_result = self._scan_line_find(picking, barcode, handlers.keys())
+        # setting scanned record as kwarg in order to make better logs.
+        # The reason for this is that from a product we might select various records
+        # and lose track of what was initially scanned. This forces us to display
+        # standard messages that might have no meaning for the user.
+        kwargs = {
+            "confirm_pack_all": confirm_pack_all,
+            "confirm_lot": confirm_lot,
+            "scanned_record": search_result.record,
+            "barcode": barcode,
+        }
+        handler = handlers.get(search_result.type, self._select_lines_from_none)
+        return handler(picking, selection_lines, search_result.record, **kwargs)
 
-    def _scan_line_find(self, picking, barcode, search_types=None):
+    def _scan_line_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
-        search_types = (
-            "package",
-            "product",
-            "packaging",
-            "lot",
-            "serial",
-            "delivery_packaging",
-        )
         return search.find(
             barcode,
             types=search_types,
@@ -510,15 +520,14 @@ class Checkout(Component):
             lambda l: l.package_id == package and not l.shopfloor_checkout_done
         )
         if not lines:
-            return self._response_for_select_line(
-                picking,
-                message={
-                    "message_type": "error",
-                    "body": _("Package {} is not in the current transfer.").format(
-                        package.name
-                    ),
-                },
-            )
+            # No line for scanned package in selected picking
+            # Check if there's any picking reserving this product.
+            return_picking = self._get_pickings_for_package(package, limit=1)
+            if return_picking:
+                message = self.msg_store.reserved_for_other_picking_type(return_picking)
+            else:
+                message = self.msg_store.package_not_found_in_picking(package, picking)
+            return self._response_for_select_line(picking, message=message)
         self._select_lines(lines, prefill_qty=prefill_qty)
         if self.work.menu.no_prefill_qty:
             lines = picking.move_line_ids
@@ -535,9 +544,12 @@ class Checkout(Component):
 
         lines = selection_lines.filtered(lambda l: l.product_id == product)
         if not lines:
-            return self._response_for_select_line(
-                picking, message=self.msg_store.product_not_found_in_current_picking()
-            )
+            return_picking = self._get_pickings_for_product(product, limit=1)
+            if return_picking:
+                message = self.msg_store.reserved_for_other_picking_type(return_picking)
+            else:
+                message = self.msg_store.product_not_found_in_current_picking(product)
+            return self._response_for_select_line(picking, message=message)
 
         # When products are as units outside of packages, we can select them for
         # packing, but if they are in a package, we want the user to scan the packages.
@@ -1049,18 +1061,21 @@ class Checkout(Component):
             return self._response_for_select_document(message=message)
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        search_result = self._scan_package_find(picking, barcode)
-        message = self._check_scan_package_find(picking, search_result)
-        if message:
-            return self._response_for_select_package(
-                picking,
-                selected_lines,
-                message=message,
-            )
-        result_handler = getattr(
-            self, "_scan_package_action_from_" + search_result.type
-        )
-        return result_handler(picking, selected_lines, search_result.record)
+        handlers = {
+            "package": self._scan_package_action_from_package,
+            "product": self._scan_package_action_from_product,
+            "packaging": self._scan_package_action_from_packaging,
+            "lot": self._scan_package_action_from_lot,
+            "serial": self._scan_package_action_from_serial,
+            "delivery_packaging": self._scan_package_action_from_delivery_packaging,
+        }
+        search_result = self._scan_package_find(picking, barcode, handlers.keys())
+        handler = handlers.get(search_result.type, self._scan_package_action_from_none)
+        kwargs = {
+            "barcode": barcode,
+            "scanned_record": search_result.record,
+        }
+        return handler(picking, selected_lines, search_result.record, **kwargs)
 
     def _scan_package_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
@@ -1080,10 +1095,6 @@ class Checkout(Component):
                 serial=dict(products=picking.move_ids.product_id),
             ),
         )
-
-    def _check_scan_package_find(self, picking, search_result):
-        # Used by inheriting modules
-        return False
 
     def _find_line_to_increment(self, product_lines):
         """Find which line should have its qty incremented.
