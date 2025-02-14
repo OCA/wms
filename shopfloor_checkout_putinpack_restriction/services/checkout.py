@@ -16,8 +16,16 @@ class Checkout(Component):
             res["no_package_enabled"] = False
         return res
 
-    def _check_scan_package_find(self, picking, search_result):
-        if search_result.type in ["package", "delivery_packaging"]:
-            if picking.put_in_pack_restriction == "no_package":
-                return self.msg_store.package_not_allowed_for_operation()
-        return super()._check_scan_package_find(picking, search_result)
+    def _scan_package_action_from_package(
+        self, picking, selected_lines, record, **kwargs
+    ):
+        if picking.put_in_pack_restriction == "no_package":
+            return self.msg_store.package_not_allowed_for_operation()
+        return super()._scan_package_action_from_package()
+
+    def _scan_package_action_from_delivery_packaging(
+        self, picking, selected_lines, record, **kwargs
+    ):
+        if picking.put_in_pack_restriction == "no_package":
+            return self.msg_store.package_not_allowed_for_operation()
+        return super()._scan_package_action_from_delivery_packaging()
