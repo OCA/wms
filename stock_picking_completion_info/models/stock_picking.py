@@ -4,7 +4,6 @@ from odoo import api, fields, models
 
 
 class PickingType(models.Model):
-
     _inherit = "stock.picking.type"
 
     display_completion_info = fields.Boolean(
@@ -14,7 +13,6 @@ class PickingType(models.Model):
 
 
 class StockPicking(models.Model):
-
     _inherit = "stock.picking"
 
     completion_info = fields.Selection(
@@ -74,7 +72,6 @@ class StockPicking(models.Model):
 
 
 class StockMove(models.Model):
-
     _inherit = "stock.move"
 
     def write(self, vals):
