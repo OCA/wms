@@ -1,13 +1,12 @@
 # Copyright 2019 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests import Form, TransactionCase
+from odoo.addons.base.tests.common import BaseCommon
 
 
-class TestStockPickingCompletionInfo(TransactionCase):
+class TestStockPickingCompletionInfo(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.partner_delta = cls.env.ref("base.res_partner_4")
         cls.warehouse = cls.env.ref("stock.warehouse0")
         cls.warehouse.write({"delivery_steps": "pick_pack_ship"})
@@ -23,10 +22,10 @@ class TestStockPickingCompletionInfo(TransactionCase):
         cls.pick_type.write({"display_completion_info": True})
 
         cls.product_1 = cls.env["product.product"].create(
-            {"name": "Product 1", "type": "product"}
+            {"name": "Product 1", "is_storable": True}
         )
         cls.product_2 = cls.env["product.product"].create(
-            {"name": "Product 2", "type": "product"}
+            {"name": "Product 2", "is_storable": True}
         )
 
     def _init_inventory(self, same_location=True):
@@ -149,10 +148,8 @@ class TestStockPickingCompletionInfo(TransactionCase):
         self.assertEqual(pick_move_2.state, "assigned")
         self.assertEqual(pick_order.state, "assigned")
         self.assertEqual(pick_order.completion_info, "full_order_picking")
-        res = pick_order.button_validate()
-        Form(
-            self.env["stock.immediate.transfer"].with_context(**res["context"])
-        ).save().process()
+        pick_order.button_validate()
+
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order.state, "done")
@@ -199,20 +196,14 @@ class TestStockPickingCompletionInfo(TransactionCase):
         self.assertEqual(pick_move_2.state, "assigned")
         self.assertEqual(pick_order_2.state, "assigned")
         self.assertEqual(pick_order_2.completion_info, "no")
-        res = pick_order_1.button_validate()
-        Form(
-            self.env["stock.immediate.transfer"].with_context(**res["context"])
-        ).save().process()
+        pick_order_1.button_validate()
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_order_1.state, "done")
         self.assertEqual(pick_order_1.completion_info, "no")
         self.assertNotEqual(pick_move_2.state, "done")
         self.assertNotEqual(pick_order_2.state, "done")
         self.assertEqual(pick_order_2.completion_info, "last_picking")
-        res = pick_order_2.button_validate()
-        Form(
-            self.env["stock.immediate.transfer"].with_context(**res["context"])
-        ).save().process()
+        pick_order_2.button_validate()
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order_2.state, "done")
         self.assertEqual(pick_order_2.completion_info, "next_picking_ready")
@@ -253,8 +244,10 @@ class TestStockPickingCompletionInfo(TransactionCase):
         self.assertEqual(pick_order.state, "assigned")
         self.assertEqual(pick_order.completion_info, "full_order_picking")
         # Process partially to create backorder
-        pick_move_1.move_line_ids.qty_done = 1.0
-        pick_move_2.move_line_ids.qty_done = pick_move_2.move_line_ids.reserved_uom_qty
+        pick_move_1.move_line_ids.quantity = 1
+        pick_move_1.picked = True
+        pick_move_2.move_line_ids.quantity = 1
+        pick_move_2.picked = True
         pick_order._action_done()
         pick_backorder = self.env["stock.picking"].search(
             [("backorder_id", "=", pick_order.id)]
@@ -263,17 +256,18 @@ class TestStockPickingCompletionInfo(TransactionCase):
         self.assertEqual(pick_move_1.state, "done")
         self.assertEqual(pick_move_2.state, "done")
         self.assertEqual(pick_order.state, "done")
-        pick_backorder.action_assign()
-        self.assertEqual(pick_backorder_move.state, "assigned")
+        # Assign backorder moves
+        pick_backorder_move._action_assign()
+        self.assertTrue(all(move.state == "assigned" for move in pick_backorder_move))
         self.assertEqual(pick_backorder.state, "assigned")
         self.assertEqual(pick_order.completion_info, "no")
         self.assertEqual(pick_backorder.completion_info, "last_picking")
         # Process backorder
-        pick_backorder_move.move_line_ids.qty_done = (
-            pick_backorder_move.move_line_ids.reserved_uom_qty
-        )
+        pick_backorder_move.picked = True
         pick_backorder._action_done()
-        self.assertEqual(pick_backorder_move.state, "done")
+        self.assertTrue(all(move.state == "done" for move in pick_backorder_move))
         self.assertEqual(pick_backorder.state, "done")
+        self.assertEqual(pick_order.completion_info, "next_picking_ready")
+        self.assertEqual(pick_backorder.completion_info, "next_picking_ready")
         self.assertEqual(pick_order.completion_info, "next_picking_ready")
         self.assertEqual(pick_backorder.completion_info, "next_picking_ready")
