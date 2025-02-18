@@ -759,11 +759,11 @@ class ClusterPicking(Component):
         if response:
             return response
 
-        new_line, qty_check = move_line._split_qty_to_be_done(quantity)
-        if qty_check == "greater":
+        message = self._check_line_qty_processible(move_line, quantity)
+        if message:
             return self._response_for_scan_destination(
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.product_uom_qty),
+                message=message,
                 qty_done=quantity,
             )
 
@@ -795,6 +795,11 @@ class ClusterPicking(Component):
                 },
                 qty_done=quantity,
             )
+
+        # Keeping second return value for compatibility
+        # Quantity already checked at _check_line_qty_processible
+        new_line, __ = move_line._split_qty_to_be_done(quantity)
+
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
         # Only apply zero check if the product is of type "product".
         zero_check = (

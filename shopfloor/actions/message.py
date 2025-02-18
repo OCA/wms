@@ -993,3 +993,6 @@ class MessageAction(Component):
             "message_type": "error",
             "body": body,
         }
+
+    def quantity_must_be_positive(self):
+        return {"message_type": "error", "body": _("Quantity must be positive.")}

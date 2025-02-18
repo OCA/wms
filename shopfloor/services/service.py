@@ -4,6 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, exceptions, fields
 from odoo.osv.expression import AND
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.component.core import AbstractComponent
 
@@ -62,6 +63,20 @@ class BaseShopfloorProcess(AbstractComponent):
         # we can remove this override and the need to call `_get_process_picking_types`
         # every time.
         return self._actions_for("search_move_line", picking_types=self.picking_types)
+
+    def _check_line_qty_processible(self, move_line, quantity):
+        """Checks that a given quantity is processible for a move line."""
+        rounding = move_line.product_uom_id.rounding
+        qty_todo = move_line.product_uom_qty
+        qty_positive = float_compare(quantity, 0, precision_rounding=rounding) == 1
+        if not qty_positive:
+            return self.msg_store.quantity_must_be_positive()
+
+        qty_greater = (
+            float_compare(quantity, qty_todo, precision_rounding=rounding) == 1
+        )
+        if qty_greater:
+            return self.msg_store.unable_to_pick_more(move_line.product_uom_qty)
 
     def _check_picking_consistency(self, pickings):
         if not pickings.exists():
