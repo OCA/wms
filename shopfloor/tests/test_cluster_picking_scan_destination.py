@@ -237,6 +237,31 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             },
         )
 
+    def test_scan_destination_pack_no_quantity(self):
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": 0,
+            },
+        )
+        # Since we processed no quantity, we shouldn't have a new line
+        new_line = self.one_line_picking.move_line_ids - line
+        self.assertFalse(new_line)
+        # However, an error should have been returned
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line),
+            message={
+                "message_type": "error",
+                "body": "Quantity must be positive.",
+            },
+        )
+
     def test_scan_destination_pack_quantity_less(self):
         """Pick less units than expected"""
         line = self.one_line_picking.move_line_ids

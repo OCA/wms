@@ -952,3 +952,6 @@ class MessageAction(Component):
             "message_type": "error",
             "body": _("Unable to find a line with the same product but different lot."),
         }
+
+    def quantity_must_be_positive(self):
+        return {"message_type": "error", "body": _("Quantity must be positive.")}
