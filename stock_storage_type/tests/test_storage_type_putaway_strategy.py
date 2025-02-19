@@ -921,3 +921,17 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             int_picking.move_line_ids[0].mapped("location_dest_id"),
             self.pallets_bin_3_location,
         )
+
+        self.env["stock.quant"].with_context(inventory_mode=True).create(
+            {
+                "product_id": self.product.id,
+                "location_id": self.pallets_bin_3_location.id,
+                "inventory_quantity": 10.0,
+            }
+        )._apply_inventory()
+
+        int_picking.move_line_ids._apply_putaway_strategy()
+        self.assertEqual(
+            int_picking.move_line_ids[0].mapped("location_dest_id"),
+            self.pallets_bin_3_location,
+        )
