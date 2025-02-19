@@ -67,6 +67,17 @@ class StorageCategoryProductCapacity(models.Model):
                 ]
             )
 
+    def _get_product_lot_location_domain(self, lots):
+        """
+        Helper to get product lots domain
+        """
+        return [
+            "|",
+            # same comment as for the products
+            ("location_will_contain_lot_ids", "in", lots.ids),
+            ("location_will_contain_lot_ids", "=", False),
+        ]
+
     def _get_product_location_domain(self, products):
         """
         Helper to get products location domain
@@ -130,17 +141,20 @@ class StorageCategoryProductCapacity(models.Model):
                         ]
                     )
             else:
-                location_domain.append(("location_is_empty", "=", True))
+                location_domain = AND(
+                    [location_domain, [("location_is_empty", "=", True)]]
+                )
         elif self.allow_new_product == "same":
-            location_domain += self._get_product_location_domain(products)
+            location_domain = AND(
+                [location_domain, self._get_product_location_domain(products)]
+            )
         elif self.allow_new_product == "same_lot":
             lots = quants.mapped("lot_id")
             # As same lot should filter also on same product
-            location_domain += self._get_product_location_domain(products)
-            location_domain += [
-                "|",
-                # same comment as for the products
-                ("location_will_contain_lot_ids", "in", lots.ids),
-                ("location_will_contain_lot_ids", "=", False),
-            ]
+            location_domain = AND(
+                [location_domain, self._get_product_location_domain(products)]
+            )
+            location_domain = AND(
+                [location_domain, self._get_product_lot_location_domain(lots)]
+            )
         return location_domain
