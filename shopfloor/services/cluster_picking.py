@@ -686,43 +686,65 @@ class ClusterPicking(Component):
 
     def _set_destination_pack_update_quantity(self, move_line, quantity, barcode):
         """Handle the done quantity increment on set_destination end point."""
-        response = None
         if not self.work.menu.no_prefill_qty:
-            return response
+            return None
+        handlers = {
+            "product": self._set_destination_update_quantity__by_product,
+            "packaging": self._set_destination_update_quantity__by_packaging,
+            "lot": self._set_destination_update_quantity__by_lot,
+            "none": self._set_destination_update_quantity__fallback,
+        }
+        search_result = self._set_destination_pack_update_quantity__find(
+            barcode, handlers.keys()
+        )
+        handler = handlers.get(
+            search_result.type, self._set_destination_update_quantity__fallback
+        )
+        return handler(move_line, search_result.record, quantity)
+
+    def _set_destination_pack_update_quantity__find(self, barcode, search_types):
         search = self._actions_for("search")
-        # Handle barcode of product or packaging
-        product = search.product_from_scan(barcode)
-        packaging = self.env["product.packaging"].browse()
-        if not product:
-            packaging = search.packaging_from_scan(barcode)
-            product = packaging.product_id
-        if product:
-            if move_line.product_id == product:
-                quantity += packaging.qty or 1.0
-                response = self._response_for_scan_destination(
-                    move_line, qty_done=quantity
-                )
-                return response
-            return self._response_for_scan_destination(
-                move_line,
-                message=self.msg_store.wrong_record(product),
-                qty_done=quantity,
-            )
-        # Handle barcode of a lot
-        lot = search.lot_from_scan(barcode)
-        if lot:
-            if move_line.lot_id == lot:
-                quantity += 1.0
-                response = self._response_for_scan_destination(
-                    move_line, qty_done=quantity
-                )
-                return response
-            return self._response_for_scan_destination(
-                move_line,
-                message=self.msg_store.wrong_record(lot),
-                qty_done=quantity,
-            )
-        return response
+        return search.find(barcode, types=search_types)
+
+    def _set_destination_update_quantity__by_product(
+        self, move_line, product, quantity
+    ):
+        if move_line.product_id == product:
+            quantity += 1.0
+            return self._response_for_scan_destination(move_line, qty_done=quantity)
+        return self._response_for_scan_destination(
+            move_line,
+            message=self.msg_store.wrong_record(product),
+            qty_done=quantity,
+        )
+
+    def _set_destination_update_quantity__by_packaging(
+        self, move_line, packaging, quantity
+    ):
+        product = packaging.product_id
+        if move_line.product_id == product:
+            quantity += packaging.qty
+            return self._response_for_scan_destination(move_line, qty_done=quantity)
+        return self._response_for_scan_destination(
+            move_line,
+            message=self.msg_store.wrong_record(product),
+            qty_done=quantity,
+        )
+
+    def _set_destination_update_quantity__by_lot(self, move_line, lot, quantity):
+        if move_line.lot_id == lot:
+            quantity += 1.0
+            return self._response_for_scan_destination(move_line, qty_done=quantity)
+        return self._response_for_scan_destination(
+            move_line,
+            message=self.msg_store.wrong_record(lot),
+            qty_done=quantity,
+        )
+
+    def _set_destination_update_quantity__fallback(
+        self, move_line, empty_rec, quantity
+    ):
+        return None
 
     def scan_destination_pack(self, picking_batch_id, move_line_id, barcode, quantity):
         """Scan the destination package (bin) for a move line
