@@ -19,6 +19,7 @@ class StockPickingType(models.Model):
         ]
 
     shipping_policy = fields.Selection(
+        string="Force Shipping Policy",
         selection="_selection_shipping_policy",
         default=lambda r: r._default_shipping_policy(),
         help="Allows to force the shipping policy on pickings according to the"

@@ -1,13 +1,14 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.tests import TransactionCase
+from odoo import fields
+
+from odoo.addons.base.tests.common import BaseCommon
 
 
-class TestPickingTypeShippingPolicy(TransactionCase):
+class TestPickingTypeShippingPolicy(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.warehouse = cls.env.ref("stock.warehouse0")
         # set pick-pack-ship on warehouse
         cls.warehouse.delivery_steps = "pick_pack_ship"
@@ -28,35 +29,46 @@ class TestPickingTypeShippingPolicy(TransactionCase):
             }
         )
 
+    def _run_procurement(self, product, qty):
+        moves_before = self.env["stock.move"].search([])
+        proc_group = self.env["procurement.group"]
+        uom = product.uom_id
+        proc_qty, proc_uom = uom._adjust_uom_quantities(qty, uom)
+        today = fields.Date.today()
+        proc_group = self.env["procurement.group"].create({})
+        values = {
+            "group_id": proc_group,
+            "date_planned": today,
+            "date_deadline": today,
+            "warehouse_id": self.warehouse or False,
+            "company_id": self.company,
+        }
+        procurement = proc_group.Procurement(
+            product,
+            proc_qty,
+            proc_uom,
+            self.customers_location,
+            product.name,
+            "PROC TEST",
+            self.company,
+            values,
+        )
+        proc_group.run([procurement])
+        moves_after = self.env["stock.move"].search([])
+        return moves_after - moves_before
+
+    def _validate_picking(self, picking):
+        picking.move_line_ids.write({"picked": True})
+        picking._action_done()
+
     def test_shipping_policy(self):
         self.pack_type.shipping_policy = "force_all_products_ready"
         self.pick_type.shipping_policy = "force_as_soon_as_possible"
-        # Create picking
-        out_picking = self.env["stock.picking"].create(
-            {
-                "picking_type_id": self.ship_type.id,
-                "location_id": self.output_location.id,
-                "location_dest_id": self.customers_location.id,
-                "move_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "name": self.product.name,
-                            "product_id": self.product.id,
-                            "product_uom_qty": 10.0,
-                            "product_uom": self.product.uom_id.id,
-                            "location_id": self.output_location.id,
-                            "location_dest_id": self.customers_location.id,
-                        },
-                    )
-                ],
-            }
-        )
-        out_picking.action_confirm()
-
-        pack_picking = out_picking.move_ids.move_orig_ids.picking_id
-        pick_picking = pack_picking.move_ids.move_orig_ids.picking_id
+        move = self._run_procurement(self.product, 10)
+        pick_picking = move.picking_id
+        self._validate_picking(pick_picking)
+        self.assertEqual(pick_picking.state, "done")
+        pack_picking = pick_picking.move_ids.move_dest_ids.picking_id
         self.assertEqual(pack_picking.picking_type_id, self.pack_type)
         self.assertEqual(pack_picking.move_type, "one")
         self.assertEqual(pick_picking.picking_type_id, self.pick_type)
