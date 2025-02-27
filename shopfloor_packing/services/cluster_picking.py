@@ -45,7 +45,7 @@ class ClusterPicking(Component):
         if response:
             return response
         return self._response_for_select_delivery_package_type(
-            picking, delivery_packaging
+            picking, delivery_packaging, selected_lines
         )
 
     def scan_package_action(self, picking_id, selected_line_ids, barcode) -> dict:
@@ -104,7 +104,10 @@ class ClusterPicking(Component):
             )
         # Call the specific put in pack with package type filled in
         return self.put_in_pack(
-            picking.batch_id.id, picking.id, package_type_id=package_type_id
+            picking.batch_id.id,
+            picking.id,
+            selected_line_ids=selected_line_ids,
+            package_type_id=package_type_id,
         )
 
     def scan_destination_pack(
@@ -179,7 +182,12 @@ class ClusterPicking(Component):
         return self._prepare_pack_picking(batch)
 
     def put_in_pack(
-        self, picking_batch_id, picking_id, nbr_packages=None, package_type_id=None
+        self,
+        picking_batch_id,
+        picking_id,
+        selected_line_ids,
+        nbr_packages=None,
+        package_type_id=None,
     ) -> dict:
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
@@ -200,8 +208,9 @@ class ClusterPicking(Component):
         if result:
             return result
 
+        lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         savepoint = self._actions_for("savepoint").new()
-        pack = self._put_in_pack(picking, nbr_packages, package_type_id)
+        pack = self._put_in_pack(picking, lines, nbr_packages, package_type_id)
         picking._reset_packing_packs_scanned()
         if not pack:
             savepoint.rollback()
@@ -280,10 +289,16 @@ class ClusterPicking(Component):
     def _get_move_lines_to_pack(self, picking) -> StockMoveLine:
         """
         This returns the lines that have an internal package
+        and the same destination
         """
-        return picking.move_line_ids.filtered(
+        move_lines = picking.move_line_ids.filtered(
             lambda ml: ml.result_package_id.is_internal
         ).sorted(key=lambda ml: ml.result_package_id.name)
+        # Take the first line to filter then the lines per destination
+        first_line = fields.first(move_lines)
+        return move_lines.filtered(
+            lambda line: line.location_dest_id == first_line.location_dest_id
+        )
 
     def _prepare_pack_picking(self, batch, message=None) -> dict:
         picking = self._get_next_picking_to_pack(batch)
@@ -308,16 +323,13 @@ class ClusterPicking(Component):
         return
 
     def _put_in_pack(
-        self, picking, number_of_parcels=None, package_type_id=None
+        self, picking, move_lines, number_of_parcels=None, package_type_id=None
     ) -> QuantPackage:
         """
         This will enhance the put in pack flow by adding the number
         of parcels or the package type to the generated package.
         """
-        move_lines_to_pack = picking.move_line_ids.filtered(
-            lambda l: l.result_package_id and l.result_package_id.is_internal
-        )
-        pack = picking._put_in_pack(move_lines_to_pack)
+        pack = picking._put_in_pack(move_lines)
         if (
             isinstance(pack, dict)
             and pack.get("res_model") == "stock.quant.package"
@@ -412,12 +424,15 @@ class ClusterPicking(Component):
         )
 
     def _response_for_select_delivery_package_type(
-        self, picking, packaging, message=None
+        self, picking, packaging, selected_lines, message=None
     ) -> dict:
         return self._response(
             next_state="select_delivery_packaging",
             data={
                 "picking": self.data.picking(picking),
+                "selected_lines_for_packing": self.data_detail.move_lines(
+                    selected_lines
+                ),
                 "packaging": self._data_for_delivery_package_type(packaging),
             },
             message=message,
@@ -446,6 +461,11 @@ class ShopfloorClusterPickingValidator(Component):
                 "type": "integer",
             },
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_ids": {
+                "type": "list",
+                "required": True,
+                "schema": {"coerce": to_int, "required": True, "type": "integer"},
+            },
             "nbr_packages": {"coerce": to_int, "required": False, "type": "integer"},
             "package_type_id": {"coerce": to_int, "required": False, "type": "integer"},
         }
@@ -561,6 +581,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def _schema_select_delivery_packaging(self) -> dict:
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "selected_lines_for_packing": self.schemas_detail.move_line_for_packing_detail(),
             "packaging": self.schemas._schema_list_of(
                 self.schemas.delivery_packaging()
             ),

@@ -46,3 +46,38 @@ class ShopfloorSchemaDetailAction(Component):
             },
         }
         return schema
+
+    def move_line_for_packing_detail(self) -> dict:
+        schema = {
+            "type": "list",
+            "schema": {
+                "type": "dict",
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "qty_done": {"type": "float", "required": True},
+                    "lot": {
+                        "type": "dict",
+                        "required": False,
+                        "nullable": True,
+                        "schema": self.lot(),
+                    },
+                    "location_dest": self._schema_dict_of(
+                        self.location(), required=False
+                    ),
+                    "location_src": self._schema_dict_of(
+                        self.location(), required=False
+                    ),
+                    "package_dest": self._schema_dict_of(
+                        self.package(with_packaging=False), required=False
+                    ),
+                    "package_src": self._schema_dict_of(
+                        self.package(with_packaging=False), required=False
+                    ),
+                    "product": self._schema_dict_of(self.product()),
+                    "quantity": {"type": "float", "required": True},
+                    "progress": {"type": "float", "nullable": True},
+                    "priority": {"type": "string", "nullable": True, "required": False},
+                },
+            },
+        }
+        return schema

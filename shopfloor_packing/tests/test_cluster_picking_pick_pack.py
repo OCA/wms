@@ -98,6 +98,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 4,
             },
         )
@@ -136,6 +137,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 2,
             },
         )
@@ -400,6 +402,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         data = {}
+        data["selected_lines_for_packing"] = self.data_detail.move_lines(lines)
         data["packaging"] = self.data.delivery_packaging_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         self.assert_response(
@@ -413,6 +416,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "package_type_id": self.package_type.id,
             },
         )

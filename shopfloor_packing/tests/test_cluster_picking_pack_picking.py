@@ -64,6 +64,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 4,
             },
         )
@@ -99,6 +100,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": move_lines.ids,
                 "nbr_packages": 2,
             },
         )
@@ -152,6 +154,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 4,
             },
         )
@@ -185,6 +188,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 2,
             },
         )
@@ -236,6 +240,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 4,
             },
         )
@@ -289,6 +294,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "barcode": self.bin1.name,
             },
         )
@@ -303,6 +309,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 2,
             },
         )
@@ -378,6 +385,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             params={
                 "picking_batch_id": self.batch.id,
                 "picking_id": picking.id,
+                "selected_line_ids": picking.move_line_ids.ids,
                 "nbr_packages": 2,
             },
         )
