@@ -61,9 +61,9 @@ class TestPickingTypeShippingPolicy(BaseCommon):
         picking.move_line_ids.write({"picked": True})
         picking._action_done()
 
-    def test_shipping_policy(self):
-        self.pack_type.shipping_policy = "force_all_products_ready"
-        self.pick_type.shipping_policy = "force_as_soon_as_possible"
+    def test_force_move_type(self):
+        self.pack_type.write({"move_type": "one", "force_move_type": True})
+        self.pick_type.write({"move_type": "direct", "force_move_type": True})
         move = self._run_procurement(self.product, 10)
         pick_picking = move.picking_id
         self._validate_picking(pick_picking)
