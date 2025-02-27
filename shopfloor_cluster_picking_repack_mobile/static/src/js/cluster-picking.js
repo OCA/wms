@@ -121,6 +121,10 @@ ClusterPickingBase.component.methods.selected_line_ids = function () {
     return this.selected_lines().map(_.property("id"));
 };
 
+ClusterPickingBase.component.methods.selected_line_ids_for_packing = function () {
+    return this.selectable_lines_for_packing().map(_.property("id"));
+};
+
 ClusterPickingBase.component.methods.selectable_lines = function () {
     const stored = this.state_get_data("select_package");
     return _.result(stored, "selected_move_lines", []);
@@ -134,6 +138,11 @@ ClusterPickingBase.component.methods.selected_lines = function () {
     return this.selectable_lines().filter(function (x) {
         return x.qty_done > 0;
     });
+};
+
+ClusterPickingBase.component.methods.selectable_lines_for_packing = function () {
+    const lines = this.state.data.selected_lines_for_packing;
+    return lines;
 };
 
 // Replace the data method with our new method to add
@@ -314,11 +323,12 @@ let data = function () {
         on_select: (selected) => {
             const picking = this.current_doc().record;
             const data = this.state.data.picking;
+            const ids = this.selected_line_ids_for_packing();
             this.wait_call(
                 this.odoo.call("put_in_pack", {
                     picking_batch_id: this.current_batch().id,
                     picking_id: data.id,
-                    selected_line_ids: this.selected_line_ids(),
+                    selected_line_ids: ids,
                     package_type_id: selected.id,
                 })
             );
