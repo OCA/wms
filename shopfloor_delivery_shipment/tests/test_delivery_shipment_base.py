@@ -20,6 +20,7 @@ class DeliveryShipmentCommonCase(common.CommonCase):
         cls.dock = cls.env.ref("shipment_advice.stock_dock_demo")
         cls.dock.sudo().barcode = "DOCK"
         cls.dock2 = cls.dock.sudo().copy({"barcode": "DOCK2"})
+        cls.loc_customers = cls.env.ref("stock.stock_location_customers")
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

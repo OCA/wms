@@ -206,6 +206,7 @@ class DeliveryShipment(Component):
         move_lines = self._find_move_lines_from_package(
             shipment_advice, package, picking, location
         )
+        # import pdb; pdb.set_trace()
         if move_lines:
             # Check transfer status
             message = self._check_picking_processible(
@@ -759,9 +760,20 @@ class DeliveryShipment(Component):
         self, shipment_advice, package, picking, location
     ):
         """Returns the move line corresponding to `package` for the given shipment."""
-        domain = self._find_move_lines_domain(shipment_advice)
         # FIXME should we check also result package here?
-        domain.append(("package_id", "=", package.id))
+        domain = [
+            ("state", "in", ("assigned", "partially_available")),
+            ("package_id", "=", package.id),
+            "|",
+            ("shipment_advice_id", "=", False),
+            ("shipment_advice_id", "=", shipment_advice.id),
+        ]
+        if shipment_advice.planned_move_ids:
+            domain.append(("move_id.shipment_advice_id", "=", shipment_advice.id))
+        else:
+            domain.append(
+                ("move_id.shipment_advice_id", "=", False),
+            )
         if location:
             domain.append(
                 ("location_id", "child_of", location.id),
@@ -847,9 +859,21 @@ class DeliveryShipment(Component):
             )
         return pickings_not_loaded
 
+    def _check_picking_type_unique(self, pickings, shipment_advice):
+        if len(pickings.picking_type_id) != 1:
+            # Check that pickings have the same picking type.
+            # This might happen if a sale order line is canceled while
+            # transfers are being processed.
+            # Package is ready to ship, but some products in it have to go back in
+            # stock.
+            return self.msg_store.package_partially_reserved_in_picking(pickings)
+
     def _check_picking_processible(self, pickings, shipment_advice):
-        # Overloaded to add checks against a shipment advice
+        message = self._check_picking_type_unique(pickings, shipment_advice)
+        if message:
+            return message
         message = super()._check_picking_processible(pickings)
+        # Overloaded to add checks against a shipment advice
         if message:
             return message
         for picking in pickings:
