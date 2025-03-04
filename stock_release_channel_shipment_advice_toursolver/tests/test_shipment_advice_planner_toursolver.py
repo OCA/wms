@@ -45,3 +45,4 @@ class TestShipmentAdvicePlannerToursolver(VCRTestCase, ChannelReleaseCase):
         )
         self.assertTrue(self.channel.shipment_advice_ids)
         self.assertEqual(self.channel.shipment_advice_ids, task.shipment_advice_ids)
+        self.assertEqual(task.release_channel_id, self.channel)
