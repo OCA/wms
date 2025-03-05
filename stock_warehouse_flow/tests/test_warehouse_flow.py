@@ -8,6 +8,31 @@ from . import common
 
 
 class TestWarehouseFlow(common.CommonFlow):
+    def test_flow_search_after_applied(self):
+        flow_ship_only = self._get_flow("ship_only")
+        flow_pick_ship = self._get_flow("pick_ship")
+        moves_before = self.env["stock.move"].search([])
+        self._run_procurement(self.product, 10, flow_pick_ship.carrier_ids)
+        moves = self.env["stock.move"].search([("id", "not in", moves_before.ids)])
+        move_ship = moves.filtered(lambda m: m.picking_type_id.code == "outgoing")
+        # When flow was applied to move, picking type set by odoo was saved
+        # in default_picking_type_id, and flow.to_picking_type_id is set
+        self.assertEqual(move_ship.picking_type_id, flow_pick_ship.to_picking_type_id)
+        default_type = self.env.ref("stock.picking_type_out")
+        self.assertEqual(move_ship.default_picking_type_id, default_type)
+        # Only pick_ship matches, because there's a constraint on the carrier
+        matching_flows = self.env["stock.warehouse.flow"]._search_for_move(move_ship)
+        self.assertEqual(matching_flows, flow_pick_ship)
+        # Drop the carrier from the procurement, only ship only flow should match
+        move_ship.group_id.carrier_id = False
+        matching_flows = self.env["stock.warehouse.flow"]._search_for_move(move_ship)
+        self.assertEqual(matching_flows, flow_ship_only)
+        # Drop default_picking_type_id, no flow is found, because
+        # now flow has Delivery Orders POST as from_picking_type_id
+        move_ship.default_picking_type_id = False
+        matching_flows = self.env["stock.warehouse.flow"]._search_for_move(move_ship)
+        self.assertFalse(matching_flows)
+
     def test_flow_ship_only(self):
         """Replace the initial move by a 'ship_only' move."""
         # NOTE: use the recorder when migrating to 15.0 to catch created moves

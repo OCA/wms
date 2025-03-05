@@ -2,11 +2,19 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
-from odoo import models
+from odoo import fields, models
 
 
 class StockMove(models.Model):
     _inherit = "stock.move"
+
+    default_picking_type_id = fields.Many2one(
+        "stock.picking.type",
+        help=(
+            "Used as a backup to save picking type set by odoo, "
+            "before a new flow is applied."
+        ),
+    )
 
     def _action_confirm(self, merge=True, merge_into=False):
         # Apply the flow configuration on the move before it generates
