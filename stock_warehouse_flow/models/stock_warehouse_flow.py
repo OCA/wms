@@ -379,9 +379,17 @@ class StockWarehouseFlow(models.Model):
 
     def _search_for_move_domain(self, move):
         domain = [
-            ("from_picking_type_id", "=", move.picking_type_id.id),
             ("delivery_route_id", "!=", False),
         ]
+        domain_picking_type = [("from_picking_type_id", "=", move.picking_type_id.id)]
+        if move.default_picking_type_id:
+            domain_picking_type = expression.OR(
+                [
+                    domain_picking_type,
+                    [("from_picking_type_id", "=", move.default_picking_type_id.id)],
+                ]
+            )
+        domain = expression.AND([domain, domain_picking_type])
         if move.group_id.carrier_id:
             domain.append(("carrier_ids", "in", move.group_id.carrier_id.ids))
         else:
@@ -527,9 +535,18 @@ class StockWarehouseFlow(models.Model):
         """Apply the flow configuration on the move."""
         if not self:
             return False
-        logger.info("Applying flow '%s' on '%s'", self.name, move)
         rule = self._get_rule_from_delivery_route()
+        # If new rule hasn't changed, do nothing
+        if move.rule_id == rule:
+            return
+        logger.info("Applying flow '%s' on '%s'", self.name, move)
+        # Backup old picking
+        old_picking = move.picking_id
         move.picking_id = False
+        # Backup default type, as we want to always lookup for rules valid
+        # for default type, and current type
+        if not move.default_picking_type_id:
+            move.default_picking_type_id = move.picking_type_id
         move.picking_type_id = self.to_picking_type_id
         move.location_id = (
             self.to_output_stock_loc_id
@@ -539,6 +556,9 @@ class StockWarehouseFlow(models.Model):
         move.rule_id = rule
         if assign_picking:
             move._assign_picking()
+            # If all moves are moved to another picking, we can unlink the old one.
+            if not old_picking.move_ids:
+                old_picking.state = "cancel"
 
     def write(self, vals):
         res = super().write(vals)
