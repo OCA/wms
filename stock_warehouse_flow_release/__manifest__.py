@@ -6,7 +6,7 @@
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "license": "AGPL-3",
     "depends": [
         # OCA/wms
@@ -14,7 +14,6 @@
         "stock_available_to_promise_release",
     ],
     "data": [],
-    "auto_install": True,
     "installable": True,
     "development_status": "Alpha",
 }
