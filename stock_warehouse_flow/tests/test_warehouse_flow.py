@@ -90,6 +90,17 @@ class TestWarehouseFlow(common.CommonFlow):
         self.assertEqual(move_ship.state, "assigned")
         self._validate_picking(move_ship.picking_id)
 
+    def test_disable_flow_at_move_confirm(self):
+        flow = self._get_flow("pick_ship")
+        # It is False by default
+        flow.impacted_route_ids.apply_flow_on = False
+        moves_before = self.env["stock.move"].search([])
+        self._run_procurement(self.product, 10, flow.carrier_ids)
+        moves = self.env["stock.move"].search([("id", "not in", moves_before.ids)])
+        move_ship = moves.filtered(lambda m: m.picking_type_id.code == "outgoing")
+        # ensure new move doesn't have flow.to_picking_type_id as picking type
+        self.assertNotEqual(move_ship.picking_type_id, flow.to_picking_type_id)
+
     def test_no_rule_found_on_delivery_route(self):
         flow = self._get_flow("pick_ship")
         # Remove the rule

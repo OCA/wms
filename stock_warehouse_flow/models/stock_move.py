@@ -16,6 +16,11 @@ class StockMove(models.Model):
         ),
     )
 
+    def _apply_flow_on_action_confirm(self):
+        if self.rule_id.route_id.apply_flow_on != "on_confirm":
+            return False
+        return self.picking_type_id.code == "outgoing"
+
     def _action_confirm(self, merge=True, merge_into=False):
         # Apply the flow configuration on the move before it generates
         # its chained moves (if any)
@@ -34,6 +39,3 @@ class StockMove(models.Model):
         return super(StockMove, moves_to_confirm)._action_confirm(
             merge=merge, merge_into=merge_into
         )
-
-    def _apply_flow_on_action_confirm(self):
-        return self.picking_type_id.code == "outgoing"
