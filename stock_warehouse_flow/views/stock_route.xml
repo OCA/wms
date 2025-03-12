@@ -14,4 +14,15 @@
     </field>
   </record>
 
+  <record id="stock_route_form_view" model="ir.ui.view">
+    <field name="name">stock.route.form.inherit</field>
+    <field name="model">stock.route</field>
+    <field name="inherit_id" ref="stock.stock_location_route_form_view" />
+    <field name="arch" type="xml">
+      <xpath expr="//group/field[@name='company_id']" position="after">
+          <field name="apply_flow_on" />
+      </xpath>
+    </field>
+  </record>
+
 </odoo>
