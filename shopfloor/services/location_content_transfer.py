@@ -342,7 +342,9 @@ class LocationContentTransfer(Component):
 
         unreserved_moves = self.env["stock.move"].browse()
         if self.work.menu.allow_unreserve_other_moves:
-            message = unreserve.check_unreserve(location, move_lines)
+            message = unreserve.check_unreserve(
+                location, move_lines, allowed_types=self.picking_types
+            )
             if message:
                 return self._response_for_start(message=message)
             move_lines, unreserved_moves = unreserve.unreserve_moves(
@@ -602,20 +604,31 @@ class LocationContentTransfer(Component):
             )
 
         search = self._actions_for("search")
+        handlers = {
+            "package": self._scan_line__by_package,
+            "product": self._scan_line__by_product,
+            "packaging": self._scan_line__by_packaging,
+            "lot": self._scan_line__by_lot,
+            "none": self._scan_line__fallback,
+        }
+        search_result = search.find(barcode, types=handlers.keys())
+        handler = handlers.get(search_result.type, self._scan_line__fallback)
+        # handler might've been called but returned no response.
+        # I.E. package is scanned but doesn't matches move_line's package.
+        # Call explicitely fallback in such case
+        response = handler(search_result.record, move_line, location)
+        return response or self._scan_line__fallback(
+            search_result.record, move_line, location
+        )
 
-        package = search.package_from_scan(barcode)
-        if package and move_line.package_id == package:
+    def _scan_line__by_package(self, package, move_line, location):
+        if move_line.package_id == package:
             # In case we have a source package but no package level because if
             # we have a package level, we would use "scan_package".
             return self._response_for_scan_destination(location, move_line)
 
-        product = search.product_from_scan(barcode)
-        if not product:
-            packaging = search.packaging_from_scan(barcode)
-            if packaging:
-                product = packaging.product_id
-
-        if product and product == move_line.product_id:
+    def _scan_line__by_product(self, product, move_line, location):
+        if product == move_line.product_id:
             if product.tracking in ("lot", "serial"):
                 move_lines = self._find_transfer_move_lines(location)
                 return self._response_for_start_single(
@@ -625,18 +638,21 @@ class LocationContentTransfer(Component):
             else:
                 return self._response_for_scan_destination(location, move_line)
 
-        lot = search.lot_from_scan(barcode, products=move_line.product_id)
-        if lot and lot == move_line.lot_id:
+    def _scan_line__by_packaging(self, packaging, move_line, location):
+        return self._scan_line__by_product(packaging.product_id, move_line, location)
+
+    def _scan_line__by_lot(self, lot, move_line, location):
+        if lot == move_line.lot_id:
             return self._response_for_scan_destination(location, move_line)
 
+    def _scan_line__fallback(self, record, move_line, location):
         # Nothing matches what is expected from the move line.
         move_lines = self._find_transfer_move_lines(location)
-        for rec in (package, product, lot):
-            if rec:
-                return self._response_for_start_single(
-                    move_lines.mapped("picking_id"),
-                    message=self.msg_store.wrong_record(rec),
-                )
+        if record:
+            return self._response_for_start_single(
+                move_lines.mapped("picking_id"),
+                message=self.msg_store.wrong_record(record),
+            )
         return self._response_for_start_single(
             move_lines.mapped("picking_id"), message=self.msg_store.barcode_not_found()
         )

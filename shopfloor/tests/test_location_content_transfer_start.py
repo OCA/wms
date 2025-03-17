@@ -275,6 +275,29 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             message=self.service.msg_store.location_empty(self.content_loc),
         )
 
+    def test_scan_location_picking_already_started(self):
+        self.menu.sudo().allow_unreserve_other_moves = True
+        picking = self._create_picking(
+            picking_type=self.menu.picking_type_ids,
+            lines=[(self.product_a, 10), (self.product_b, 10)],
+        )
+        self._fill_stock_for_moves(
+            picking.move_ids, in_package=True, location=self.content_loc
+        )
+        picking.action_assign()
+        picking.move_line_ids[0].qty_done = 10
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.picking_already_started_in_location(picking),
+        )
+        # check that the original moves are still assigned
+        self.assertRecordValues(
+            picking.move_ids, [{"state": "assigned"}, {"state": "assigned"}]
+        )
+
     def test_scan_location_wrong_picking_type_allow_unreserve_error(self):
         """Content has different picking type than menu, option to unreserve
 
@@ -298,7 +321,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         )
         self.assert_response_start(
             response,
-            message=self.service.msg_store.picking_already_started_in_location(picking),
+            message=self.service.msg_store.reserved_for_other_picking_type(picking),
         )
         # check that the original moves are still assigned
         self.assertRecordValues(
