@@ -17,28 +17,6 @@ msgstr ""
 "X-Generator: Weblate 5.6.2\n"
 
 #. module: stock_available_to_promise_release
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#, python-format
-msgid ""
-"\n"
-"- Origin picking(s):\n"
-"\t -%(picking_names)s."
-msgstr ""
-"\n"
-"- Prelievo origine(s):\n"
-"\t -%(picking_names)s."
-
-#. module: stock_available_to_promise_release
-#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
-#, python-format
-msgid ""
-"\n"
-"- Picking: %(picking_name)s."
-msgstr ""
-"\n"
-"- Prelievo: %(picking_name)s."
-
-#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
 msgid "# of moves ready"
 msgstr "N° di movimenti pronti"
@@ -47,6 +25,12 @@ msgstr "N° di movimenti pronti"
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__need_release_count
 msgid "# of need release moves"
 msgstr "N° di movimenti che richiedono il rilascio"
+
+#. module: stock_available_to_promise_release
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "- blocking transfer(s): %(picking_names)s"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
@@ -601,9 +585,8 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
-msgid "You are not allowed to unrelease this move %(move_name)s."
+msgid "You are not allowed to unrelease those deliveries:\n"
 msgstr ""
-"Non si ha l'abilitazione al rilascio di questo movimento %(move_name)s."
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__zip_code
@@ -620,6 +603,29 @@ msgstr "giorni"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minuti"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "- Origin picking(s):\n"
+#~ "\t -%(picking_names)s."
+#~ msgstr ""
+#~ "\n"
+#~ "- Prelievo origine(s):\n"
+#~ "\t -%(picking_names)s."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "- Picking: %(picking_name)s."
+#~ msgstr ""
+#~ "\n"
+#~ "- Prelievo: %(picking_name)s."
+
+#, python-format
+#~ msgid "You are not allowed to unrelease this move %(move_name)s."
+#~ msgstr ""
+#~ "Non si ha l'abilitazione al rilascio di questo movimento %(move_name)s."
 
 #~ msgid ""
 #~ "If checked, when a backorder is created the moves into the backorder are "
