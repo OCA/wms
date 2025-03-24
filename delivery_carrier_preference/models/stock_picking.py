@@ -39,7 +39,9 @@ class StockPicking(models.Model):
                 }
             }
         else:
-            self.carrier_id = carrier
+            # Set a context key to not trigger a carrier change on the
+            # procurement group.
+            self.with_context(skip_align_group_carrier=True).carrier_id = carrier
 
     def get_preferred_carriers(self):
         # TODO Check possible conflicting settings between doc company and
