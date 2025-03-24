@@ -100,6 +100,27 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             data=data,
         )
 
+    def test_prepare_unload_all_same_dest_single(self):
+        """
+        Check that the `prepare_unload()` will return
+        a single unload response.
+        """
+        self.menu.sudo().unload_single_package = True
+        move_lines = self.move_lines
+        self._set_dest_package_and_done(move_lines[:2], self.bin1)
+        self._set_dest_package_and_done(move_lines[2:], self.bin2)
+        move_lines.write({"location_dest_id": self.packing_location.id})
+        response = self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": self.batch.id}
+        )
+        location = self.packing_location
+        data = self._data_for_batch(self.batch, location, self.bin1)
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
     def test_prepare_unload_different_dest(self):
         """All move lines have different destination locations"""
         move_lines = self.move_lines
@@ -936,5 +957,68 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "body": f"Last operation of transfer {picking.name}. Next operation "
                 f"({next_picking.name}) is ready to proceed."
             },
+            data=data,
+        )
+
+    def test_unload_single_pack_at_once(self):
+        """
+        Check scenario with a pack at once
+        """
+        self.menu.sudo().unload_single_package = True
+        dest_location = self.bin1_lines[0].location_dest_id
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        # The scan of destination set 'unloaded' to True to track the fact
+        # that we set the destination for the line. In this case, the line
+        # and the stock.picking are 'done' because all the lines of the picking
+        # have been unloaded
+        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            self.bin1_lines,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "picking_id": self.one_line_picking.id,
+                    "location_dest_id": self.packing_a_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            self.bin2_lines,
+            [
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
+
+        location = self.bin2_lines[0].location_dest_id
+        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        self.assert_response(
+            response,
+            next_state="unload_single",
             data=data,
         )

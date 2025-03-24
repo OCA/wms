@@ -829,6 +829,10 @@ class ClusterPicking(Component):
         It goes to different screens depending if all the move lines have
         the same destination or not.
 
+        This behavior can be changed (unload_single_package in menu)
+        if unload should be done in a different
+        location and that location is not known yet.
+
         Transitions:
         * unload_all: when all lines go to the same destination
         * unload_single: when lines have different destinations
@@ -836,7 +840,10 @@ class ClusterPicking(Component):
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
-        if self._are_all_dest_location_same(batch):
+        if (
+            not self.work.menu.unload_single_package
+            and self._are_all_dest_location_same(batch)
+        ):
             return self._response_for_unload_all(batch)
         else:
             # the lines have different destinations

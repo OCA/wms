@@ -16,6 +16,7 @@
   "cluster_picking.unload_all.title": "Unload all bins",
   "cluster_picking.unload_set_destination.title": "Set destination",
   "cluster_picking.unload_single.title": "Unload single bin",
+  "cluster_picking.unload_scan_pack.scan_placeholder": "Scan Package",
   "list.no_items": "No item to list.",
   "location_content_transfer.scan_destination.title": "Set a qty and scan destination location",
   "location_content_transfer.scan_destination_all.title": "Scan destination location for all items",
