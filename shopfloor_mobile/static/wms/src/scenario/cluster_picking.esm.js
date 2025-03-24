@@ -87,6 +87,54 @@ const ClusterPicking = {
                 </div>
             </div>
 
+            <div class="unload-set-destination" v-if="state_is('unload_set_destination')">
+                <item-detail-card
+                    v-if="current_carrier()"
+                    :card_color="utils.colors.color_for('success')"
+                    :key="make_state_component_key(['batch-picking', state.data.id])"
+                    :record="current_carrier()"
+                    :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
+                    />
+                <detail-package
+                        :record="state.data.package"
+                        :color="'success'"
+                />
+                <v-card class="main">
+                    <v-card-title>
+                        <div class="main-info">
+                            <div class="destination">
+                                <span class="label">Destination:</span>
+                                {{ state.data.location_dest.name }}
+                            </div>
+                    </v-card-title>
+                </v-card>
+
+            </div>
+
+            <div class="unload-single" v-if="state_is('unload_single')">
+                <item-detail-card
+                    v-if="current_carrier()"
+                    :card_color="utils.colors.color_for('success')"
+                    :key="make_state_component_key(['batch-picking', state.data.id])"
+                    :record="current_carrier()"
+                    :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
+                    />
+                <detail-package
+                    :record="state.data.package"
+                    :color="'detail_main_card'"
+                />
+                <v-card class="main">
+                    <v-card-title>
+                        <div class="main-info">
+                            <div class="destination">
+                                <span class="label">Destination:</span>
+                                {{ state.data.location_dest.name }}
+                            </div>
+                        </div>
+                    </v-card-title>
+                </v-card>
+            </div>
+
             <div class="unload-all" v-if="state_is('unload_all')">
                 <item-detail-card
                     v-if="current_carrier()"
@@ -115,7 +163,7 @@ const ClusterPicking = {
             </div>
 
             <div class="button-list button-vertical-list full">
-                <v-row align="center" v-if="state_in(['unload_all', 'change_pack_lot'])">
+                <v-row align="center" v-if="state_in(['unload_all', 'unload_single', 'unload_set_destination', 'change_pack_lot'])">
                     <v-col class="text-center" cols="12">
                         <btn-back />
                     </v-col>
@@ -383,7 +431,7 @@ const ClusterPicking = {
                     display_info: {
                         title: this.$t("cluster_picking.unload_single.title"),
                         scan_placeholder: this.$t(
-                            "cluster_picking.scan_destination.scan_placeholder"
+                            "cluster_picking.unload_scan_pack.scan_placeholder"
                         ),
                     },
                     on_scan: (scanned) => {

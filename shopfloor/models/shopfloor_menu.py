@@ -23,6 +23,12 @@ if you want to provide bulk products to the next operation.
 Incompatible with: "Pick and pack at the same time"
 """
 
+UNLOAD_SINGLE_PACKAGE_HELP = """
+With this option, each package will be presented to the user to unload.
+
+The user will have the choice of destination (if available) for each one.
+"""
+
 MULTIPLE_MOVE_SINGLE_PACK_HELP = """
 When picking a move,
 allow to set a destination package that was already used for the other lines.
@@ -142,6 +148,12 @@ class ShopfloorMenu(models.Model):
         string="Unload package at destination",
         default=False,
         help=UNLOAD_PACK_AT_DEST_HELP,
+    )
+    unload_single_package_is_possible = fields.Boolean(
+        compute="_compute_unload_single_package_is_possible"
+    )
+    unload_single_package = fields.Boolean(
+        string="Unload single package", help=UNLOAD_SINGLE_PACKAGE_HELP
     )
 
     disable_full_bin_action_is_possible = fields.Boolean(
@@ -369,6 +381,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.pick_pack_same_time_is_possible = menu.scenario_id.has_option(
                 "pick_pack_same_time"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_unload_single_package_is_possible(self):
+        for menu in self:
+            menu.unload_single_package_is_possible = menu.scenario_id.has_option(
+                "unload_single_package"
             )
 
     @api.depends("scenario_id")
