@@ -57,3 +57,17 @@ class StockPicking(models.Model):
         if specific_rc_domain:
             domain = expression.AND([domain, specific_rc_domain])
         return domain
+
+    def _find_release_channel_possible_candidate(self):
+        channels = super()._find_release_channel_possible_candidate()
+        specific_channel = self.env["stock.release.channel.partner.date"].search(
+            self._get_release_channel_partner_date_domain()
+        )
+        # No fallback on other channels if a specific channel is found
+        if (
+            specific_channel
+            and channels
+            and specific_channel.release_channel_id not in channels
+        ):
+            return channels.browse()
+        return channels

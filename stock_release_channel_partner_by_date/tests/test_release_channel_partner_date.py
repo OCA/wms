@@ -14,7 +14,9 @@ class TestReleaseChannelPartnerDate(ReleaseChannelPartnerCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.delivery_date_channel = cls.partner_channel.copy(
-            {"name": "Specific Date Channel"}
+            {
+                "name": "Specific Date Channel",
+            }
         )
 
     def _create_channel_partner_date(self, channel, partner, date):
@@ -53,3 +55,21 @@ class TestReleaseChannelPartnerDate(ReleaseChannelPartnerCommon):
         self.assertTrue(channel_date.active)
         self.delivery_date_channel.action_sleep()
         self.assertFalse(channel_date.active)
+
+    def test_release_channel_on_specific_date_not_available(self):
+        """Test that when no release channel is available to satisfy
+        a specific partner date,no fallback release channel is
+        proposed."""
+        # Exclude delivery channel from possible candidates
+        self.delivery_date_channel.picking_type_ids = self.env[
+            "stock.picking.type"
+        ].search([("id", "!=", self.move.picking_id.picking_type_id.id)], limit=1)
+        scheduled_date = fields.Datetime.now()
+        self._create_channel_partner_date(
+            self.delivery_date_channel,
+            self.partner,
+            scheduled_date,
+        )
+        self.move.picking_id.scheduled_date = scheduled_date
+        self.move.picking_id.assign_release_channel()
+        self.assertFalse(self.move.picking_id.release_channel_id)
