@@ -9,9 +9,12 @@ from odoo.osv import expression
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    def _get_release_channel_partner_date_domain(self):
+    def _get_release_channel_partner_date_domain(self, check_late=True):
         assert self.scheduled_date
-        scheduled_date = max(self.scheduled_date, fields.Datetime.now())
+        if check_late:
+            scheduled_date = max(self.scheduled_date, fields.Datetime.now())
+        else:
+            scheduled_date = self.scheduled_date
         tz = (
             self.picking_type_id.warehouse_id.partner_id.tz
             or self.env.company.partner_id.tz
