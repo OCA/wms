@@ -12,12 +12,14 @@ class TestSaleReleaseChannel(SaleReleaseChannelCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.wh = cls.env.ref("stock.warehouse0")
         cls.carrier = cls.env.ref("delivery.delivery_carrier")
         cls.carrier2 = cls.env.ref("delivery.delivery_local_delivery")
         cls.carrier_channel = cls.default_channel.copy(
             {
                 "name": "Test with carrier",
                 "sequence": 10,
+                "warehouse_id": cls.wh.id,
                 "carrier_ids": [(6, 0, cls.carrier.ids)],
             }
         )
