@@ -32,7 +32,7 @@ class BarcodeParser(Component):
     def _authorized_barcode_types(self):
         return self.search_action._barcode_type_handler.keys()
 
-    def parse(self, barcode) -> list[BarcodeResult]:
+    def parse(self, barcode, types) -> list[BarcodeResult]:
         """
         This method will parse the barcode and return the
         value with its type if determined.

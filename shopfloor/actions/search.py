@@ -8,7 +8,8 @@ from odoo.addons.component.core import Component
 
 
 class SearchResult:
-    __slots__ = ("record", "type", "code")
+
+    __slots__ = ("record", "type", "code", "parse_result")
 
     def __init__(self, **kw) -> None:
         for k in self.__slots__:
@@ -43,6 +44,12 @@ class SearchAction(Component):
     """
 
     _inherit = "shopfloor.search.action"
+
+    @property
+    def parser(self):
+        parser = self._actions_for("barcode")
+        parser.search_action = self
+        return parser
 
     @property
     def _barcode_type_handler(self):
@@ -87,11 +94,20 @@ class SearchAction(Component):
     def generic_find(self, barcode, types=None, handler_kw=None):
         _types = types or self._barcode_type_handler.keys()
         # TODO: decide the best default order in case we don't pass `types`
-        for btype in _types:
-            record = self._find_record_by_type(barcode, btype, handler_kw)
-            if record:
-                return self._make_search_result(record=record, code=barcode, type=btype)
-        return self._make_search_result(type="none")
+        parse_results = self.parser.parse(barcode, types)
+        for parse_result in parse_results:
+            for btype in _types:
+                record = self._find_record_by_type(
+                    parse_result.value, btype, handler_kw
+                )
+                if record:
+                    return self._make_search_result(
+                        record=record,
+                        code=barcode,
+                        type=btype,
+                        parse_result=parse_results,
+                    )
+        return self._make_search_result(type="none", parse_result=parse_results)
 
     def location_from_scan(self, barcode, limit=1):
         model = self.env["stock.location"]
