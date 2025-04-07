@@ -27,7 +27,7 @@ class BarcodeParser(Component):
         """Convert back GS1 AI to search type."""
         return MAPPING_AI_TO_TYPE[ai]
 
-    def _parse_gs1(self, barcode, types, safe=True):
+    def _parse_gs1(self, barcode, types, safe=True) -> list[GS1Barcode]:
         types = types or ()
         ai_whitelist = ()
         # Collect all AIs by converting from search types
@@ -37,7 +37,7 @@ class BarcodeParser(Component):
                 ai_whitelist += ai
         if types and not ai_whitelist:
             # A specific type was asked but no AI could be found.
-            return None, None
+            return list()
         parsed = GS1Barcode.parse(barcode, ai_whitelist=ai_whitelist, safe=safe)
         return parsed
 
@@ -49,7 +49,6 @@ class BarcodeParser(Component):
         Override this to implement specific parsing
 
         """
-        # search = self._actions_for("search")
         parsed = self._parse_gs1(barcode, types)
         if parsed:
             result = []
