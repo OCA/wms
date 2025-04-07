@@ -15,7 +15,7 @@ class TestUtils(BaseCase):
         self.assertEqual(len(res), 3, res)
         item = [x for x in res if x.ai == "01"][0]
         self.assertEqual(item.code, code)
-        self.assertEqual(item.value, "09506000117843")
+        self.assertEqual(item.value, "9506000117843")
         self.assertEqual(item.raw_value, "09506000117843")
         item = [x for x in res if x.ai == "11"][0]
         self.assertEqual(item.code, code)
@@ -32,7 +32,7 @@ class TestUtils(BaseCase):
         self.assertEqual(len(res), 1, res)
         item = [x for x in res if x.ai == "01"][0]
         self.assertEqual(item.code, code)
-        self.assertEqual(item.value, "09506000117843")
+        self.assertEqual(item.value, "9506000117843")
         self.assertEqual(item.raw_value, "09506000117843")
 
     def test_parse3(self):
