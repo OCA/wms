@@ -1,7 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 # pylint: disable=missing-return
-
 from odoo import fields
 
 from odoo.addons.shopfloor.tests.common import CommonCase as BaseCommonCase
