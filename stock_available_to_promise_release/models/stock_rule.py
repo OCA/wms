@@ -14,6 +14,10 @@ class StockRule(models.Model):
         related="route_id.available_to_promise_defer_pull", store=True
     )
 
+    allow_unrelease_return_done_move = fields.Boolean(
+        related="route_id.allow_unrelease_return_done_move", store=True
+    )
+
     no_backorder_at_release = fields.Boolean(
         related="route_id.no_backorder_at_release", store=True
     )
