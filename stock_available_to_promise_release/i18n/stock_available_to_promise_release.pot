@@ -180,6 +180,15 @@ msgid ""
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_location_route__allow_unrelease_return_done_move
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_rule__allow_unrelease_return_done_move
+msgid ""
+"If checked, unreleasing the delivery may create a new inverse internal "
+"operation on the last done pulled transfer. Otherwise, you won't be able to "
+"unrelease as soon as one of the pulled transfer is done"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
 msgid ""
 "If checked, when a backorder is created (i.e. at the validation of the "
@@ -356,6 +365,12 @@ msgid "Release based on Available to Promise"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_location_route__allow_unrelease_return_done_move
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__allow_unrelease_return_done_move
+msgid "Reverse done transfer on cancellation"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_move_release_form
 msgid "Shipment date"
 msgstr ""
@@ -412,6 +427,12 @@ msgstr ""
 msgid ""
 "The following moves have been un-released: \n"
 "%(move_names)s"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "The operation %(picking_names)s is done and cannot be returned"
 msgstr ""
 
 #. module: stock_available_to_promise_release
