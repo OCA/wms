@@ -17,16 +17,29 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: stock_warehouse_flow_release
+#: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_location_route__apply_flow_on
+msgid "Apply Flow On"
+msgstr ""
+
+#. module: stock_warehouse_flow_release
+#: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_location_route__display_name
 #: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_move__display_name
 msgid "Display Name"
 msgstr "Nome visualizzato"
 
 #. module: stock_warehouse_flow_release
+#: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_location_route__id
 #: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_move__id
 msgid "ID"
 msgstr "ID"
 
 #. module: stock_warehouse_flow_release
+#: model:ir.model,name:stock_warehouse_flow_release.model_stock_location_route
+msgid "Inventory Routes"
+msgstr ""
+
+#. module: stock_warehouse_flow_release
+#: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_location_route____last_update
 #: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_move____last_update
 msgid "Last Modified on"
 msgstr "Ultima modifica il"
@@ -35,3 +48,8 @@ msgstr "Ultima modifica il"
 #: model:ir.model,name:stock_warehouse_flow_release.model_stock_move
 msgid "Stock Move"
 msgstr "Movimento di magazzino"
+
+#. module: stock_warehouse_flow_release
+#: model:ir.model.fields.selection,name:stock_warehouse_flow_release.selection__stock_location_route__apply_flow_on__on_release
+msgid "When move is released"
+msgstr ""
