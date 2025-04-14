@@ -8,12 +8,10 @@ from odoo import models
 class StockMove(models.Model):
     _inherit = "stock.move"
 
-    def _apply_flow_on_action_confirm(self):
-        # Override to not apply the flow configuration on moves to release.
-        # The flow will be applied on the release, not before.
-        if self.rule_id.route_id.available_to_promise_defer_pull:
+    def _apply_flow_on_release(self):
+        if self.rule_id.route_id.apply_flow_on != "on_release":
             return False
-        return super()._apply_flow_on_action_confirm()
+        return self.picking_type_id.code == "outgoing"
 
     def _before_release(self):
         # Apply the flow when releasing the move
@@ -21,6 +19,8 @@ class StockMove(models.Model):
         FLOW = self.env["stock.warehouse.flow"]
         move_ids_to_release = []
         for move in self:
+            if not move._apply_flow_on_release():
+                continue
             _move_ids_to_release = FLOW._search_and_apply_for_move(move).ids
             _move_ids_to_release.remove(move.id)
             move_ids_to_release += _move_ids_to_release
