@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <script id="script_app_main" position="before">
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_reception_mobile')"
+            />
+
+            <!-- Scenario -->
+            <script
+                id="script_scenario_reception"
+                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
+                id="script_scenario_reception_states"
+                t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception_states.js?v=#{mod_version}"
+                type="module"
+            />
+
+        </script>
+    </template>
+    <template
+        id="shopfloor_app_demo_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_demo_assets"
+    >
+        <xpath expr="//script[last()]" position="after">
+            <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_reception_mobile')"
+            />
+            <script
+                id="script_demo_reception"
+                t-attf-src="/shopfloor_reception_mobile/static/src/demo/demo.reception.js?v=#{mod_version}"
+                type="module"
+            />
+        </xpath>
+    </template>
+</odoo>
