@@ -77,6 +77,7 @@ setuptools.setup(
         'odoo14-addon-stock_storage_type_putaway_abc',
         'odoo14-addon-stock_unique_order_per_location',
         'odoo14-addon-stock_warehouse_flow',
+        'odoo14-addon-stock_warehouse_flow_delivery_refresh',
         'odoo14-addon-stock_warehouse_flow_product_packaging',
         'odoo14-addon-stock_warehouse_flow_release',
     ],
