@@ -2,7 +2,7 @@
 # @author Pierre Verkest <pierreverkest84@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class StockServiceLevel(models.Model):
@@ -20,8 +20,7 @@ class StockServiceLevel(models.Model):
         )
     ]
 
-    def name_get(self):
-        names = []
+    @api.depends("name", "code")
+    def _compute_display_name(self):
         for rec in self:
-            names.append((rec.id, f"[{rec.code}] {rec.name}"))
-        return names
+            rec.display_name = f"[{rec.code}] {rec.name}"

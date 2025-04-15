@@ -1,10 +1,10 @@
 # Copyright 2024 Foodles (https://www.foodles.co)
 # @author Pierre Verkest <pierreverkest84@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 
-class StockServiceLeveLCommonCase(SavepointCase):
+class StockServiceLeveLCommonCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -31,7 +31,7 @@ class StockServiceLeveLCommonCase(SavepointCase):
                 "group_stock_multi_locations": True,
             }
         )
-        cls.pick_ship_route = cls.env["stock.location.route"].search(
+        cls.pick_ship_route = cls.env["stock.route"].search(
             [("name", "ilike", "deliver in 2")]
         )
         cls.product.categ_id.route_ids |= cls.pick_ship_route
