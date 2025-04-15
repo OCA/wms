@@ -34,7 +34,6 @@ class TestStockServiceLevel(StockServiceLeveLCommonCase):
         inventory.action_validate()
 
     def test_procurement_with_2_steps_output(self):
-
         procurement_group = self.env["procurement.group"].create(
             {"name": "My procurement", "move_type": "one"}
         )
