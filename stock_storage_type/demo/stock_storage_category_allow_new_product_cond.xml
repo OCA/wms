@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo noupdate="1">
+    <record
+        id="storage_category_allow_new_product_cond_pallets"
+        model="stock.storage.category.allow_new_product.cond"
+    >
+        <field name="name">Package type is 'Pallets'</field>
+        <field name="code_snippet">
+<![CDATA[
+result = False
+pallets_type = env.ref("stock_storage_type.package_storage_type_pallets")
+if package_type and package_type == pallets_type:
+    result = True
+]]>
+        </field>
+    </record>
+
+</odoo>

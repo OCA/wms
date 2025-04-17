@@ -81,7 +81,9 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
 
     def test_storage_strategy_only_empty_ordered_locations_pallets(self):
         # Set pallets location type as only empty
-        self.pallets_location_storage_type.write({"allow_new_product": "empty"})
+        self.pallets_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "empty"}
+        )
         # Set a quantity in pallet bin 2 to make sure constraint is applied
         self.env["stock.quant"]._update_available_quantity(
             self.product, self.pallets_bin_2_location, 1.0
@@ -142,14 +144,25 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
 
     def test_storage_strategy_max_weight_ordered_locations_pallets(self):
+        """Test pallet max weight constraint on a location.
+
+        Configure 'Pallets storage area/Pallets Bin 2' with a max weight to 50kg.
+        Reception of two pallets of 60kg suggests to put them into Bin 1 and 3,
+        skipping Bin 2 that doesn't match anymore.
+        """
+        self.pallets_location.storage_category_id.allow_new_product = "empty"
         # Add a category for max_weight 50
         category_50 = self.env["stock.storage.category"].create(
-            {"name": "Pallets max 50 kg", "max_weight": 50}
+            {
+                "name": "Pallets max 50 kg",
+                "max_weight": 50,
+                "allow_new_product": "empty",
+            }
         )
 
         # Define new pallets location type with a max weight on bin 2
         light_location_storage_type = self.pallets_location_storage_type.copy(
-            {"allow_new_product": "empty", "storage_category_id": category_50.id}
+            {"storage_category_id": category_50.id}
         )
         self.pallets_bin_2_location.write({"storage_category_id": category_50.id})
         self.assertEqual(
@@ -215,7 +228,9 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
 
     def test_storage_strategy_no_products_lots_mix_ordered_locations_cardboxes(self):
-        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
+        self.cardboxes_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same_lot"}
+        )
         # Set a quantity in cardbox bin 2 to make sure constraint is applied
         self.env["stock.quant"]._update_available_quantity(
             self.env.ref("product.product_product_10"),
@@ -398,7 +413,9 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         (less qty first).
         """
         StockLocation = self.env["stock.location"]
-        self.cardboxes_location_storage_type.write({"allow_new_product": "same"})
+        self.cardboxes_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same"}
+        )
         product = self.product
         packaging = self.product_cardbox_product_packaging
         dest_location = self.cardboxes_location

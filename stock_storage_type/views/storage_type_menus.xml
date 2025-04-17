@@ -8,6 +8,13 @@
         groups="stock.group_adv_location"
     />
     <menuitem
+        id="stock_storage_category_allow_new_product_cond_menu"
+        action="stock_storage_category_allow_new_product_cond_act_window"
+        name="Storage Category Allow New Product Conditions"
+        parent="storage_type_menu"
+        sequence="12"
+    />
+    <menuitem
         id="stock_storage_location_sequence_cond_menu"
         action="stock_storage_location_sequence_cond_act_window"
         name="Storage Location Sequence Conditions"

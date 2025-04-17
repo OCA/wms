@@ -6,7 +6,7 @@ from odoo import _, fields, models
 class StockStorageLocationSequence(models.Model):
 
     _name = "stock.storage.location.sequence"
-    _description = "Sequence of locations to put-away the package storage type"
+    _description = "Sequence of locations to put-away the package type"
     _order = "sequence"
 
     package_type_id = fields.Many2one("stock.package.type", required=True)
@@ -22,9 +22,10 @@ class StockStorageLocationSequence(models.Model):
         string="Conditions",
         comodel_name="stock.storage.location.sequence.cond",
         relation="stock_location_sequence_cond_rel",
+        help="All conditions have to match to apply the put-away strategy.",
     )
 
-    def _format_package_storage_type_message(self, last=False):
+    def _format_package_type_message(self, last=False):
         self.ensure_one()
         # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
@@ -47,25 +48,25 @@ class StockStorageLocationSequence(models.Model):
             )
             if last:
                 # If last, we want to check if restrictions are defined on
-                # location storage types accepting this package storage type
+                # capacities accepting this package type
                 # TODO improve ugly code
                 capacities = type_matching_locations.mapped(
                     "computed_storage_category_id.capacity_ids"
                 ).filtered(
                     lambda lst, package_type=self.package_type_id: package_type
                     == lst.package_type_id
-                    and not lst.has_restrictions
+                    and not lst.storage_category_id.has_restrictions
                 )
                 if not capacities:
                     msg = _(
                         ' * <span style="color: orange;">{location} (WARNING: '
-                        "restrictions are active on location storage types "
-                        "matching this package storage type)</span>"
+                        "restrictions are active on storage categories "
+                        "matching this package type)</span>"
                     ).format(location=self.location_id.name)
         else:
             msg = _(
                 ' * <span style="color: red;">{location} '
-                "(WARNING: no suitable location matching storage type)</span>"
+                "(WARNING: no suitable location matching package type)</span>"
             ).format(location=self.location_id.name)
         return msg
 

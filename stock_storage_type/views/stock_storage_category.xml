@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- Copyright 2022 ACSONE SA/NV
+     Copyright 2025 Camptocamp SA
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
     <record id="stock_storage_category_form" model="ir.ui.view">
@@ -7,9 +8,26 @@
         <field name="model">stock.storage.category</field>
         <field name="inherit_id" ref="stock.stock_storage_category_form" />
         <field name="arch" type="xml">
-            <field name="package_type_id" position="after">
-                <field name="allow_new_product" />
-            </field>
+            <notebook position="inside">
+                <page name="advanced" string="Advanced">
+                    <group
+                        string="Allow New Product Rules"
+                        name="allow_new_product_rules"
+                    >
+                        <field name="allow_new_product_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="allow_new_product" />
+                                <field
+                                    name="condition_ids"
+                                    widget="many2many_tags"
+                                    options="{'no_quick_create': True}"
+                                />
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </notebook>
         </field>
     </record>
 

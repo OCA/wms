@@ -38,28 +38,33 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         return move_to_assign
 
     def test_not_only_empty_confirmed_move(self):
-        self.pallets_location_storage_type.write({"allow_new_product": "mixed"})
+        category = self.pallets_location_storage_type.storage_category_id
+        category.allow_new_product_ids.allow_new_product = "mixed"
         move = self._test_confirmed_move()
         self.assertEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_only_empty_confirmed_move(self):
-        self.pallets_location_storage_type.write({"allow_new_product": "empty"})
+        category = self.pallets_location_storage_type.storage_category_id
+        category.allow_new_product_ids.allow_new_product = "empty"
         move = self._test_confirmed_move()
         self.assertNotEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_do_not_mix_products_confirmed_move_ok(self):
-        self.pallets_location_storage_type.write({"allow_new_product": "same"})
+        category = self.pallets_location_storage_type.storage_category_id
+        category.allow_new_product_ids.allow_new_product = "same"
         move = self._test_confirmed_move()
         self.assertEqual(
             move.move_line_ids.location_dest_id, self.pallets_bin_1_location
         )
 
     def test_do_not_mix_products_confirmed_move_nok(self):
-        self.pallets_location_storage_type.write({"allow_new_product": "same"})
+        self.pallets_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same"}
+        )
         move_other_product = self._test_confirmed_move(
             self.env.ref("product.product_product_10")
         )
@@ -70,7 +75,9 @@ class TestStorageTypeMove(TestStorageTypeCommon):
 
     def test_package_level_location_dest_domain_only_empty(self):
         # Set pallets location type as only empty
-        self.pallets_location_storage_type.write({"allow_new_product": "empty"})
+        self.pallets_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "empty"}
+        )
         # Create picking
         in_picking = self.env["stock.picking"].create(
             {
@@ -202,7 +209,9 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         # Mark picking to allow creation and use of existing lots in order
         # to register two times the same lot in different packages
         self.receipts_picking_type.use_existing_lots = True
-        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
+        self.cardboxes_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same_lot"}
+        )
         # Create picking
         in_picking = self.env["stock.picking"].create(
             {
@@ -381,7 +390,9 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         Check that lot restriction is well applied
         """
         # Constrain Cardbox Capacity to accept same lots only
-        self.cardboxes_location_storage_type.write({"allow_new_product": "same_lot"})
+        self.cardboxes_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same_lot"}
+        )
         # Set a quantity in cardbox bin 2 to make sure constraint is applied
         self.env["stock.quant"]._update_available_quantity(
             self.env.ref("product.product_product_10"),

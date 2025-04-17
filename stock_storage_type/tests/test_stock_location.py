@@ -50,7 +50,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 | self.pallets_reserve_bin_4_location
             ).ids,
         )
-        # Set the max_height on pallets storage type higher than the others
+        # Set the max_height on pallets storage category higher than the others
         self.pallets_location_storage_type.storage_category_id.max_height = 2
         self.cardboxes_location_storage_type.storage_category_id.max_height = 1
         ordered_locations = sublocation.get_storage_locations(self.product)
@@ -71,7 +71,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 | self.pallets_reserve_bin_4_location
             ).ids,
         )
-        # Set the max_height on cardboxes storage type higher than the others
+        # Set the max_height on cardboxes storage category higher than the others
         self.pallets_location_storage_type.storage_category_id.max_height = 1
         self.cardboxes_location_storage_type.storage_category_id.max_height = 2
         ordered_locations = sublocation.get_storage_locations(self.product)
@@ -283,11 +283,12 @@ class TestStockLocation(TestStorageTypeCommon):
         self._update_qty_in_location(location, self.product, 10)
         self.assertFalse(location.location_is_empty)
 
-        # When the location has no "only_empty" storage type, we don't
+        # When the location has no "only_empty" rule, we don't
         # care about if it is empty or not, we keep it as True so we
         # can always put things inside. Not computing it prevents
         # useless race conditions on concurrent writes.
-        location.computed_storage_category_id.capacity_ids.filtered(
-            lambda c: c.allow_new_product == "empty"
+        category = location.computed_storage_category_id
+        category.allow_new_product_ids.filtered(
+            lambda rule: rule.allow_new_product == "empty"
         ).allow_new_product = "mixed"
         self.assertTrue(location.location_is_empty)

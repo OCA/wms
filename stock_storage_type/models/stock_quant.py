@@ -30,7 +30,6 @@ class StockQuant(models.Model):
                         "Location {location}"
                     ).format(storage=package_type.name, location=location.name)
                 )
-            allowed = False
             package_weight_kg = (
                 quant.package_id.pack_weight_in_kg
                 or quant.package_id.estimated_pack_weight_kg
@@ -47,94 +46,80 @@ class StockQuant(models.Model):
             )
             products_in_location = other_quants_in_location.mapped("product_id")
             lots_in_location = other_quants_in_location.mapped("lot_id")
-            capacity_fails = []
-            for capacity in allowed_capacities:
-                # Check content constraints
-                if capacity.allow_new_product == "empty" and other_quants_in_location:
-                    capacity_fails.append(
-                        _(
-                            "Storage Capacity {storage_capacity} is flagged "
-                            "'only empty'"
-                            " with other quants in location."
-                        ).format(storage_capacity=capacity.display_name)
-                    )
-                    continue
-                if capacity.allow_new_product == "same" and (
-                    len(package_products) > 1
-                    or len(products_in_location) >= 1
-                    and package_products != products_in_location
-                ):
-                    capacity_fails.append(
-                        _(
-                            "Storage Capacity {storage_capacity} is flagged 'do not mix"
-                            " products' but there are other products in "
-                            "location."
-                        ).format(storage_capacity=capacity.display_name)
-                    )
-                    continue
-                if capacity.allow_new_product == "same_lot" and (
-                    len(package_lots) > 1
-                    or len(lots_in_location) >= 1
-                    and package_lots != lots_in_location
-                ):
-                    capacity_fails.append(
-                        _(
-                            "Storage Capacity {storage_capacity} is flagged 'do not mix"
-                            " lots' but there are other lots in "
-                            "location."
-                        ).format(storage_capacity=capacity.display_name)
-                    )
-                    continue
-                # Check size constraint
-                if (
-                    capacity.storage_category_id.max_height_in_m
-                    and quant.package_id.height_in_m
-                    > capacity.storage_category_id.max_height_in_m
-                ):
-                    capacity_fails.append(
-                        _(
-                            "Storage Category {storage_category} defines "
-                            "max height of {max_h} but the package is bigger: "
-                            "{height}."
-                        ).format(
-                            storage_category=capacity.storage_category_id.display_name,
-                            max_h=capacity.storage_category_id.max_height_in_m,
-                            height=quant.package_id.height_in_m,
-                        )
-                    )
-                    continue
-                if (
-                    capacity.storage_category_id.max_weight_in_kg
-                    and package_weight_kg
-                    > capacity.storage_category_id.max_weight_in_kg
-                ):
-                    capacity_fails.append(
-                        _(
-                            "Storage Category {storage_category} defines "
-                            "max weight of {max_w} but the package is heavier: "
-                            "{weight_kg}."
-                        ).format(
-                            storage_category=capacity.storage_category_id.display_name,
-                            max_w=capacity.storage_category_id.max_weight_in_kg,
-                            weight_kg=package_weight_kg,
-                        )
-                    )
-                    continue
-                # If we get here, it means there is a location storage type
-                #  allowing the package into the location
-                allowed = True
-                break
-            if not allowed:
+            error = None
+            category = location.computed_storage_category_id
+            allow_new_product = category.get_allow_new_product(
+                product=quant.product_id,
+                package_type=package_type,
+                package=quant.package_id,
+                quants=quant,
+            )
+            # Check content constraints
+            if allow_new_product == "empty" and other_quants_in_location:
+                error = _(
+                    "Storage Category {category} is flagged "
+                    "'only empty' with other quants in location."
+                ).format(category=category.display_name)
+            elif allow_new_product == "same" and (
+                len(package_products) > 1
+                or len(products_in_location) >= 1
+                and package_products != products_in_location
+            ):
+                error = _(
+                    "Storage Category {category} is flagged 'do not mix"
+                    " products' but there are other products in "
+                    "location."
+                ).format(category=category.display_name)
+            elif allow_new_product == "same_lot" and (
+                len(package_lots) > 1
+                or len(lots_in_location) >= 1
+                and package_lots != lots_in_location
+            ):
+                error = _(
+                    "Storage Category {category} is flagged 'do not mix"
+                    " lots' but there are other lots in "
+                    "location."
+                ).format(category=category.display_name)
+            # Check size constraint
+            elif (
+                category.max_height_in_m
+                and quant.package_id.height_in_m > category.max_height_in_m
+            ):
+                error = _(
+                    "Storage Category {category} defines "
+                    "max height of {max_h} but the package is bigger: "
+                    "{height}."
+                ).format(
+                    category=category.display_name,
+                    max_h=category.max_height_in_m,
+                    height=quant.package_id.height_in_m,
+                )
+            elif (
+                category.max_weight_in_kg
+                and package_weight_kg > category.max_weight_in_kg
+            ):
+                error = _(
+                    "Storage Category {category} defines "
+                    "max weight of {max_w} but the package is heavier: "
+                    "{weight_kg}."
+                ).format(
+                    category=category.display_name,
+                    max_w=category.max_weight_in_kg,
+                    weight_kg=package_weight_kg,
+                )
+            # If we get here, it means there is a storage category
+            #  allowing the package into the location
+            if error:
                 raise ValidationError(
                     _(
                         "Package {package} is not allowed into location {location},"
-                        " because there isn't any storage capacity that allows"
-                        " package type {type} into it:\n\n{fails}"
+                        " because there isn't any rules that allows"
+                        " package type {type} into it:\n\n{error}"
                     ).format(
                         package=quant.package_id.name,
                         location=location.complete_name,
                         type=package_type.name,
-                        fails="\n".join(capacity_fails),
+                        error=error,
                     )
                 )
 

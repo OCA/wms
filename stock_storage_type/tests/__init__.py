@@ -6,4 +6,5 @@ from . import (
     test_storage_type,
     test_storage_type_move,
     test_storage_type_putaway_strategy,
+    test_storage_category_allow_new_product,
 )

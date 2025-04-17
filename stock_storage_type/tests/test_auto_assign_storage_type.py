@@ -19,7 +19,7 @@ class TestAutoAssignStorageType(TestStorageTypeCommon):
     def test_auto_assign_package_storage_type_without_packaging_id(self):
         """Packages without `packaging_id` are internal packages and they
         are intended to be stored in the warehouse.
-        On such packages storage type is automatically defined.
+        On such packages, a package type is automatically defined.
         """
         package = self.env["stock.quant.package"].create(
             {"name": "TEST", "product_packaging_id": self.product_packaging.id}

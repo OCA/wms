@@ -37,7 +37,7 @@ class TestStorageType(TransactionCase):
         )
 
     def test_location_allowed_storage_types(self):
-        # As cardboxes location storage type is defined on parent stock
+        # As cardboxes capacity is defined on parent stock
         #  location_storage_type_ids
         self.assertEqual(
             self.cardboxes_stock.computed_storage_category_id.capacity_ids,
@@ -89,7 +89,7 @@ class TestStorageType(TransactionCase):
             self.cardboxes_location_storage_type,
         )
         # If I create a child bin on cardboxes bin 1, it will use the first
-        #  parent's storage type
+        #  parent's capacity
         bin_1_child = self.env["stock.location"].create(
             {"name": "Carboxes bin 1 child", "location_id": self.cardboxes_bin_1.id}
         )
@@ -163,16 +163,23 @@ class TestStorageType(TransactionCase):
         Test for the message displayed on Stock Package Type forms
         """
         pallets = self.env.ref("stock_storage_type.package_storage_type_pallets")
-        message = "When a package with storage type Pallets is put away, the "
+        category = pallets.storage_category_capacity_ids.storage_category_id
+        message = "When a package with type Pallets is put away, the "
         message += "strategy will look for an allowed location in the "
         message += "following locations:"
         self.assertIn(message, pallets.storage_type_message)
 
+        category.allow_new_product_ids.allow_new_product = "empty"
+        pallets._compute_storage_type_message()
         message = (
             "Pallets reserve storage area (WARNING: restrictions are active on "
-            "location storage types matching this package storage type)"
+            "storage categories matching this package type)"
         )
+        self.assertIn(message, pallets.storage_type_message)
 
+        category.allow_new_product_ids.allow_new_product = "mixed"
+        pallets._compute_storage_type_message()
+        message = "Pallets reserve storage area (Ordered Children Locations)"
         self.assertIn(message, pallets.storage_type_message)
 
     def test_sequence_to_location_menu(self):
@@ -184,10 +191,4 @@ class TestStorageType(TransactionCase):
                 self.location_sequence_pallet.package_type_id.storage_category_capacity_ids.ids,
             ),
             action["domain"],
-        )
-
-    def test_storage_capacity_display(self):
-        self.assertEqual(
-            self.cardboxes_stock.computed_storage_category_id.capacity_ids.display_name,
-            "Cardboxes x 1.0 (Package: Cardboxes - Allow New Product: Allow mixed products)",
         )
