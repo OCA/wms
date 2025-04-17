@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2025 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+  <record
+        id="stock_storage_category_allow_new_product_cond_view_form"
+        model="ir.ui.view"
+    >
+    <field name="name">stock.storage.category.allow_new_product.cond.form</field>
+    <field name="model">stock.storage.category.allow_new_product.cond</field>
+    <field name="arch" type="xml">
+      <form>
+        <field name="active" invisible="1" />
+        <widget
+                    name="web_ribbon"
+                    title="Archived"
+                    bg_color="bg-danger"
+                    attrs="{'invisible': [('active', '=', True)]}"
+                />
+        <sheet>
+          <div name="title" class="oe_title">
+            <label for="name" class="oe_edit_only" />
+            <h1>
+              <field name="name" />
+            </h1>
+          </div>
+          <group name="main">
+            <field name="condition_type" />
+          </group>
+          <field
+                        name="code_snippet_docs"
+                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                    />
+          <field
+                        name="code_snippet"
+                        widget="ace"
+                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                    />
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record
+        model="ir.actions.act_window"
+        id="stock_storage_category_allow_new_product_cond_act_window"
+    >
+    <field name="name">Storage Category Allow New Product Conditions</field>
+    <field name="res_model">stock.storage.category.allow_new_product.cond</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+
+</odoo>

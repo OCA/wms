@@ -16,7 +16,7 @@ class StockPackageType(models.Model):
     storage_type_message = fields.Html(compute="_compute_storage_type_message")
     height_required = fields.Boolean(
         string="Height required for packages",
-        help=("Height is mandatory for packages configured with this storage type."),
+        help=("Height is mandatory for packages configured with this package type."),
         default=False,
     )
     barcode = fields.Char(copy=False)
@@ -36,10 +36,10 @@ class StockPackageType(models.Model):
                     if sl == storage_locations[-1]:
                         last = True
                     formatted_storage_locations_msgs.append(
-                        sl._format_package_storage_type_message(last=last)
+                        sl._format_package_type_message(last=last)
                     )
                 msg = _(
-                    "When a package with storage type {name} is put away, the "
+                    "When a package with type {name} is put away, the "
                     "strategy will look for an allowed location in the "
                     "following locations: <br/><br/>"
                     "{message} <br/><br/>"
@@ -56,7 +56,7 @@ class StockPackageType(models.Model):
                 msg = _(
                     '<span style="color: red;">The "Put-Away sequence" '
                     "must be defined in order to put away packages using "
-                    "this package storage type ({storage}).</span>"
+                    "this package type ({storage}).</span>"
                 ).format(storage=package_type.name)
             package_type.storage_type_message = msg
 

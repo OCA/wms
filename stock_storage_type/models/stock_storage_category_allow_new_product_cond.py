@@ -1,5 +1,5 @@
-# Copyright 2022 ACSONE SA/NV
-# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+# Copyright 2025 Camptocamp SA
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 import logging
 
 from odoo import _, exceptions, models
@@ -8,27 +8,28 @@ from odoo.tools import safe_eval
 _logger = logging.getLogger(__name__)
 
 
-class StockStorageLocationSequenceCond(models.Model):
+class StockStorageCategoryAllowNewProductCond(models.Model):
     _inherit = "stock.storage.condition.mixin"
-    _name = "stock.storage.location.sequence.cond"
-    _description = "Stock Storage Location Sequence Condition"
+    _name = "stock.storage.category.allow_new_product.cond"
+    _description = "Stock Storage Category Allow New Product Condition"
 
     _sql_constraints = [
         (
             "name",
             "EXCLUDE (name WITH =) WHERE (active = True)",
-            "Stock storage location sequence condition name must be unique",
+            "Storage Category Allow New Product Condition name must be unique",
         )
     ]
 
     def _default_code_snippet_docs(self):
         return """
         Available vars:
-        * storage_location_sequence
-        * condition
-        * putaway_location
-        * quant (recordset)
-        * product
+        * condition (recordset)
+        * storage_category (recordset)
+        * product (recordset)
+        * package_type (recordset)
+        * package (recordset)
+        * quants (recordset)
         * env
         * datetime
         * dateutil
@@ -41,9 +42,15 @@ class StockStorageLocationSequenceCond(models.Model):
         """
 
     def _get_code_snippet_eval_context(
-        self, storage_location_sequence, putaway_location, quant, product
+        self,
+        storage_category,
+        product,
+        package_type,
+        package,
+        quants,
     ):
         """Prepare the context used when evaluating python code
+
         :returns: dict -- evaluation context given to safe_eval
         """
         self.ensure_one()
@@ -51,24 +58,36 @@ class StockStorageLocationSequenceCond(models.Model):
             "env": self.env,
             "user": self.env.user,
             "condition": self,
-            "putaway_location": putaway_location,
-            "quant": quant,
+            "storage_category": storage_category,
             "product": product,
+            "package_type": package_type,
+            "package": package,
+            "quants": quants,
             "datetime": safe_eval.datetime,
             "dateutil": safe_eval.dateutil,
             "time": safe_eval.time,
-            "storage_location_sequence": storage_location_sequence,
             "exceptions": safe_eval.wrap_module(
                 exceptions, ["UserError", "ValidationError"]
             ),
         }
 
-    def _exec_code(self, storage_location_sequence, putaway_location, quant, product):
+    def _exec_code(
+        self,
+        storage_category,
+        product,
+        package_type,
+        package,
+        quants,
+    ):
         self.ensure_one()
         if not self._code_snippet_valued():
             return False
         eval_ctx = self._get_code_snippet_eval_context(
-            storage_location_sequence, putaway_location, quant, product
+            storage_category,
+            product,
+            package_type,
+            package,
+            quants,
         )
         snippet = self.code_snippet
         safe_eval.safe_eval(snippet, eval_ctx, mode="exec", nocopy=True)
@@ -80,25 +99,38 @@ class StockStorageLocationSequenceCond(models.Model):
         if not result:
             _logger.debug(
                 "Condition %s not met:\n"
-                "* putaway sequence: %s\n"
-                "* putaway location: %s\n"
-                "* quants: %s\n"
+                "* storage_category: %s\n"
                 "* product: %s\n"
+                "* package_type: %s\n"
+                "* package: %s\n"
+                "* quants: %s\n"
                 % (
                     self.name,
-                    storage_location_sequence.id,
-                    putaway_location.name,
-                    quant.ids,
-                    product.display_name,
+                    storage_category.ids,
+                    package_type and package_type.id or None,
+                    package and package.id or None,
+                    product.id,
+                    quants and quants.ids or None,
                 )
             )
         return result
 
-    def evaluate(self, storage_location_sequence, putaway_location, quant, product):
+    def evaluate(
+        self,
+        storage_category,
+        product,
+        package_type,
+        package,
+        quants,
+    ):
         self.ensure_one()
         if self.condition_type == "code":
             return self._exec_code(
-                storage_location_sequence, putaway_location, quant, product
+                storage_category,
+                product,
+                package_type,
+                package,
+                quants,
             )
         condition_type = self.condition_type
         raise exceptions.UserError(

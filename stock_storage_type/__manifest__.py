@@ -4,7 +4,7 @@
 {
     "name": "Stock Storage Type",
     "summary": "Manage packages and locations storage types",
-    "version": "16.0.1.1.0",
+    "version": "16.0.2.0.0",
     "development_status": "Beta",
     "category": "Warehouse Management",
     "website": "https://github.com/OCA/wms",
@@ -24,7 +24,7 @@
         "views/product_template.xml",
         "views/stock_location.xml",
         "views/stock_storage_category.xml",
-        "views/stock_storage_category_capacity.xml",
+        "views/stock_storage_category_allow_new_product_cond.xml",
         "views/stock_package_level.xml",
         "views/stock_package_type.xml",
         "views/stock_storage_location_sequence.xml",
@@ -33,6 +33,7 @@
     ],
     "demo": [
         "demo/stock_package_type.xml",
+        "demo/stock_storage_category_allow_new_product_cond.xml",
         "demo/stock_storage_category.xml",
         "demo/stock_storage_category_capacity.xml",
         "demo/product_packaging.xml",
