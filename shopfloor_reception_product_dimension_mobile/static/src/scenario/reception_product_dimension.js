@@ -57,6 +57,7 @@ const new_template =
                     label="Weight"
                     type="number"
                     placeholder="Product Weight"
+                    :suffix="state.data.product.weight_uom.name"
                     v-model="state.data.product.weight"
                 ></v-text-field>
             </v-row>
