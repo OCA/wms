@@ -17,6 +17,10 @@ class DataDetailAction(Component):
                 "dimensional_uom_id:dimension_uom",
                 self._simple_record_parser() + ["factor", "rounding"],
             ),
+            (
+                "weight_uom_id:weight_uom",
+                self._simple_record_parser() + ["factor", "rounding"],
+            ),
         ]
 
     def product_detail(self, record, **kw):

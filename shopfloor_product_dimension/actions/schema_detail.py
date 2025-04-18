@@ -20,6 +20,12 @@ class ShopfloorSchemaDetailAction(Component):
                         rounding={"required": True, "nullable": True, "type": "float"},
                     )
                 ),
+                "weight_uom": self._schema_dict_of(
+                    self._simple_record(
+                        factor={"required": True, "nullable": True, "type": "float"},
+                        rounding={"required": True, "nullable": True, "type": "float"},
+                    )
+                ),
             }
         )
         return schema

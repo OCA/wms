@@ -31,6 +31,12 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                     "name": record.dimensional_uom_id.name,
                     "rounding": record.dimensional_uom_id.rounding,
                 },
+                "weight_uom": {
+                    "id": record.weight_uom_id.id,
+                    "factor": record.weight_uom_id.factor,
+                    "name": record.weight_uom_id.name,
+                    "rounding": record.weight_uom_id.rounding,
+                },
             }
         )
 
