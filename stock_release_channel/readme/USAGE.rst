@@ -26,3 +26,9 @@ A asleep channel can be waken up by using the "Wake up" button. When the "Wake u
 button is used, in addition to the state change, the system looks for pending
 transfers requiring a release and try to assign them to a channel in the
 "Open" or "Locked" state.
+
+You can also use the "Sleep and Reassign" action on channels that have transfers
+in progress. This is particularly useful if you don't want to use the current
+channel and want to reassign pickings to another(s) channel(s). Before using that
+action, you should check that channels for those pickings are open (as the transfers
+could not be assigned if there is no corresponding channel found).

@@ -11,6 +11,7 @@
                     <field name="is_action_unlock_allowed" invisible="1" />
                     <field name="is_action_sleep_allowed" invisible="1" />
                     <field name="is_action_wake_up_allowed" invisible="1" />
+                    <field name="is_action_safe_sleep_allowed" invisible="1" />
                     <button
                         name="action_lock"
                         string="Lock"
@@ -42,6 +43,16 @@
                         class="oe_stat_button"
                         icon="fa-bolt"
                         attrs="{'invisible': [('is_action_wake_up_allowed', '=', False)]}"
+                    />
+                    <button
+                        name="action_safe_sleep"
+                        string="Sleep and Reassign"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-random"
+                        confirm="Are you sure you want to make this channel fall asleep and reassign pickings? You maybe need to check if new channel to catch these pickings is open before doing this."
+                        help="Click here to make this channel sleep and reassign current pickings"
+                        attrs="{'invisible': [('is_action_safe_sleep_allowed', '=', False)]}"
                     />
                     <field
                         name="state"
