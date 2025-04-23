@@ -17,7 +17,7 @@ class StockMove(models.Model):
 
     def _before_release(self):
         # Apply the flow when releasing the move
-        super()._before_release()
+        res = super()._before_release()
         FLOW = self.env["stock.warehouse.flow"]
         move_ids_to_release = []
         for move in self:
@@ -26,3 +26,4 @@ class StockMove(models.Model):
             move_ids_to_release += _move_ids_to_release
         if move_ids_to_release:
             self.browse(move_ids_to_release).release_available_to_promise()
+        return res
