@@ -741,6 +741,17 @@ class StockMove(models.Model):
                 if float_is_zero(qty_to_return, precision_rounding=rounding):
                     continue
                 done_moves = origin_moves.filtered(lambda m: m.state == "done")
+                # in case of canceled origin_moves, the quantity to return must
+                # be limited to the quantity not consumed
+                done_dest_moves = done_moves.move_dest_ids.filtered(
+                    lambda m: m.state == "done"
+                )
+                returnable_qty = sum(done_moves.mapped("product_qty")) - sum(
+                    done_dest_moves.mapped("product_qty")
+                )
+                qty_to_return = min(qty_to_return, returnable_qty)
+                if float_compare(qty_to_return, 0, precision_rounding=rounding) <= 0:
+                    continue
                 if not move.rule_id.allow_unrelease_return_done_move:
                     # Without allow_unrelease_return_done_move enabled,
                     # only moves that aren't done can be unreleased.
