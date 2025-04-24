@@ -76,16 +76,19 @@ class Reception(Component):
         domain.append(("scheduled_date", "<=", today_end))
         return domain
 
-    def _get_today_start_end_datetime(self):
+    def _get_today_start_end_datetime(self, naive=True):
         company = self.env.company
         tz = company.partner_id.tz or "UTC"
         today = fields.Datetime.today()
-        today_start = fields.Datetime.start_of(today, "day")
-        today_end = fields.Datetime.end_of(today, "day")
-        today_start_localized = (
-            pytz.timezone(tz).localize(today_start).astimezone(pytz.utc)
-        )
-        today_end_localized = pytz.timezone(tz).localize(today_end).astimezone(pytz.utc)
+        today_start = today_start_localized = fields.Datetime.start_of(today, "day")
+        today_end = today_end_localized = fields.Datetime.end_of(today, "day")
+        if not naive:
+            today_start_localized = (
+                pytz.timezone(tz).localize(today_start).astimezone(pytz.utc)
+            )
+            today_end_localized = (
+                pytz.timezone(tz).localize(today_end).astimezone(pytz.utc)
+            )
         return (today_start_localized, today_end_localized)
 
     # DOMAIN METHODS
@@ -337,7 +340,7 @@ class Reception(Component):
             # could return more than one picking.
             # If there's only one picking due today, we go to the next screen.
             # Otherwise, we ask the user to scan a package instead.
-            today_start, today_end = self._get_today_start_end_datetime()
+            today_start, today_end = self._get_today_start_end_datetime(naive=False)
             picking_filter_result_due_today = picking_filter_result.filtered(
                 lambda p: today_start
                 <= p.scheduled_date.astimezone(pytz.utc)
@@ -727,9 +730,10 @@ class Reception(Component):
 
     def _response_for_select_document(self, pickings=None, message=None):
         if not pickings:
-            pickings = self.env["stock.picking"].search(
-                self._domain_stock_picking(today_only=True),
-                order=self._order_stock_picking(),
+            # We use the standard shopfloor
+            move_lines = self.search_move_line.search_move_lines(match_user=True)
+            pickings = move_lines.picking_id.filtered_domain(
+                self._domain_stock_picking(today_only=True)
             )
         else:
             # We sort by scheduled date first. However, there might be a case
