@@ -91,6 +91,10 @@ class Reception(Component):
             )
         return (today_start_localized, today_end_localized)
 
+    @property
+    def filter_today_scheduled_pickings(self):
+        return self.work.menu.filter_today_scheduled_pickings
+
     # DOMAIN METHODS
 
     def _domain_move_line_by_packaging(self, packaging):
@@ -733,7 +737,9 @@ class Reception(Component):
             # We use the standard shopfloor
             move_lines = self.search_move_line.search_move_lines(match_user=True)
             pickings = move_lines.picking_id.filtered_domain(
-                self._domain_stock_picking(today_only=True)
+                self._domain_stock_picking(
+                    today_only=self.filter_today_scheduled_pickings
+                )
             )
         else:
             # We sort by scheduled date first. However, there might be a case

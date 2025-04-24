@@ -13,6 +13,7 @@
     "external_dependencies": {"python": ["openupgradelib"]},
     "data": [
         "data/shopfloor_scenario_data.xml",
+        "views/shopfloor_menu.xml",
     ],
     "demo": [
         "demo/stock_picking_type_demo.xml",

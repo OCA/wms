@@ -10,7 +10,8 @@
 {
       "auto_post_line": true,
       "allow_return": true,
-      "scan_location_or_pack_first": true
+      "scan_location_or_pack_first": true,
+      "allow_filter_today_scheduled_pickings": true
 }
       </field>
   </record>
