@@ -346,14 +346,18 @@ const Reception = {
                 ],
             };
         },
-        picking_detail_options_for_select_move: function (move) {
+        picking_detail_options_for_select_move: function () {
             return {
                 show_title: true,
                 showActions: false,
                 list_item_options: {
                     loud_title: true,
                     title_action_field: {
-                        action_val_path: "name",
+                        action_val_path: function (record, field) {
+                            return record.product.barcode
+                                ? "product.barcode"
+                                : "product.default_code";
+                        },
                     },
                     list_item_klass_maker: this.move_card_color,
                     key_title: "product.display_name",
