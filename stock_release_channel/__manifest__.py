@@ -17,13 +17,13 @@
         "queue_job",  # OCA/queue
     ],
     "data": [
+        "security/stock_release_channel.xml",
         "views/res_partner.xml",
         "views/stock_release_channel_views.xml",
         "views/stock_picking_views.xml",
         "views/res_config_settings.xml",
         "data/queue_job_data.xml",
         "data/ir_cron_data.xml",
-        "security/stock_release_channel.xml",
     ],
     "demo": [
         "demo/stock_release_channel.xml",
