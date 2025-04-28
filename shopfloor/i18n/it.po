@@ -818,6 +818,18 @@ msgstr "Nessuna quantità elaborata, impossibile completare il trasferimento."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "No transfer found for %s %s"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No transfer found for barcode %s"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "No transfer found for the scanned lot."
 msgstr "Nessun trasferimento trovato per il codice scansionato."
 
@@ -999,12 +1011,6 @@ msgid "Package {} is not empty."
 msgstr "Il collo {} non è vuoto."
 
 #. module: shopfloor
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Package {} is not in the current transfer."
-msgstr "Il collo {} non è nel trasferimento attuale."
-
-#. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Package {} not found in location {}"
@@ -1151,15 +1157,15 @@ msgid "Processing reserved quantities is not allowed for menu {}."
 msgstr "Elaborazione quantità prenotate non consentita da menu {}."
 
 #. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Product %s is not in the current transfer."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
 msgstr "Movimenti prodotto (riga movimento di magazzino)"
-
-#. module: shopfloor
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid "Product is not in the current transfer."
-msgstr "Il prodotto non è nel trasferimento attuale."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1219,6 +1225,12 @@ msgstr "Prodotti grezzi esidui non in colli, procedere ugualmente?"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__reserved_move_line_ids
 msgid "Reserved Move Line"
 msgstr "Riga movimento prenotata"
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Reserved for %(picking_type)s %(picking_name)s"
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1782,6 +1794,13 @@ msgstr "Trasferimento"
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"Transfer has been canceled. This cannot be processed using this scenario"
+msgstr ""
+
+#. module: shopfloor
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Transfer {} complete"
 msgstr "Trasferimento {} completo"
 
@@ -2073,6 +2092,14 @@ msgstr "{} non trovato nel trasferimento attuale o già nel collo."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} metti in {}"
+
+#, python-format
+#~ msgid "Package {} is not in the current transfer."
+#~ msgstr "Il collo {} non è nel trasferimento attuale."
+
+#, python-format
+#~ msgid "Product is not in the current transfer."
+#~ msgstr "Il prodotto non è nel trasferimento attuale."
 
 #, python-format
 #~ msgid "Lot is not in the current transfer."
