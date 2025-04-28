@@ -555,9 +555,10 @@ class StockWarehouseFlow(models.Model):
         move.rule_id = rule
         if assign_picking:
             move._assign_picking()
-            # If all moves are moved to another picking, we can unlink the old one.
+            # If all moves are moved to another picking, the old picking will
+            # be draft. Force it to cancel.
             if not old_picking.move_lines:
-                old_picking.state = "cancel"
+                old_picking.action_cancel()
 
     def write(self, vals):
         res = super().write(vals)

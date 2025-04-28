@@ -26,6 +26,7 @@ class StockMove(models.Model):
         # its chained moves (if any)
         FLOW = self.env["stock.warehouse.flow"]
         move_ids_to_confirm = []
+        old_pickings = self.picking_id
         for move in self:
             if not move._apply_flow_on_action_confirm():
                 move_ids_to_confirm.append(move.id)
@@ -36,6 +37,14 @@ class StockMove(models.Model):
                 move, assign_picking=False
             ).ids
         moves_to_confirm = self.browse(move_ids_to_confirm)
-        return super(StockMove, moves_to_confirm)._action_confirm(
+        res = super(StockMove, moves_to_confirm)._action_confirm(
             merge=merge, merge_into=merge_into
         )
+        # In case the move was already assigned to a picking and action_confirm
+        # was called again, with the flow it may have changed the conditions
+        # and assigned to a different picking. If the initial picking is empty,
+        # marked it as canceled.
+        for old_picking in old_pickings:
+            if not old_picking.move_lines:
+                old_picking.action_cancel()
+        return res
