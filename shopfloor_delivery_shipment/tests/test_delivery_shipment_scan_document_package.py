@@ -1,5 +1,7 @@
 # Copyright 2021 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
+from odoo import fields
+
 from .test_delivery_shipment_base import DeliveryShipmentCommonCase
 
 
@@ -144,6 +146,97 @@ class DeliveryShipmentScanDocumentPackageCase(DeliveryShipmentCommonCase):
         self.assertEqual(
             content[location_src]["package_levels"],
             self.service.data.package_levels(package_level),
+        )
+
+    @classmethod
+    def _create_picking_chain(cls, wh, products):
+        if products is None:
+            products = []
+        group = cls.env["procurement.group"].create(
+            {
+                "name": "TEST",
+                "move_type": "direct",
+                "partner_id": cls.customer.id,
+            }
+        )
+        values = {
+            "company_id": wh.company_id,
+            "group_id": group,
+            "date_planned": fields.Datetime.now(),
+            "warehouse_id": wh,
+        }
+        for product, qty in products:
+            uom = product.uom_id
+            cls.env["procurement.group"].run(
+                [
+                    cls.env["procurement.group"].Procurement(
+                        product,
+                        qty,
+                        uom,
+                        cls.loc_customers,
+                        "TEST",
+                        "TEST",
+                        wh.company_id,
+                        values,
+                    )
+                ]
+            )
+        return cls.env["stock.picking"].search([("group_id", "=", group.id)])
+
+    def test_scan_document_package_partially_reserved(self):
+        wh = self.wh
+        wh.sudo().delivery_steps = "pick_ship"
+        pickings = self._create_picking_chain(
+            wh, [(self.product_a, 10.0), (self.product_b, 10.0)]
+        )
+        out_picking = pickings.filtered(lambda p: p.picking_type_id.code == "outgoing")
+        pick_picking = pickings.filtered(lambda p: p.picking_type_id.code == "internal")
+        package = self.env["stock.quant.package"].create({})
+        self._fill_stock_for_moves(pick_picking.move_lines, in_package=package)
+        pick_picking.action_assign()
+        for move in pick_picking.move_lines:
+            move.quantity_done = move.product_uom_qty
+            move.move_line_ids.qty_done = move.product_uom_qty
+        pick_picking._action_done()
+        # create shipment
+        shipment = self._create_shipment()
+        # Create return for product a
+        move_a = pick_picking.move_lines.filtered(
+            lambda m: m.product_id == self.product_a
+        )
+        wiz_vals = {
+            "picking_id": pick_picking.id,
+            "location_id": pick_picking.location_id.id,
+            "product_return_moves": [
+                (
+                    0,
+                    0,
+                    {
+                        "product_id": move_a.product_id.id,
+                        "quantity": move_a.quantity_done,
+                        "uom_id": move_a.product_uom.id,
+                        "move_id": move_a.id,
+                    },
+                )
+            ],
+        }
+        wiz = self.env["stock.return.picking"].create(wiz_vals)
+        res = wiz.create_returns()
+        return_picking = self.env["stock.picking"].browse(res["res_id"])
+        # Try to ship the goods, it should be prevented
+        response = self.service.dispatch(
+            "scan_document",
+            params={
+                "shipment_advice_id": shipment.id,
+                "barcode": package.name,
+            },
+        )
+        self.assert_response_scan_document(
+            response,
+            shipment,
+            message=self.service.msg_store.package_partially_reserved_in_picking(
+                return_picking | out_picking
+            ),
         )
 
     def test_scan_document_shipment_not_planned_package_planned(self):

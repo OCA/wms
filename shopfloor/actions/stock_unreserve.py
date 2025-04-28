@@ -10,7 +10,9 @@ class StockUnreserve(Component):
     _inherit = "shopfloor.process.action"
     _usage = "stock.unreserve"
 
-    def check_unreserve(self, location, move_lines, product=None, lot=None):
+    def check_unreserve(
+        self, location, move_lines, product=None, lot=None, allowed_types=None
+    ):
         """Return a message if there is an ongoing operation in the location.
 
         It could be a move line with some qty already processed or another
@@ -20,12 +22,17 @@ class StockUnreserve(Component):
         :param move_lines: move lines to unreserve
         :param product: optional product to limit the scope in the location
         """
+        if not allowed_types:
+            allowed_types = self.env["stock.picking.type"]
         location_move_lines = self._find_location_all_move_lines(location, product, lot)
         extra_move_lines = location_move_lines - move_lines
         if extra_move_lines:
-            return self.msg_store.picking_already_started_in_location(
-                extra_move_lines.picking_id
-            )
+            extra_pickings = extra_move_lines.picking_id
+            if allowed_types:
+                for picking in extra_pickings:
+                    if picking.picking_type_id not in allowed_types:
+                        return self.msg_store.reserved_for_other_picking_type(picking)
+            return self.msg_store.picking_already_started_in_location(extra_pickings)
 
     def unreserve_moves(self, move_lines, picking_types):
         """Unreserve moves from `move_lines'.

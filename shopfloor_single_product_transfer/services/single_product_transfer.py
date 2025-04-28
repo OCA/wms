@@ -5,6 +5,7 @@
 import logging
 from functools import wraps
 
+from odoo import fields
 from odoo.osv.expression import AND
 from odoo.tools import float_compare
 
@@ -292,14 +293,25 @@ class ShopfloorSingleProductTransfer(Component):
         self, product, location=None, package=None, lot=None, packaging=None
     ):
         unreserve = self._actions_for("stock.unreserve")
+        move_lines = self._find_location_or_package_move_lines(
+            product, location=location, package=package, lot=lot
+        )
         if self.work.menu.allow_unreserve_other_moves:
-            move_lines = self._find_location_or_package_move_lines(
-                product, location=location, package=package, lot=lot
-            )
             response = unreserve.check_unreserve(location, move_lines, product, lot)
             if response:
                 return response
             unreserve.unreserve_moves(move_lines, self.picking_types)
+        elif move_lines:
+            # This happens when unreserve disallowed, but goods are reserved
+            # for another operation
+            return self._scan_product__product_reserved_by_another_operation(
+                product,
+                fields.first(move_lines.picking_id),
+                location=location,
+                package=package,
+                lot=lot,
+                packaging=packaging,
+            )
         else:
             # If we get there then no qty is available, and we are not allowed to unreserve
             # other moves. No stock available for product.
@@ -342,6 +354,14 @@ class ShopfloorSingleProductTransfer(Component):
             if response:
                 return response
             return self._response_for_set_quantity(move_line)
+
+    def _scan_product__product_reserved_by_another_operation(
+        self, product, picking, location=None, package=None, lot=None, packaging=None
+    ):
+        message = self.msg_store.reserved_for_other_picking_type(picking)
+        return self._response_for_select_product(
+            location=location, package=package, message=message
+        )
 
     def _scan_product__no_stock_available(
         self, product, location=None, package=None, lot=None, packaging=None

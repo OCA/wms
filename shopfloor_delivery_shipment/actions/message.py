@@ -168,3 +168,16 @@ class MessageAction(Component):
             "message_type": "info",
             "body": _("Shipment {} is validated.").format(shipment_advice.name),
         }
+
+    def package_partially_reserved_in_picking(self, pickings):
+        picking_names = ", ".join(pickings.mapped("name"))
+        body = _(
+            "Scanned barcode is partially reserved for multiple pickings "
+            "%(picking_names)s"
+        ) % {
+            "picking_names": picking_names,
+        }
+        return {
+            "message_type": "error",
+            "body": body,
+        }
