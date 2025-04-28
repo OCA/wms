@@ -166,6 +166,13 @@ msgid "Product {} is already loaded in the shipment {}."
 msgstr "El producto {} ya está cargado en el envío {}."
 
 #. module: shopfloor_delivery_shipment
+#: code:addons/shopfloor_delivery_shipment/actions/message.py:0
+#, python-format
+msgid ""
+"Scanned barcode is partially reserved for multiple pickings %(picking_names)s"
+msgstr ""
+
+#. module: shopfloor_delivery_shipment
 #: model:ir.model.fields,field_description:shopfloor_delivery_shipment.field_shopfloor_menu__shipment_advice_create_is_possible
 msgid "Shipment Advice Create Is Possible"
 msgstr "Es posible crear un Aviso de Envío"
