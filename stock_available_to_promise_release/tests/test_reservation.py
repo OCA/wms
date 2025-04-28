@@ -1131,13 +1131,14 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
     # TODO: test w/ multiple orders by priority
 
     def test_picking_priority(self):
-        self.wh.delivery_steps = "pick_pack_ship"
+        self.wh.delivery_steps = "pick_ship"
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         self._update_qty_in_location(self.loc_bin1, self.product1, 20.0)
         pick = self._create_picking_chain(self.wh, [(self.product1, 20)])
         pick.priority = "1"
         pick.action_confirm()
         pick.release_available_to_promise()
+        self.assertEqual(pick.priority, "1")
         self.assertEqual(pick.move_ids.move_orig_ids.picking_id.priority, "1")
 
         # from here we simulate a special processing flow where a priority
@@ -1148,23 +1149,20 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         # partially process the picking
         pick_pick = pick.move_ids.move_orig_ids.picking_id
         pick_pick.move_ids.quantity_done = 3.0
-        pick_pick._action_done()
+        pick_pick.with_context(
+            skip_immediate=True, skip_backorder=True
+        ).button_validate()
         # process and validate the picking to create a backorder
         pick.move_ids.quantity_done = 3.0
-        pick.unrelease()
-        pick._action_done()
-
-        # force priority on the initial picks to simulate an inconsistency
-        # this case should not happen but we observe it in real life without
-        # knowing how it happens
-        pick.priority = "1"
-        pick_pick.priority = "1"
+        pick.picking_type_id.unrelease_on_backorder = True
+        pick.with_context(skip_immediate=True, skip_backorder=True).button_validate()
         backorder = pick.backorder_ids
+        self.assertEqual(backorder.move_ids.need_release, True)
+        # the backorder should have kept the initial priority
+        self.assertEqual(backorder.priority, "1")
         # change the priority on the backorder and release it
         backorder.priority = "0"
-        backorder.action_confirm()
-        # force need release to True for the test
-        backorder.move_ids.need_release = True
+        self.assertEqual(pick.move_ids.priority, "0")
         backorder.release_available_to_promise()
         # the backorder should keep the new priority
         self.assertEqual(backorder.priority, "0")
