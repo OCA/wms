@@ -843,6 +843,20 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "No transfer found for %(model_name)s %(record_name)s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No transfer found for barcode %s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "No transfer found for the scanned lot."
 msgstr ""
 
@@ -1048,13 +1062,6 @@ msgid "Package {} is not empty."
 msgstr ""
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Package {} is not in the current transfer."
-msgstr ""
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant_package
 msgid "Packages"
 msgstr ""
@@ -1210,15 +1217,15 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor
-#: model:ir.model,name:shopfloor.model_stock_move_line
-msgid "Product Moves (Stock Move Line)"
-msgstr ""
-
-#. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Product is not in the current transfer."
+msgid "Product %s is not in the current transfer."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model,name:shopfloor.model_stock_move_line
+msgid "Product Moves (Stock Move Line)"
 msgstr ""
 
 #. module: shopfloor
@@ -1287,6 +1294,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor.field_stock_location__reserved_move_line_ids
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__reserved_move_line_ids
 msgid "Reserved Move Line"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Reserved for %(picking_type)s %(picking_name)s"
 msgstr ""
 
 #. module: shopfloor
@@ -1888,6 +1902,14 @@ msgstr ""
 #: model:ir.model,name:shopfloor.model_stock_picking
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__picking_id
 msgid "Transfer"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid ""
+"Transfer has been canceled. This cannot be processed using this scenario"
 msgstr ""
 
 #. module: shopfloor
