@@ -68,7 +68,9 @@ class CheckoutSelectCase(CheckoutCommonCase):
         )
 
     def test_select_error_not_allowed(self):
+        # Trying to pick a picking with wrong picking type
         picking = self._create_picking(picking_type=self.wh.pick_type_id)
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking.action_assign()
-        self._test_error(picking, "You cannot move this using this menu.")
+        expected_message = f"Reserved for {picking.picking_type_id.name} {picking.name}"
+        self._test_error(picking, expected_message)

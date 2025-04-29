@@ -22,7 +22,7 @@ class TestScanLineReturn(CommonCaseReturn):
             data={"picking": self._data_for_picking_with_moves(return_picking)},
             message={
                 "message_type": "error",
-                "body": "Product is not in the current transfer.",
+                "body": f"Product {wrong_product.name} is not in the current transfer.",
             },
         )
 

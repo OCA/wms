@@ -214,6 +214,15 @@ class MessageAction(Component):
     def already_done(self):
         return {"message_type": "info", "body": _("Operation already processed.")}
 
+    def transfer_canceled(self):
+        return {
+            "message_type": "info",
+            "body": _(
+                "Transfer has been canceled. "
+                "This cannot be processed using this scenario"
+            ),
+        }
+
     def move_already_done(self):
         return {"message_type": "warning", "body": _("Move already processed.")}
 
@@ -458,6 +467,34 @@ class MessageAction(Component):
             "body": _("No transfer found for this product."),
         }
 
+    def transfer_not_found_for_barcode(self, barcode):
+        body = _("No transfer found for barcode %s", barcode)
+        return {
+            "message_type": "error",
+            "body": body,
+        }
+
+    def transfer_not_found_for_record(self, record):
+        model_mapping = {
+            "product.product": "product",
+            "stock.picking": "transfer",
+            "stock.quant.package": "package",
+            "product.packaging": "packaging",
+            "stock.location": "location",
+            "stock.lot": "lot",
+            "stock.move": "move",
+        }
+        model_name = model_mapping.get(record._name)
+        body = _(
+            "No transfer found for %(model_name)s %(record_name)s",
+            model_name=model_name,
+            record_name=record.name,
+        )
+        return {
+            "message_type": "error",
+            "body": body,
+        }
+
     def product_not_found_in_location_or_transfer(self, product, location, picking):
         return {
             "message_type": "error",
@@ -526,11 +563,9 @@ class MessageAction(Component):
             "body": _("Place it in {}?").format(location_name),
         }
 
-    def product_not_found_in_current_picking(self):
-        return {
-            "message_type": "error",
-            "body": _("Product is not in the current transfer."),
-        }
+    def product_not_found_in_current_picking(self, product):
+        body = _("Product %s is not in the current transfer.", product.name)
+        return {"message_type": "error", "body": body}
 
     def lot_mixed_package_scan_package(self):
         return {
@@ -981,4 +1016,14 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Unable to find a line with the same product but different lot."),
+        }
+
+    def reserved_for_other_picking_type(self, picking):
+        body = _("Reserved for %(picking_type)s %(picking_name)s") % {
+            "picking_type": picking.picking_type_id.name,
+            "picking_name": picking.name,
+        }
+        return {
+            "message_type": "error",
+            "body": body,
         }

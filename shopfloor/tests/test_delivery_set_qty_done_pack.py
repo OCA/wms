@@ -67,7 +67,7 @@ class DeliverySetQtyDonePackCase(DeliveryCommonCase):
         )
         self.assert_response_deliver(
             response,
-            message=self.service.msg_store.stock_picking_not_available(self.picking),
+            message=self.service.msg_store.transfer_canceled(),
         )
 
     def test_set_qty_done_pack_package_not_found(self):

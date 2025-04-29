@@ -214,25 +214,29 @@ class Checkout(Component):
         * summary: stock.picking is selected and all its lines have a
           destination pack set
         """
-        search_result = self._scan_document_find(barcode)
-        result_handler = getattr(self, "_select_document_from_" + search_result.type)
-        return result_handler(search_result.record)
+        handlers = {
+            "picking": self._select_document_from_picking,
+            "location": self._select_document_from_location,
+            "package": self._select_document_from_package,
+            "packaging": self._select_document_from_packaging,
+            "product": self._select_document_from_product,
+            "none": self._select_document_from_none,
+        }
+        if self.work.menu.scan_location_or_pack_first:
+            handlers.pop("product")
+        search_result = self._scan_document_find(barcode, handlers.keys())
+        # Keep track of what has been initially scan, and forward it through kwargs
+        kwargs = {
+            "barcode": barcode,
+            "current_state": "select_document",
+            "scanned_record": search_result.record,
+        }
+        handler = handlers.get(search_result.type, self._select_document_from_none)
+        return handler(search_result.record, **kwargs)
 
-    def _scan_document_find(self, barcode, search_types=None):
+    def _scan_document_find(self, barcode, search_types):
         search = self._actions_for("search")
-        search_types = (
-            "picking",
-            "location",
-            "package",
-            "packaging",
-        ) + (("product",) if not self.work.menu.scan_location_or_pack_first else ())
-        return search.find(
-            barcode,
-            types=search_types,
-        )
-
-    def _select_document_from_picking(self, picking, **kw):
-        return self._select_picking(picking, "select_document")
+        return search.find(barcode, types=search_types)
 
     def _select_document_from_location(self, location, **kw):
         if not self.is_src_location_valid(location):
@@ -251,7 +255,9 @@ class Checkout(Component):
                     ),
                 }
             )
-        return self._select_picking(pickings, "select_document")
+        # Keep track of what has been initially scan, and forward it through kwargs
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(pickings, **kwargs)
 
     def _select_document_from_package(self, package, **kw):
         pickings = package.move_line_ids.filtered(
@@ -260,14 +266,15 @@ class Checkout(Component):
         if len(pickings) > 1:
             # Filter only if we find several pickings to narrow the
             # selection to one of the good type. If we have one picking
-            # of the wrong type, it will be caught in _select_picking
+            # of the wrong type, it will be caught in _select_document_from_picking
             # with the proper error message.
             # Side note: rather unlikely to have several transfers ready
             # and moving the same things
             pickings = pickings.filtered(
                 lambda p: p.picking_type_id in self.picking_types
             )
-        return self._select_picking(fields.first(pickings), "select_document")
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(fields.first(pickings), **kwargs)
 
     def _select_document_from_product(self, product, line_domain=None, **kw):
         line_domain = line_domain or []
@@ -287,7 +294,8 @@ class Checkout(Component):
             order="priority desc, scheduled_date asc, id desc",
             limit=1,
         )
-        return self._select_picking(picking, "select_document")
+        kwargs = {**kw, "current_state": "select_document"}
+        return self._select_document_from_picking(picking, **kwargs)
 
     def _select_document_from_packaging(self, packaging, **kw):
         # And retrieve its product
@@ -298,35 +306,33 @@ class Checkout(Component):
         line_domain = [("reserved_uom_qty", ">=", packaging.qty)]
         return self._select_document_from_product(product, line_domain=line_domain)
 
-    def _select_document_from_none(self, picking, **kw):
+    def _select_document_from_none(self, *args, barcode=None, **kwargs):
         """Handle result when no record is found."""
-        return self._select_picking(picking, "select_document")
+        return self._response_for_select_document(
+            message=self.msg_store.transfer_not_found_for_barcode(barcode)
+        )
 
-    def _select_picking(self, picking, state_for_error):
+    def _select_document_from_picking(
+        self, picking, current_state=None, barcode=None, **kwargs
+    ):
+        # Get origin record to give more context to the user when raising an error
+        # as we got picking from product/package/packaging/...
+        scanned_record = kwargs.get("scanned_record")
         if not picking:
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.stock_picking_not_found()
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.barcode_not_found()
-            )
+            message = self.msg_store.transfer_not_found_for_record(scanned_record)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         if picking.picking_type_id not in self.picking_types:
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.cannot_move_something_in_picking_type()
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.cannot_move_something_in_picking_type()
-            )
+            message = self.msg_store.reserved_for_other_picking_type(picking)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         if picking.state != "assigned":
-            if state_for_error == "manual_selection":
-                return self._response_for_manual_selection(
-                    message=self.msg_store.stock_picking_not_available(picking)
-                )
-            return self._response_for_select_document(
-                message=self.msg_store.stock_picking_not_available(picking)
-            )
+            message = self.msg_store.stock_picking_not_available(picking)
+            if current_state == "manual_selection":
+                return self._response_for_manual_selection(message=message)
+            return self._response_for_select_document(message=message)
         return self._response_for_select_line(picking)
 
     def _data_for_move_lines(self, lines, **kw):
@@ -402,10 +408,17 @@ class Checkout(Component):
           lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_manual_selection(message=message)
-        return self._select_picking(picking, "manual_selection")
+        # Because _select_document_from_picking expects some context
+        # to give meaningful infos to the user, add some here.
+        kwargs = {
+            "current_state": "manual_selection",
+            "barcode": picking.name,
+            "scanned_record": picking,
+        }
+        return self._select_document_from_picking(picking, **kwargs)
 
     def _select_lines(self, lines, prefill_qty=0, related_lines=None):
         for i, line in enumerate(lines):
@@ -451,7 +464,7 @@ class Checkout(Component):
         screen to change the qty done and destination pack if needed
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -460,21 +473,31 @@ class Checkout(Component):
             return self._response_for_summary(picking)
 
         # Search of the destination package
-        search_result = self._scan_line_find(picking, barcode)
-        result_handler = getattr(self, "_select_lines_from_" + search_result.type)
-        kw = {"confirm_pack_all": confirm_pack_all, "confirm_lot": confirm_lot}
-        return result_handler(picking, selection_lines, search_result.record, **kw)
+        handlers = {
+            "package": self._select_lines_from_package,
+            "product": self._select_lines_from_product,
+            "packaging": self._select_lines_from_packaging,
+            "lot": self._select_lines_from_lot,
+            "serial": self._select_lines_from_serial,
+            "delivery_packaging": self._select_lines_from_delivery_packaging,
+            "none": self._select_lines_from_none,
+        }
+        search_result = self._scan_line_find(picking, barcode, handlers.keys())
+        # setting scanned record as kwarg in order to make better logs.
+        # The reason for this is that from a product we might select various records
+        # and lose track of what was initially scanned. This forces us to display
+        # standard messages that might have no meaning for the user.
+        kwargs = {
+            "confirm_pack_all": confirm_pack_all,
+            "confirm_lot": confirm_lot,
+            "scanned_record": search_result.record,
+            "barcode": barcode,
+        }
+        handler = handlers.get(search_result.type, self._select_lines_from_none)
+        return handler(picking, selection_lines, search_result.record, **kwargs)
 
-    def _scan_line_find(self, picking, barcode, search_types=None):
+    def _scan_line_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
-        search_types = (
-            "package",
-            "product",
-            "packaging",
-            "lot",
-            "serial",
-            "delivery_packaging",
-        )
         return search.find(
             barcode,
             types=search_types,
@@ -497,15 +520,14 @@ class Checkout(Component):
             lambda l: l.package_id == package and not l.shopfloor_checkout_done
         )
         if not lines:
-            return self._response_for_select_line(
-                picking,
-                message={
-                    "message_type": "error",
-                    "body": _("Package {} is not in the current transfer.").format(
-                        package.name
-                    ),
-                },
-            )
+            # No line for scanned package in selected picking
+            # Check if there's any picking reserving this product.
+            return_picking = self._get_pickings_for_package(package, limit=1)
+            if return_picking:
+                message = self.msg_store.reserved_for_other_picking_type(return_picking)
+            else:
+                message = self.msg_store.package_not_found_in_picking(package, picking)
+            return self._response_for_select_line(picking, message=message)
         self._select_lines(lines, prefill_qty=prefill_qty)
         if self.work.menu.no_prefill_qty:
             lines = picking.move_line_ids
@@ -522,9 +544,12 @@ class Checkout(Component):
 
         lines = selection_lines.filtered(lambda l: l.product_id == product)
         if not lines:
-            return self._response_for_select_line(
-                picking, message=self.msg_store.product_not_found_in_current_picking()
-            )
+            return_picking = self._get_pickings_for_product(product, limit=1)
+            if return_picking:
+                message = self.msg_store.reserved_for_other_picking_type(return_picking)
+            else:
+                message = self.msg_store.product_not_found_in_current_picking(product)
+            return self._response_for_select_line(picking, message=message)
 
         # When products are as units outside of packages, we can select them for
         # packing, but if they are in a package, we want the user to scan the packages.
@@ -774,7 +799,7 @@ class Checkout(Component):
         assert package_id or move_line_id
 
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -793,7 +818,7 @@ class Checkout(Component):
         self, picking_id, selected_line_ids, move_line_ids, quantity_func
     ):
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1031,25 +1056,28 @@ class Checkout(Component):
         to close the stock picking
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        search_result = self._scan_package_find(picking, barcode)
-        message = self._check_scan_package_find(picking, search_result)
-        if message:
-            return self._response_for_select_package(
-                picking,
-                selected_lines,
-                message=message,
-            )
-        result_handler = getattr(
-            self, "_scan_package_action_from_" + search_result.type
-        )
-        return result_handler(picking, selected_lines, search_result.record)
+        handlers = {
+            "package": self._scan_package_action_from_package,
+            "product": self._scan_package_action_from_product,
+            "packaging": self._scan_package_action_from_packaging,
+            "lot": self._scan_package_action_from_lot,
+            "serial": self._scan_package_action_from_serial,
+            "delivery_packaging": self._scan_package_action_from_delivery_packaging,
+        }
+        search_result = self._scan_package_find(picking, barcode, handlers.keys())
+        handler = handlers.get(search_result.type, self._scan_package_action_from_none)
+        kwargs = {
+            "barcode": barcode,
+            "scanned_record": search_result.record,
+        }
+        return handler(picking, selected_lines, search_result.record, **kwargs)
 
-    def _scan_package_find(self, picking, barcode, search_types=None):
+    def _scan_package_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
         search_types = (
             "package",
@@ -1067,10 +1095,6 @@ class Checkout(Component):
                 serial=dict(products=picking.move_ids.product_id),
             ),
         )
-
-    def _check_scan_package_find(self, picking, search_result):
-        # Used by inheriting modules
-        return False
 
     def _find_line_to_increment(self, product_lines):
         """Find which line should have its qty incremented.
@@ -1186,7 +1210,7 @@ class Checkout(Component):
         * select_package: when no delivery packaging is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1216,7 +1240,7 @@ class Checkout(Component):
         * select_line: goes back to selection of lines to work on next lines
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         packaging = None
@@ -1238,7 +1262,7 @@ class Checkout(Component):
         if self.options.get("checkout__disable_no_package"):
             raise BadRequest("`checkout.no_package` endpoint is not enabled")
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1270,7 +1294,7 @@ class Checkout(Component):
         * select_package: when no package is available
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1320,7 +1344,7 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1347,7 +1371,7 @@ class Checkout(Component):
         * summary: all lines are put in packages
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
@@ -1374,7 +1398,7 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         return self._response_for_summary(picking)
@@ -1393,7 +1417,7 @@ class Checkout(Component):
         * summary: if the package_id no longer exists
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         package = self.env["stock.quant.package"].browse(package_id).exists()
@@ -1408,7 +1432,7 @@ class Checkout(Component):
         * summary
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1445,7 +1469,7 @@ class Checkout(Component):
         * select_line: when package or line has been canceled
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
 
@@ -1490,7 +1514,7 @@ class Checkout(Component):
         * select_child_location: there are child destination locations
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         lines = picking.move_line_ids
@@ -1533,7 +1557,7 @@ class Checkout(Component):
         * select_child_location: in case of error
         """
         picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_status(picking)
+        message = self._check_picking_processible(picking)
         if message:
             return self._response_for_select_document(message=message)
         search = self._actions_for("search")

@@ -166,6 +166,24 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
     def test_scan_line_error_package_not_in_picking(self):
         picking = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking.move_ids, in_package=True)
+        picking.action_assign()
+        # Create a package for product_a
+        package = self._create_package_in_location(
+            picking.location_id, [(self.product_a, 10, None)]
+        )
+        # we work with picking, but we scan another package (not in a pick)
+        self._test_scan_line_error(
+            picking,
+            package.name,
+            {
+                "message_type": "error",
+                "body": f"Package {package.name} not found in transfer {picking.name}",
+            },
+        )
+
+    def test_scan_line_error_package_reserved_by_another_picking(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
         picking2 = self._create_picking(lines=[(self.product_a, 10)])
         self._fill_stock_for_moves(picking2.move_ids, in_package=True)
         (picking | picking2).action_assign()
@@ -176,9 +194,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             package.name,
             {
                 "message_type": "error",
-                "body": "Package {} is not in the current transfer.".format(
-                    package.name
-                ),
+                "body": f"Reserved for Checkout {picking2.name}",
             },
         )
 
@@ -247,7 +263,22 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             self.product_b.barcode,
             {
                 "message_type": "error",
-                "body": "Product is not in the current transfer.",
+                "body": "Product Product B is not in the current transfer.",
+            },
+        )
+
+    def test_scan_line_error_product_in_another_picking(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        self._fill_stock_for_moves(picking.move_ids, in_package=True)
+        picking2 = self._create_picking(lines=[(self.product_b, 10)])
+        self._fill_stock_for_moves(picking2.move_ids, in_package=True)
+        (picking | picking2).action_assign()
+        self._test_scan_line_error(
+            picking,
+            self.product_b.barcode,
+            {
+                "message_type": "error",
+                "body": f"Reserved for Checkout {picking2.name}",
             },
         )
 
