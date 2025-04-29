@@ -933,6 +933,20 @@ msgstr "Nessuna quantità elaborata, impossibile completare il trasferimento."
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "No transfer found for %(model_name)s %(record_name)s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "No transfer found for barcode %s"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "No transfer found for the scanned lot."
 msgstr "Nessun trasferimento trovato per il codice scansionato."
 
@@ -1153,13 +1167,6 @@ msgid "Package {} is not empty."
 msgstr "Il collo {} non è vuoto."
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Package {} is not in the current transfer."
-msgstr "Il collo {} non è nel trasferimento attuale."
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_quant_package
 msgid "Packages"
 msgstr "Colli"
@@ -1323,16 +1330,16 @@ msgstr ""
 "trasferimento %(picking_name)s."
 
 #. module: shopfloor
-#: model:ir.model,name:shopfloor.model_stock_move_line
-msgid "Product Moves (Stock Move Line)"
-msgstr "Movimenti prodotto (riga movimento di magazzino)"
-
-#. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Product is not in the current transfer."
-msgstr "Il prodotto non è nel trasferimento attuale."
+msgid "Product %s is not in the current transfer."
+msgstr ""
+
+#. module: shopfloor
+#: model:ir.model,name:shopfloor.model_stock_move_line
+msgid "Product Moves (Stock Move Line)"
+msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #. module: shopfloor
 #. odoo-python
@@ -1402,6 +1409,13 @@ msgstr "È possibile richiedere il collo di destinazione"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__reserved_move_line_ids
 msgid "Reserved Move Line"
 msgstr "Riga movimento prenotata"
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "Reserved for %(picking_type)s %(picking_name)s"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -2043,6 +2057,14 @@ msgstr "Trasferimento"
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"Transfer has been canceled. This cannot be processed using this scenario"
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "Transfer {} complete"
 msgstr "Trasferimento {} completo"
 
@@ -2335,6 +2357,14 @@ msgstr ""
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid "Package {} is not in the current transfer."
+#~ msgstr "Il collo {} non è nel trasferimento attuale."
+
+#, python-format
+#~ msgid "Product is not in the current transfer."
+#~ msgstr "Il prodotto non è nel trasferimento attuale."
 
 #, python-format
 #~ msgid "Lot is not in the current transfer."
