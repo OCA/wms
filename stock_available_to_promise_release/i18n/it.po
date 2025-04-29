@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-15 15:06+0000\n"
+"PO-Revision-Date: 2025-04-29 16:26+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.6.2\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
@@ -183,6 +183,10 @@ msgid ""
 "operation on the last done pulled transfer. Otherwise, you won't be able to "
 "unrelease as soon as one of the pulled transfer is done"
 msgstr ""
+"Se selezionata, l'annullamento del rilascio della consegna potrebbe creare "
+"una nuova operazione interna inversa sull'ultimo trasferimento prelevato "
+"eseguito. In caso contrario, non sarà possibile annullare il rilascio non "
+"appena uno dei trasferimenti prelevati viene completato"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
@@ -358,7 +362,7 @@ msgstr "Rilascio in base alla disponibilità alle promesse"
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__allow_unrelease_return_done_move
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__allow_unrelease_return_done_move
 msgid "Reverse done transfer on cancellation"
-msgstr ""
+msgstr "Inverti trasferimento eseguito all'annullamento"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_release
@@ -420,7 +424,7 @@ msgstr ""
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
 msgid "The operation %(picking_names)s is done and cannot be returned"
-msgstr ""
+msgstr "L'operazione %(picking_names)s è conclusa e non può essere resa"
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
