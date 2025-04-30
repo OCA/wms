@@ -14,6 +14,21 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: stock_warehouse_flow_release
+#: model:ir.model.fields,field_description:stock_warehouse_flow_release.field_stock_route__apply_flow_on
+msgid "Apply Flow On"
+msgstr ""
+
+#. module: stock_warehouse_flow_release
+#: model:ir.model,name:stock_warehouse_flow_release.model_stock_route
+msgid "Inventory Routes"
+msgstr ""
+
+#. module: stock_warehouse_flow_release
 #: model:ir.model,name:stock_warehouse_flow_release.model_stock_move
 msgid "Stock Move"
+msgstr ""
+
+#. module: stock_warehouse_flow_release
+#: model:ir.model.fields.selection,name:stock_warehouse_flow_release.selection__stock_route__apply_flow_on__on_release
+msgid "When move is released"
 msgstr ""
