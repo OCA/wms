@@ -55,6 +55,7 @@ setuptools.setup(
         'odoo-addon-stock_storage_type>=16.0dev,<16.1dev',
         'odoo-addon-stock_storage_type_putaway_abc>=16.0dev,<16.1dev',
         'odoo-addon-stock_warehouse_flow>=16.0dev,<16.1dev',
+        'odoo-addon-stock_warehouse_flow_delivery_refresh>=16.0dev,<16.1dev',
         'odoo-addon-stock_warehouse_flow_release>=16.0dev,<16.1dev',
     ],
     classifiers=[
