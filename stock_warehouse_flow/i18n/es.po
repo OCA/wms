@@ -37,6 +37,11 @@ msgid "Applicable Flows"
 msgstr "Flujos aplicables"
 
 #. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_route__apply_flow_on
+msgid "Apply Flow On"
+msgstr ""
+
+#. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_search
 msgid "Archived"
@@ -61,6 +66,11 @@ msgstr "Creado por"
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__create_date
 msgid "Created on"
 msgstr "Creado el"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_move__default_picking_type_id
+msgid "Default Picking Type"
+msgstr ""
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_warehouse_flow__delivery_steps__ship_only
@@ -401,6 +411,13 @@ msgid "Uom"
 msgstr "UdM"
 
 #. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_move__default_picking_type_id
+msgid ""
+"Used as a backup to save picking type set by odoo, before a new flow is "
+"applied."
+msgstr ""
+
+#. module: stock_warehouse_flow
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__sequence_prefix
 msgid ""
 "Used to generate the default prefix of new operation types. (e.g. 'DG' => "
@@ -425,6 +442,11 @@ msgstr "Flujo de Almacén"
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__warning
 msgid "Warning"
 msgstr "Aviso"
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields.selection,name:stock_warehouse_flow.selection__stock_route__apply_flow_on__on_confirm
+msgid "When move is confirmed"
+msgstr ""
 
 #. module: stock_warehouse_flow
 #: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_warehouse_flow__carrier_ids
