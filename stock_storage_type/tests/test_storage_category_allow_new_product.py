@@ -82,15 +82,15 @@ class TestStorageCategoryAllowNewProduct(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 48.0
+        ml1 = in_picking.move_line_ids
+        ml1.quantity = 48.0
+        ml2 = ml1.copy({"quantity": 48.0})
+        ml1.picked = True
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
-        ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id
-        )
-        ml_without_package.qty_done = 48.0
+        ml2.picked = True
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging

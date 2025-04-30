@@ -15,7 +15,7 @@
                         name="allow_new_product_rules"
                     >
                         <field name="allow_new_product_ids" nolabel="1" colspan="2">
-                            <tree editable="bottom">
+                            <list editable="bottom">
                                 <field name="sequence" widget="handle" />
                                 <field name="allow_new_product" />
                                 <field
@@ -23,7 +23,7 @@
                                     widget="many2many_tags"
                                     options="{'no_quick_create': True}"
                                 />
-                            </tree>
+                            </list>
                         </field>
                     </group>
                 </page>

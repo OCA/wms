@@ -134,7 +134,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 "location_id": self.stock_location.id,
                 "location_dest_id": location.id,
                 "product_uom_id": self.product3.uom_id.id,
-                "reserved_uom_qty": 10,
+                "quantity": 10,
                 "move_id": ml_move.id,
                 "company_id": self.env.company.id,
             }
@@ -176,7 +176,7 @@ class TestStockLocation(TestStorageTypeCommon):
         ml_move._action_confirm()
         ml_move._action_assign()
 
-        ml_move.quantity_done = 10.0
+        ml_move.picked = True
         ml_move._action_done()
         # Odoo lets a zero quantity quant before scheduler do the garbage collector
         quant = self.env["stock.quant"].search(
@@ -216,7 +216,7 @@ class TestStockLocation(TestStorageTypeCommon):
                 "location_id": self.stock_location.id,
                 "location_dest_id": location.id,
                 "product_uom_id": self.product.uom_id.id,
-                "reserved_uom_qty": 10,
+                "quantity": 10,
                 "move_id": ml_move.id,
                 "company_id": self.env.company.id,
             }
@@ -258,7 +258,7 @@ class TestStockLocation(TestStorageTypeCommon):
         ml_move._action_confirm()
         ml_move._action_assign()
 
-        ml_move.quantity_done = 10.0
+        ml_move.picked = True
         ml_move._action_done()
         # Odoo lets a zero quantity quant before scheduler do the garbage collector
         quant = self.env["stock.quant"].search(

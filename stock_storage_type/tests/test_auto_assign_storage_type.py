@@ -50,7 +50,7 @@ class TestAutoAssignStorageType(TestStorageTypeCommon):
         confirmed_move._action_assign()
         picking = confirmed_move.picking_id
         picking.action_confirm()
-        picking.move_line_ids.qty_done = 10.0
+        picking.move_line_ids.picked = True
         first_package = picking.action_put_in_pack()
 
         picking.button_validate()
@@ -81,7 +81,7 @@ class TestAutoAssignStorageType(TestStorageTypeCommon):
         confirmed_move._action_assign()
         picking = confirmed_move.picking_id
         picking.action_confirm()
-        picking.move_line_ids.qty_done = 10.0
+        picking.move_line_ids.picked = True
         first_package = picking.action_put_in_pack()
 
         picking.button_validate()

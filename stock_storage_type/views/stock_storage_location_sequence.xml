@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <record id="package_storage_location_tree_view" model="ir.ui.view">
-        <field name="name">package.storage.location.tree.view</field>
+        <field name="name">package.storage.location.list.view</field>
         <field name="model">stock.storage.location.sequence</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="sequence" widget="handle" />
                 <field
                     name="package_type_id"
@@ -19,7 +19,7 @@
                     name="button_show_locations"
                     type="object"
                 />
-            </tree>
+            </list>
         </field>
     </record>
 </odoo>

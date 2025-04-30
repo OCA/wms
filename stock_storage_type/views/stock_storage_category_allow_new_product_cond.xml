@@ -15,7 +15,7 @@
                     name="web_ribbon"
                     title="Archived"
                     bg_color="bg-danger"
-                    attrs="{'invisible': [('active', '=', True)]}"
+                    invisible="active"
                 />
                 <sheet>
                     <div name="title" class="oe_title">
@@ -29,12 +29,12 @@
                     </group>
                     <field
                         name="code_snippet_docs"
-                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                        invisible="condition_type != 'code'"
                     />
                     <field
                         name="code_snippet"
                         widget="ace"
-                        attrs="{'invisible': [('condition_type', '!=', 'code')]}"
+                        invisible="condition_type != 'code'"
                     />
                 </sheet>
             </form>
@@ -47,6 +47,6 @@
     >
         <field name="name">Storage Category Allow New Product Conditions</field>
         <field name="res_model">stock.storage.category.allow_new_product.cond</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

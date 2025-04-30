@@ -3,15 +3,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import logging
 
-from psycopg2 import sql
-
 from odoo import api, fields, models
 from odoo.fields import Command
-from odoo.tools import float_compare, index_exists
+from odoo.tools import float_compare, index_exists, sql
 
 _logger = logging.getLogger(__name__)
 OUT_MOVE_LINE_DOMAIN = [
-    ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
+    ("state", "in", ("waiting", "confirmed", "partially_available", "assigned")),
 ]
 
 
@@ -309,7 +307,8 @@ class StockLocation(models.Model):
 
     @api.depends(
         "quant_ids.quantity",
-        "out_move_line_ids.qty_done",
+        "out_move_line_ids.quantity",
+        "out_move_line_ids.picked",
         "in_move_ids",
         "in_move_line_ids",
         "only_empty",
@@ -329,14 +328,16 @@ class StockLocation(models.Model):
         out_qty_by_location = {}
         qty_by_location = {}
         for group in self.env["stock.move.line"].read_group(
-            OUT_MOVE_LINE_DOMAIN + location_domain,
-            fields=["qty_done:sum"],
+            OUT_MOVE_LINE_DOMAIN + [("picked", "=", True)] + location_domain,
+            fields=["quantity:sum"],
             groupby=["location_id"],
         ):
             location_id = group["location_id"][0]
-            out_qty_by_location[location_id] = group["qty_done"]
+            out_qty_by_location[location_id] = group["quantity"]
         for group in self.env["stock.quant"].read_group(
-            location_domain, fields=["quantity:sum"], groupby=["location_id"]
+            location_domain,
+            fields=["quantity:sum"],
+            groupby=["location_id"],
         ):
             location_id = group["location_id"][0]
             qty_by_location[location_id] = group["quantity"]
@@ -407,7 +408,7 @@ class StockLocation(models.Model):
         else:
             stock_move_line_ids = self.env.context.get("exclude_sml_ids", [])
             stock_move_lines = self.env["stock.move.line"].browse(stock_move_line_ids)
-            quants = stock_move_lines.mapped("reserved_quant_id").filtered(
+            quants = stock_move_lines.mapped("quant_id").filtered(
                 lambda q: q.product_id == product
             )
         if not package_type:
@@ -497,19 +498,23 @@ class StockLocation(models.Model):
         if not self.leaf_child_location_ids:
             return self.leaf_child_location_ids
         query = self._where_calc([("id", "in", self.leaf_child_location_ids.ids)])
-        _, where_clause, where_params = query.get_sql()
+        where_clause = query.where_clause
         orderby_clause, orderby_params = self._get_sorted_leaf_locations_orderby(
             products
         )
-        query = sql.SQL(
-            "SELECT id FROM {table} WHERE {where} ORDER BY {orderby}"
-        ).format(
-            table=sql.Identifier(self._table),
-            where=sql.SQL(where_clause),
-            orderby=sql.SQL(orderby_clause),
+        orderby = (
+            sql.SQL(orderby_clause, *orderby_params)
+            if orderby_params
+            else sql.SQL(orderby_clause)
         )
-        self._cr.execute(query, where_params + orderby_params)
-        location_ids = [x[0] for x in self.env.cr.fetchall()]
+        query = sql.SQL(
+            "%s%s%s%s",
+            sql.SQL("SELECT id"),
+            sql.SQL(" FROM %s", sql.SQL.identifier(self._table)),
+            sql.SQL(" WHERE %s", where_clause),
+            sql.SQL(" ORDER BY %s", orderby),
+        )
+        location_ids = [x[0] for x in self.env.execute_query(query)]
         return self.env["stock.location"].browse(location_ids)
 
     def select_first_allowed_location(self, package_type, quants, products):
@@ -567,6 +572,10 @@ class StockLocation(models.Model):
                 self, quants, products, package_type
             )
             _logger.debug("pertinent location domain: %s", location_domain)
+            # Flush pending changes to get expected result.
+            # e.g. M2M fields like 'in_move_ids' and 'in_move_line_ids' have to
+            # be up-to-date in DB as domain is using them by default.
+            self.env.flush_all()
             locations = self.search(location_domain)
             valid_location_ids |= set(locations.ids)
         return self.browse(valid_location_ids)
@@ -650,8 +659,8 @@ class StockLocation(models.Model):
                 item["location_id"][0]
                 for item in StockQuant.read_group(
                     domain_quant,
-                    ["location_id", "quantity"],
-                    ["location_id"],
+                    fields=["location_id", "quantity"],
+                    groupby=["location_id"],
                     orderby="quantity",
                 )
                 if (float_compare(item["quantity"], 0, precision_digits=2) > 0)

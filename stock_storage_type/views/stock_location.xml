@@ -9,23 +9,23 @@
                 <field
                     name="computed_storage_category_id"
                     readonly="1"
-                    groups="stock.group_stock_storage_categories"
+                    groups="stock.group_stock_multi_locations"
                 />
             </field>
             <field name="removal_strategy_id" position="after">
                 <field
                     name="pack_putaway_strategy"
-                    groups="stock.group_stock_storage_categories"
+                    groups="stock.group_stock_multi_locations"
                 />
                 <field
                     name="package_type_putaway_sequence"
-                    groups="stock.group_stock_storage_categories"
+                    groups="stock.group_stock_multi_locations"
                 />
                 <field
                     name="computed_storage_capacity_ids"
                     widget="many2many_tags"
                     readonly="1"
-                    groups="stock.group_stock_storage_categories"
+                    groups="stock.group_stock_multi_locations"
                 />
             </field>
         </field>

@@ -35,15 +35,15 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 4.0
+        ml1 = in_picking.move_line_ids
+        ml1.quantity = 4
+        ml2 = ml1.copy({"quantity": 4})
+        ml1.picked = True
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_cardbox_product_packaging
         # Put in pack again
-        ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id
-        )
-        ml_without_package.qty_done = 4.0
+        ml2.picked = True
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging
@@ -113,15 +113,15 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 48.0
+        ml1 = in_picking.move_line_ids
+        ml1.quantity = 48
+        ml2 = ml1.copy({"quantity": 48})
+        ml1.picked = True
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         # Put in pack again
-        ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id
-        )
-        ml_without_package.qty_done = 48.0
+        ml2.picked = True
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
@@ -194,17 +194,17 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 48.0
+        ml1 = in_picking.move_line_ids
+        ml1.quantity = 48
+        ml2 = ml1.copy({"quantity": 48})
+        ml1.picked = True
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_pallet_product_packaging
         first_package.onchange_product_packaging_id()
         self.assertEqual(first_package.pack_weight, 60)
         # Put in pack again
-        ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id
-        )
-        ml_without_package.qty_done = 48.0
+        ml2.picked = True
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_pallet_product_packaging
@@ -276,19 +276,19 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack product
-        in_picking.move_line_ids.filtered(
+        ml1 = in_picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product
-        ).qty_done = 4.0
+        )
+        ml1.quantity = 4
+        ml2 = ml1.copy({"quantity": 4})
+        ml1.picked = True
         product_first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_first_package.product_packaging_id = (
             self.product_cardbox_product_packaging
         )
         # Put in pack product again
-        product_ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id and ml.product_id == self.product
-        )
-        product_ml_without_package.qty_done = 4.0
+        ml2.picked = True
         product_second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_second_pack.product_packaging_id = (
@@ -296,20 +296,21 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
 
         # Put in pack product lot
-        product_lot_ml = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
+        ml3 = in_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_lot
         )
-        product_lot_ml.write({"qty_done": 5.0, "lot_name": "A0001"})
+        ml3.quantity = 5
+        ml4 = ml3.copy({"quantity": 5})
+        ml3.lot_name = "A0001"
+        ml3.picked = True
         product_lot_first_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_lot_first_pack.product_packaging_id = (
             self.product_lot_cardbox_product_packaging
         )
         # Put in pack product lot again
-        product_lot_ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
-        )
-        product_lot_ml_without_package.write({"qty_done": 5.0, "lot_name": "A0002"})
+        ml4.lot_name = "A0002"
+        ml4.picked = True
         product_lot_second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         product_lot_second_pack.product_packaging_id = (
@@ -691,15 +692,15 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         # Mark as todo
         in_picking.action_confirm()
         # Put in pack
-        in_picking.move_line_ids.qty_done = 4.0
+        ml1 = in_picking.move_line_ids
+        ml1.quantity = 4
+        ml2 = ml1.copy({"quantity": 4})
+        ml1.picked = True
         first_package = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         first_package.product_packaging_id = self.product_cardbox_product_packaging
         # Put in pack again
-        ml_without_package = in_picking.move_line_ids.filtered(
-            lambda ml: not ml.result_package_id
-        )
-        ml_without_package.qty_done = 4.0
+        ml2.picked = True
         second_pack = in_picking.action_put_in_pack()
         # Ensure packaging is set properly on pack
         second_pack.product_packaging_id = self.product_cardbox_product_packaging

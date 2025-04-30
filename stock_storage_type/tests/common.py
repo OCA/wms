@@ -60,10 +60,10 @@ class TestStorageTypeCommon(TransactionCase):
 
         cls.product = ref("product.product_product_9")
         cls.product2 = cls.env["product.product"].create(
-            {"name": "Product B", "type": "product"}
+            {"name": "Product B", "type": "consu", "is_storable": True}
         )
         cls.product3 = cls.env["product.product"].create(
-            {"name": "Product C", "type": "product"}
+            {"name": "Product C", "type": "consu", "is_storable": True}
         )
         cls.product_lot = ref("stock.product_cable_management_box")
 
@@ -104,14 +104,7 @@ class TestStorageTypeCommon(TransactionCase):
             }
         )
         cls.internal_picking_type.write({"show_entire_packs": True})
-        # show_reserved must be set here because it changes the behaviour of
-        # put_in_pack operation:
-        # if show_reserved: qty_done must be set on stock.picking.move_line_ids
-        # if not show_reserved: qty_done must be set on
-        # stock.picking.move_line_nosuggest_ids
-        cls.receipts_picking_type.write(
-            {"show_entire_packs": True, "show_reserved": True}
-        )
+        cls.receipts_picking_type.show_entire_packs = True
 
     @classmethod
     def _update_qty_in_location(
