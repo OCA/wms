@@ -17,6 +17,9 @@ class StockRoute(models.Model):
         compute="_compute_applicable_flow_ids",
         string="Applicable Flows",
     )
+    apply_flow_on = fields.Selection(
+        [("on_confirm", "When move is confirmed")], default="on_confirm"
+    )
 
     @api.depends("rule_ids.picking_type_id")
     def _compute_applicable_flow_ids(self):

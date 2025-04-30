@@ -12,8 +12,25 @@ class TestWarehouseFlowRelease(common.CommonFlow):
         # Set the default delivery route as pick+ship to make releasing working
         # (there is no need to release a 'ship_only' move)
         cls.wh.delivery_steps = "pick_ship"
-        # Enable the operation release on the default delivery route
-        cls.wh.delivery_route_id.available_to_promise_defer_pull = True
+        cls.out_rules = cls.env["stock.rule"].search(
+            [("picking_type_id.code", "=", "outgoing")]
+        )
+        cls.out_rules.route_id.available_to_promise_defer_pull = True
+        cls.out_rules.route_id.apply_flow_on = "on_release"
+
+    def test_flow_pick_ship_flow_at_confirm(self):
+        self.out_rules.route_id.apply_flow_on = "on_confirm"
+        # enable flow assigning at confirm
+        flow = self._get_flow("pick_ship")
+        to_picking_type = flow.to_picking_type_id
+        # NOTE: use the recorder when migrating to 15.0 to catch created moves
+        moves_before = self.env["stock.move"].search([])
+        self._run_procurement(self.product, 10, flow.carrier_ids)
+        moves_after = self.env["stock.move"].search([])
+        move = moves_after - moves_before
+        self.assertEqual(len(move), 1)
+        self.assertTrue(move.need_release)
+        self.assertEqual(move.picking_type_id, to_picking_type)
 
     def test_flow_pick_ship_on_release(self):
         """Replace the initial 'ship_only' move by pick+ship chained moves.
