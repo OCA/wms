@@ -5,7 +5,6 @@ from odoo.exceptions import ValidationError
 
 
 class StockQuantPackage(models.Model):
-
     _inherit = "stock.quant.package"
 
     pack_weight_in_kg = fields.Float(

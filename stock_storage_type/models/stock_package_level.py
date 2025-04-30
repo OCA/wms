@@ -5,7 +5,6 @@ from odoo import api, fields, models
 
 
 class StockPackageLevel(models.Model):
-
     _inherit = "stock.package_level"
 
     # We use a domain with the module 'web_domain_field', because if we use a

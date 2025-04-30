@@ -5,7 +5,6 @@ from odoo.exceptions import ValidationError
 
 
 class StockQuant(models.Model):
-
     _inherit = "stock.quant"
 
     @api.constrains("package_id", "location_id", "lot_id", "product_id")

@@ -4,7 +4,6 @@ from odoo import _, api, fields, models
 
 
 class StockPackageType(models.Model):
-
     _inherit = "stock.package.type"
 
     product_packaging_ids = fields.One2many("product.packaging", "package_type_id")

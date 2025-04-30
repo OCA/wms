@@ -4,7 +4,6 @@ from odoo import _, fields, models
 
 
 class StockStorageLocationSequence(models.Model):
-
     _name = "stock.storage.location.sequence"
     _description = "Sequence of locations to put-away the package type"
     _order = "sequence"
@@ -42,10 +41,7 @@ class StockStorageLocationSequence(models.Model):
                 if strat[0] == self.location_id.pack_putaway_strategy:
                     pack_storage_strat = strat[1]
                     break
-            msg = ' * <span style="color: green;">{} ({})</span>'.format(
-                self.location_id.name,
-                pack_storage_strat,
-            )
+            msg = f' * <span style="color: green;">{self.location_id.name} ({pack_storage_strat})</span>'
             if last:
                 # If last, we want to check if restrictions are defined on
                 # capacities accepting this package type
@@ -74,7 +70,7 @@ class StockStorageLocationSequence(models.Model):
         xmlid = "stock.action_location_form"
         action = self.env["ir.actions.act_window"]._for_xml_id(xmlid)
         action["domain"] = [
-            ("parent_path", "=ilike", "{}%".format(self.location_id.parent_path)),
+            ("parent_path", "=ilike", f"{self.location_id.parent_path}%"),
             (
                 "computed_storage_capacity_ids",
                 "in",

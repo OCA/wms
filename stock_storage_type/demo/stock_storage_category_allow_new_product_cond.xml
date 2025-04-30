@@ -16,5 +16,4 @@ if package_type and package_type == pallets_type:
 ]]>
         </field>
     </record>
-
 </odoo>

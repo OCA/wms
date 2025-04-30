@@ -2,7 +2,6 @@
 <!-- Copyright 2022 ACSONE SA/NV
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-
     <record model="ir.ui.view" id="stock_storage_location_sequence_cond_form_view">
         <field
             name="name"
@@ -42,7 +41,6 @@
         </field>
     </record>
 
-
     <record model="ir.ui.view" id="stock_storage_location_sequence_cond_tree_view">
         <field
             name="name"
@@ -65,6 +63,4 @@
         <field name="domain">[]</field>
         <field name="context">{}</field>
     </record>
-
-
 </odoo>
