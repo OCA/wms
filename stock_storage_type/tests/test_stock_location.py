@@ -100,8 +100,8 @@ class TestStockLocation(TestStorageTypeCommon):
         self._update_qty_in_location(location, self.product, 10)
         self.assertEqual(location.location_will_contain_product_ids, self.product)
 
-        # the moves and move lines created are not really valid, but we don't care, it's
-        # only to have "in_move_ids" and "in_move_line_ids" on the location
+        # the moves and move lines created are not really valid, but we don't care,
+        # its only to have "pending_in_move[_line]_ids" on the location
         self.env["stock.move"].create(
             {
                 "name": "test",
@@ -196,8 +196,8 @@ class TestStockLocation(TestStorageTypeCommon):
         self._update_qty_in_location(location, self.product, 10, lot=lot1)
         self.assertEqual(location.location_will_contain_lot_ids, lot1)
 
-        # the moves and move lines created are not really valid, but we don't care, it's
-        # only to have "in_move_ids" and "in_move_line_ids" on the location
+        # the moves and move lines created are not really valid, but we don't care,
+        # its only to have "pending_in_move[_line]_ids" on the location
         ml_move = self.env["stock.move"].create(
             {
                 "name": "test",

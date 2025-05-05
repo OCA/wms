@@ -14,9 +14,13 @@
     "application": False,
     "installable": True,
     "depends": [
-        "stock_putaway_hook",
+        # OCA/stock-logistics-tracking
         "stock_quant_package_dimension",
+        # OCA/stock-logistics-warehouse
         "stock_storage_category_capacity_name",
+        "stock_location_pending_move",
+        # OCA/stock-logistics-workflow
+        "stock_putaway_hook",
     ],
     "data": [
         "security/ir.model.access.csv",

@@ -66,33 +66,6 @@ class StockLocation(models.Model):
         '(has an "only empty" policy).',
         recursive=True,
     )
-    # TODO: Maybe renaming these fields as there are already such fields
-    # in core but without domains. Something like 'pending_in_move_ids'
-    in_move_ids = fields.One2many(
-        "stock.move",
-        "location_dest_id",
-        domain=[
-            ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
-        ],
-        help="technical field: the pending incoming stock.moves in the location",
-    )
-
-    in_move_line_ids = fields.One2many(
-        "stock.move.line",
-        "location_dest_id",
-        domain=[
-            ("state", "in", ("waiting", "confirmed", "partially_available", "assigned"))
-        ],
-        help="technical field: the pending incoming "
-        "stock.move.lines in the location",
-    )
-    out_move_line_ids = fields.One2many(
-        "stock.move.line",
-        "location_id",
-        domain=OUT_MOVE_LINE_DOMAIN,
-        help="technical field: the pending outgoing "
-        "stock.move.lines in the location",
-    )
     location_will_contain_lot_ids = fields.Many2many(
         "stock.lot",
         store=True,
@@ -270,8 +243,8 @@ class StockLocation(models.Model):
 
     @api.depends(
         "quant_ids.quantity",
-        "in_move_ids",
-        "in_move_line_ids",
+        "pending_in_move_ids",
+        "pending_in_move_line_ids",
         "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
@@ -284,14 +257,14 @@ class StockLocation(models.Model):
                     rec.mapped("quant_ids")
                     .filtered(lambda q: q.quantity > 0)
                     .product_id
-                    | rec.mapped("in_move_ids.product_id")
-                    | rec.mapped("in_move_line_ids.product_id")
+                    | rec.mapped("pending_in_move_ids.product_id")
+                    | rec.mapped("pending_in_move_line_ids.product_id")
                 )
                 rec.location_will_contain_product_ids = products
 
     @api.depends(
         "quant_ids.quantity",
-        "in_move_line_ids",
+        "pending_in_move_line_ids",
         "do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
@@ -302,15 +275,15 @@ class StockLocation(models.Model):
             else:
                 lots = rec.mapped("quant_ids").filtered(
                     lambda q: q.quantity > 0
-                ).lot_id | rec.mapped("in_move_line_ids.lot_id")
+                ).lot_id | rec.mapped("pending_in_move_line_ids.lot_id")
                 rec.location_will_contain_lot_ids = lots
 
     @api.depends(
         "quant_ids.quantity",
-        "out_move_line_ids.quantity",
-        "out_move_line_ids.picked",
-        "in_move_ids",
-        "in_move_line_ids",
+        "pending_out_move_line_ids.quantity",
+        "pending_out_move_line_ids.picked",
+        "pending_in_move_ids",
+        "pending_in_move_line_ids",
         "only_empty",
     )
     def _compute_location_is_empty(self):
@@ -349,8 +322,8 @@ class StockLocation(models.Model):
             if (
                 qty_by_location.get(rec.id, 0.0) - out_qty_by_location.get(rec.id, 0.0)
                 > 0
-                or rec.in_move_ids
-                or rec.in_move_line_ids
+                or rec.pending_in_move_ids
+                or rec.pending_in_move_line_ids
             ):
                 rec.location_is_empty = False
             else:
@@ -573,8 +546,8 @@ class StockLocation(models.Model):
             )
             _logger.debug("pertinent location domain: %s", location_domain)
             # Flush pending changes to get expected result.
-            # e.g. M2M fields like 'in_move_ids' and 'in_move_line_ids' have to
-            # be up-to-date in DB as domain is using them by default.
+            # e.g. M2M fields like 'pending_in_move_ids' and 'pending_in_move_line_ids'
+            # have to be up-to-date in DB as domain is using them by default.
             self.env.flush_all()
             locations = self.search(location_domain)
             valid_location_ids |= set(locations.ids)
