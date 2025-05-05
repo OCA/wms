@@ -341,6 +341,13 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                 ]
             )
 
+        # List available cardboxes bins. We don't know in which bin each Cardbox
+        # package will be stored, so to make tests reliable we are poping used
+        # bin from this list while checks are going forward.
+        # We start with 4 available bins
+        available_cardboxes_bins = self.cardboxes_location.child_ids
+        self.assertEqual(len(available_cardboxes_bins), 4)
+
         first_level = _levels_for(first_package)
         self.assertEqual(len(first_level), 1)
         # Pallet into pallets bin
@@ -349,22 +356,25 @@ class TestStorageTypeMove(TestStorageTypeCommon):
         second_level = _levels_for(second_pack)
         # Cardbox into cardbox bin
         self.assertEqual(len(second_level), 1)
-        self.assertEqual(second_level.location_dest_id, self.cardboxes_bin_1_location)
+        self.assertIn(second_level.location_dest_id, available_cardboxes_bins)
+        available_cardboxes_bins -= second_level.location_dest_id
 
         third_level = _levels_for(third_pack)
 
         # Cardbox with different product go into different cardbox location
         self.assertEqual(len(third_level), 1)
-        self.assertEqual(third_level.location_dest_id, self.cardboxes_bin_3_location)
+        self.assertIn(third_level.location_dest_id, available_cardboxes_bins)
+        available_cardboxes_bins -= third_level.location_dest_id
 
         fourth_fifth_levels = _levels_for(fourth_pack | fifth_pack)
         # Cardbox with same product but different lot go into different
         # cardbox location
         # Cardbox with same product same lot go into same location
         self.assertEqual(len(fourth_fifth_levels), 2)
-        self.assertEqual(
-            fourth_fifth_levels.location_dest_id, self.cardboxes_bin_2_location
-        )
+        self.assertEqual(len(fourth_fifth_levels.location_dest_id), 1)
+        self.assertIn(fourth_fifth_levels.location_dest_id, available_cardboxes_bins)
+        available_cardboxes_bins -= fourth_fifth_levels.location_dest_id
+        self.asserEqual(len(available_cardboxes_bins), 1)
 
         for pack_level in (
             first_level | second_level | third_level | fourth_fifth_levels
