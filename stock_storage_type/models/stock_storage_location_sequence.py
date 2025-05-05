@@ -28,8 +28,8 @@ class StockStorageLocationSequence(models.Model):
         self.ensure_one()
         # TODO improve ugly code
         type_matching_locations = self.location_id.get_storage_locations().filtered(
-            lambda l: self.package_type_id
-            in l.computed_storage_category_id.capacity_ids.mapped("package_type_id")
+            lambda loc: self.package_type_id
+            in loc.computed_storage_category_id.capacity_ids.mapped("package_type_id")
         )
         if type_matching_locations:
             # Get the selection description
@@ -41,7 +41,10 @@ class StockStorageLocationSequence(models.Model):
                 if strat[0] == self.location_id.pack_putaway_strategy:
                     pack_storage_strat = strat[1]
                     break
-            msg = f' * <span style="color: green;">{self.location_id.name} ({pack_storage_strat})</span>'
+            msg = (
+                f' * <span style="color: green;">'
+                f"{self.location_id.name} ({pack_storage_strat})</span>"
+            )
             if last:
                 # If last, we want to check if restrictions are defined on
                 # capacities accepting this package type

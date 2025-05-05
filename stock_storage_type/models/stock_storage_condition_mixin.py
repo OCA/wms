@@ -27,7 +27,8 @@ class StockStorageConditionMixin(models.AbstractModel):
             if not rec._code_snippet_valued():
                 raise exceptions.UserError(
                     _(
-                        "Condition type is set to `Code`: you must provide a piece of code"
+                        "Condition type is set to `Code`: "
+                        "you must provide a piece of code"
                     )
                 )
 

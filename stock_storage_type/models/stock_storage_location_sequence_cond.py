@@ -83,14 +83,12 @@ class StockStorageLocationSequenceCond(models.Model):
                 "* putaway sequence: %s\n"
                 "* putaway location: %s\n"
                 "* quants: %s\n"
-                "* product: %s\n"
-                % (
-                    self.name,
-                    storage_location_sequence.id,
-                    putaway_location.name,
-                    quant.ids,
-                    product.display_name,
-                )
+                "* product: %s\n",
+                self.name,
+                storage_location_sequence.id,
+                putaway_location.name,
+                quant.ids,
+                product.display_name,
             )
         return result
 

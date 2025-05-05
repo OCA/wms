@@ -103,15 +103,13 @@ class StockStorageCategoryAllowNewProductCond(models.Model):
                 "* product: %s\n"
                 "* package_type: %s\n"
                 "* package: %s\n"
-                "* quants: %s\n"
-                % (
-                    self.name,
-                    storage_category.ids,
-                    package_type and package_type.id or None,
-                    package and package.id or None,
-                    product.id,
-                    quants and quants.ids or None,
-                )
+                "* quants: %s\n",
+                self.name,
+                storage_category.ids,
+                package_type and package_type.id or None,
+                package and package.id or None,
+                product.id,
+                quants and quants.ids or None,
             )
         return result
 

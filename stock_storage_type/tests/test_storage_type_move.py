@@ -152,7 +152,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             ]
         )
         only_empty_possible_locations = possible_locations.filtered(
-            lambda l: not l.quant_ids
+            lambda loc: not loc.quant_ids
         )
 
         for level in int_picking.package_level_ids:
@@ -171,7 +171,7 @@ class TestStorageTypeMove(TestStorageTypeCommon):
             self.product, self.pallets_bin_3_location, 1.0
         )
         only_empty_possible_locations_2 = possible_locations.filtered(
-            lambda l: not l.quant_ids
+            lambda loc: not loc.quant_ids
         )
         self.assertEqual(
             only_empty_possible_locations,
