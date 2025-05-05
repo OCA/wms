@@ -1,0 +1,2 @@
+odoo-addon-stock_putaway_hook @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1931/head#subdirectory=stock_putaway_hook
+odoo-addon-stock_storage_category_capacity_name @ git+https://github.com/OCA/stock-logistics-warehouse.git@refs/pull/2327/head#subdirectory=stock_storage_category_capacity_name
