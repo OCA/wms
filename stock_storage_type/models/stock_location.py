@@ -46,7 +46,7 @@ class StockLocation(models.Model):
         "Ordered Children Locations: when moved to this "
         "location, a suitable location will be searched in its children "
         "locations according to the restrictions defined on their "
-        "respective location storage types.",
+        "respective storage category.",
     )
     package_type_putaway_sequence = fields.Integer(
         string="Putaway Sequence",
@@ -64,7 +64,7 @@ class StockLocation(models.Model):
         help="technical field: True if the location is empty "
         "and there is no pending incoming products in the location. "
         " Computed only if the location needs to check for emptiness "
-        '(has an "only empty" location storage type).',
+        '(has an "only empty" policy).',
         recursive=True,
     )
     # TODO: Maybe renaming these fields as there are already such fields
@@ -158,7 +158,7 @@ class StockLocation(models.Model):
     @api.depends(
         "usage",
         "computed_storage_category_id.allow_new_product",
-        "computed_storage_category_id.capacity_ids.allow_new_product",
+        "computed_storage_category_id.allow_new_product_ids.allow_new_product",
     )
     def _compute_do_not_mix_lots(self):
         """
@@ -167,18 +167,16 @@ class StockLocation(models.Model):
            - one of its Storage Capacities value
         """
         for rec in self:
+            rules = rec.computed_storage_category_id.allow_new_product_ids
             rec.do_not_mix_lots = rec.usage == "internal" and (
-                any(
-                    storage_type.allow_new_product == "same_lot"
-                    for storage_type in rec.computed_storage_category_id.capacity_ids
-                )
+                any(rule.allow_new_product == "same_lot" for rule in rules)
                 or rec.computed_storage_category_id.allow_new_product == "same_lot"
             )
 
     @api.depends(
         "usage",
         "computed_storage_category_id.allow_new_product",
-        "computed_storage_category_id.capacity_ids.allow_new_product",
+        "computed_storage_category_id.allow_new_product_ids.allow_new_product",
     )
     def _compute_only_empty(self):
         """
@@ -187,18 +185,16 @@ class StockLocation(models.Model):
            - one of its Storage Capacities value
         """
         for rec in self:
+            rules = rec.computed_storage_category_id.allow_new_product_ids
             rec.only_empty = rec.usage == "internal" and (
-                any(
-                    storage_type.allow_new_product == "empty"
-                    for storage_type in rec.computed_storage_category_id.capacity_ids
-                )
+                any(rule.allow_new_product == "empty" for rule in rules)
                 or rec.computed_storage_category_id.allow_new_product == "empty"
             )
 
     @api.depends(
         "usage",
         "computed_storage_category_id.allow_new_product",
-        "computed_storage_category_id.capacity_ids.allow_new_product",
+        "computed_storage_category_id.allow_new_product_ids.allow_new_product",
     )
     def _compute_do_not_mix_products(self):
         """
@@ -207,11 +203,9 @@ class StockLocation(models.Model):
            - one of its Storage Capacities value
         """
         for rec in self:
+            rules = rec.computed_storage_category_id.allow_new_product_ids
             rec.do_not_mix_products = rec.usage == "internal" and (
-                any(
-                    storage_type.allow_new_product in ("same", "same_lot")
-                    for storage_type in rec.computed_storage_category_id.capacity_ids
-                )
+                any(rule.allow_new_product in ("same", "same_lot") for rule in rules)
                 or rec.computed_storage_category_id.allow_new_product
                 in ("same", "same_lot")
             )
@@ -513,30 +507,29 @@ class StockLocation(models.Model):
         allowed = self.select_allowed_locations(package_type, quants, products, limit=1)
         return allowed
 
-    def _domain_location_storage_type_constraints(self, package_type, quants, products):
-        """Compute the domain for the location storage type which match the package
-        storage type
+    def _domain_storage_category_constraints(self, package_type, quants, products):
+        """Compute the domain for the storage category which matches the package type.
 
-        This method also checks the "capacity" constraints (height and weight)
+        This method also checks the category constraints (height and weight)
         """
-        # There can be multiple location storage types for a given
+        # There can be multiple storage capacities for a given
         # location, so we need to filter on the ones relative to the package
         # we consider.
-        Capacity = self.env["stock.storage.category.capacity"]
-        compatible_location_storage_types = Capacity.search(
+        Category = self.env["stock.storage.category"]
+        compatible_categories = Category.search(
             [("computed_location_ids", "in", self.ids)]
         )
 
-        pertinent_loc_storagetype_domain = [
-            ("id", "in", compatible_location_storage_types.ids),
-            ("package_type_id", "=", package_type.id),
+        pertinent_category_domain = [
+            ("id", "in", compatible_categories.ids),
+            ("capacity_ids.package_type_id", "=", package_type.id),
         ]
         if quants.package_id.height:
-            pertinent_loc_storagetype_domain += [
+            pertinent_category_domain += [
                 "|",
-                ("storage_category_id.max_height_in_m", "=", 0),
+                ("max_height_in_m", "=", 0),
                 (
-                    "storage_category_id.max_height_in_m",
+                    "max_height_in_m",
                     ">=",
                     quants.package_id.height_in_m,
                 ),
@@ -546,23 +539,23 @@ class StockLocation(models.Model):
             or quants.package_id.estimated_pack_weight_kg
         )
         if package_weight_kg:
-            pertinent_loc_storagetype_domain += [
+            pertinent_category_domain += [
                 "|",
-                ("storage_category_id.max_weight_in_kg", "=", 0),
-                ("storage_category_id.max_weight_in_kg", ">=", package_weight_kg),
+                ("max_weight_in_kg", "=", 0),
+                ("max_weight_in_kg", ">=", package_weight_kg),
             ]
         _logger.debug(
-            "pertinent storage type domain: %s", pertinent_loc_storagetype_domain
+            "pertinent storage category domain: %s", pertinent_category_domain
         )
-        return pertinent_loc_storagetype_domain
+        return pertinent_category_domain
 
-    def _allowed_locations_for_location_storage_types(
-        self, location_storage_types, quants, products
+    def _allowed_locations_for_storage_categories(
+        self, categories, quants, products, package_type
     ):
         valid_location_ids = set()
-        for loc_storage_type in location_storage_types:
-            location_domain = loc_storage_type._domain_location_storage_type(
-                self, quants, products
+        for category in categories:
+            location_domain = category._domain_location_storage_category(
+                self, quants, products, package_type
             )
             _logger.debug("pertinent location domain: %s", location_domain)
             locations = self.search(location_domain)
@@ -581,7 +574,7 @@ class StockLocation(models.Model):
         return self[:limit]
 
     def select_allowed_locations(self, package_type, quants, products, limit=None):
-        """Filter allowed locations for a storage type
+        """Filter allowed locations for a package type.
 
         ``self`` contains locations already ordered according to the
         putaway strategy, so beware of the return that must keep the
@@ -589,45 +582,31 @@ class StockLocation(models.Model):
         """
         # We have package who may be placed in a stock.location
         #
-        # 1. On the stock.location there are location_storage_type and on the
-        # packages there are package_storage_type. Between both, there's a m2m
-        # who says which package ST can be placed in which location ST
+        # 1. On the location there is a storage category that defines which
+        # package type is allowed. This is given by the storage capacities.
         #
-        # 2. On a location_ST there are some additional restrictions: a -
-        # capacity (volume / height / weight) and b - properties (boolean
+        # 2. On a storage category there are some additional restrictions:
+        # a - capacity (volume / height / weight) and b - properties (boolean
         # flags: only empty, don't mix lots, don't mix products)
-        Capacity = self.env["stock.storage.category.capacity"]
         _logger.debug(
-            "select allowed location for package storage type %s (q=%s, p=%s)",
+            "select allowed location for package type %s (q=%s, p=%s)",
             package_type.name,
             quants,
             products.mapped("name"),
         )
-        # 1: filter locations on compatible storage type
-        compatible_locations = self.search(
-            [
-                ("id", "in", self.ids),
-                (
-                    "computed_storage_category_id.capacity_ids",
-                    "in",
-                    package_type.storage_category_capacity_ids.ids,
-                ),
-            ]
-        )
-        pertinent_loc_s_t_domain = (
-            compatible_locations._domain_location_storage_type_constraints(
-                package_type, quants, products
-            )
+        # 1: filter pertinent storage categories
+        pertinent_category_domain = self._domain_storage_category_constraints(
+            package_type, quants, products
         )
 
-        pertinent_loc_storage_types = Capacity.search(pertinent_loc_s_t_domain)
+        pertinent_categories = self.env["stock.storage.category"].search(
+            pertinent_category_domain
+        )
 
-        # now loop over the pertinent location storage types (there should be
+        # now loop over the pertinent categories (there should be
         # few of them) and check for properties to find suitable locations
-        valid_locations = (
-            compatible_locations._allowed_locations_for_location_storage_types(
-                pertinent_loc_storage_types, quants, products
-            )
+        valid_locations = self._allowed_locations_for_storage_categories(
+            pertinent_categories, quants, products, package_type
         )
 
         valid_locations = self._order_allowed_locations(valid_locations)

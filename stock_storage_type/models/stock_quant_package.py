@@ -51,8 +51,8 @@ class StockQuantPackage(models.Model):
         res = super().auto_assign_packaging()
         for package in self:
             if not package.package_type_id:
-                # if no storage type could be set by auto assign,
-                # fallback on the default product's storage type (if any)
+                # if no package type could be set by auto assign,
+                # fallback on the default product's package type (if any)
                 package._sync_package_type_from_single_product()
         return res
 
@@ -71,7 +71,7 @@ class StockQuantPackage(models.Model):
     def _sync_package_type_from_packaging(self):
         for package in self:
             if package.package_type_id:
-                # Do not set package storage type for delivery packages
+                # Do not set package type for delivery packages
                 # to not trigger constraint like height requirement
                 # (we are delivering them, not storing them)
                 continue
