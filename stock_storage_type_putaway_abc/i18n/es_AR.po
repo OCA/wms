@@ -61,7 +61,7 @@ msgid ""
 "None: when moved to this location, it will not be put away any further.\n"
 "Ordered Children Locations: when moved to this location, a suitable location "
 "will be searched in its children locations according to the restrictions "
-"defined on their respective location storage types."
+"defined on their respective storage category."
 msgstr ""
 
 #~ msgid "Display Name"
