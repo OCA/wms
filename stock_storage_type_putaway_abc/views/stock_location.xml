@@ -7,10 +7,7 @@
         <field name="arch" type="xml">
             <field name="pack_putaway_strategy" position="after">
                 <field name="display_abc_storage" invisible="1" />
-                <field
-                    name="abc_storage"
-                    attrs="{'invisible': [('display_abc_storage', '=', False)]}"
-                />
+                <field name="abc_storage" invisible="not display_abc_storage" />
             </field>
         </field>
     </record>
