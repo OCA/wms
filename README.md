@@ -21,6 +21,7 @@ Repository | Description
 [stock-logistics-barcode](https://github.com/OCA/stock-logistics-barcode) | Product and product packaging barcodes
 [stock-logistics-interfaces](https://github.com/OCA/stock-logistics-interfaces) | Interfaces to interact with physical devices (vertical lift, measurement device...)
 [stock-logistics-orderpoint](https://github.com/OCA/stock-logistics-orderpoint) | Reordering rules
+[stock-logistics-putaway](https://github.com/OCA/stock-logistics-putaway) | Enhance put-away computation for storing goods in stock.
 [stock-logistics-release-channel](https://github.com/OCA/stock-logistics-release-channel) | Dispatch management. Organize and dispatch work in the warehouse by release channels
 [stock-logistics-reporting](https://github.com/OCA/stock-logistics-reporting) | Stock reportings
 [stock-logistics-request](https://github.com/OCA/stock-logistics-request) | Record needs for products
