@@ -6,7 +6,6 @@ from .stock_location import ABC_SELECTION
 
 
 class ProductTemplate(models.Model):
-
     _inherit = "product.template"
 
     abc_storage = fields.Selection(ABC_SELECTION, default="b")

@@ -8,7 +8,6 @@ ABC_SELECTION = [("a", "A"), ("b", "B"), ("c", "C")]
 
 
 class StockLocation(models.Model):
-
     _inherit = "stock.location"
 
     pack_putaway_strategy = fields.Selection(
