@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-06-07 12:35+0000\n"
+"PO-Revision-Date: 2025-05-07 13:23+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -24,6 +24,9 @@ msgid ""
 " * <span style=\"color: orange;\">{location} (WARNING: restrictions are "
 "active on storage categories matching this package type)</span>"
 msgstr ""
+" * <span style=\"color: orange;\">{location} (ATTENZIONE: sono attive "
+"restrizioni sulle categorie di stoccaggio corrispondenti a questo tipo di "
+"collo)</span>"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -33,6 +36,8 @@ msgid ""
 " * <span style=\"color: red;\">{location} (WARNING: no suitable location "
 "matching package type)</span>"
 msgstr ""
+" * <span style=\"color: red;\">{location} (ATTENZIONE: nessuna ubicazione "
+"adatta corrisponde al tipo di collo)</span>"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -42,6 +47,8 @@ msgid ""
 "<span style=\"color: red;\">The \"Put-Away sequence\" must be defined in "
 "order to put away packages using this package type ({storage}).</span>"
 msgstr ""
+"<span style=\"color: red;\">La \"Sequenza deposito\" deve essere definita "
+"per depositare i colli utilizzando questo tipo di collo ({storage}).</span>"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_type__active
@@ -54,17 +61,21 @@ msgstr "Attiva"
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_storage_category_form
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzato"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_category_allow_new_product__condition_ids
 msgid "All conditions have to match to apply the Allow New Product policy."
 msgstr ""
+"Per applicare la politica Consenti nuovi prodotti, tutte le condizioni "
+"devono essere soddisfatte."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_location_sequence__location_sequence_cond_ids
 msgid "All conditions have to match to apply the put-away strategy."
 msgstr ""
+"Per applicare la strategia di stoccaggio, devono essere soddisfatte tutte le "
+"condizioni."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__allow_new_product
@@ -76,7 +87,7 @@ msgstr "Consente nuovo prodotto"
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__allow_new_product_ids
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.stock_storage_category_form
 msgid "Allow New Product Rules"
-msgstr ""
+msgstr "Consenti nuove regole prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__package_type_putaway_sequence
@@ -224,6 +235,7 @@ msgstr "Altezza in metri"
 #: model:ir.model.fields,help:stock_storage_type.field_stock_package_type__height_required
 msgid "Height is mandatory for packages configured with this package type."
 msgstr ""
+"L'altezza è obbligatoria per i colli configurati con questo tipo di collo."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_package_type__height_required
@@ -337,7 +349,7 @@ msgstr "L'altezza massima deve essere un numero positivo."
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_condition_mixin
 msgid "Mixin to implement storage condition."
-msgstr ""
+msgstr "Mixin per implementare le condizioni di stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category_allow_new_product_cond__name
@@ -399,6 +411,10 @@ msgid ""
 "\n"
 "{error}"
 msgstr ""
+"Il collo {package} non è consentito nell'ubicazione {location}, perché non "
+"ci sono regole che consentano l'accesso al tipo di collo {type}:\n"
+"\n"
+"{error}"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_quant_package
@@ -458,7 +474,7 @@ msgstr "Sequenza"
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence
 msgid "Sequence of locations to put-away the package type"
-msgstr ""
+msgstr "Sequenza delle ubicazioni per stoccare il tipo di collo"
 
 #. module: stock_storage_type
 #: model_terms:ir.ui.view,arch_db:stock_storage_type.package_storage_location_tree_view
@@ -474,6 +490,7 @@ msgstr "Livello collo magazzino"
 #: model:ir.model,name:stock_storage_type.model_stock_storage_category_allow_new_product_cond
 msgid "Stock Storage Category Allow New Product Condition"
 msgstr ""
+"Categoria di stoccaggio delle giacenze Consenti nuova condizione del prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_location_sequence_cond
@@ -507,17 +524,19 @@ msgstr "Categoria stoccaggio"
 #: model:ir.model.constraint,message:stock_storage_type.constraint_stock_storage_category_allow_new_product_cond_name
 msgid "Storage Category Allow New Product Condition name must be unique"
 msgstr ""
+"Il nome della categoria di stoccaggio Consenti nuova condizione prodotto "
+"deve essere univoco"
 
 #. module: stock_storage_type
 #: model:ir.actions.act_window,name:stock_storage_type.stock_storage_category_allow_new_product_cond_act_window
 #: model:ir.ui.menu,name:stock_storage_type.stock_storage_category_allow_new_product_cond_menu
 msgid "Storage Category Allow New Product Conditions"
-msgstr ""
+msgstr "Categoria stoccaggio Consenti nuova categoria prodotto"
 
 #. module: stock_storage_type
 #: model:ir.model,name:stock_storage_type.model_stock_storage_category_allow_new_product
 msgid "Storage Category Allow New Product Rule"
-msgstr ""
+msgstr "Categoria stoccaggio Consenti nuova regola prodotto"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -527,6 +546,8 @@ msgid ""
 "Storage Category {category} defines max height of {max_h} but the package is "
 "bigger: {height}."
 msgstr ""
+"La categoria stoccaggio {category} ha una altezza massima di {max_h} ma il "
+"collo è più grande: {height}."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -536,6 +557,8 @@ msgid ""
 "Storage Category {category} defines max weight of {max_w} but the package is "
 "heavier: {weight_kg}."
 msgstr ""
+"La categoria stoccaggio {category} ha un peso massimo di {max_w} ma il collo "
+"è più pesante: {weight_kg}."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -545,6 +568,8 @@ msgid ""
 "Storage Category {category} is flagged 'do not mix lots' but there are other "
 "lots in location."
 msgstr ""
+"La categoria stoccaggio {category} è impostata a 'non mescolare i lotti' ma "
+"ci sono altri lotti nell'ubicazione."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -554,6 +579,8 @@ msgid ""
 "Storage Category {category} is flagged 'do not mix products' but there are "
 "other products in location."
 msgstr ""
+"La categoria stoccaggio {categoria} è impostata a 'non mescolare i prodotti' "
+"ma ci sono altri prodotti nell'ubicazione."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -563,6 +590,8 @@ msgid ""
 "Storage Category {category} is flagged 'only empty' with other quants in "
 "location."
 msgstr ""
+"La categoria stoccaggio {category} è impostata a 'solo vuote' con altri "
+"quanti nell'ubicazione."
 
 #. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.stock_storage_location_sequence_cond_menu
@@ -624,6 +653,13 @@ msgid ""
 "will be searched in its children locations according to the restrictions "
 "defined on their respective storage category."
 msgstr ""
+"Questo definisce la strategia di stoccaggio in base al tipo di collo da "
+"utilizzare quando un prodotto o un collo è depositato in questa ubicazione.\n"
+"Nessuna: quando movimentato in questa ubicazione, non verrà movimentato "
+"ulteriormente.\n"
+"Ordinamento per ubicazioni figlie: quando movimentato in questa ubicazione, "
+"verrà cercata una ubicazione idonea nelle ubicazioni figlie in accordo con "
+"le restrizioni definite nelle rispettive categorie stoccaggio."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__computed_storage_category_id
@@ -666,6 +702,12 @@ msgid ""
 "children of the destination location after the (product or category) put-"
 "away is applied."
 msgstr ""
+"Quando i colli con tipo {name} sono depositati, la strategia cerca una "
+"ubicazione disponibile nelle seguenti ubicazioni: <br/><br/>{message} <br/><"
+"br/><b>Nota</b>: questo accade finché queste ubicazioni <u>sono figlie della "
+"ubicazione destinazione del movimento di magazzino</u> o finché queste "
+"ubicazioni sono figlie dell'ubicazione di destinazione dopo che è stato "
+"eseguito il deposito (prodotto o categoria)."
 
 #. module: stock_storage_type
 #. odoo-python
@@ -682,6 +724,9 @@ msgid ""
 "incoming products in the location.  Computed only if the location needs to "
 "check for emptiness (has an \"only empty\" policy)."
 msgstr ""
+"Campo tecnico: Vero se l'ubicazione è vuota e non ci sono prodotti in arrivo "
+"in sospeso. Calcolato solo se l'ubicazione deve verificare se vuota (ha una "
+"politica \"solo vuote\")."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
