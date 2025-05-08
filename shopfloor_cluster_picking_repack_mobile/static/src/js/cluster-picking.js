@@ -12,11 +12,11 @@ let template = ClusterPickingBase.component.template;
 ClusterPickingBase.component.template = template.replace(
     "</Screen>",
     `
-    <pack-picking-detail
+    <pack-picking
          v-if="state_is('pack_picking_scan_pack')"
          :record="state.data"
     />
-    <pack-picking-detail
+    <pack-picking
          v-if="state_is('pack_picking_put_in_pack')"
          :record="state.data"
     />
