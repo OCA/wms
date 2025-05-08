@@ -374,13 +374,13 @@ class ClusterPicking(Component):
     # RESPONSES
 
     def _response_pack_picking_put_in_pack(self, picking, message=None) -> dict:
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         return self._response(
             next_state="pack_picking_put_in_pack", data=data, message=message
         )
 
     def _response_pack_picking_scan_pack(self, picking, message=None) -> dict:
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         return self._response(
             next_state="pack_picking_scan_pack", data=data, message=message
         )
@@ -430,9 +430,7 @@ class ClusterPicking(Component):
             next_state="select_delivery_packaging",
             data={
                 "picking": self.data.picking(picking),
-                "selected_lines_for_packing": self.data_detail.move_lines(
-                    selected_lines
-                ),
+                "selected_lines_for_packing": self.data.move_lines(selected_lines),
                 "packaging": self._data_for_delivery_package_type(packaging),
             },
             message=message,
@@ -515,15 +513,15 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     def _states(self) -> dict:
         states = super()._states()
-        states["pack_picking_put_in_pack"] = self.schemas_detail.pack_picking_detail()
-        states["pack_picking_scan_pack"] = self.schemas_detail.pack_picking_detail()
+        states["pack_picking_put_in_pack"] = self.schemas.pack_picking()
+        states["pack_picking_scan_pack"] = self.schemas.pack_picking()
         states["select_package"] = self.schemas.select_package()
         states["select_delivery_packaging"] = self._schema_select_delivery_packaging
         return states
 
     @property
     def _schema_pack_picking(self) -> dict:
-        schema = self.schemas_detail.pack_picking_detail()
+        schema = self.schemas.pack_picking()
         return {"type": "dict", "nullable": True, "schema": schema}
 
     @property
@@ -581,7 +579,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def _schema_select_delivery_packaging(self) -> dict:
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
-            "selected_lines_for_packing": self.schemas_detail.move_line_for_packing_detail(),
+            "selected_lines_for_packing": self.schemas._schema_list_of(
+                self.schemas.move_line()
+            ),
             "packaging": self.schemas._schema_list_of(
                 self.schemas.delivery_packaging()
             ),

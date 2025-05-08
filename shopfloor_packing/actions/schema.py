@@ -37,3 +37,43 @@ class ShopfloorSchemaAction(Component):
             },
         }
         return schema
+
+    def pack_picking(self):
+        schema = {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "required": True, "nullable": False},
+            "partner": {
+                "type": "dict",
+                "required": True,
+                "nullable": False,
+                "schema": {
+                    "id": {"required": True, "type": "integer"},
+                    "name": {"type": "string", "required": True, "nullable": False},
+                },
+            },
+            "scanned_packs": {"type": "list", "schema": {"type": "integer"}},
+            "move_lines": {
+                "type": "list",
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"required": True, "type": "integer"},
+                        "qty_done": {"type": "float", "required": True},
+                        "lot": {
+                            "type": "dict",
+                            "required": False,
+                            "nullable": True,
+                            "schema": self.lot(),
+                        },
+                        "package_dest": self._schema_dict_of(
+                            self.package(with_packaging=False), required=False
+                        ),
+                        "package_src": self._schema_dict_of(
+                            self.package(with_packaging=False), required=False
+                        ),
+                        "product": self._schema_dict_of(self.product()),
+                    },
+                },
+            },
+        }
+        return schema

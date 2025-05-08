@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable strict */
-Vue.component("pack-picking-detail", {
+Vue.component("pack-picking", {
     props: ["record"],
     methods: {
         move_lines_color_klass(rec) {
