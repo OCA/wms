@@ -37,7 +37,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # The first bin to process is bin1 we should therefore scan the bin 1
         # to pack and put in pack
         picking = move_lines[-1].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -52,7 +52,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin1.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",
@@ -74,7 +74,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         self.assertEqual(result_package[0].number_of_parcels, 4)
 
         picking = move_lines[0].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         # message = self.service.msg_store.stock_picking_packed_successfully(picking)
         self.assert_response(
             response, next_state="pack_picking_scan_pack", data=data, message=message
@@ -88,7 +88,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin2.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",
@@ -127,7 +127,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # The first bin to process is bin1 we should therefore a pack_picking
         # step with the picking info of the last move_line
         picking = move_lines[-1].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -142,7 +142,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin1.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",
@@ -163,7 +163,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
 
         # next picking..
         picking = move_lines[0].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response, next_state="pack_picking_scan_pack", data=data, message=message
         )
@@ -176,7 +176,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin2.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",
@@ -214,7 +214,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         )
         # step with the picking info of the last move_line
         picking = move_lines[0].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -229,7 +229,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin1.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",
@@ -282,7 +282,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             move_line = self.service._next_line_for_pick(self.batch)
 
         # everything is processed, we should put in pack...
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -298,7 +298,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "barcode": self.bin1.name,
             },
         )
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_put_in_pack",

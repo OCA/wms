@@ -67,7 +67,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # The first bin to process is bin1 we should therefore scan the bin 1
         # to pack and put in pack
         picking = move_lines[-1].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -108,7 +108,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         self.assertEqual(result_package[0].number_of_parcels, 4)
 
         picking = move_lines[0].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         # message = self.service.msg_store.stock_picking_packed_successfully(picking)
         self.assert_response(
             response, next_state="pack_picking_scan_pack", data=data, message=message
@@ -174,7 +174,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # The first bin to process is bin1 we should therefore scan the bin 1
         # to pack and put in pack
         picking = move_lines[-1].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -236,7 +236,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # The first bin to process is bin1 we should therefore scan the bin 1
         # to pack and put in pack
         picking = move_lines[-1].picking_id
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -296,7 +296,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # to pack and put in pack
         picking = move_lines[-1].picking_id
         picking.carrier_id = self.carrier
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -338,11 +338,8 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             "cannot be higher than the maximum allowed. (%s : %s > %s)"
             % (line.product_id.name, line.qty_done, line.reserved_qty),
         }
-        next_picking = first(
-            self.batch.picking_ids.filtered(lambda p: p.is_shopfloor_packing_todo)
-        )
-        data = self.data.select_package(next_picking, lines)
-        # data  = self.data_detail.pack_picking_detail(next_picking)
+        data = self.data.select_package(picking, lines.sorted())
+        # data  = self.data.pack_picking(next_picking)
         self.assert_response(
             response, next_state="select_package", data=data, message=message
         )
@@ -367,7 +364,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # to pack and put in pack
         picking = move_lines[-1].picking_id
         picking.carrier_id = self.carrier
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -402,7 +399,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         data = {}
-        data["selected_lines_for_packing"] = self.data_detail.move_lines(lines)
+        data["selected_lines_for_packing"] = self.data.move_lines(lines)
         data["packaging"] = self.data.delivery_packaging_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         self.assert_response(
@@ -424,7 +421,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         next_picking = self.batch.picking_ids.filtered(
             lambda p: p.is_shopfloor_packing_todo
         )
-        data = data = self.data_detail.pack_picking_detail(next_picking)
+        data = data = self.data.pack_picking(next_picking)
 
         self.assert_response(
             response, next_state="pack_picking_scan_pack", data=data, message=message
@@ -450,7 +447,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # to pack and put in pack
         picking = move_lines[-1].picking_id
         picking.carrier_id = self.carrier
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
@@ -489,7 +486,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         next_picking = first(
             self.batch.picking_ids.filtered(lambda p: p.is_shopfloor_packing_todo)
         )
-        data = self.data_detail.pack_picking_detail(next_picking)
+        data = self.data.pack_picking(next_picking)
         self.assert_response(
             response, next_state="pack_picking_scan_pack", message=message, data=data
         )
@@ -514,7 +511,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # to pack and put in pack
         picking = move_lines[-1].picking_id
         picking.carrier_id = self.carrier
-        data = self.data_detail.pack_picking_detail(picking)
+        data = self.data.pack_picking(picking)
         self.assert_response(
             response,
             next_state="pack_picking_scan_pack",
