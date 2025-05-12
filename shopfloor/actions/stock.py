@@ -108,7 +108,13 @@ class StockAction(Component):
         return picking.copy(return_values)
 
     def mark_move_line_as_picked(
-        self, move_lines, quantity=None, package=None, user=None, check_user=False
+        self,
+        move_lines,
+        quantity=None,
+        package=None,
+        user=None,
+        check_user=False,
+        split=True,
     ):
         """Set the qty_done and extract lines in new order"""
         user = user or self.env.user
@@ -121,7 +127,8 @@ class StockAction(Component):
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
             line.qty_done = qty_done
-            line._split_partial_quantity()
+            if split:
+                line._split_partial_quantity()
             data = {
                 "shopfloor_user_id": user.id,
             }
@@ -129,13 +136,17 @@ class StockAction(Component):
                 # destination package is set to the scanned one
                 data["result_package_id"] = package.id
             line.write(data)
+        values_assigned = {
+            "user_id": user.id,
+            "printed": True,
+        }
         # Extract the picked quantity in a split order and set current user
-        move_lines._extract_in_split_order(
-            {
-                "user_id": user.id,
-                "printed": True,
-            }
-        )
+        if split:
+            move_lines._extract_in_split_order(values_assigned)
+        else:
+            move_lines.picking_id.filtered(
+                lambda picking: not picking.printed or not picking.user_id == user
+            ).write(values_assigned)
         move_lines.picking_id.filtered(lambda p: p.user_id != user).user_id = user.id
 
     def unmark_move_line_as_picked(self, move_lines):
