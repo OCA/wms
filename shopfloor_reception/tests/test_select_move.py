@@ -26,6 +26,7 @@ class TestSelectLine(CommonCase):
 
     def test_scan_product(self):
         picking = self._create_picking()
+        self.assertFalse(picking.printed)
         response = self.service.dispatch(
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_a.barcode},
@@ -34,6 +35,7 @@ class TestSelectLine(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        self.assertTrue(selected_move_line.picking_id.printed)
         self.assert_response(
             response,
             next_state="set_lot",
