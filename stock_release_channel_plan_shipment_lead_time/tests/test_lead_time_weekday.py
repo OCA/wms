@@ -2,9 +2,12 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from freezegun import freeze_time
 
+from odoo import fields
 from odoo.fields import Command
 
 from odoo.addons.stock_release_channel.tests.common import ReleaseChannelCase
+
+to_datetime = fields.Datetime.to_datetime
 
 
 class TestReleaseChannelLeadTimeWeekday(ReleaseChannelCase):
@@ -153,3 +156,22 @@ class TestReleaseChannelLeadTimeWeekday(ReleaseChannelCase):
                     {"delivery_weekday_ids": [Command.link(self.thursday.id)]}
                 )
                 self.assertIn(self.monday, self.default_channel.preparation_weekday_ids)
+
+    @freeze_time("2025-01-02")
+    def test_delivery_date_plan_weekdays(self):
+        self.default_channel.write({"delivery_weekday_ids": [Command.clear()]})
+        self.default_channel.shipment_lead_time = 2
+        self.default_channel.write(
+            {"delivery_weekday_ids": [Command.link(self.wednesday.id)]}
+        )
+        dt = fields.Datetime.now()  # Thursday
+        gen = self.default_channel._next_delivery_date_plan_weekdays(dt)
+        # next preparation date is on next Monday (Wed -2d lead time)
+        result = next(gen)
+        next_mon = to_datetime("2025-01-06 00:00:00")
+        self.assertEqual(result, next_mon)
+        result = gen.send(next_mon)
+        self.assertEqual(result, next_mon)
+        # if we add 1 day, the next preparation date is 1 week later
+        result = gen.send(fields.Datetime.add(next_mon, days=1))
+        self.assertEqual(result, fields.Datetime.add(next_mon, weeks=1))
