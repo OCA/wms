@@ -1,3 +1,4 @@
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import timedelta
 
@@ -6,6 +7,8 @@ from freezegun import freeze_time
 from odoo import fields
 
 from odoo.addons.stock_release_channel.tests.common import ChannelReleaseCase
+
+to_datetime = fields.Datetime.to_datetime
 
 
 class ReleaseChannelEndDateCase(ChannelReleaseCase):
@@ -58,3 +61,23 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         self.picking.partner_id.state_id = self.env.ref("base.state_us_35")
         self._assign_picking(self.picking)
         self.assertNotEqual(self.channel, self.picking.release_channel_id)
+
+    @freeze_time("2023-09-01")
+    def test_delivery_date_public_holiday(self):
+        partner = self.picking.partner_id
+        self.channel.exclude_public_holidays = True
+        partner.tz = "Europe/Brussels"
+        dt = to_datetime("2023-09-17 08:00:00")
+        gen = self.channel._next_delivery_date_partner_public_holiday(dt, partner)
+        # not an holiday
+        result = next(gen)
+        self.assertEqual(result, dt)
+        result = gen.send(dt)
+        self.assertEqual(result, dt)
+        # an holiday
+        dt = to_datetime("2023-09-18 08:00:00")
+        result = gen.send(dt)
+        next_day = to_datetime("2023-09-18 22:00:00")
+        self.assertEqual(result, next_day)
+        result = gen.send(dt)
+        self.assertEqual(result, next_day)
