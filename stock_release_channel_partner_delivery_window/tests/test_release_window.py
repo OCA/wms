@@ -8,6 +8,8 @@ from odoo import fields
 
 from odoo.addons.stock_release_channel.tests.common import ChannelReleaseCase
 
+to_datetime = fields.Datetime.to_datetime
+
 
 class ReleaseChannelEndDateCase(ChannelReleaseCase):
     @classmethod
@@ -104,3 +106,28 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
         self.picking.partner_id = self.customer_time_window
         self._assign_picking(self.picking)
         self.assertEqual(self.channel, self.picking.release_channel_id)
+
+    def test_delivery_date_partner_time_window_workdays(self):
+        # before opening
+        dt = to_datetime("2025-01-01 05:00:00")  # Wed
+        gen = self.channel._next_delivery_date_partner_delivery_window(
+            dt, self.customer_time_window
+        )
+        result = next(gen)
+        opening = to_datetime("2025-01-02 08:00:00")  # Thu
+        self.assertEqual(result, opening)
+        result = gen.send(result)
+        self.assertEqual(result, opening)
+        # during opening
+        dt = to_datetime("2025-01-02 09:00:00")
+        result = gen.send(dt)
+        self.assertEqual(result, dt)
+        result = gen.send(result)
+        self.assertEqual(result, dt)
+        # after opening
+        dt = to_datetime("2025-01-02 19:00:00")
+        result = gen.send(dt)
+        next_opening = to_datetime("2025-01-04 08:00:00")  # Sat
+        self.assertEqual(result, next_opening)
+        result = gen.send(result)
+        self.assertEqual(result, next_opening)
