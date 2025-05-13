@@ -6,4 +6,5 @@ from . import (
     test_release_channel,
     test_release_channel_lifecycle,
     test_release_channel_partner,
+    test_release_channel_delivery_date,
 )

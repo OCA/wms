@@ -920,3 +920,62 @@ class StockReleaseChannel(models.Model):
             dt_tz = dt_tz.replace(hour=0, minute=0, second=0, microsecond=0)
         dt = dt_tz.astimezone(pytz.utc).replace(tzinfo=None)
         return dt
+
+    @property
+    def _delivery_date_steps(self):
+        """Returns the steps to compute the delivery date."""
+        return ["preparation", "delivery", "customer"]
+
+    @property
+    def _delivery_date_generators(self):
+        """Returns generators to compute delivery date.
+
+        Meant to be extended by modules to register a generator.
+        Returns a dict where:
+        - the key must be part of _delivery_date_steps.
+        - the value is a list of generators
+        """
+        return defaultdict(list)
+
+    def _get_earliest_delivery_date(self, partner, order_dt):
+        """Compute the earliest delivery date for this channel
+
+        Go through each steps. All generators of a step must agree on a date.
+        Initialize them with the provided start date for the first step and
+        then with the agreed date from the previous step. If a generator
+        provides a later date, send that date to the other generators to
+        request agreement or a new later date.
+        This algorithm performs a quick convergence to a date.
+        """
+        self.ensure_one()
+        best_dt = order_dt
+        for step in self._delivery_date_steps:
+            funcs = self._delivery_date_generators.get(step)
+            if not funcs:
+                continue
+            generators = []
+            best_generators = []
+            start_dt = best_dt
+            for func in funcs:
+                # initialize generators with the start date
+                gen = func(start_dt, partner)
+                generators.append(gen)
+                new_dt = next(gen)
+                if new_dt > best_dt:
+                    best_dt = new_dt
+                    best_generators = [gen]
+                elif new_dt == best_dt:
+                    best_generators.append(gen)
+            # loop until all generators return the same last date
+            while len(generators) != len(best_generators):
+                for gen in generators:
+                    if gen in best_generators:
+                        continue
+                    best_dt = gen.send(previous_dt := best_dt)
+                    if best_dt != previous_dt:
+                        best_generators = [gen]
+                    else:
+                        best_generators.append(gen)
+            for gen in generators:
+                gen.close()
+        return best_dt
