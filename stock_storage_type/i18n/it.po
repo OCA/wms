@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-05-07 13:23+0000\n"
+"PO-Revision-Date: 2025-05-13 10:23+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -579,7 +579,7 @@ msgid ""
 "Storage Category {category} is flagged 'do not mix products' but there are "
 "other products in location."
 msgstr ""
-"La categoria stoccaggio {categoria} è impostata a 'non mescolare i prodotti' "
+"La categoria stoccaggio {category} è impostata a 'non mescolare i prodotti' "
 "ma ci sono altri prodotti nell'ubicazione."
 
 #. module: stock_storage_type
@@ -668,7 +668,7 @@ msgid ""
 "the category set on the location or on one of its parent."
 msgstr ""
 "Questo rappresenta la categoria stoccaggio che verrà utilizzata. Dipende "
-"dalla categoria mpostata nell'ubicazione o in uno dei suoi padri."
+"dalla categoria impostata nell'ubicazione o in uno dei suoi padri."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_category__length_uom_id
