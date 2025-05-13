@@ -6,7 +6,10 @@ from datetime import datetime
 
 from freezegun import freeze_time
 
+from odoo import fields
 from odoo.tests.common import TransactionCase
+
+to_datetime = fields.Datetime.to_datetime
 
 
 class TestStockReleaseChannelCutoff(TransactionCase):
@@ -66,3 +69,38 @@ class TestStockReleaseChannelCutoff(TransactionCase):
 
         self.channel.cutoff_time = 8.0
         self.assertTrue(self.channel.cutoff_warning)
+
+    @freeze_time("2023-02-01 09:00:00")
+    def test_delivery_date_no_cutoff(self):
+        self.channel.state = "asleep"
+        self.env.company.partner_id.tz = "Europe/Brussels"
+        self.channel.cutoff_time = 0
+        dt = to_datetime("2023-02-01 08:00:00")
+        gen = self.channel._next_delivery_date_cutoff(dt)
+        result = next(gen)
+        self.assertEqual(result, dt)
+        result = gen.send(result)
+        self.assertEqual(result, dt)
+
+    @freeze_time("2023-02-01 09:00:00")
+    def test_delivery_date_cutoff(self):
+        self.channel.state = "asleep"
+        self.env.company.partner_id.tz = "Europe/Brussels"
+        self.channel.cutoff_time = 9.5  # = 8.5 in UTC
+        # before cutoff
+        dt = to_datetime("2023-02-01 08:00:00")
+        gen = self.channel._next_delivery_date_cutoff(dt)
+        result = next(gen)
+        self.assertEqual(result, dt)
+        result = gen.send(result)
+        self.assertEqual(result, dt)
+        # after cutoff
+        dt = to_datetime("2023-02-01 09:00:00")
+        result = gen.send(dt)
+        next_day = to_datetime("2023-02-01 23:00:00")
+        self.assertEqual(result, next_day)
+        result = gen.send(result)
+        self.assertEqual(result, next_day)
+        dt = to_datetime("2023-02-02 09:00:00")
+        result = gen.send(dt)
+        self.assertEqual(result, dt)
