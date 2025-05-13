@@ -1,3 +1,4 @@
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from datetime import timedelta
 
@@ -28,8 +29,8 @@ class ReleaseChannelEndDateCase(ChannelReleaseCase):
                         0,
                         0,
                         {
-                            "time_window_start": 0.00,
-                            "time_window_end": 23.99,
+                            "time_window_start": 8.00,
+                            "time_window_end": 18.50,
                             "time_window_weekday_ids": [
                                 (
                                     6,
