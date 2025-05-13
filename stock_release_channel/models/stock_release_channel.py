@@ -8,7 +8,7 @@ from collections import defaultdict
 from copy import deepcopy
 from operator import itemgetter
 
-from pytz import timezone
+import pytz
 
 from odoo import _, api, exceptions, fields, models
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
@@ -617,7 +617,7 @@ class StockReleaseChannel(models.Model):
             "time": safe_time,
             "datetime": safe_datetime,
             "dateutil": safe_dateutil,
-            "timezone": timezone,
+            "timezone": pytz.timezone,
             # orm
             "env": self.env,
             # record
@@ -900,3 +900,23 @@ class StockReleaseChannel(models.Model):
         """Return the new date to set on move chain"""
         self.ensure_one()
         return False
+
+    def _localize(self, dt, tz=None):
+        """Localize a datetime
+
+        Use the given tz or use the tz of the warehouse
+        """
+        wh_tz = pytz.timezone(tz or self.warehouse_id.partner_id.tz or "UTC")
+        dt_tz = dt.astimezone(pytz.utc).astimezone(wh_tz)
+        return dt_tz
+
+    @api.model
+    def _naive(self, dt_tz, reset_time=False):
+        """Convert a datetime as naive datetime
+
+        Allow to reset time
+        """
+        if reset_time:
+            dt_tz = dt_tz.replace(hour=0, minute=0, second=0, microsecond=0)
+        dt = dt_tz.astimezone(pytz.utc).replace(tzinfo=None)
+        return dt
