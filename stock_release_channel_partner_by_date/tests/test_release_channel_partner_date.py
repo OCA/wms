@@ -4,32 +4,10 @@
 
 from odoo import fields
 
-from odoo.addons.stock_release_channel.tests.test_release_channel_partner import (
-    ReleaseChannelPartnerCommon,
-)
+from .common import ReleaseChannelPartnerDateCommon
 
 
-class TestReleaseChannelPartnerDate(ReleaseChannelPartnerCommon):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.delivery_date_channel = cls.partner_channel.copy(
-            {
-                "name": "Specific Date Channel",
-                "warehouse_id": cls.wh.id,
-            }
-        )
-
-    def _create_channel_partner_date(self, channel, partner, date):
-        rc_date_model = self.env["stock.release.channel.partner.date"]
-        return rc_date_model.create(
-            {
-                "partner_id": partner.id,
-                "release_channel_id": channel.id,
-                "date": date,
-            }
-        )
-
+class TestReleaseChannelPartnerDate(ReleaseChannelPartnerDateCommon):
     def test_release_channel_on_specific_date(self):
         """partner specific date release channel is higher priority than other channels"""
         self.delivery_date_channel.action_wake_up()
