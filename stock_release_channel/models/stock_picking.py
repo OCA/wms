@@ -108,19 +108,33 @@ class StockPicking(models.Model):
         )
 
     def _get_release_channel_possible_candidate_domain_channel(self):
+        """Domain for finding channel candidates based on channel.
+
+        The condition is defined by the channel.
+        """
         return [
             ("is_manual_assignment", "=", False),
             ("state", "!=", "asleep"),
-        ]
-
-    def _get_release_channel_possible_candidate_domain_picking(self):
-        return [
-            ("company_id", "=", self.company_id.id),
             "|",
             ("picking_type_ids", "=", False),
             ("picking_type_ids", "in", self.picking_type_id.ids),
+        ]
+
+    def _get_release_channel_possible_candidate_domain_picking(self):
+        """Domain for finding channel candidates based on picking.
+
+        The condition is defined by the picking.
+        """
+        # when a warehouse is defined on the channel, it must always match
+        # otherwise fallback on the picking type
+        return [
+            ("company_id", "=", self.company_id.id),
             "|",
+            "&",
             ("warehouse_id", "=", False),
+            "|",
+            ("picking_type_ids", "=", False),
+            ("picking_type_ids", "in", self.picking_type_id.ids),
             ("warehouse_id", "=", self.picking_type_id.warehouse_id.id),
         ]
 

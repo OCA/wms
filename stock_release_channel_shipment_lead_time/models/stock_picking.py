@@ -7,9 +7,9 @@ from odoo import api, fields, models
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    def _get_release_channel_possible_candidate_domain_picking(self):
+    def _get_release_channel_possible_candidate_domain_channel(self):
         # Exclude deliveries (OUT pickings) when the date_deadline is after the shipment date
-        domain = super()._get_release_channel_possible_candidate_domain_picking()
+        domain = super()._get_release_channel_possible_candidate_domain_channel()
 
         date = self.date_deadline
         if date:
