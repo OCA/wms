@@ -3,7 +3,7 @@
 
 {
     "name": "Glue Stock Release Channels for Delivery Dates and Public holidays",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "BCIM, Odoo Community Association (OCA)",
