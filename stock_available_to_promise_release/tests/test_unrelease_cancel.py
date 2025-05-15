@@ -1,4 +1,5 @@
 # Copyright 2025 Camptocamp SA
+# Copyright 2025 Raumschmiede GmbH
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from datetime import datetime
 
@@ -36,6 +37,11 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         cls.pack_picking = cls._prev_picking(cls.ship_picking)
         cls.pick_picking = cls._prev_picking(cls.pack_picking)
 
+        cls.demo_user = cls.env.ref("base.user_demo")
+        cls.ship_picking.user_id = cls.demo_user
+        cls.pack_picking.user_id = cls.demo_user
+        cls.pick_picking.user_id = cls.demo_user
+
         # Why is this not working when creating picking after enabling this setting?
         delivery_route.write(
             {
@@ -70,6 +76,8 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         self.assertEqual(self.pack_picking.state, "cancel")
         self.assertEqual(self.pick_picking.state, "done")
         cancel_picking = self._get_cleanup_picking()
+        self.assertEqual(self.pick_picking.user_id, self.demo_user)
+        self.assertFalse(cancel_picking.user_id)
         self.assertEqual(len(cancel_picking), 1)
         self.assertEqual(cancel_picking.location_id, self.loc_pack)
         self.assertEqual(cancel_picking.location_dest_id, self.loc_stock)
@@ -84,6 +92,8 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         self.assertEqual(self.pack_picking.state, "done")
         self.assertEqual(self.pick_picking.state, "done")
         cancel_picking = self._get_cleanup_picking()
+        self.assertEqual(self.pack_picking.user_id, self.demo_user)
+        self.assertFalse(cancel_picking.user_id)
         self.assertEqual(len(cancel_picking), 1)
         self.assertEqual(cancel_picking.location_id, self.loc_output)
         self.assertEqual(cancel_picking.location_dest_id, self.loc_stock)
@@ -98,6 +108,7 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         self.assertEqual(self.pack_picking.state, "cancel")
         self.assertEqual(self.pick_picking.state, "done")
         cancel_picking = self._get_cleanup_picking()
+        self.assertFalse(cancel_picking.user_id)
         # In the end, we cancelled 5 units for the pick backorder, and returned
         # 5 units from pack -> stock
         self.assertEqual(pick_backorder.state, "cancel")
@@ -116,6 +127,7 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         self.assertEqual(self.pack_picking.state, "done")
         self.assertEqual(self.pick_picking.state, "done")
         cancel_pickings = self._get_cleanup_picking()
+        self.assertFalse(cancel_pickings.user_id)
         self.assertEqual(len(cancel_pickings), 2)
         # In the end, we cancelled 5 units for the pack backorder, returned
         # 5 units from pack -> stock, and 5 units from output -> stock
