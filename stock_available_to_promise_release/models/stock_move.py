@@ -1,6 +1,7 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 # Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
+# Copyright 2025 Raumschmiede GmbH
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 import itertools
 import logging
@@ -723,7 +724,12 @@ class StockMove(models.Model):
             if product_return_moves:
                 wiz_values["product_return_moves"] = product_return_moves
                 return_wiz = self.env["stock.return.picking"].create(wiz_values)
-                return_wiz.create_returns()
+                action = return_wiz.create_returns()
+
+                cancel_picking = self.picking_id.browse(action["res_id"])
+                # Do not copy the responsible user from the source picking as somebody
+                # else could scan the new cancel picking
+                cancel_picking.user_id = False
         return True
 
     def _unrelease_set_returnable_qty_per_move(
