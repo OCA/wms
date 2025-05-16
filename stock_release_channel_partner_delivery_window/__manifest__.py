@@ -1,3 +1,4 @@
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
@@ -11,6 +12,7 @@
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
+        "sale",
         "stock_partner_delivery_window",
         "stock_release_channel_shipment_lead_time",
     ],
