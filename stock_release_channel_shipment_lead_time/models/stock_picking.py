@@ -7,9 +7,10 @@ from odoo import api, fields, models
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    def _get_release_channel_possible_candidate_domain_channel(self):
+    @property
+    def _release_channel_possible_candidate_domain_extras(self):
         # Exclude deliveries (OUT pickings) when the date_deadline is after the shipment date
-        domain = super()._get_release_channel_possible_candidate_domain_channel()
+        domains = super()._release_channel_possible_candidate_domain_extras
 
         date = self.date_deadline
         if date:
@@ -23,14 +24,13 @@ class StockPicking(models.Model):
                 self.with_context(tz=tz), date
             ).date()
 
-            domain.extend(
-                [
-                    "|",
-                    ("shipment_date", "=", False),
-                    ("shipment_date", ">=", date),
-                ]
-            )
-        return domain
+            domain_shipment = [
+                "|",
+                ("shipment_date", "=", False),
+                ("shipment_date", ">=", date),
+            ]
+            domains.append(domain_shipment)
+        return domains
 
     @api.model
     def _search_scheduled_date_prior_to_channel_end_date_condition(self):
