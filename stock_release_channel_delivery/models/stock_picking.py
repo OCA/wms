@@ -1,23 +1,25 @@
 # Copyright 2023 ACSONE SA/NV
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import models
+from odoo.osv import expression
 
 
 class StockPicking(models.Model):
 
     _inherit = "stock.picking"
 
-    def _get_release_channel_possible_candidate_domain_picking(self):
-        domain = super()._get_release_channel_possible_candidate_domain_picking()
+    @property
+    def _release_channel_possible_candidate_domain_base(self):
+        domain = super()._release_channel_possible_candidate_domain_base
         if self.carrier_id:
-            domain.extend(
-                [
-                    "|",
-                    ("carrier_ids", "=", False),
-                    ("carrier_ids", "in", self.carrier_id.ids),
-                ]
-            )
+            domain_carrier = [
+                "|",
+                ("carrier_ids", "=", False),
+                ("carrier_ids", "in", self.carrier_id.ids),
+            ]
         else:
-            domain.extend([("carrier_ids", "=", False)])
+            domain_carrier = [("carrier_ids", "=", False)]
+        domain = expression.AND([domain, domain_carrier])
         return domain
