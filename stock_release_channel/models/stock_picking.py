@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 from odoo import _, exceptions, fields, models
@@ -103,27 +104,43 @@ class StockPicking(models.Model):
         self.ensure_one()
         return (
             self.env["stock.release.channel"]
-            .search(self._get_release_channel_possible_candidate_domain())
+            .search(self._release_channel_possible_candidate_domain)
             .sorted(key=lambda r: (not bool(r.partner_ids), r.sequence))
         )
 
-    def _get_release_channel_possible_candidate_domain_channel(self):
-        """Domain for finding channel candidates based on channel.
-
-        The condition is defined by the channel.
-        """
-        return [
+    @property
+    def _release_channel_possible_candidate_domain(self):
+        """Domain for finding channel candidates"""
+        self.ensure_one()
+        domain_base = self._release_channel_possible_candidate_domain_base
+        domain = [
             ("is_manual_assignment", "=", False),
-            ("state", "!=", "asleep"),
+            ("state", "in", ("open", "locked")),
             "|",
             ("picking_type_ids", "=", False),
             ("picking_type_ids", "in", self.picking_type_id.ids),
         ]
+        domain_partner = (
+            self.partner_id._release_channel_possible_candidate_domain
+            if self.partner_id
+            else []
+        )
+        domain_extras = []
+        if self._release_channel_possible_candidate_domain_apply_extras:
+            domain_extras = self._release_channel_possible_candidate_domain_extras
+        domain = expression.AND([domain, domain_base, domain_partner] + domain_extras)
+        return domain
 
-    def _get_release_channel_possible_candidate_domain_picking(self):
-        """Domain for finding channel candidates based on picking.
+    @property
+    def _release_channel_possible_candidate_domain_base(self):
+        """Base domain for finding channel candidates based on picking.
 
-        The condition is defined by the picking.
+        This is the base domain we always want to apply.
+
+        This is used by stock_release_channel_partner_by_date where you
+        can force a channel for a partner on a specific day. This domain is
+        used to check if there is a specific channel defined for the warehouse
+        (and carrier with delivery module).
         """
         # when a warehouse is defined on the channel, it must always match
         # otherwise fallback on the picking type
@@ -138,27 +155,22 @@ class StockPicking(models.Model):
             ("warehouse_id", "=", self.picking_type_id.warehouse_id.id),
         ]
 
-    def _get_release_channel_possible_candidate_domain_partner(self):
-        return [
-            "|",
-            ("partner_ids", "=", False),
-            ("partner_ids", "in", self.partner_id.ids),
-        ]
+    @property
+    def _release_channel_possible_candidate_domain_extras(self):
+        """Additional domains for finding channel candidates based on picking.
 
-    def _inject_possible_candidate_domain_partner(self):
-        """Hooks that could be overridden.
+        Allow extension modules to add domain rules. Each module can add a
+        domain to the list.
 
-        Return a boolean.
+        Those domains won't be used by stock_release_channel_partner_by_date
+        where you can force a channel for a partner on a specific day.
+        """
+        return []
+
+    @property
+    def _release_channel_possible_candidate_domain_apply_extras(self):
+        """Extra domains can be discarded.
+
+        For example, when there is an SO commitment date.
         """
         return True
-
-    def _get_release_channel_possible_candidate_domain(self):
-        self.ensure_one()
-        domain_channel = self._get_release_channel_possible_candidate_domain_channel()
-        domain_picking = self._get_release_channel_possible_candidate_domain_picking()
-        domain = expression.AND([domain_channel, domain_picking])
-        if self._inject_possible_candidate_domain_partner():
-            domain = expression.AND(
-                [domain, self._get_release_channel_possible_candidate_domain_partner()]
-            )
-        return domain
