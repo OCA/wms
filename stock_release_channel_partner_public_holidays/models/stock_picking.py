@@ -4,14 +4,14 @@
 from datetime import timedelta
 
 from odoo import fields, models
-from odoo.osv import expression
 
 
 class StockPicking(models.Model):
 
     _inherit = "stock.picking"
 
-    def _get_release_channel_possible_candidate_domain_partner_public_holidays(self):
+    @property
+    def _release_channel_possible_candidate_domain_partner_public_holidays(self):
         now = fields.Datetime.now()
         all_holidays = self.env["hr.holidays.public"].get_holidays_list(
             start_dt=now,
@@ -26,11 +26,10 @@ class StockPicking(models.Model):
             ("shipment_date", "not in", all_holidays.mapped("date")),
         ]
 
-    def _get_release_channel_possible_candidate_domain_channel(self):
-        domain = super()._get_release_channel_possible_candidate_domain_channel()
-        return expression.AND(
-            [
-                domain,
-                self._get_release_channel_possible_candidate_domain_partner_public_holidays(),
-            ]
+    @property
+    def _release_channel_possible_candidate_domain_extras(self):
+        domains = super()._release_channel_possible_candidate_domain_extras
+        domains.append(
+            self._release_channel_possible_candidate_domain_partner_public_holidays
         )
+        return domains
