@@ -14,6 +14,7 @@
         "sales_team",
         "sale_stock",
         # OCA/wms
+        "sale_stock_release_channel",
         "stock_release_channel_partner_by_date",
     ],
     "data": [

@@ -29,14 +29,15 @@ class SaleOrder(models.Model):
         return f"[{parts}]"
 
     def _release_channel_id_domain_parts(self):
-        return [
-            "'|', ('warehouse_id', '=', False), ('warehouse_id', '=', warehouse_id)",
-        ]
+        return ["('warehouse_id', 'in', (False, warehouse_id))"]
 
     def _get_release_channel_id_depends(self):
         return ["partner_shipping_id", "warehouse_id", "commitment_date"]
 
-    @api.depends(lambda o: o._get_release_channel_id_depends())
+    @api.depends(
+        lambda o: ["release_channel_partner_date_id"]
+        + o._get_release_channel_id_depends()
+    )
     def _compute_release_channel_id(self):
         for rec in self:
             if not rec._check_release_channel_partner_date_requirements():
@@ -44,32 +45,40 @@ class SaleOrder(models.Model):
             channel_date = rec.release_channel_partner_date_id
             if channel_date:
                 rec.release_channel_id = channel_date.release_channel_id
+            elif rec.release_channel_id not in rec.release_channel_id.filtered_domain(
+                self._release_channel_possible_candidate_domain_base
+            ):
+                # empty release channel when value is not compatible anymore
+                # with new depends values
+                rec.release_channel_id = False
 
     @api.depends(
-        "state",
-        "partner_shipping_id",
-        "commitment_date",
-        "expected_date",
-        "warehouse_id",
+        lambda o: ["state", "expected_date"] + o._get_release_channel_id_depends()
     )
     def _compute_release_channel_partner_date_id(self):
         for rec in self:
-            channel_partner_date = rec._get_release_channel_partner_date()
+            channel_partner_date = rec._get_release_channel_partner_date()[:1]
             rec.release_channel_partner_date_id = channel_partner_date
 
     def _get_release_channel_partner_date(self):
         self.ensure_one()
-        model = self.env["stock.release.channel.partner.date"]
-        domain = self._get_release_channel_partner_date_domain()
-        return domain and model.search(domain, limit=1) or model
-
-    def _get_release_channel_partner_date_domain(self):
-        self.ensure_one()
         if not self._check_release_channel_partner_date_requirements():
-            return
+            return self.env["stock.release.channel.partner.date"]
+        return (
+            self.env["stock.release.channel.partner.date"]
+            .with_context(active_test=False)
+            .search(self._release_channel_partner_date_domain)
+            .filtered(
+                lambda o: o.release_channel_id.filtered_domain(
+                    self._release_channel_possible_candidate_domain_base
+                )
+            )
+        )
+
+    @property
+    def _release_channel_partner_date_domain(self):
         delivery_date = self._get_delivery_date()
         return [
-            ("release_channel_id.warehouse_id", "in", [False, self.warehouse_id.id]),
             ("partner_id", "=", self.partner_shipping_id.id),
             ("date", "=", delivery_date),
         ]
@@ -103,10 +112,11 @@ class SaleOrder(models.Model):
         model = self.env["stock.release.channel.partner.date"]
         if self.state not in ("sale", "done") or not self.release_channel_id:
             return model
-        channel = self.release_channel_id.with_context(active_test=False)
-        channel_dates = channel.release_channel_partner_date_ids.filtered_domain(
-            self._get_release_channel_partner_date_domain()
-        )
+        channel_dates = (
+            self._get_release_channel_partner_date().filtered(
+                lambda rcd: rcd.release_channel_id == self.release_channel_id
+            )
+        )[:1]
         if channel_dates:
             channel_dates.write({"active": True})
         else:

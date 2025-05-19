@@ -20,8 +20,7 @@ class SaleReleaseChannelCase(ReleaseChannelCase):
     def _create_sale_order(cls, channel=False, date=False, warehouse=False):
         sale_form = Form(cls.env["sale.order"])
         sale_form.partner_id = cls.customer
-        if warehouse:
-            sale_form.warehouse_id = warehouse
+        sale_form.warehouse_id = warehouse or cls.wh
         with sale_form.order_line.new() as line_form:
             line_form.product_id = cls.product
             line_form.product_uom_qty = 1
