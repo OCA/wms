@@ -11,8 +11,8 @@
     "website": "https://github.com/OCA/wms",
     "depends": [
         # OCA/wms
+        "sale_stock_release_channel_delivery",
         "sale_stock_release_channel_partner_by_date",
-        "stock_release_channel_delivery",
     ],
     "data": [
         "views/sale_order.xml",
