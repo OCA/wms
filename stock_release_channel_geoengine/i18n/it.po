@@ -101,11 +101,6 @@ msgid "To Release:"
 msgstr "Da rilasciare:"
 
 #. module: stock_release_channel_geoengine
-#: model:ir.model,name:stock_release_channel_geoengine.model_stock_picking
-msgid "Transfer"
-msgstr "Trasferimento"
-
-#. module: stock_release_channel_geoengine
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
 msgid "Waiting:"
 msgstr "In attesa:"
@@ -114,3 +109,6 @@ msgstr "In attesa:"
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
 msgid "Warehouse:"
 msgstr "Magazzino:"
+
+#~ msgid "Transfer"
+#~ msgstr "Trasferimento"
