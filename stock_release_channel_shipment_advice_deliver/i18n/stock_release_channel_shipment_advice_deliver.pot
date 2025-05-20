@@ -262,11 +262,6 @@ msgid ""
 msgstr ""
 
 #. module: stock_release_channel_shipment_advice_deliver
-#: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_picking
-msgid "Transfer"
-msgstr ""
-
-#. module: stock_release_channel_shipment_advice_deliver
 #: model:ir.model,name:stock_release_channel_shipment_advice_deliver.model_stock_release_channel_deliver_check_wizard
 msgid "stock release channel deliver check wizard"
 msgstr ""
