@@ -98,11 +98,6 @@ msgid "To Release:"
 msgstr ""
 
 #. module: stock_release_channel_geoengine
-#: model:ir.model,name:stock_release_channel_geoengine.model_stock_picking
-msgid "Transfer"
-msgstr ""
-
-#. module: stock_release_channel_geoengine
 #: model_terms:ir.ui.view,arch_db:stock_release_channel_geoengine.stock_release_channel_geoengine_view
 msgid "Waiting:"
 msgstr ""
