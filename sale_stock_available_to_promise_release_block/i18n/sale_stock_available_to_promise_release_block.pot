@@ -14,6 +14,34 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release_block.field_unblock_release__option
+msgid ""
+"- Manual: schedule blocked deliveries at a given date;\n"
+"- Automatic: schedule blocked deliveries as soon as possible;\n"
+"- Based on current order: schedule blocked deliveries with the contextual sale order."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__available_move_to_unblock_count
+msgid "Available Move To Unblock Count"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__available_move_to_unblock_ids
+msgid "Available moves to unblock"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release_block.field_sale_order__available_move_to_unblock_ids
+msgid "Available moves to unblock for this order."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_order_form
+msgid "Backorders"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
 #: model:ir.actions.server,name:sale_stock_available_to_promise_release_block.action_sale_order_line_block_release
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__block_release
 msgid "Block Release"
@@ -32,13 +60,103 @@ msgid "Blocked"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.unblock_release_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__date_deadline
+msgid "Date Deadline"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_order_form
+msgid "Deliveries that could be unblocked at order confirmation."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_order_form
+msgid "Deliveries that will be unblocked at order confirmation."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__move_ids
+msgid "Delivery moves"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order_line__is_release_blocked
 msgid "Has Blocked Delivery"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__id
+msgid "ID"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.view_sales_order_line_filter
 msgid "Is Release Blocked"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__move_to_unblock_count
+msgid "Move To Unblock Count"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_sale_order__move_to_unblock_ids
+msgid "Moves To Unblock"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,help:sale_stock_available_to_promise_release_block.field_sale_order__move_to_unblock_ids
+msgid "Moves to unblock when the current order is confirmed."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__option
+msgid "Option"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__order_id
+msgid "Order"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__order_line_ids
+msgid "Order Lines"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release_block
@@ -62,6 +180,23 @@ msgid "Sales Order Lines having blocked deliveries"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.unblock_release_view_form
+msgid "Selected deliveries"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.unblock_release_view_form
+msgid ""
+"Selected delivery moves will be unblocked when the above order is confirmed.\n"
+"            Their delivery method, shipping policy and scheduled date will be aligned with the deliveries of the confirmed order."
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model,name:sale_stock_available_to_promise_release_block.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
 #: model:ir.model,name:sale_stock_available_to_promise_release_block.model_stock_rule
 msgid "Stock Rule"
 msgstr ""
@@ -74,6 +209,25 @@ msgid "This operator is not supported"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release_block
-#: model:ir.actions.server,name:sale_stock_available_to_promise_release_block.action_sale_order_line_unblock_release
+#: model:ir.actions.act_window,name:sale_stock_available_to_promise_release_block.action_sale_order_line_unblock_release
+#: model:ir.actions.act_window,name:sale_stock_available_to_promise_release_block.action_stock_move_unblock_release
+#: model:ir.model,name:sale_stock_available_to_promise_release_block.model_unblock_release
 msgid "Unblock Release"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_stock_move__unblocked_by_order_id
+msgid "Unblocked by order"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release_block.unblock_release_view_form
+msgid "Validate"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release_block
+#. odoo-python
+#: code:addons/sale_stock_available_to_promise_release_block/wizards/unblock_release.py:0
+#, python-format
+msgid "You cannot reschedule deliveries in the past."
 msgstr ""
