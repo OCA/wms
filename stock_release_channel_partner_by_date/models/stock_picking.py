@@ -3,13 +3,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from odoo import fields, models
-from odoo.osv import expression
 
 
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    def _get_release_channel_partner_date_domain(self):
+    @property
+    def _release_channel_partner_date_domain(self):
         assert self.scheduled_date
         scheduled_date = max(self.scheduled_date, fields.Datetime.now())
         tz = (
@@ -30,30 +30,22 @@ class StockPicking(models.Model):
         """Return specific channel entries corresponding to the transfer."""
         return (
             self.env["stock.release.channel.partner.date"]
-            .search(self._get_release_channel_partner_date_domain())
+            .search(self._release_channel_partner_date_domain)
             .filtered(
                 lambda o: o.release_channel_id.filtered_domain(
-                    self._get_release_channel_possible_candidate_domain_picking()
+                    self._release_channel_possible_candidate_domain_base
                 )
             )
         )
 
-    def _inject_possible_candidate_domain_partner(self):
-        # Do not inject partners domain if there are channels for this specific
-        # delivery address and date
-        specific_rcs = self._get_release_channel_partner_dates()
-        if specific_rcs:
-            return False
-        return super()._inject_possible_candidate_domain_partner()
-
-    def _get_release_channel_possible_candidate_domain(self):
-        domain = super()._get_release_channel_possible_candidate_domain()
+    @property
+    def _release_channel_possible_candidate_domain(self):
         # Look for a specific release channel at first
-        specific_rc_domain = None
         if self.scheduled_date:
             specific_rcs = self._get_release_channel_partner_dates()
             if specific_rcs:
-                specific_rc_domain = [("id", "in", specific_rcs.release_channel_id.ids)]
-        if specific_rc_domain:
-            domain = expression.AND([domain, specific_rc_domain])
-        return domain
+                return [
+                    ("state", "in", ("open", "locked")),
+                    ("id", "in", specific_rcs.release_channel_id.ids),
+                ]
+        return super()._release_channel_possible_candidate_domain

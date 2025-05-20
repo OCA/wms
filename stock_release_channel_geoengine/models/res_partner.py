@@ -1,7 +1,9 @@
 # Copyright 2023 ACSONE SA/NV
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
+from odoo.osv import expression
 
 
 class ResPartner(models.Model):
@@ -31,3 +33,17 @@ class ResPartner(models.Model):
                     [("delivery_zone", "geo_intersect", rec.geo_point)]
                 )
             )
+
+    @property
+    def _release_channel_possible_candidate_domain(self):
+        domain = super()._release_channel_possible_candidate_domain
+        if self.in_geo_release_channel:
+            domain_geoengine = [
+                "|",
+                ("restrict_to_delivery_zone", "=", False),
+                ("delivery_zone", "geo_intersect", self.geo_point),
+            ]
+        else:
+            domain_geoengine = [("restrict_to_delivery_zone", "=", False)]
+        domain = expression.AND([domain, domain_geoengine])
+        return domain

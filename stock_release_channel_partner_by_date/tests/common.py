@@ -19,8 +19,9 @@ class ReleaseChannelPartnerDateCommon(ReleaseChannelPartnerCommon):
             }
         )
 
-    def _create_channel_partner_date(self, channel, partner, date):
-        rc_date_model = self.env["stock.release.channel.partner.date"]
+    @classmethod
+    def _create_channel_partner_date(cls, channel, partner, date):
+        rc_date_model = cls.env["stock.release.channel.partner.date"]
         return rc_date_model.create(
             {
                 "partner_id": partner.id,

@@ -12,7 +12,6 @@
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
-        "sale",
         "stock_partner_delivery_window",
         "stock_release_channel_shipment_lead_time",
     ],
