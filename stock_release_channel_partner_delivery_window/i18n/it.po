@@ -17,11 +17,16 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: stock_release_channel_partner_delivery_window
+#: model:ir.model.fields,field_description:stock_release_channel_partner_delivery_window.field_stock_release_channel__delivery_date_weekday
+msgid "Delivery Date Weekday"
+msgstr ""
+
+#. module: stock_release_channel_partner_delivery_window
 #: model:ir.model.fields,help:stock_release_channel_partner_delivery_window.field_stock_release_channel__respect_partner_delivery_time_windows
 msgid ""
 "If the delivery has moves linked to SO lines linked to SO that has a "
-"commitment_date, then we never respect the partner time window (it is not an"
-" exclusion selection criteria anymore)"
+"commitment_date, then we never respect the partner time window (it is not an "
+"exclusion selection criteria anymore)"
 msgstr ""
 "Se la consegna ha movimenti collegati a righe dell'OV che ha una data "
 "impegno, allora non si rispetta mai l'intervallo tempoale del partner (non è "
