@@ -5,7 +5,7 @@
 {
     "name": "Release channel shipment lead time",
     "summary": "Release channel with shipment lead time",
-    "version": "16.0.1.3.1",
+    "version": "16.0.2.0.0",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
