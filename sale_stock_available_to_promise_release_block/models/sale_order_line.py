@@ -18,6 +18,7 @@ class SaleOrderLine(models.Model):
         compute="_compute_release_blocked_label",
     )
 
+    @api.depends("move_ids.release_blocked")
     def _compute_is_release_blocked(self):
         for rec in self:
             rec.is_release_blocked = any(rec.move_ids.mapped("release_blocked"))
@@ -30,7 +31,9 @@ class SaleOrderLine(models.Model):
     @api.depends("is_release_blocked")
     def _compute_release_blocked_label(self):
         for rec in self:
-            rec.release_blocked_label = _("Blocked") if rec.is_release_blocked else ""
+            rec.release_blocked_label = (
+                _("Blocked") if rec.is_release_blocked else False
+            )
 
     def _prepare_procurement_values(self, group_id=False):
         vals = super()._prepare_procurement_values(group_id=group_id)
