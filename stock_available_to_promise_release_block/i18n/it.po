@@ -95,11 +95,9 @@ msgid "Transfer"
 msgstr "Trasferimento"
 
 #. module: stock_available_to_promise_release_block
-#: model:ir.actions.server,name:stock_available_to_promise_release_block.action_stock_move_unblock_release
-msgid "Unblock Release"
-msgstr "Sblocco rilascio"
-
-#. module: stock_available_to_promise_release_block
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release_block.stock_picking_form_view
 msgid "Unblock release"
 msgstr "Sblocco rilascio"
+
+#~ msgid "Unblock Release"
+#~ msgstr "Sblocco rilascio"
