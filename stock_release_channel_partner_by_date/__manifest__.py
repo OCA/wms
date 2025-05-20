@@ -5,7 +5,7 @@
 {
     "name": "Stock Release Channels for Delivery Dates",
     "summary": "Set release channels for specific delivery dates",
-    "version": "16.0.2.0.0",
+    "version": "16.0.2.0.1",
     "development_status": "Beta",
     "license": "AGPL-3",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
