@@ -39,6 +39,7 @@ setuptools.setup(
         'odoo-addon-stock_release_channel_depot>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_geoengine>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_partner_by_date>=16.0dev,<16.1dev',
+        'odoo-addon-stock_release_channel_partner_by_date_delivery_window>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_partner_by_date_public_holidays>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_partner_delivery_window>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_partner_public_holidays>=16.0dev,<16.1dev',
