@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-04-22 09:34+0000\n"
+"PO-Revision-Date: 2025-05-21 10:26+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: sale_stock_available_to_promise_release_block
 #: model:ir.model.fields,help:sale_stock_available_to_promise_release_block.field_unblock_release__option
@@ -121,7 +121,7 @@ msgstr "Il rilascio è bloccato"
 #. module: sale_stock_available_to_promise_release_block
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Ultima modifica il"
 
 #. module: sale_stock_available_to_promise_release_block
 #: model:ir.model.fields,field_description:sale_stock_available_to_promise_release_block.field_unblock_release__write_uid
