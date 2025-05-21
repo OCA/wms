@@ -406,3 +406,75 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         self.assertEqual(response["next_state"], "unload_all")
+
+    def _product_put_in_pack(self):
+        batch = self._create_picking_batch(
+            [[self.BatchProduct(product=self.product_a, quantity=10)]]
+        )
+        move_line = batch.move_line_ids
+        self._set_dest_package_and_done(move_line, self.bin1)
+        move_line.write({"location_dest_id": self.packing_location.id})
+        response = self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": batch.id}
+        )
+
+        # The first bin to process is bin1 scan the pack and try to put in pack
+        picking = move_line.picking_id
+        data = self.data.pack_picking(picking)
+        self.assert_response(
+            response,
+            next_state="pack_picking_scan_pack",
+            data=data,
+        )
+        # we scan the pack
+        response = self.service.dispatch(
+            "scan_packing_to_pack",
+            params={
+                "picking_batch_id": batch.id,
+                "picking_id": picking.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        data = self.data.pack_picking(picking)
+        self.assert_response(
+            response,
+            next_state="pack_picking_put_in_pack",
+            data=data,
+        )
+        # we process to the put in pack
+        self.service.dispatch(
+            "put_in_pack",
+            params={
+                "picking_batch_id": batch.id,
+                "picking_id": picking.id,
+                "selected_line_ids": move_line.ids,
+                "nbr_packages": 4,
+            },
+        )
+        return move_line
+
+    def test_put_in_pack_set_correct_package_type(self):
+        """Shopfloor should set the package type if possible."""
+        pt_model = self.env["stock.package.type"].sudo()
+        package_type_4 = pt_model.create({"name": "PT4", "number_of_parcels": 4})
+        package_type_7 = pt_model.create({"name": "PT7", "number_of_parcels": 7})
+        self.product_a.package_type_id = package_type_7
+        move_line = self._product_put_in_pack()
+        self.assertEqual(move_line.result_package_id.number_of_parcels, 4)
+        self.assertEqual(move_line.result_package_id.package_type_id, package_type_4)
+        move_line.picking_id._action_done()
+        self.assertEqual(move_line.result_package_id.number_of_parcels, 4)
+        self.assertEqual(move_line.result_package_id.package_type_id, package_type_4)
+
+    def test_put_in_pack_cant_set_correct_package_type(self):
+        """If shopfloor can't find a package type, storage_type shouldn't overwrite
+        number_of_parcels."""
+        pt_model = self.env["stock.package.type"].sudo()
+        package_type_7 = pt_model.create({"name": "PT7", "number_of_parcels": 7})
+        self.product_a.package_type_id = package_type_7
+        move_line = self._product_put_in_pack()
+        self.assertEqual(move_line.result_package_id.number_of_parcels, 4)
+        self.assertFalse(move_line.result_package_id.package_type_id)
+        move_line.picking_id._action_done()
+        self.assertEqual(move_line.result_package_id.number_of_parcels, 4)
+        self.assertFalse(move_line.result_package_id.package_type_id)

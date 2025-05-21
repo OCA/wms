@@ -196,6 +196,13 @@ class ClusterPicking(Component):
             lambda p, picking_id=picking_id: p.id == picking_id
         )
 
+        package_type = self.env["stock.package.type"].browse(package_type_id)
+        if not package_type and nbr_packages:
+            package_type = self._get_suitable_package_type(nbr_packages)
+            if package_type:
+                package_type_id = package_type.id
+                nbr_packages = None
+
         # Check if parameters are correct
         packing_action: PackingAction = self._actions_for("packing")
         result = packing_action._check_put_in_pack(
@@ -225,6 +232,14 @@ class ClusterPicking(Component):
         )
 
     # HELPER METHODS
+    def _get_suitable_package_type(self, number_of_parcels):
+        return self.env["stock.package.type"].search(
+            [
+                ("number_of_parcels", "=", number_of_parcels),
+                ("package_carrier_type", "=", "none"),
+            ],
+            limit=1,
+        )
 
     @property
     def default_pick_pack_action(self):
