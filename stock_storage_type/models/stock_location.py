@@ -142,6 +142,23 @@ class StockLocation(models.Model):
         compute="_compute_only_empty", store=True, recursive=True
     )
 
+    has_potential_product_mix_exception = fields.Boolean(
+        compute="_compute_has_potential_product_mix_exception",
+        store=True,
+        index=True,
+        help="This will represent a situation where several moves are pointing"
+        "to the location for different products and the location does"
+        "not allow mixed products.",
+    )
+    has_potential_lot_mix_exception = fields.Boolean(
+        compute="_compute_has_potential_lot_mix_exception",
+        store=True,
+        index=True,
+        help="This will represent a situation where several moves are pointing"
+        "to the location for different product lots and the location does"
+        "not allow mixed lots.",
+    )
+
     def init(self):  # pylint: disable=missing-return
         super().init()
         if not index_exists(self._cr, "stock_move_line_location_state_index"):
@@ -154,6 +171,36 @@ class StockLocation(models.Model):
                     (state IS NULL OR state NOT IN ('cancel', 'done'))
                 """
             )
+
+    @api.depends("do_not_mix_lots", "location_will_contain_lot_ids")
+    def _compute_has_potential_lot_mix_exception(self):
+        locations_with_exception = self.browse()
+        locations_without_exception = self.browse()
+        for location in self:
+            if (
+                location._should_compute_will_contain_lot_ids()
+                and len(location.location_will_contain_lot_ids) > 1
+            ):
+                locations_with_exception |= location
+            else:
+                locations_without_exception |= location
+        locations_with_exception.has_potential_lot_mix_exception = True
+        locations_without_exception.has_potential_lot_mix_exception = False
+
+    @api.depends("do_not_mix_lots", "location_will_contain_product_ids")
+    def _compute_has_potential_product_mix_exception(self):
+        locations_with_exception = self.browse()
+        locations_without_exception = self.browse()
+        for location in self:
+            if (
+                location._should_compute_will_contain_product_ids()
+                and len(location.location_will_contain_product_ids) > 1
+            ):
+                locations_with_exception |= location
+            else:
+                locations_without_exception |= location
+        locations_with_exception.has_potential_product_mix_exception = True
+        locations_without_exception.has_potential_product_mix_exception = False
 
     @api.depends(
         "usage",

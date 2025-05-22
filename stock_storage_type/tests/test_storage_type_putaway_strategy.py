@@ -836,3 +836,123 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             "the move line's destination must stay in Stock as we have"
             " a 'none' strategy on it and it is in the sequence",
         )
+
+    def test_storage_strategy_same_ordered_locations_pallets_reapply(self):
+        """
+        Check if location is well recomputed after filling it with another move
+        and after emptying other ones that are after in the ordering
+
+            - The location is first computed on the last free one
+            - The location is filled in with another move
+            - The move's location destination is recomputed
+        """
+        # Set pallets location type as only empty and remove specific pallet condition
+        self.pallets_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same"}
+        )
+        self.pallets_location_storage_type.storage_category_id.allow_new_product_ids = (
+            False
+        )
+        # Set another product in bin 2 and bin 3
+        self.env["stock.quant"]._update_available_quantity(
+            self.product2, self.pallets_bin_2_location, 1.0
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product3, self.pallets_bin_3_location, 1.0
+        )
+        # Create picking
+        in_picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.receipts_picking_type.id,
+                "location_id": self.suppliers_location.id,
+                "location_dest_id": self.input_location.id,
+                "move_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product.id,
+                            "product_uom_qty": 96.0,
+                            "product_uom": self.product.uom_id.id,
+                        },
+                    )
+                ],
+            }
+        )
+        # Mark as todo
+        in_picking.action_confirm()
+        # Put in pack
+        in_picking.move_line_ids.qty_done = 48.0
+        first_package = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        first_package.product_packaging_id = self.product_pallet_product_packaging
+        # Put in pack again
+        ml_without_package = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id
+        )
+        ml_without_package.qty_done = 48.0
+        second_pack = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        second_pack.product_packaging_id = self.product_pallet_product_packaging
+
+        # Validate picking
+        in_picking.button_validate()
+        # Assign internal picking
+        int_picking = in_picking.move_ids.move_dest_ids.picking_id
+        int_picking.action_assign()
+        self.assertEqual(int_picking.location_dest_id, self.stock_location)
+        self.assertEqual(
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
+        )
+        # First move line goes into pallets bin 1
+        # Second move line goes into pallets bin 3 as bin 1 is planned for
+        # first move line and bin 2 is already used
+        self.assertEqual(
+            int_picking.move_line_ids[0].mapped("location_dest_id"),
+            self.pallets_bin_1_location,
+        )
+
+        self.env["stock.quant"].with_context(inventory_mode=True).create(
+            {
+                "product_id": self.product3.id,
+                "location_id": self.pallets_bin_1_location.id,
+                "inventory_quantity": 10.0,
+            }
+        )._apply_inventory()
+
+        # Void the bin 3
+        quant = self.env["stock.quant"].search(
+            [
+                ("product_id", "=", self.product3.id),
+                ("location_id", "=", self.pallets_bin_3_location.id),
+            ]
+        )
+        quant.location_id = self.env.ref("stock.stock_location_customers")
+
+        # Try to re-apply the putaways to check the good destination is selected
+        int_picking.move_line_ids._apply_putaway_strategy()
+        self.assertNotEqual(
+            int_picking.move_line_ids[0].mapped("location_dest_id"),
+            self.pallets_bin_1_location,
+        )
+        self.assertEqual(
+            int_picking.move_line_ids[0].mapped("location_dest_id"),
+            self.pallets_bin_3_location,
+        )
+
+        self.env["stock.quant"].with_context(inventory_mode=True).create(
+            {
+                "product_id": self.product.id,
+                "location_id": self.pallets_bin_3_location.id,
+                "inventory_quantity": 10.0,
+            }
+        )._apply_inventory()
+
+        int_picking.move_line_ids._apply_putaway_strategy()
+        self.assertEqual(
+            int_picking.move_line_ids[0].mapped("location_dest_id"),
+            self.pallets_bin_3_location,
+        )
