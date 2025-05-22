@@ -14,6 +14,7 @@
     "application": False,
     "installable": True,
     "depends": [
+        "stock_location_fill_state",
         "stock_move_line_reserved_quant",
         "stock_putaway_hook",
         "stock_quant_package_dimension",
