@@ -58,15 +58,7 @@ class StockLocation(models.Model):
         "location_id",
         string="Storage locations sequences",
     )
-    location_is_empty = fields.Boolean(
-        compute="_compute_location_is_empty",
-        store=True,
-        help="technical field: True if the location is empty "
-        "and there is no pending incoming products in the location. "
-        " Computed only if the location needs to check for emptiness "
-        '(has an "only empty" policy).',
-        recursive=True,
-    )
+
     # TODO: Maybe renaming these fields as there are already such fields
     # in core but without domains. Something like 'pending_in_move_ids'
     in_move_ids = fields.One2many(
@@ -310,9 +302,6 @@ class StockLocation(models.Model):
     def _should_compute_will_contain_lot_ids(self):
         return self.do_not_mix_lots
 
-    def _should_compute_location_is_empty(self):
-        return self.only_empty
-
     @api.depends(
         "quant_ids.quantity",
         "in_move_ids",
@@ -349,54 +338,6 @@ class StockLocation(models.Model):
                     lambda q: q.quantity > 0
                 ).lot_id | rec.mapped("in_move_line_ids.lot_id")
                 rec.location_will_contain_lot_ids = lots
-
-    @api.depends(
-        "quant_ids.quantity",
-        "out_move_line_ids.qty_done",
-        "in_move_ids",
-        "in_move_line_ids",
-        "only_empty",
-    )
-    def _compute_location_is_empty(self):
-        # No restriction should apply on customer/supplier/...
-        # locations and we don't need to compute is empty
-        # if there is no limit on the location
-        only_empty_locations = self.filtered(
-            lambda l: not l._should_compute_location_is_empty()
-        )
-        only_empty_locations.update({"location_is_empty": True})
-        records = self - only_empty_locations
-        if not records:
-            return
-        location_domain = [("location_id", "in", records.ids)]
-        out_qty_by_location = {}
-        qty_by_location = {}
-        for group in self.env["stock.move.line"].read_group(
-            OUT_MOVE_LINE_DOMAIN + location_domain,
-            fields=["qty_done:sum"],
-            groupby=["location_id"],
-        ):
-            location_id = group["location_id"][0]
-            out_qty_by_location[location_id] = group["qty_done"]
-        for group in self.env["stock.quant"].read_group(
-            location_domain, fields=["quantity:sum"], groupby=["location_id"]
-        ):
-            location_id = group["location_id"][0]
-            qty_by_location[location_id] = group["quantity"]
-        for rec in records:
-            # we do want to keep a write here even if the value is the same
-            # to enforce concurrent transaction safety: 2 moves taking
-            # quantities in a location have to be executed sequentially
-            # or the location could remain "not empty"
-            if (
-                qty_by_location.get(rec.id, 0.0) - out_qty_by_location.get(rec.id, 0.0)
-                > 0
-                or rec.in_move_ids
-                or rec.in_move_line_ids
-            ):
-                rec.location_is_empty = False
-            else:
-                rec.location_is_empty = True
 
     # method provided by "stock_putaway_hook"
     def _putaway_strategy_finalizer(
