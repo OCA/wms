@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-11-24 09:36+0000\n"
+"PO-Revision-Date: 2025-05-22 07:57+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,12 +14,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: stock_release_channel_partner_delivery_window
 #: model:ir.model.fields,field_description:stock_release_channel_partner_delivery_window.field_stock_release_channel__delivery_date_weekday
 msgid "Delivery Date Weekday"
-msgstr ""
+msgstr "Giorno della settimana della data di consegna"
 
 #. module: stock_release_channel_partner_delivery_window
 #: model:ir.model.fields,help:stock_release_channel_partner_delivery_window.field_stock_release_channel__respect_partner_delivery_time_windows
