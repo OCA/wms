@@ -133,17 +133,24 @@ class StockStorageCategory(models.Model):
         """
         Helper to get products location domain
         """
-        return [
-            "|",
-            # Ideally, we would like a domain which is a strict comparison:
-            # if we do not mix products, we should be able to filter on ==
-            # product.id. Here, if we can create a move for product B and
-            # set it's destination in a location already used by product A,
-            # then all the new moves for product B will be allowed in the
-            # location.
-            ("location_will_contain_product_ids", "in", products.ids),
-            ("location_will_contain_product_ids", "=", False),
-        ]
+        # Ideally, we would like a domain which is a strict comparison:
+        # if we do not mix products, we should be able to filter on ==
+        # product.id. Here, if we can create a move for product B and
+        # set it's destination in a location already used by product A,
+        # then all the new moves for product B will be allowed in the
+        # location.
+
+        # Take only locations that has no potential different products
+        # in it.
+        return OR(
+            [
+                [
+                    ("has_potential_product_mix_exception", "=", False),
+                    ("location_will_contain_product_ids", "in", products.ids),
+                ],
+                [("location_will_contain_product_ids", "=", False)],
+            ]
+        )
 
     def _domain_location_storage_category(
         self, candidate_locations, quants, products, package_type
