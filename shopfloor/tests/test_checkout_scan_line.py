@@ -67,7 +67,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking.action_assign()
         # The product a is scanned, so selected and quantity updated
         line_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         # Because not part of a package other lines are selected also
         related_lines = picking.move_line_ids - line_a
@@ -84,7 +84,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         picking.action_assign()
         # The product a is scanned, so selected and quantity updated
         lines_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         # Because not part of a package other lines are selected also
         related_lines = picking.move_line_ids - lines_a
@@ -100,7 +100,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         # when we scan the packaging of the product, we should select the
         # lines as if the product was scanned

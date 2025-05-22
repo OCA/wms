@@ -185,7 +185,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": self.zone_sublocation2.barcode},
         )
         move_lines = self.pickings.move_line_ids.filtered(
-            lambda l: l.location_id == self.zone_sublocation2
+            lambda x: x.location_id == self.zone_sublocation2
         ).sorted(
             self.service.search_move_line._sort_key_move_lines(self.service.lines_order)
         )
@@ -213,7 +213,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(
             package=package,
         )
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         move_line = move_lines[0]
         self.assert_response_set_line_destination(
             response,
@@ -234,7 +234,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": pack_code},
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -252,7 +252,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": "P-Unknown"},
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -278,7 +278,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(
             locations=self.zone_sublocation1
         )
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -299,7 +299,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(
             locations=self.zone_location
         )
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -334,7 +334,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(
             package=package1,
         )
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -390,7 +390,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": self.free_product.barcode},
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -414,7 +414,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": self.product_e.barcode},
         )
         move_lines = self.service._find_location_move_lines(product=self.product_e)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -459,7 +459,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.service._find_location_move_lines(
             locations=self.zone_sublocation3
         )
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -507,7 +507,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": self.product_c.barcode},
         )
         move_lines = self.service._find_location_move_lines(product=self.product_c)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -534,7 +534,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": lot.name},
         )
         move_lines = self.service._find_location_move_lines(lot=lot)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         move_line = move_lines[0]
         self.assert_response_set_line_destination(
             response,
@@ -563,7 +563,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         # FIX ME: need to filter lines only on lot scanned !!
         move_lines = self.service._find_location_move_lines()
         # move_lines = self.service._find_location_move_lines(lot=lot)
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,
@@ -581,7 +581,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
             params={"barcode": self.free_lot.name},
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,

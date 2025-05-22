@@ -439,7 +439,7 @@ class Checkout(Component):
         return lines
 
     def _deselect_lines(self, lines):
-        lines.filtered(lambda l: not l.shopfloor_checkout_done).write(
+        lines.filtered(lambda x: not x.shopfloor_checkout_done).write(
             {"qty_done": 0, "shopfloor_user_id": False}
         )
 
@@ -517,7 +517,7 @@ class Checkout(Component):
         self, picking, selection_lines, package, prefill_qty=0, **kw
     ):
         lines = selection_lines.filtered(
-            lambda l: l.package_id == package and not l.shopfloor_checkout_done
+            lambda x: x.package_id == package and not x.shopfloor_checkout_done
         )
         if not lines:
             # No line for scanned package in selected picking
@@ -542,7 +542,7 @@ class Checkout(Component):
                 picking, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
 
-        lines = selection_lines.filtered(lambda l: l.product_id == product)
+        lines = selection_lines.filtered(lambda x: x.product_id == product)
         if not lines:
             return_picking = self._get_pickings_for_product(product, limit=1)
             if return_picking:
@@ -580,7 +580,7 @@ class Checkout(Component):
             # not in a package. But only the quantity on first selected lines
             # are updated.
             related_lines = selection_lines.filtered(
-                lambda l: not l.package_id and l.product_id != product
+                lambda x: not x.package_id and x.product_id != product
             )
 
         lines = self._select_lines(
@@ -630,7 +630,7 @@ class Checkout(Component):
             # Change lot confirmed
             line = fields.first(
                 selection_lines.filtered(
-                    lambda l: l.product_id == lot.product_id and l.lot_id != lot
+                    lambda x: x.product_id == lot.product_id and x.lot_id != lot
                 )
             )
             if not line:
@@ -689,7 +689,7 @@ class Checkout(Component):
 
     def _picking_lines_by_lot(self, picking, selection_lines, lot):
         """Control filtering of selected lines by given lot."""
-        return selection_lines.filtered(lambda l: l.lot_id == lot)
+        return selection_lines.filtered(lambda x: x.lot_id == lot)
 
     def _change_lot_response_handler_ok(self, move_line, message=None):
         return message
@@ -775,7 +775,7 @@ class Checkout(Component):
             )
 
         related_lines = selection_lines.filtered(
-            lambda l: not l.package_id and l.product_id != move_line.product_id
+            lambda x: not x.package_id and x.product_id != move_line.product_id
         )
         lines = self._select_lines(move_line, related_lines=related_lines)
         return self._response_for_select_package(picking, lines)
@@ -884,7 +884,7 @@ class Checkout(Component):
         as selected
         """
         return self._change_line_qty(
-            picking_id, selected_line_ids, [move_line_id], lambda l: l.reserved_uom_qty
+            picking_id, selected_line_ids, [move_line_id], lambda x: x.reserved_uom_qty
         )
 
     def set_custom_qty(self, picking_id, selected_line_ids, move_line_id, qty_done):
@@ -917,7 +917,7 @@ class Checkout(Component):
                 picking.id,
                 selected_lines.ids,
                 switch_lines.ids,
-                lambda l: l.reserved_uom_qty,
+                lambda x: x.reserved_uom_qty,
             )
 
     def _increment_custom_qty(
@@ -1117,7 +1117,7 @@ class Checkout(Component):
                 selected_lines,
                 message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
             )
-        product_lines = selected_lines.filtered(lambda l: l.product_id == product)
+        product_lines = selected_lines.filtered(lambda x: x.product_id == product)
         if self.work.menu.no_prefill_qty:
             quantity_increment = packaging.qty if packaging else 1
             return self._increment_custom_qty(
@@ -1136,7 +1136,7 @@ class Checkout(Component):
         )
 
     def _scan_package_action_from_lot(self, picking, selected_lines, lot, **kw):
-        lot_lines = selected_lines.filtered(lambda l: l.lot_id == lot)
+        lot_lines = selected_lines.filtered(lambda x: x.lot_id == lot)
         if self.work.menu.no_prefill_qty:
             return self._increment_custom_qty(
                 picking, selected_lines, self._find_line_to_increment(lot_lines), 1
@@ -1482,8 +1482,8 @@ class Checkout(Component):
 
         if package:
             move_lines = picking.move_line_ids.filtered(
-                lambda l: self._filter_lines_checkout_done(l)
-                and l.result_package_id == package
+                lambda x: self._filter_lines_checkout_done(x)
+                and x.result_package_id == package
             )
             for move_line in move_lines:
                 move_line.write(

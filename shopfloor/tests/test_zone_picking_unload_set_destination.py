@@ -283,7 +283,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
                 package_dest,
             )
         free_package_line = move_lines.filtered(
-            lambda l: l.result_package_id == self.free_package
+            lambda x: x.result_package_id == self.free_package
         )
         another_package_line = move_lines - free_package_line
 

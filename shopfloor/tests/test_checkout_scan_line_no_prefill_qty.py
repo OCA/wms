@@ -65,7 +65,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         line_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         # When no_prefill_qty is enabled in the checkout menu, prefilled qty
         # should be 1.0 if a product is scanned
@@ -79,7 +79,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
         self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         lines_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         # When no_prefill_qty is enabled in the checkout menu, prefilled qty
         # should be the packaging qty, if a packaging is scanned

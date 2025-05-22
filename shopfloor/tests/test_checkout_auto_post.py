@@ -12,15 +12,15 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         self._fill_stock_for_moves(picking.move_ids)
         picking.action_assign()
         selected_move_line_a = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda x: x.product_id == self.product_a
         )
         selected_move_line_a.qty_done = 7
         selected_move_line_b = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_b
+            lambda x: x.product_id == self.product_b
         )
         selected_move_line_b.qty_done = 9
         selected_move_line_c = picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_c
+            lambda x: x.product_id == self.product_c
         )
 
         # User has selected 7 units out of 10 for product_a,
@@ -53,10 +53,10 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
         # - the original line for product c, unchanged;
         # - two lines (products a and b) with the non-split qtys.
         line_a_in_original_picking = picking.move_line_ids.filtered(
-            lambda l: l.product_id == selected_move_line_a.product_id
+            lambda x: x.product_id == selected_move_line_a.product_id
         )
         line_b_in_original_picking = picking.move_line_ids.filtered(
-            lambda l: l.product_id == selected_move_line_b.product_id
+            lambda x: x.product_id == selected_move_line_b.product_id
         )
         self.assertEqual(line_a_in_original_picking.reserved_uom_qty, 3)
         self.assertEqual(line_b_in_original_picking.reserved_uom_qty, 11)

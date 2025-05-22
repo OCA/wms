@@ -220,7 +220,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         # done, the operator is currently moving the goods to the destination location)
         pack_move_line1 = pick_move_line1.move_id.move_dest_ids.filtered(
             lambda m: m.state not in ("cancel", "done")
-        ).move_line_ids.filtered(lambda l: not l.shopfloor_user_id)
+        ).move_line_ids.filtered(lambda x: not x.shopfloor_user_id)
         self._location_content_transfer_process_line(pack_move_line1)
         # Operator-1 process the second pallet with the "zone picking" scenario
         self._zone_picking_process_line(pick_move_line2)
@@ -228,7 +228,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         # the location where this second pallet is
         pack_move_line2 = pick_move_line2.move_id.move_dest_ids.filtered(
             lambda m: m.state not in ("cancel", "done")
-        ).move_line_ids.filtered(lambda l: not l.shopfloor_user_id)
+        ).move_line_ids.filtered(lambda x: not x.shopfloor_user_id)
         assert (
             len(pack_move_line2) == 1
         ), f"Operator-3 should end up with one move line taken from {pack_move_line2.picking_id.name}"
@@ -300,12 +300,12 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         )
         self.assertEqual(pack_move_a, self.pack_move_a)
         pack_first_pallet = pack_move_a.move_line_ids.filtered(
-            lambda l: not l.shopfloor_user_id and l.location_id == dest_location1
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location1
         )
         self.assertEqual(pack_first_pallet.reserved_uom_qty, 6)
         self.assertEqual(pack_first_pallet.qty_done, 0)
         pack_second_pallet = pack_move_a.move_line_ids.filtered(
-            lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
         )
         self.assertEqual(pack_second_pallet.reserved_uom_qty, 4)
         self.assertEqual(pack_second_pallet.qty_done, 0)
@@ -365,7 +365,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         )
         self.assertEqual(pack_move_a, self.pack_move_a)
         pack_second_pallet = pack_move_a.move_line_ids.filtered(
-            lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
         )
         picking_before = pack_second_pallet.picking_id
         move_lines = self.service.search_move_line.search_move_lines(
@@ -441,7 +441,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         )
         self.assertEqual(pack_move_a1, self.pack_move_a)
         pack_first_pallet = pack_move_a1.move_line_ids.filtered(
-            lambda l: not l.shopfloor_user_id and l.location_id == dest_location1
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location1
         )
         self.assertEqual(pack_first_pallet.reserved_uom_qty, 6)
         self.assertEqual(pack_first_pallet.qty_done, 0)
@@ -467,7 +467,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
             lambda m: m.move_line_ids.package_id == self.package_2
         )
         pack_second_pallet = pack_move_a2.move_line_ids.filtered(
-            lambda l: not l.shopfloor_user_id and l.location_id == dest_location2
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
         )
         self.assertEqual(pack_second_pallet.reserved_uom_qty, 4)
         self.assertEqual(pack_second_pallet.qty_done, 0)

@@ -59,7 +59,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
             },
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_set_line_destination(
             response,
             zone_location=self.zone_location,
@@ -84,7 +84,7 @@ class ZonePickingSetLineDestinationPackageNotAllowedCase(ZonePickingCommonCase):
             },
         )
         move_lines = self.service._find_location_move_lines()
-        move_lines = move_lines.sorted(lambda l: l.move_id.priority, reverse=True)
+        move_lines = move_lines.sorted(lambda x: x.move_id.priority, reverse=True)
         self.assert_response_select_line(
             response,
             zone_location=self.zone_location,

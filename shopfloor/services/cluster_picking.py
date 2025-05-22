@@ -364,13 +364,13 @@ class ClusterPicking(Component):
     def _lines_to_pick(self, picking_batch):
         return self._lines_for_picking_batch(
             picking_batch,
-            filter_func=lambda l: (
-                l.state in ("assigned", "partially_available")
+            filter_func=lambda x: (
+                x.state in ("assigned", "partially_available")
                 # On 'StockPicking.action_assign()', result_package_id is set to
                 # the same package as 'package_id'. Here, we need to exclude lines
                 # that were already put into a bin, i.e. the destination package
                 # is different.
-                and (not l.result_package_id or l.result_package_id == l.package_id)
+                and (not x.result_package_id or x.result_package_id == x.package_id)
             ),
         )
 
@@ -378,11 +378,11 @@ class ClusterPicking(Component):
         """Get the last line picked and put in a pack for this picking"""
         return fields.first(
             picking.move_line_ids.filtered(
-                lambda l: l.qty_done > 0
-                and l.result_package_id
+                lambda x: x.qty_done > 0
+                and x.result_package_id
                 # if we are moving the entire package, we shouldn't
                 # add stuff inside it, it's not a new package
-                and l.package_id != l.result_package_id
+                and x.package_id != x.result_package_id
             ).sorted(key="write_date", reverse=True)
         )
 
@@ -595,7 +595,7 @@ class ClusterPicking(Component):
                 move_line, message=self.msg_store.scan_lot_on_product_tracked_by_lot()
             )
         other_product_lines = picking.move_line_ids.filtered(
-            lambda l: l.product_id == product and l.location_id == move_line.location_id
+            lambda x: x.product_id == product and x.location_id == move_line.location_id
         )
         packages = other_product_lines.mapped("package_id")
         # Do not use mapped here: we want to see if we have more than one package,
@@ -1149,7 +1149,7 @@ class ClusterPicking(Component):
         lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
         lines.package_level_id.location_dest_id = location
         for picking in lines.batch_id.picking_ids:
-            picking_lines = lines.filtered(lambda l, p=picking: l.picking_id == p)
+            picking_lines = lines.filtered(lambda x, p=picking: x.picking_id == p)
             self._unload_set_picking_to_done(picking, picking_lines)
 
     def _unload_set_picking_to_done(self, picking, picking_lines):
@@ -1274,7 +1274,7 @@ class ClusterPicking(Component):
 
         # we work only on the lines of the scanned package
         lines = self._lines_to_unload(batch).filtered(
-            lambda l: l.result_package_id == package
+            lambda x: x.result_package_id == package
         )
         if not lines:
             return self._unload_end(batch)
