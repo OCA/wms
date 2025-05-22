@@ -129,6 +129,17 @@ class StockStorageCategory(models.Model):
                 ]
             )
 
+    def _get_product_lot_location_domain(self, lots):
+        """
+        Helper to get product lots domain
+        """
+        return [
+            "|",
+            # same comment as for the products
+            ("location_will_contain_lot_ids", "in", lots.ids),
+            ("location_will_contain_lot_ids", "=", False),
+        ]
+
     def _get_product_location_domain(self, products):
         """
         Helper to get products location domain
@@ -206,17 +217,18 @@ class StockStorageCategory(models.Model):
                     ]
                 )
         elif allow_new_product == "same":
-            location_domain += self._get_product_location_domain(products)
+            location_domain = AND(
+                [location_domain, self._get_product_location_domain(products)]
+            )
         elif allow_new_product == "same_lot":
             lots = quants.mapped("lot_id")
             # As same lot should filter also on same product
-            location_domain += self._get_product_location_domain(products)
-            location_domain += [
-                "|",
-                # same comment as for the products
-                ("location_will_contain_lot_ids", "in", lots.ids),
-                ("location_will_contain_lot_ids", "=", False),
-            ]
+            location_domain = AND(
+                [location_domain, self._get_product_location_domain(products)]
+            )
+            location_domain = AND(
+                [location_domain, self._get_product_lot_location_domain(lots)]
+            )
         return location_domain
 
     def get_allow_new_product(
