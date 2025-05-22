@@ -7,7 +7,7 @@ from psycopg2 import sql
 
 from odoo import api, fields, models
 from odoo.fields import Command
-from odoo.tools import float_compare, index_exists
+from odoo.tools import float_compare, groupby, index_exists
 
 _logger = logging.getLogger(__name__)
 OUT_MOVE_LINE_DOMAIN = [
@@ -682,18 +682,17 @@ class StockLocation(models.Model):
         valid_no_mix = valid_locations.filtered("do_not_mix_products")
         loc_ordered_by_qty = []
         if valid_no_mix:
-            StockQuant = self.env["stock.quant"]
-            domain_quant = [("location_id", "in", valid_no_mix.ids)]
-            loc_ordered_by_qty = [
-                item["location_id"][0]
-                for item in StockQuant.read_group(
-                    domain_quant,
-                    ["location_id", "quantity"],
-                    ["location_id"],
-                    orderby="quantity",
+            for location, items in groupby(
+                valid_no_mix.quant_ids.sorted("quantity"),
+                lambda quant: quant.location_id,
+            ):
+                loc_ordered_by_qty.extend(
+                    [
+                        location.id
+                        for item in items
+                        if (float_compare(item["quantity"], 0, precision_digits=2) > 0)
+                    ]
                 )
-                if (float_compare(item["quantity"], 0, precision_digits=2) > 0)
-            ]
         valid_location_ids = set(valid_locations.ids) - set(loc_ordered_by_qty)
         ordered_valid_location_ids = loc_ordered_by_qty + [
             id_ for id_ in self.ids if id_ in valid_location_ids
