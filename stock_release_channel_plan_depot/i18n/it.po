@@ -6,20 +6,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2025-05-22 10:26+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: stock_release_channel_plan_depot
 #: model:ir.model.fields,field_description:stock_release_channel_plan_depot.field_stock_release_channel_preparation_plan__depot_id
 msgid "Depot"
-msgstr ""
+msgstr "Deposito"
 
 #. module: stock_release_channel_plan_depot
 #: model:ir.model,name:stock_release_channel_plan_depot.model_stock_release_channel_preparation_plan
 msgid "Stock Release Channel Preparation Plan"
-msgstr ""
+msgstr "Piano preparazione canale rilascio magazzino"
