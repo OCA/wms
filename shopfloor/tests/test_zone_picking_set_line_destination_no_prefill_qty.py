@@ -64,7 +64,7 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
             move_line,
             qty_done=qty_done,
             message={
-                "body": "Package {} is not empty.".format(wrong_package.name),
+                "body": f"Package {wrong_package.name} is not empty.",
                 "message_type": "warning",
             },
         )

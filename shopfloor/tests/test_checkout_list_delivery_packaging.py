@@ -31,7 +31,7 @@ class CheckoutListDeliveryPackagingCase(CheckoutCommonCase, CheckoutSelectPackag
     @classmethod
     def tearDownClass(cls):
         cls.loader.restore_registry()
-        super(CheckoutListDeliveryPackagingCase, cls).tearDownClass()
+        super().tearDownClass()
 
     @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):

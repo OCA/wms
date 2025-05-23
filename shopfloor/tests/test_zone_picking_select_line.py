@@ -695,7 +695,7 @@ class ZonePickingSelectLineCase(ZonePickingCommonCase):
         move_lines = self.picking5.move_line_ids
         self.assertEqual(move_lines.location_dest_id, self.packing_location)
         for move_line, package_dest in zip(
-            move_lines, self.free_package | self.another_package
+            move_lines, self.free_package | self.another_package, strict=False
         ):
             self.service.dispatch(
                 "set_destination",

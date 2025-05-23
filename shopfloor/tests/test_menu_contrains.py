@@ -7,7 +7,6 @@ from .test_menu_base import MenuCountersCommonCase
 
 class TestMenuContrains(MenuCountersCommonCase):
     def test_move_line_search_sort_order_custom_code_invalid(self):
-
         with self.assertRaises(exceptions.ValidationError):
             # wrong indentation in python code
             self.menu1.sudo().write(

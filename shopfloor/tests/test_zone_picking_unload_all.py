@@ -329,7 +329,9 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             {"name": "ANOTHER_PACKAGE"}
         )
         for move_line, package_dest in zip(
-            self.picking5.move_line_ids, self.free_package | self.another_package
+            self.picking5.move_line_ids,
+            self.free_package | self.another_package,
+            strict=False,
         ):
             self.service._set_destination_package(
                 move_line,

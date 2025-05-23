@@ -268,7 +268,6 @@ class CommonCase(BaseCommonCase):
 
 
 class PickingBatchMixin:
-
     BatchProduct = namedtuple(
         "BatchProduct",
         # browse record of the product,

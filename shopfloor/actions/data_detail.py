@@ -212,7 +212,7 @@ class DataDetailAction(Component):
     def _product_image_url(self, record, field_name):
         if not record[field_name]:
             return None
-        return "/web/image/product.product/{}/{}".format(record.id, field_name)
+        return f"/web/image/product.product/{record.id}/{field_name}"
 
     @property
     def _product_supplierinfo_parser(self):
@@ -228,7 +228,7 @@ class DataDetailAction(Component):
         return self._jsonify(
             record.with_context(packaging=record.id),
             self._packaging_detail_parser,
-            **kw
+            **kw,
         )
 
     @property

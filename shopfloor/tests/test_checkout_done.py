@@ -20,7 +20,7 @@ class CheckoutDoneCase(CheckoutCommonCase):
             next_state="select_document",
             message={
                 "message_type": "success",
-                "body": "Transfer {} done".format(picking.name),
+                "body": f"Transfer {picking.name} done",
             },
             data={"restrict_scan_first": False},
         )

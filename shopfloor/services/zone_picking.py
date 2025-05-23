@@ -1214,7 +1214,6 @@ class ZonePicking(Component):
         # When the barcode is a package
         package = search.package_from_scan(barcode)
         if package:
-
             if not moving_full_quantity and move_line.package_id == package:
                 # Check we're not using the source package as transfer package.
                 message = self.msg_store.dest_package_not_valid(package)

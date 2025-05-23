@@ -231,9 +231,7 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         ).move_line_ids.filtered(lambda l: not l.shopfloor_user_id)
         assert (
             len(pack_move_line2) == 1
-        ), "Operator-3 should end up with one move line taken from {}".format(
-            pack_move_line2.picking_id.name
-        )
+        ), f"Operator-3 should end up with one move line taken from {pack_move_line2.picking_id.name}"
         self._location_content_transfer_process_line(pack_move_line2)
 
     def test_with_zone_picking2(self):

@@ -219,7 +219,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                     kw.get("move_lines", [])
                 ),
                 "products": self.data_detail._location_content(record),
-            }
+            },
         )
 
     def _expected_location_lot(self, record, **kw):
@@ -228,7 +228,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
             **{
                 "removal_date": record.removal_date or None,
                 "quantity": sum(record.quant_ids.mapped("quantity")),
-            }
+            },
         )
 
     def _expected_product_detail(self, record, **kw):
@@ -262,7 +262,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
         if kw.get("full"):
             detail.update(
                 {
-                    "image": "/web/image/product.product/{}/image_128".format(record.id)
+                    "image": f"/web/image/product.product/{record.id}/image_128"
                     if record.image_128
                     else None,
                     "locations": locations_info,
@@ -296,5 +296,5 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                 "length_uom": record.length_uom_name,
                 "weight_uom": record.weight_uom_name,
                 "barcode": record.barcode,
-            }
+            },
         )

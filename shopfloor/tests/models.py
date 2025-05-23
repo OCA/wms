@@ -7,6 +7,7 @@ Add a new "test" value for 'delivery_type' field of carrier and
 Shopfloor do not depend on 'delivery_*' modules adding the different
 delivery types.
 """
+
 from odoo import fields, models
 
 

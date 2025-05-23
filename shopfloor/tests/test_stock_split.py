@@ -10,7 +10,7 @@ from odoo.tests.common import TransactionCase
 class TestStockSplit(TransactionCase):
     @classmethod
     def setUpClass(cls):
-        super(TestStockSplit, cls).setUpClass()
+        super().setUpClass()
         cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.warehouse = cls.env.ref("stock.warehouse0")
         cls.warehouse.delivery_steps = "pick_pack_ship"

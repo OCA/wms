@@ -18,7 +18,7 @@ class SavepointBuilder(Component):
         return Savepoint(self.env.cr)
 
 
-class Savepoint(object):
+class Savepoint:
     """Wrapper for SQL Savepoint
 
     Close to "cr.savepoint()" context manager but this class gives more control

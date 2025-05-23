@@ -28,7 +28,6 @@ class BaseShopfloorService(AbstractComponent):
 
 
 class BaseShopfloorProcess(AbstractComponent):
-
     _inherit = "base.shopfloor.process"
 
     def _get_process_picking_types(self):

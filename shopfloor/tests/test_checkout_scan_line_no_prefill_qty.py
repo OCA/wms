@@ -37,7 +37,7 @@ class CheckoutScanLineNoPrefillQtyCase(CheckoutScanLineCaseBase):
             "scan_line", params={"picking_id": picking.id, "barcode": barcode}
         )
         response_lines = response["data"]["select_package"]["selected_move_lines"]
-        for response_line, qty in zip(response_lines, qties):
+        for response_line, qty in zip(response_lines, qties, strict=False):
             self.assertEqual(response_line["qty_done"], qty)
 
     def test_scan_line_product_exist_in_two_lines(self):

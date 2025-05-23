@@ -154,7 +154,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             next_state="start",
             message={
                 "message_type": "error",
-                "body": "No pending operation for package {}.".format(self.pack_a.name),
+                "body": f"No pending operation for package {self.pack_a.name}.",
             },
         )
 
@@ -533,8 +533,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="start",
             popup={
-                "body": "Last operation of transfer {}. Next operation "
-                "({}) is ready to proceed.".format(self.picking.name, next_picking.name)
+                "body": f"Last operation of transfer {self.picking.name}. Next operation "
+                f"({next_picking.name}) is ready to proceed."
             },
             message={
                 "message_type": "success",

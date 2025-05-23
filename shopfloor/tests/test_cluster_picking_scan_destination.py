@@ -64,9 +64,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(next_line),
             message={
                 "message_type": "success",
-                "body": "{} {} put in {}".format(
-                    line.qty_done, line.product_id.display_name, self.bin1.name
-                ),
+                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )
 
@@ -149,8 +147,8 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(line, qty_done=10.0),
             message={
                 "message_type": "error",
-                "body": "The destination bin {} is not empty,"
-                " please take another.".format(self.bin1.name),
+                "body": f"The destination bin {self.bin1.name} is not empty, "
+                "please take another.",
             },
         )
 
@@ -233,9 +231,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(line, qty_done=11.0),
             message={
                 "message_type": "error",
-                "body": "You must not pick more than {} units.".format(
-                    line.reserved_uom_qty
-                ),
+                "body": f"You must not pick more than {line.reserved_uom_qty} units.",
             },
         )
 
@@ -271,9 +267,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(new_line),
             message={
                 "message_type": "success",
-                "body": "{} {} put in {}".format(
-                    line.qty_done, line.product_id.display_name, self.bin1.name
-                ),
+                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )
 
@@ -369,8 +363,6 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             data=self._line_data(next_line),
             message={
                 "message_type": "success",
-                "body": "{} {} put in {}".format(
-                    line.qty_done, line.product_id.display_name, self.bin1.name
-                ),
+                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
             },
         )

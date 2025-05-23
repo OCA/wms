@@ -275,7 +275,7 @@ class ZonePickingUnloadSetDestinationCase(ZonePickingCommonCase):
         )
         move_lines = self.picking5.move_line_ids
         for move_line, package_dest in zip(
-            move_lines, self.free_package | self.another_package
+            move_lines, self.free_package | self.another_package, strict=False
         ):
             self.service._set_destination_package(
                 move_line,

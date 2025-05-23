@@ -4,7 +4,6 @@ from odoo.addons.component.core import Component
 
 
 class LocationContentTransferSorter(Component):
-
     _name = "shopfloor.location.content.transfer.sorter"
     _inherit = "shopfloor.process.action"
     _usage = "location_content_transfer.sorter"

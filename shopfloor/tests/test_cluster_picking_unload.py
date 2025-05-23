@@ -933,8 +933,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_single",
             popup={
-                "body": "Last operation of transfer {}. Next operation "
-                "({}) is ready to proceed.".format(picking.name, next_picking.name)
+                "body": f"Last operation of transfer {picking.name}. Next operation "
+                f"({next_picking.name}) is ready to proceed."
             },
             data=data,
         )
