@@ -343,12 +343,14 @@ class ZonePickingCommonCase(CommonCase):
             data["sublocation"] = self.data.location(sublocation)
         for data_move_line in data["move_lines"]:
             move_line = self.env["stock.move.line"].browse(data_move_line["id"])
-            data_move_line[
-                "location_will_be_empty"
-            ] = move_line.location_id.planned_qty_in_location_is_empty(move_line)
-            data_move_line[
-                "handle_complete_mix_pack"
-            ] = self.service._handle_complete_mix_pack(move_line.package_id)
+            # fmt: off
+            data_move_line["location_will_be_empty"] = (
+                move_line.location_id.planned_qty_in_location_is_empty(move_line)
+            )
+            data_move_line["handle_complete_mix_pack"] = (
+                self.service._handle_complete_mix_pack(move_line.package_id)
+            )
+            # fmt: on
         self.assert_response(
             response,
             next_state=state,
@@ -401,9 +403,6 @@ class ZonePickingCommonCase(CommonCase):
         expected_move_line = self.data.move_line(move_line, with_picking=True)
         if qty_done is not None:
             expected_move_line["qty_done"] = qty_done
-        allow_alternative_destination_package = (
-            self.menu.allow_alternative_destination_package
-        )
         self.assert_response(
             response,
             next_state=state,
@@ -412,7 +411,9 @@ class ZonePickingCommonCase(CommonCase):
                 "picking_type": self.data.picking_type(picking_type),
                 "move_line": expected_move_line,
                 "confirmation_required": confirmation_required,
-                "allow_alternative_destination_package": allow_alternative_destination_package,
+                "allow_alternative_destination_package": (
+                    self.menu.allow_alternative_destination_package
+                ),
                 "handle_complete_mix_pack": handle_complete_mix_pack,
             },
             message=message,

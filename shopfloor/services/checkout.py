@@ -366,7 +366,7 @@ class Checkout(Component):
         return picking.move_line_ids.filtered(self._filter_lines_unpacked)
 
     def _lines_prepare(self, picking, selected_lines):
-        """Hook to manipulate lines' ordering or anything else before sending them back."""
+        """Hook to manipulate lines' ordering or anything else."""
         return selected_lines
 
     def _domain_for_list_stock_picking(self):
@@ -698,7 +698,7 @@ class Checkout(Component):
         return message
 
     def _select_lines_from_serial(self, picking, selection_lines, lot, **kw):
-        # Search for serial number is actually the same as searching for lot (as of v14...)
+        # Search for serial number is the same as searching for lot (as of v14)
         return self._select_lines_from_lot(picking, selection_lines, lot, **kw)
 
     # Handling of the destination package scanned
@@ -1144,7 +1144,7 @@ class Checkout(Component):
         return self._switch_line_qty_done(picking, selected_lines, lot_lines)
 
     def _scan_package_action_from_serial(self, picking, selection_lines, lot, **kw):
-        # Search for serial number is actually the same as searching for lot (as of v14...)
+        # Search serial number is actually the same as searching for lot (as of v14...)
         return self._scan_package_action_from_lot(picking, selection_lines, lot, **kw)
 
     def _scan_package_action_from_package(self, picking, selected_lines, package, **kw):

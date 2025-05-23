@@ -25,7 +25,8 @@ class CheckoutAutoPostCase(CheckoutCommonCase):
 
         # User has selected 7 units out of 10 for product_a,
         # and 9 units out of 20 for product_b.
-        # We would expect a split picking to be created with those two lines and qtys done.
+        # We would expect a split picking to be created
+        # with those two lines and qtys done.
         self.service.dispatch(
             "scan_package_action",
             params={

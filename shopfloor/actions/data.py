@@ -351,7 +351,8 @@ class DataAction(Component):
 
     def _get_operation_progress(self, domain):
         lines = self.env["stock.move.line"].search(domain)
-        # operations_to_do = number of total operations that are pending for this location.
+        # operations_to_do = number of total operations
+        # that are pending for this location.
         # operations_done = number of operations already done.
         operations_to_do = 0
         operations_done = 0

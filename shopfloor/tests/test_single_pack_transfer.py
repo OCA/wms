@@ -533,8 +533,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="start",
             popup={
-                "body": f"Last operation of transfer {self.picking.name}. Next operation "
-                f"({next_picking.name}) is ready to proceed."
+                "body": f"Last operation of transfer {self.picking.name}. "
+                f"Next operation ({next_picking.name}) is ready to proceed."
             },
             message={
                 "message_type": "success",

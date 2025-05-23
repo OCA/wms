@@ -430,7 +430,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         )
 
     def test_set_destination_all_check_confirmation(self):
-        """Endpoint called confirming with a different location, ask confirmation again"""
+        """Endpoint called confirming with a different location, ask confirmation"""
         move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})

@@ -582,7 +582,7 @@ class ClusterPicking(Component):
     def _scan_line_by_packaging(self, picking, move_line, packaging, sublocation):
         """Packaging scanned, check if we can work with it.
 
-        If the packaging related product is part of several packages in the same location,
+        If the packaging product is part of several packages in the same location,
         we can't be sure it's the correct one, in such case, ask to scan a package
         """
         response = self._check_first_scan_location_or_pack_first(move_line, sublocation)

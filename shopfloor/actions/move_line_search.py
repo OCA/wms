@@ -53,7 +53,9 @@ class MoveLineSearch(Component):
             "key": None,
             "get_sort_key_priority": self._sort_key_move_lines_priority,
             "get_sort_key_location": self._sort_key_move_lines_location,
-            "get_sort_key_assigned_to_current_user": self._sort_key_assigned_to_current_user,
+            "get_sort_key_assigned_to_current_user": (
+                self._sort_key_assigned_to_current_user
+            ),
         }
 
     def _search_move_lines_domain(
