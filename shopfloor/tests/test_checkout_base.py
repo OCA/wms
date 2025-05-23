@@ -91,11 +91,6 @@ class CheckoutCommonCase(CommonCase):
                 "message_type": "warning",
                 "body": "The quantity scanned for one or more lines cannot be "
                 "higher than the maximum allowed. "
-                "(%(product_name)s : %(quantity_done)s > %(quantity_reserved)s)"
-                % dict(
-                    product_name=line.product_id.name,
-                    quantity_done=str(line.qty_done),
-                    quantity_reserved=str(line.reserved_uom_qty),
-                ),
+                f"({line.product_id.name} : {str(line.qty_done)} > {str(line.reserved_uom_qty)})",  # noqa
             },
         )

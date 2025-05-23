@@ -302,8 +302,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             next_state="start",
             message={
                 "message_type": "error",
-                "body": "Location %s doesn't contain any package."
-                % (self.shelf2.name,),
+                "body": f"Location {self.shelf2.name} doesn't contain any package.",
             },
         )
 
@@ -340,8 +339,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             next_state="start",
             message={
                 "message_type": "warning",
-                "body": "Several packages found in %s, please scan a package."
-                % (self.shelf1.name,),
+                "body": f"Several packages found in {self.shelf1.name}, "
+                "please scan a package.",
             },
         )
 
@@ -366,8 +365,9 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             next_state="start",
             message={
                 "message_type": "error",
-                "body": "You cannot work on a package (%s) outside of locations: %s"
-                % (self.pack_a.name, self.picking_type.default_location_src_id.name),
+                "body": f"You cannot work on a package ({self.pack_a.name}) "
+                "outside of locations: "
+                f"{self.picking_type.default_location_src_id.name}",
             },
         )
 
