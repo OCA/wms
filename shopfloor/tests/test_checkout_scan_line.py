@@ -177,7 +177,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
             package.name,
             {
                 "message_type": "error",
-                "body": f"Package {package.name} not found in transfer {picking.name}",
+                "body": f"Package {package.name} not found in transfer {picking.name}",  # noqa
             },
         )
 
