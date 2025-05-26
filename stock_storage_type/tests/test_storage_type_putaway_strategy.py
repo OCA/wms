@@ -956,3 +956,173 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             int_picking.move_line_ids[0].mapped("location_dest_id"),
             self.pallets_bin_3_location,
         )
+
+    def test_storage_strategy_same_lot_emptying(self):
+        """
+        Ensure that if a location is being emptied, it becomes available
+        for a new movement.
+
+        So:
+            - Fill in all carboxes location bins.
+            - Create an OUT move with quantity done (location will be 'being emptied')
+            - Do the reception
+            - Check the internal move will go to the BIN 1
+
+        """
+        self.product_other = self.env.ref("product.product_product_10")
+        self.cardboxes_location_storage_type.storage_category_id.write(
+            {"allow_new_product": "same_lot"}
+        )
+        # Fill in all locations
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_other,
+            self.cardboxes_bin_1_location,
+            1.0,
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_other,
+            self.cardboxes_bin_2_location,
+            1.0,
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_other,
+            self.cardboxes_bin_3_location,
+            1.0,
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_other,
+            self.cardboxes_bin_4_location,
+            1.0,
+        )
+
+        # Create picking
+        in_picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.receipts_picking_type.id,
+                "location_id": self.suppliers_location.id,
+                "location_dest_id": self.input_location.id,
+                "move_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product.id,
+                            "product_uom_qty": 8.0,
+                            "product_uom": self.product.uom_id.id,
+                            "picking_type_id": self.receipts_picking_type.id,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product_lot.name,
+                            "location_id": self.suppliers_location.id,
+                            "location_dest_id": self.input_location.id,
+                            "product_id": self.product_lot.id,
+                            "product_uom_qty": 10.0,
+                            "product_uom": self.product_lot.uom_id.id,
+                            "picking_type_id": self.receipts_picking_type.id,
+                        },
+                    ),
+                ],
+            }
+        )
+        # Mark as todo
+        in_picking.action_confirm()
+        # Put in pack product
+        in_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product
+        ).qty_done = 4.0
+        product_first_package = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        product_first_package.product_packaging_id = (
+            self.product_cardbox_product_packaging
+        )
+        # Put in pack product again
+        product_ml_without_package = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id and ml.product_id == self.product
+        )
+        product_ml_without_package.qty_done = 4.0
+        product_second_pack = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        product_second_pack.product_packaging_id = (
+            self.product_cardbox_product_packaging
+        )
+
+        # Put in pack product lot
+        product_lot_ml = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
+        )
+        product_lot_ml.write({"qty_done": 5.0, "lot_name": "A0001"})
+        product_lot_first_pack = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        product_lot_first_pack.product_packaging_id = (
+            self.product_lot_cardbox_product_packaging
+        )
+        # Put in pack product lot again
+        product_lot_ml_without_package = in_picking.move_line_ids.filtered(
+            lambda ml: not ml.result_package_id and ml.product_id == self.product_lot
+        )
+        product_lot_ml_without_package.write({"qty_done": 5.0, "lot_name": "A0002"})
+        product_lot_second_pack = in_picking.action_put_in_pack()
+        # Ensure packaging is set properly on pack
+        product_lot_second_pack.product_packaging_id = (
+            self.product_lot_cardbox_product_packaging
+        )
+
+        # Create a move to pick a bin location, so that location fill state
+        # will be 'being emptied'.
+        customers = self.env.ref("stock.stock_location_customers")
+        pick_picking = self.env["stock.picking"].create(
+            {
+                "picking_type_id": self.internal_picking_type.id,
+                "location_id": self.cardboxes_bin_1_location.id,
+                "location_dest_id": customers.id,
+                "move_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": self.product.name,
+                            "location_id": self.cardboxes_bin_1_location.id,
+                            "location_dest_id": customers.id,
+                            "product_id": self.product_other.id,
+                            "product_uom_qty": 8.0,
+                            "product_uom": self.product_other.uom_id.id,
+                            "picking_type_id": self.internal_picking_type.id,
+                        },
+                    ),
+                ],
+            }
+        )
+
+        pick_picking.action_assign()
+        self.assertEqual(
+            pick_picking.move_line_ids.location_id,
+            self.cardboxes_bin_1_location,
+        )
+
+        pick_picking.move_line_ids.qty_done = 8.0
+
+        self.assertEqual("being_emptied", self.cardboxes_bin_1_location.fill_state)
+
+        # Validate picking
+        in_picking.button_validate()
+
+        # Assign internal picking
+        int_picking = in_picking.move_ids.mapped("move_dest_ids.picking_id")
+        int_picking.action_assign()
+        self.assertEqual(int_picking.location_dest_id, self.stock_location)
+        self.assertEqual(
+            int_picking.move_ids.mapped("location_dest_id"), self.stock_location
+        )
+        product_mls = int_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product
+        )
+        self.assertEqual(
+            product_mls.mapped("location_dest_id"), self.cardboxes_bin_1_location
+        )
