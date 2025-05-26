@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-05-21 10:26+0000\n"
+"PO-Revision-Date: 2025-05-26 09:25+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -19,7 +19,7 @@ msgstr ""
 #. module: stock_available_to_promise_release_shipment_advice
 #: model:ir.model.fields,field_description:stock_available_to_promise_release_shipment_advice.field_stock_move__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nome visualizzato"
 
 #. module: stock_available_to_promise_release_shipment_advice
 #: model:ir.model.fields,field_description:stock_available_to_promise_release_shipment_advice.field_stock_move__id
@@ -34,4 +34,4 @@ msgstr "Ultima modifica il"
 #. module: stock_available_to_promise_release_shipment_advice
 #: model:ir.model,name:stock_available_to_promise_release_shipment_advice.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Movimento di magazzino"
