@@ -133,12 +133,22 @@ class StockStorageCategory(models.Model):
         """
         Helper to get product lots domain
         """
-        return [
-            "|",
-            # same comment as for the products
-            ("location_will_contain_lot_ids", "in", lots.ids),
-            ("location_will_contain_lot_ids", "=", False),
-        ]
+        lot_domain = OR(
+            [
+                [
+                    ("location_will_contain_lot_ids", "in", lots.ids),
+                ],
+                [
+                    ("location_will_contain_lot_ids", "=", False),
+                ],
+            ]
+        )
+
+        location_domain = OR(
+            [lot_domain, [("fill_state", "in", ("empty", "being_emptied"))]]
+        )
+
+        return location_domain
 
     def _get_product_location_domain(self, products):
         """
@@ -153,7 +163,7 @@ class StockStorageCategory(models.Model):
 
         # Take only locations that has no potential different products
         # in it.
-        return OR(
+        product_domain = OR(
             [
                 [
                     ("has_potential_product_mix_exception", "=", False),
@@ -162,6 +172,10 @@ class StockStorageCategory(models.Model):
                 [("location_will_contain_product_ids", "=", False)],
             ]
         )
+        location_domain = OR(
+            [product_domain, [("fill_state", "in", ("empty", "being_emptied"))]]
+        )
+        return location_domain
 
     def _domain_location_storage_category(
         self, candidate_locations, quants, products, package_type

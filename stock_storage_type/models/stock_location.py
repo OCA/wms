@@ -164,13 +164,14 @@ class StockLocation(models.Model):
                 """
             )
 
-    @api.depends("do_not_mix_lots", "location_will_contain_lot_ids")
+    @api.depends("do_not_mix_lots", "location_will_contain_lot_ids", "fill_state")
     def _compute_has_potential_lot_mix_exception(self):
         locations_with_exception = self.browse()
         locations_without_exception = self.browse()
         for location in self:
             if (
-                location._should_compute_will_contain_lot_ids()
+                location.fill_state not in ("empty", "being_emptied")
+                and location._should_compute_will_contain_lot_ids()
                 and len(location.location_will_contain_lot_ids) > 1
             ):
                 locations_with_exception |= location
@@ -179,13 +180,14 @@ class StockLocation(models.Model):
         locations_with_exception.has_potential_lot_mix_exception = True
         locations_without_exception.has_potential_lot_mix_exception = False
 
-    @api.depends("do_not_mix_lots", "location_will_contain_product_ids")
+    @api.depends("do_not_mix_lots", "location_will_contain_product_ids", "fill_state")
     def _compute_has_potential_product_mix_exception(self):
         locations_with_exception = self.browse()
         locations_without_exception = self.browse()
         for location in self:
             if (
-                location._should_compute_will_contain_product_ids()
+                location.fill_state not in ("empty", "being_emptied")
+                and location._should_compute_will_contain_product_ids()
                 and len(location.location_will_contain_product_ids) > 1
             ):
                 locations_with_exception |= location
