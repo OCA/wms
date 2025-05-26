@@ -10,7 +10,7 @@ class StockServiceLevel(models.Model):
 
     route_ids = fields.Many2many(
         string="Routes",
-        comodel_name="stock.location.route",
+        comodel_name="stock.route",
         domain="[('service_level_selectable', '=', True)]",
         help=(
             "Routes restricted to this service level. "

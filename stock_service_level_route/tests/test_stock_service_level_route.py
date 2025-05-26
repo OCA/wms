@@ -1,7 +1,7 @@
 # Copyright 2024 Foodles (https://www.foodles.co)
 # @author Pierre Verkest <pierreverkest84@gmail.com>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo.addons.stock_service_level.tests.common import StockServiceLeveLCommonCase
+from .common import StockServiceLeveLCommonCase
 
 
 class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
@@ -158,7 +158,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
             # They don't share the same route so each picking the related
             # picking type
             3,
-            transfers.move_lines.mapped(
+            transfers.move_ids.mapped(
                 lambda move: (
                     move.rule_id.name,
                     move.picking_id.name,
@@ -173,11 +173,11 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
             lambda pick: pick.picking_type_id == self.premium_picking_type
         )
         self.assertEqual(
-            standard_picking.move_lines.rule_id.route_id,
+            standard_picking.move_ids.rule_id.route_id,
             self.pick_ship_std_route,
         )
         self.assertEqual(
-            premium_picking.move_lines.rule_id.route_id,
+            premium_picking.move_ids.rule_id.route_id,
             self.pick_ship_prm_route,
         )
         premium_picking.action_assign()
@@ -194,7 +194,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
                 and mov.move_id.service_level_id == expected_service_level
             )
             self.assertEqual(len(concern_move_line), 1)
-            self.assertEqual(concern_move_line.product_uom_qty, expect_reserved_qty)
+            self.assertEqual(concern_move_line.quantity, expect_reserved_qty)
 
         assert_move_line_per_location(
             premium_picking.move_line_ids,
@@ -277,7 +277,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         self.assertEqual(
             len(transfers),
             2,
-            transfers.move_lines.mapped(
+            transfers.move_ids.mapped(
                 lambda move: (
                     move.rule_id.name,
                     move.picking_id.name,
@@ -289,13 +289,13 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         )
 
         self.assertEqual(
-            len(picking.move_lines),
+            len(picking.move_ids),
             3,
         )
         self.assertEqual(
-            picking.move_lines.rule_id.route_id,
+            picking.move_ids.rule_id.route_id,
             self.pick_ship_no_restriction_route,
-            f"Got {picking.move_lines.rule_id.route_id.name} "
+            f"Got {picking.move_ids.rule_id.route_id.name} "
             f"expected {self.pick_ship_no_restriction_route.name} route.",
         )
 
@@ -353,7 +353,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         self.assertEqual(
             len(transfers),
             2,
-            transfers.move_lines.mapped(
+            transfers.move_ids.mapped(
                 lambda move: (
                     move.rule_id.name,
                     move.picking_id.name,
@@ -365,11 +365,11 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         )
 
         self.assertEqual(
-            len(picking.move_lines),
+            len(picking.move_ids),
             2,
         )
         self.assertEqual(
-            picking.move_lines.rule_id.route_id,
+            picking.move_ids.rule_id.route_id,
             self.pick_ship_both_route,
         )
 
@@ -423,7 +423,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         self.assertEqual(
             len(transfers),
             2,
-            transfers.move_lines.mapped(
+            transfers.move_ids.mapped(
                 lambda move: (
                     move.rule_id.name,
                     move.picking_id.name,
@@ -435,14 +435,14 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
         )
 
         self.assertEqual(
-            len(picking.move_lines),
+            len(picking.move_ids),
             1,
         )
         self.assertEqual(
-            picking.move_lines.rule_id.route_id,
+            picking.move_ids.rule_id.route_id,
             self.pick_ship_no_service_level_route,
-            f"Got {picking.move_lines.rule_id.route_id.name} "
-            f"(seq: {picking.move_lines.rule_id.route_id.sequence}) "
+            f"Got {picking.move_ids.rule_id.route_id.name} "
+            f"(seq: {picking.move_ids.rule_id.route_id.sequence}) "
             f"expected {self.pick_ship_no_service_level_route.name} "
             f"(seq: {self.pick_ship_no_service_level_route.sequence}) route.",
         )
@@ -514,7 +514,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
             # They don't share the same route so each picking the related
             # picking type
             3,
-            transfers.move_lines.mapped(
+            transfers.move_ids.mapped(
                 lambda move: (
                     move.rule_id.name,
                     move.picking_id.name,
@@ -529,11 +529,11 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
             lambda pick: pick.picking_type_id == self.premium_picking_type
         )
         self.assertEqual(
-            standard_picking_by_both_route.move_lines.rule_id.route_id,
+            standard_picking_by_both_route.move_ids.rule_id.route_id,
             self.pick_ship_both_route,
         )
         self.assertEqual(
-            premium_picking.move_lines.rule_id.route_id,
+            premium_picking.move_ids.rule_id.route_id,
             self.pick_ship_prm_route,
         )
         premium_picking.action_assign()
@@ -550,7 +550,7 @@ class TestPropagateServiceLevel(StockServiceLeveLCommonCase):
                 and mov.move_id.service_level_id == expected_service_level
             )
             self.assertEqual(len(concern_move_line), 1)
-            self.assertEqual(concern_move_line.product_uom_qty, expect_reserved_qty)
+            self.assertEqual(concern_move_line.quantity, expect_reserved_qty)
 
         assert_move_line_per_location(
             premium_picking.move_line_ids,
