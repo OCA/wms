@@ -150,7 +150,7 @@ class StockAction(Component):
         pickings = move_lines.picking_id
         for picking in pickings:
             lines_still_assigned = picking.move_line_ids.filtered(
-                lambda l: l.shopfloor_user_id
+                lambda x: x.shopfloor_user_id
             )
             if lines_still_assigned:
                 # Because there is other lines in the picking still assigned

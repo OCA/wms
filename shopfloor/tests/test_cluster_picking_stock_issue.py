@@ -125,7 +125,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
             + self.move2.product_uom_qty
             + sum(
                 self.batch_other.picking_ids.move_line_ids.filtered(
-                    lambda l: l.location_id == self.shelf2
+                    lambda x: x.location_id == self.shelf2
                 ).mapped("reserved_uom_qty")
             )
         )
@@ -162,10 +162,10 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         self.assertEqual(self.move5.move_line_ids.location_id, self.shelf2)
 
         line_shelf1 = self.move3.move_line_ids.filtered(
-            lambda l: l.location_id == self.shelf1
+            lambda x: x.location_id == self.shelf1
         )
         line_shelf2 = self.move3.move_line_ids.filtered(
-            lambda l: l.location_id == self.shelf2
+            lambda x: x.location_id == self.shelf2
         )
 
         # pick the first 2 moves

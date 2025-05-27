@@ -126,7 +126,6 @@ class SinglePackTransfer(Component):
                     message=self.msg_store.package_already_picked_by(package, picking)
                 )
             elif other_move_lines and self.work.menu.allow_unreserve_other_moves:
-
                 unreserved_moves = other_move_lines.move_id
                 other_package_levels = other_move_lines.package_level_id
                 other_package_levels.explode_package()

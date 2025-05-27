@@ -135,7 +135,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
             },
             message={
                 "message_type": "success",
-                "body": "Packaging changed on package {}".format(self.package.name),
+                "body": f"Packaging changed on package {self.package.name}",
             },
         )
 

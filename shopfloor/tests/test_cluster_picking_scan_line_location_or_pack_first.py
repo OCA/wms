@@ -103,8 +103,7 @@ class ClusterPickingScanLineLocationOrPackFirstCase(ClusterPickingLineCommonCase
         """Check scanning a location then a product without package.
 
         When there is multiple product in the location and the location is scanned,
-        The user needs to scan the product but the system does not remember the location ?
-
+        User needs to scan the product but the system does not remember the location.
         """
         self._simulate_batch_selected(self.batch, in_package=False, in_lot=False)
         line = self.batch.picking_ids.move_line_ids

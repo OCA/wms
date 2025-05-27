@@ -20,7 +20,8 @@ class StockPicking(models.Model):
     )
     bulk_line_count = fields.Integer(
         compute="_compute_picking_info",
-        help="Technical field. Indicates number of move lines without package included.",
+        help="Technical field. "
+        "Indicates number of move lines without package included.",
     )
 
     @api.depends(

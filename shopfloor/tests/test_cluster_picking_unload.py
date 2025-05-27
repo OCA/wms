@@ -430,7 +430,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         )
 
     def test_set_destination_all_check_confirmation(self):
-        """Endpoint called confirming with a different location, ask confirmation again"""
+        """Endpoint called confirming with a different location, ask confirmation"""
         move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines, self.bin1)
         move_lines.write({"location_dest_id": self.packing_a_location.id})
@@ -933,8 +933,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_single",
             popup={
-                "body": "Last operation of transfer {}. Next operation "
-                "({}) is ready to proceed.".format(picking.name, next_picking.name)
+                "body": f"Last operation of transfer {picking.name}. Next operation "
+                f"({next_picking.name}) is ready to proceed."
             },
             data=data,
         )

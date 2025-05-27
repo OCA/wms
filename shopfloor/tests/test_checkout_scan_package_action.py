@@ -40,40 +40,40 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
 
     def test_scan_package_action_select_product(self):
         self._test_select_product(
-            lambda l: l.product_id.barcode, lambda l: l.reserved_uom_qty, lambda __: 0
+            lambda x: x.product_id.barcode, lambda x: x.reserved_uom_qty, lambda __: 0
         )
 
     def test_scan_package_action_deselect_product(self):
         self._test_select_product(
-            lambda l: l.product_id.barcode, lambda __: 0, lambda l: l.reserved_uom_qty
+            lambda x: x.product_id.barcode, lambda __: 0, lambda x: x.reserved_uom_qty
         )
 
     def test_scan_package_action_select_product_packaging(self):
         self._test_select_product(
-            lambda l: l.product_id.packaging_ids.barcode,
-            lambda l: l.reserved_uom_qty,
+            lambda x: x.product_id.packaging_ids.barcode,
+            lambda x: x.reserved_uom_qty,
             lambda __: 0,
         )
 
     def test_scan_package_action_deselect_product_packaging(self):
         self._test_select_product(
-            lambda l: l.product_id.packaging_ids.barcode,
+            lambda x: x.product_id.packaging_ids.barcode,
             lambda __: 0,
-            lambda l: l.reserved_uom_qty,
+            lambda x: x.reserved_uom_qty,
         )
 
     def test_scan_package_action_select_product_lot(self):
         self._test_select_product(
-            lambda l: l.lot_id.name,
+            lambda x: x.lot_id.name,
             lambda __: 0,
-            lambda l: l.reserved_uom_qty,
+            lambda x: x.reserved_uom_qty,
             in_lot=True,
         )
 
     def test_scan_package_action_deselect_product_lot(self):
         self._test_select_product(
-            lambda l: l.lot_id.name,
-            lambda l: l.reserved_uom_qty,
+            lambda x: x.lot_id.name,
+            lambda x: x.reserved_uom_qty,
             lambda __: 0,
             in_lot=True,
         )

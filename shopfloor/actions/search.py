@@ -8,7 +8,6 @@ from odoo.addons.component.core import Component
 
 
 class SearchResult:
-
     __slots__ = ("record", "type", "code")
 
     def __init__(self, **kw) -> None:
@@ -31,7 +30,8 @@ class SearchResult:
 
     @property
     def records(self):
-        """In some cases we expect more than one records (eg: location limit > 1) or lots"""
+        # In some cases we expect more than one records
+        # (eg: location limit > 1) or lots
         return self.record if len(self.record) > 1 else None
 
 

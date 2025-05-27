@@ -266,7 +266,7 @@ class ShopfloorApp(models.Model):
 
     def _prepare_endpoint_vals(self, service, method_name, route, routing_params):
         request_method = routing_params["methods"][0]
-        name = f"app#{self.id}::{service._name}/{method_name}__{request_method.lower()}"
+        name = f"app#{self.id}::{service._name}/{method_name}__{request_method.lower()}"  # noqa
         endpoint_vals = dict(
             name=name,
             request_method=request_method,
@@ -278,7 +278,7 @@ class ShopfloorApp(models.Model):
         return endpoint_vals
 
     def _route_group(self):
-        return f"{self._name}:{self.tech_name}"
+        return f"{self._name}:{self.tech_name}"  # noqa
 
     def _is_component_registry_ready(self):
         comp_registry = _component_databases.get(self.env.cr.dbname)

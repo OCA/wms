@@ -233,7 +233,7 @@ class Delivery(Component):
 
     def _deliver_package(self, picking, package, location):
         lines = package.move_line_ids.filtered(
-            lambda l: l.state in ("assigned", "partially_available")
+            lambda x: x.state in ("assigned", "partially_available")
         )
         if not lines:
             return self._response_for_deliver(
@@ -372,7 +372,7 @@ class Delivery(Component):
         if message:
             return self._response_for_deliver(location=location, message=message)
         lines = lines.filtered(
-            lambda l: l.move_id.picking_type_id in self.picking_types
+            lambda x: x.move_id.picking_type_id in self.picking_types
         )
         # State of the picking might change while we reach this point: check again!
         message = self._check_picking_status(lines.mapped("picking_id"))
@@ -421,7 +421,7 @@ class Delivery(Component):
                 )
         # We focus only on lines on which we can increase the 'qty_done'
         lines = lines.filtered(
-            lambda l: (l.qty_done + product_qty) <= l.reserved_uom_qty
+            lambda x: (x.qty_done + product_qty) <= x.reserved_uom_qty
         )
         # Filter lines to keep only ones from one delivery operation
         # (we do not want to process lines of another delivery operation)

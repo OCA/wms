@@ -253,7 +253,8 @@ class ShopfloorMenu(models.Model):
         string="Destination package required",
         default=True,
         help="If set, the user will have to scan only the source location "
-        "and the destination location to process a line. The unload step will be skipped.",
+        "and the destination location to process a line. "
+        "The unload step will be skipped.",
     )
 
     require_destination_package_is_possible = fields.Boolean(
@@ -548,7 +549,8 @@ class ShopfloorMenu(models.Model):
             ):
                 raise exceptions.ValidationError(
                     _(
-                        "Custom sort key code is required when 'Custom code' is selected."
+                        "Custom sort key code is required "
+                        "when 'Custom code' is selected."
                     )
                 )
             if (
@@ -557,7 +559,7 @@ class ShopfloorMenu(models.Model):
             ):
                 raise exceptions.ValidationError(
                     _(
-                        "Custom sort key code is only allowed when 'Custom code' is selected."
+                        "Custom sort key code is only allowed when 'Custom code' is selected."  # noqa
                     )
                 )
             code = (

@@ -123,7 +123,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Package %(package_name)s is not available in transfer %(picking_name)s.",
+                "Package %(package_name)s "
+                "is not available in transfer %(picking_name)s.",
                 package_name=package.name,
                 picking_name=picking.name,
             ),
@@ -314,7 +315,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Several moves found on different locations, please scan first the location."
+                "Several moves found on different locations, "
+                "please scan first the location."
             ),
         }
 
@@ -435,7 +437,8 @@ class MessageAction(Component):
             "message_type": "warning",
             "body": _(
                 _(
-                    "This source document is part of multiple transfers, please scan a package."
+                    "This source document is part of multiple transfers, "
+                    "please scan a package."
                 )
             ),
         }
@@ -511,8 +514,10 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "{message_code} not found in the current transfer or already in a package."
-            ).format(message_code=message_code),
+                "%(message_code)s not found in the current transfer "
+                "or already in a package.",
+                message_code=message_code,
+            ),
         }
 
     def packaging_not_found_in_picking(self):
@@ -757,7 +762,8 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Please note that the scanned quantity is higher than the maximum allowed."
+                "Please note that the scanned quantity "
+                "is higher than the maximum allowed."
             ),
         }
 

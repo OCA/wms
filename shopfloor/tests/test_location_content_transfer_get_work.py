@@ -123,11 +123,14 @@ class TestLocationContentTransferGetWork(LocationContentTransferCommonCase):
 
     def test_find_work_custom_sort_key(self):
         # fmt: off
+        custom_code = (
+            f"key = ("
+            f"-1 if line.location_id.id == {self.content_loc.id} else 10, )"
+        )
         self.menu.sudo().write(
             {
                 "move_line_search_sort_order": "custom_code",
-                "move_line_search_sort_order_custom_code":
-                    f"key = (-1 if line.location_id.id == {self.content_loc.id} else 10, )",
+                "move_line_search_sort_order_custom_code": custom_code,
             }
         )
         # fmt: on

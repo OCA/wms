@@ -680,7 +680,7 @@ class DeliveryScanDeliverSpecialCase(DeliveryCommonCase):
             response,
             message={
                 "message_type": "error",
-                "body": "Transfer {} is not available.".format(picking.name),
+                "body": f"Transfer {picking.name} is not available.",
             },
         )
 

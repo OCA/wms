@@ -716,9 +716,7 @@ class TestActionsChangePackageLot(CommonCase):
         # still we have to handle it). Forbid to pick.
         expected_message = self.msg_store.package_change_error(
             new_package,
-            "Package {} has been partially picked in another location".format(
-                new_package.display_name
-            ),
+            f"Package {new_package.display_name} has been partially picked in another location",  # noqa
         )
         self.change_package_lot.change_package(
             line,
@@ -921,6 +919,10 @@ class TestActionsChangePackageLot(CommonCase):
         line2 = picking2.move_line_ids
         line2.qty_done = 10
 
+        expected_msg = (
+            f"Package {package2.display_name} does not contain available product "
+            f"{line1.product_id.display_name}, cannot replace package."
+        )
         self.change_package_lot.change_package(
             line1,
             package2,
@@ -929,13 +931,7 @@ class TestActionsChangePackageLot(CommonCase):
             # failure callback
             lambda move_line, message=None: self.assertEqual(
                 message,
-                self.msg_store.package_change_error(
-                    package2,
-                    "Package {} does not contain available product {},"
-                    " cannot replace package.".format(
-                        package2.display_name, line1.product_id.display_name
-                    ),
-                ),
+                self.msg_store.package_change_error(package2, expected_msg),
             ),
         )
 

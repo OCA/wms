@@ -37,7 +37,5 @@ def _enable_option_in_menus(menus):
     for menu in menus:
         menu.allow_alternative_destination_package = True
         _logger.info(
-            "Option allow_alternative_destination_package enabled for menu {}".format(
-                menu.name
-            )
+            f"Option allow_alternative_destination_package enabled for menu {menu.name}"
         )
