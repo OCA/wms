@@ -93,6 +93,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"%(message_code)s not found in the current transfer or already in a package."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "%(qty)s %(product_name)s put in %(package_name)s"
 msgstr ""
 
@@ -2167,14 +2175,6 @@ msgstr ""
 #: model:shopfloor.scenario,name:shopfloor.scenario_zone_picking
 #: model:stock.picking.type,name:shopfloor.picking_type_zone_picking_demo
 msgid "Zone Picking"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
-msgid ""
-"{message_code} not found in the current transfer or already in a package."
 msgstr ""
 
 #. module: shopfloor

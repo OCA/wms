@@ -140,6 +140,14 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid ""
+"%(message_code)s not found in the current transfer or already in a package."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "%(qty)s %(product_name)s put in %(package_name)s"
 msgstr "%(qty)s %(product_name)s messo in %(package_name)s"
 
@@ -2347,18 +2355,15 @@ msgstr "Prelievo per area"
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid ""
-"{message_code} not found in the current transfer or already in a package."
-msgstr ""
-"{message_code} non trovato nel trasferimento attuale o già presente in un "
-"collo."
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid ""
+#~ "{message_code} not found in the current transfer or already in a package."
+#~ msgstr ""
+#~ "{message_code} non trovato nel trasferimento attuale o già presente in un "
+#~ "collo."
 
 #, python-format
 #~ msgid "Package {} is not in the current transfer."
