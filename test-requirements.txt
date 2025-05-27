@@ -1,0 +1,1 @@
+odoo-addon-stock-service-level @ git+https://github.com/damdam-s/wms.git@17.0-mig-stock_service_level#subdirectory=stock_service_level
