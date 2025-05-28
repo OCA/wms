@@ -4,7 +4,6 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-
     _inherit = "res.company"
 
     stock_sale_report_display_is_available = fields.Boolean(
