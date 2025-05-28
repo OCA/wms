@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-05-03 14:48+0000\n"
+"PO-Revision-Date: 2025-05-28 10:54+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -142,7 +142,7 @@ msgstr ""
 #, python-format
 msgid ""
 "%(message_code)s not found in the current transfer or already in a package."
-msgstr ""
+msgstr "%(message_code)s non trovato nel trasferimento attuale o già nel collo."
 
 #. module: shopfloor
 #. odoo-python
