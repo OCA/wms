@@ -1,10 +1,14 @@
 # Copyright 2020 Camptocamp (https://www.camptocamp.com)
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
 
 import logging
 
+from odoo_test_helper import FakeModelLoader
+
 from odoo import _, fields
 from odoo.tests import common
+from odoo.tests.common import TransactionCase
 
 from odoo.addons.stock_available_to_promise_release.tests.common import (
     PromiseReleaseCommonCase,
@@ -225,3 +229,22 @@ class ChannelReleaseCase(PromiseReleaseCommonCase):
                 }
             },
         )
+
+
+class StockReleaseChannelDeliveryDateCommon(TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.loader = FakeModelLoader(cls.env, cls.__module__)
+        cls.loader.backup_registry()
+        from .models.generator_test import StockReleaseChannel
+
+        cls.loader.update_registry((StockReleaseChannel,))
+
+        cls.partner = cls.env.ref("base.main_partner")
+        cls.channel = cls.env.ref("stock_release_channel.stock_release_channel_default")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.loader.restore_registry()
+        return super().tearDownClass()
