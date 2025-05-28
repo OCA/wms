@@ -209,8 +209,8 @@ class StockMove(models.Model):
         return "COALESCE(m.need_release, False) = COALESCE(move.need_release, False)"
 
     def _previous_promised_qty_sql_moves_before(self):
-        sql = """
-            {moves_matches}
+        sql = f"""
+            {self._previous_promised_qty_sql_moves_before_matches()}
             AND (
                 m.priority > move.priority
                 OR
@@ -231,9 +231,7 @@ class StockMove(models.Model):
                     AND m.id > move.id
                 )
             )
-        """.format(
-            moves_matches=self._previous_promised_qty_sql_moves_before_matches()
-        )
+        """
         return sql
 
     def _previous_promised_qty_sql_moves_no_release(self):
@@ -241,29 +239,24 @@ class StockMove(models.Model):
 
     def _previous_promised_qty_sql_lateral_where(self, warehouse):
         locations = warehouse.view_location_id
-        sql = """
+        sql = f"""
                 m.id != move.id
                 AND m.product_id = move.product_id
                 AND p_type.code = 'outgoing'
                 AND loc.parent_path LIKE ANY(%(location_paths)s)
                 AND (
-                    {moves_before}
+                    {self._previous_promised_qty_sql_moves_before()}
                     OR (
                         move.need_release IS true
-                        AND ({moves_no_release})
+                        AND ({self._previous_promised_qty_sql_moves_no_release()})
                     )
                 )
                 AND m.state IN (
                     'waiting', 'confirmed', 'partially_available', 'assigned'
                 )
-        """.format(
-            moves_before=self._previous_promised_qty_sql_moves_before(),
-            moves_no_release=self._previous_promised_qty_sql_moves_no_release(),
-        )
+        """
         params = {
-            "location_paths": [
-                "{}%".format(location.parent_path) for location in locations
-            ]
+            "location_paths": [f"{location.parent_path}%" for location in locations]
         }
         horizon_date = self._promise_reservation_horizon_date()
         if horizon_date:
@@ -836,7 +829,7 @@ class StockMove(models.Model):
                             "You cannot unrelease the move %(move_name)s "
                             "because some origin moves %(done_move_names)s are done"
                         ),
-                        **msg_args
+                        **msg_args,
                     )
                     raise UserError(message)
                 # Multiple pickings can satisfy a move

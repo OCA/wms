@@ -21,9 +21,9 @@
                             <div class="content-group">
                                 <div class="mt16">
                                     <field
-                                        name="stock_reservation_horizon"
-                                        class="o_light_label"
-                                    /> days
+                                    name="stock_reservation_horizon"
+                                    class="o_light_label"
+                                /> days
                                 </div>
                             </div>
                         </div>
@@ -41,9 +41,9 @@
                             <div class="content-group">
                                 <div class="mt16">
                                     <field
-                                        name="stock_release_max_prep_time"
-                                        class="o_light_label"
-                                    /> minutes
+                                    name="stock_release_max_prep_time"
+                                    class="o_light_label"
+                                /> minutes
                                 </div>
                             </div>
                         </div>
