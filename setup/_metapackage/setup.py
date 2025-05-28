@@ -13,6 +13,7 @@ setuptools.setup(
         'odoo-addon-sale_stock_available_to_promise_release_block>=16.0dev,<16.1dev',
         'odoo-addon-sale_stock_release_channel>=16.0dev,<16.1dev',
         'odoo-addon-sale_stock_release_channel_delivery>=16.0dev,<16.1dev',
+        'odoo-addon-sale_stock_release_channel_delivery_date>=16.0dev,<16.1dev',
         'odoo-addon-sale_stock_release_channel_partner_by_date>=16.0dev,<16.1dev',
         'odoo-addon-sale_stock_release_channel_partner_by_date_delivery>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor>=16.0dev,<16.1dev',
