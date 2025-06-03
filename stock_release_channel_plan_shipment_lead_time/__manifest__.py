@@ -3,7 +3,7 @@
 {
     "name": "Stock release channel plan shipment lead time",
     "summary": "Stock release channel plan shipment lead time",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "development_status": "Beta",
     "category": "Uncategorized",
     "website": "https://github.com/OCA/wms",
