@@ -59,6 +59,7 @@ setuptools.setup(
         'odoo-addon-stock_release_channel_shipment_lead_time>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_show_volume>=16.0dev,<16.1dev',
         'odoo-addon-stock_release_channel_show_weight>=16.0dev,<16.1dev',
+        'odoo-addon-stock_release_channel_warehouse_calendar>=16.0dev,<16.1dev',
         'odoo-addon-stock_storage_type>=16.0dev,<16.1dev',
         'odoo-addon-stock_storage_type_putaway_abc>=16.0dev,<16.1dev',
         'odoo-addon-stock_warehouse_flow>=16.0dev,<16.1dev',
