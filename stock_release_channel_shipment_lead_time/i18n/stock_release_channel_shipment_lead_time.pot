@@ -14,6 +14,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_stock_release_channel__delivery_calendar_id
+msgid "Delivery Calendar"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_shipment_advice__delivery_date
 msgid "Delivery Date"
 msgstr ""
@@ -41,6 +46,13 @@ msgstr ""
 #. module: stock_release_channel_shipment_lead_time
 #: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_lead_time
 msgid "Shipment Lead Time (days)"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__delivery_calendar_id
+msgid ""
+"Shipment Working Hours. Defaults tot warehouse calendar for simplicity but "
+"another calendar can be used."
 msgstr ""
 
 #. module: stock_release_channel_shipment_lead_time
