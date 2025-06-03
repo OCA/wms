@@ -17,6 +17,11 @@ msgstr ""
 "X-Generator: Weblate 5.6.2\n"
 
 #. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_stock_release_channel__delivery_calendar_id
+msgid "Delivery Calendar"
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_lead_time.field_shipment_advice__delivery_date
 msgid "Delivery Date"
 msgstr "Date de livraison"
@@ -47,6 +52,13 @@ msgid "Shipment Lead Time (days)"
 msgstr ""
 
 #. module: stock_release_channel_shipment_lead_time
+#: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__delivery_calendar_id
+msgid ""
+"Shipment Working Hours. Defaults tot warehouse calendar for simplicity but "
+"another calendar can be used."
+msgstr ""
+
+#. module: stock_release_channel_shipment_lead_time
 #: model:ir.model,name:stock_release_channel_shipment_lead_time.model_stock_release_channel
 msgid "Stock Release Channels"
 msgstr "Canux de livraison"
@@ -60,8 +72,8 @@ msgstr "Transfert"
 #: model:ir.model.fields,help:stock_release_channel_shipment_lead_time.field_stock_release_channel__shipment_date
 msgid ""
 "if no warehouse or no calendar on the warehouse:process end date + shipment "
-"lead time.Otherwise, it's counted by calendar included leaves:number of days"
-" = lead time + 1"
+"lead time.Otherwise, it's counted by calendar included leaves:number of days "
+"= lead time + 1"
 msgstr ""
 
 #. module: stock_release_channel_shipment_lead_time
