@@ -13,11 +13,22 @@
         <field name="storage_category_id" ref="storage_category_pallets" />
         <field
             name="condition_ids"
-            eval="[(4, ref('stock_storage_type.storage_category_allow_new_product_cond_pallets'))]"
+            eval="[(4, ref('stock_storage_type.storage_category_allow_new_product_cond_pallets')),]"
         />
         <field name="allow_new_product">empty</field>
     </record>
 
+    <record
+        id="storage_category_allow_new_product_empty_pallets_uk"
+        model="stock.storage.category.allow_new_product"
+    >
+        <field name="storage_category_id" ref="storage_category_pallets" />
+        <field
+            name="condition_ids"
+            eval="[(4, ref('stock_storage_type.storage_category_allow_new_product_cond_pallets_uk')),]"
+        />
+        <field name="allow_new_product">empty</field>
+    </record>
     <record id="storage_category_cardboxes" model="stock.storage.category">
         <field name="name">Cardboxes</field>
     </record>

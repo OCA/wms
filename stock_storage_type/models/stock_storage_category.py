@@ -203,8 +203,8 @@ class StockStorageCategory(models.Model):
                     quants,
                 )
                 if not res:
-                    # Fallback on category option value
-                    return self.allow_new_product
+                    # Go to next rule
+                    break
             # All conditions are matching
             if res:
                 return rule.allow_new_product

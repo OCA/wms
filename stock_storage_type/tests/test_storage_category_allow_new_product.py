@@ -109,3 +109,51 @@ class TestStorageCategoryAllowNewProduct(TestStorageTypeCommon):
             int_picking.move_line_ids.mapped("location_dest_id"),
             self.pallets_bin_1_location,
         )
+
+    def test_storage_category_mixed_allow_new_product(self):
+        self.category.allow_new_product = "mixed"
+        self.assertEqual(self.category.get_allow_new_product(self.product), "mixed")
+
+        # Create a quant with a package of type Pallet to check the
+        # allow_new_product rule result
+        package_type_pallets = self.env.ref(
+            "stock_storage_type.package_storage_type_pallets"
+        )
+        package_type_pallets_uk = self.env.ref(
+            "stock_storage_type.package_storage_type_pallets_uk"
+        )
+        self.product2.package_type_id = package_type_pallets_uk
+        package = self.env["stock.quant.package"].create(
+            {
+                "name": "TEST PKG",
+                "package_type_id": package_type_pallets.id,
+            }
+        )
+        package_uk = self.env["stock.quant.package"].create(
+            {
+                "name": "TEST PKG",
+                "package_type_id": package_type_pallets_uk.id,
+            }
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product,
+            self.pallets_bin_2_location,
+            1.0,
+            package_id=package,
+        )
+        quant = self.env["stock.quant"].search(
+            [
+                ("location_id", "=", self.pallets_bin_2_location.id),
+                ("product_id", "=", self.product.id),
+                ("package_id", "=", package.id),
+            ]
+        )
+        self.assertEqual(
+            self.category.get_allow_new_product(
+                self.product2,
+                quants=quant,
+                package_type=package_type_pallets_uk,
+                package=package_uk,
+            ),
+            "same",
+        )
