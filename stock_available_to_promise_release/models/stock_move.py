@@ -730,6 +730,14 @@ class StockMove(models.Model):
                 # Do not copy the responsible user from the source picking as somebody
                 # else could scan the new cancel picking
                 cancel_picking.user_id = False
+
+                returned_moves = return_wiz.product_return_moves.move_id
+                pickings_to_assign = returned_moves.move_dest_ids.picking_id.filtered(
+                    lambda picking: picking.id != cancel_picking.id
+                    and picking.state == "confirmed"
+                )
+                if pickings_to_assign:
+                    pickings_to_assign.action_assign()
         return True
 
     def _unrelease_set_returnable_qty_per_move(
