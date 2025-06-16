@@ -9,18 +9,23 @@
                 <field name="count_picking_need_release" />
             </field>
             <xpath
-                expr="//a[@name='get_action_picking_tree_waiting']/../.."
-                position="before"
+                expr="//div[hasclass('col-6', 'stock-overview-links')]"
+                position="inside"
             >
                 <div t-if="record.count_picking_need_release.raw_value > 0" class="row">
-                    <div class="col-9">
-                        <a name="get_action_picking_tree_need_release" type="object">
-                            Need Release
-                        </a>
-                    </div>
-                    <div class="col-3">
-                        <field name="count_picking_need_release" />
-                    </div>
+                    <a
+                        class="col-8 offset-4 pe-0 text-truncate"
+                        name="get_action_picking_tree_need_release"
+                        type="object"
+                    >
+                        <div class="row">
+                            <span class="col-6">Need Release</span>
+                            <field
+                                class="col-2 text-end"
+                                name="count_picking_need_release"
+                            />
+                        </div>
+                    </a>
                 </div>
             </xpath>
         </field>
@@ -35,7 +40,7 @@
                 <group name="release" string="Chained moves release process">
                     <field
                         name="unrelease_on_backorder"
-                        attrs='{"invisible": [("code", "!=", "outgoing")]}'
+                        invisible="code != 'outgoing'"
                     />
                     <field name="prevent_new_move_after_release" />
                 </group>

@@ -14,7 +14,7 @@
                 <button
                     type="object"
                     name="action_open_move_need_release"
-                    attrs="{'invisible': [('move_need_release_count', '=', 0)]}"
+                    invisible="not move_need_release_count"
                     class="oe_stat_button"
                     icon="fa-cubes"
                     groups="stock.group_stock_manager"

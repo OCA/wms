@@ -71,8 +71,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         """
         self.shipping1.action_cancel()
         self.assertEqual(self.shipping1.state, "cancel")
-        move_active = self.picking1.move_ids.filtered(lambda l: l.state == "assigned")
-        move_cancel = self.picking1.move_ids.filtered(lambda l: l.state == "cancel")
+        move_active = self.picking1.move_ids.filtered(
+            lambda line: line.state == "assigned"
+        )
+        move_cancel = self.picking1.move_ids.filtered(
+            lambda line: line.state == "cancel"
+        )
         self.assertEqual(move_active.product_uom_qty, 3.0)
         self.assertEqual(move_cancel.product_uom_qty, 2.0)
         self.assertEqual(move_active.move_dest_ids, self.shipping2.move_ids)
@@ -96,8 +100,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         """
         self.shipping1.move_ids._action_cancel()
         self.assertEqual(self.shipping1.state, "cancel")
-        move_active = self.picking1.move_ids.filtered(lambda l: l.state == "assigned")
-        move_cancel = self.picking1.move_ids.filtered(lambda l: l.state == "cancel")
+        move_active = self.picking1.move_ids.filtered(
+            lambda line: line.state == "assigned"
+        )
+        move_cancel = self.picking1.move_ids.filtered(
+            lambda line: line.state == "cancel"
+        )
         self.assertEqual(move_active.product_uom_qty, 3.0)
         self.assertEqual(move_cancel.product_uom_qty, 2.0)
         self.assertEqual(move_active.move_dest_ids, self.shipping2.move_ids)

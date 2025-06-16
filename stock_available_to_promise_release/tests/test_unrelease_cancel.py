@@ -96,7 +96,8 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         self.assertFalse(cancel_picking.user_id)
         self.assertEqual(len(cancel_picking), 1)
         self.assertEqual(cancel_picking.location_id, self.loc_output)
-        self.assertEqual(cancel_picking.location_dest_id, self.loc_stock)
+        for move in cancel_picking.move_ids:
+            self.assertEqual(move.location_dest_id, self.loc_stock)
 
     def test_unrelease_picked_partial(self):
         qty_picked = [(self.product1, 5.0)]

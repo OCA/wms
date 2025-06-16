@@ -3,7 +3,7 @@
 # Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
-from odoo import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
 
 
 class StockPicking(models.Model):
@@ -53,7 +53,7 @@ class StockPicking(models.Model):
 
     def _search_need_release(self, operator, value):
         if operator not in ("=", "!="):
-            raise exceptions.UserError(_("Unsupported operator: %s") % (operator,))
+            raise exceptions.UserError(self.env._("Unsupported operator: %s", operator))
         groups = self.env["stock.move"].read_group(
             [("need_release", "=", True)], ["picking_id"], ["picking_id"]
         )
@@ -97,7 +97,7 @@ class StockPicking(models.Model):
 
     def _search_release_ready(self, operator, value):
         if operator != "=":
-            raise exceptions.UserError(_("Unsupported operator %s") % (operator,))
+            raise exceptions.UserError(self.env._("Unsupported operator: %s", operator))
         # if we search moves with a promise qty > 0, we restrict
         # the number of moves / pickings to filter afterwards
         moves = self.env["stock.move"].search(
@@ -134,12 +134,7 @@ class StockPicking(models.Model):
     def _release_link_backorder(self, origin_picking):
         self.backorder_id = origin_picking
         origin_picking.message_post(
-            body=_(
-                "The backorder <a href=# data-oe-model=stock.picking"
-                " data-oe-id=%(id)s>%(name)s</a> has been created.",
-                name=self.name,
-                id=self.id,
-            )
+            body=self.env._("The backorder %s has been created.", self._get_html_link())
         )
 
     def _after_release_update_chain(self):

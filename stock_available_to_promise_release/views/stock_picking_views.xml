@@ -5,14 +5,10 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
-            <sheet position="inside">
-                <field name="need_release" invisible="1" />
-            </sheet>
             <button name="action_confirm" position="after">
-                <field name="release_ready" invisible="1" />
                 <button
                     name="release_available_to_promise"
-                    attrs="{'invisible': [('release_ready', '=', False)]}"
+                    invisible="not release_ready"
                     string="Release"
                     type="object"
                     class="oe_highlight"
@@ -23,7 +19,7 @@
                 <button
                     type="object"
                     name="action_open_move_need_release"
-                    attrs="{'invisible': [('need_release', '=', False)]}"
+                    invisible="not need_release"
                     class="oe_stat_button"
                     icon="fa-cubes"
                 >
@@ -41,25 +37,22 @@
                     </div>
                 </button>
             </div>
-            <button name="action_assign_serial" position="after">
-                <field name="unrelease_allowed" invisible="1" />
+            <field name="picked" position="after">
+                <field name="unrelease_allowed" column_invisible="1" />
                 <button
                     name="unrelease"
-                    attrs="{'invisible': [('unrelease_allowed', '=', False)]}"
+                    invisible="not unrelease_allowed"
                     string="Un Release"
                     type="object"
                     icon="fa-cube"
                     groups="stock.group_stock_user"
                 />
-            </button>
+            </field>
             <field name="date_done" position="before">
                 <field name="last_release_date" />
             </field>
             <field name="move_type" position="before">
-                <field
-                    name="release_policy"
-                    attrs="{'invisible': [('need_release', '=', False)]}"
-                />
+                <field name="release_policy" invisible="not need_release" />
             </field>
         </field>
     </record>
@@ -76,9 +69,9 @@
             <field name="scheduled_date" position="after">
                 <field name="last_release_date" optional="hide" />
             </field>
-            <tree position="inside">
+            <list position="inside">
                 <field name="date_priority" optional="show" />
-                <field name="need_release" invisible="1" />
+                <field name="need_release" column_invisible="1" />
                 <field name="release_ready" />
                 <field name="release_ready_count" />
                 <button
@@ -87,9 +80,9 @@
                     title="View Move Allocations"
                     icon="fa-cubes"
                     type="object"
-                    attrs="{'invisible': [('need_release', '=', False)]}"
+                    invisible="not need_release"
                 />
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_picking_release_search" model="ir.ui.view">
@@ -121,19 +114,19 @@
         <field name="name">Transfers Allocations</field>
         <field name="res_model">stock.picking</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">list,kanban,form</field>
         <field name="search_view_id" ref="stock.view_picking_internal_search" />
         <field
             name="view_ids"
             eval="[(5, 0, 0),
-                     (0, 0, {'view_mode': 'tree', 'view_id': ref('view_picking_release_tree')}),
+                     (0, 0, {'view_mode': 'list', 'view_id': ref('view_picking_release_tree')}),
                      (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.stock_picking_kanban')}),
                      (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')}),
                      ]"
         />
         <field
             name="context"
-        >{'search_default_release_ready': 1, 'contact_display': 'partner_address'}</field>
+        >{'search_default_release_ready': 1, 'search_default_groupby_picking_id': 1}</field>
         <field name="domain">[('need_release', '=' , True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

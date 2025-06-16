@@ -17,21 +17,22 @@ class PromiseReleaseCommonCase(common.TransactionCase):
                 "reception_steps": "one_step",
                 "delivery_steps": "pick_ship",
                 "code": "WHTEST",
+                "delivery_pull": True,
             }
         )
         cls.loc_stock = cls.wh.lot_stock_id
         cls.loc_customer = cls.env.ref("stock.stock_location_customers")
         cls.product1 = cls.env["product.product"].create(
-            {"name": "Product 1", "type": "product"}
+            {"name": "Product 1", "type": "consu", "is_storable": True}
         )
         cls.product2 = cls.env["product.product"].create(
-            {"name": "Product 2", "type": "product"}
+            {"name": "Product 2", "type": "consu", "is_storable": True}
         )
         cls.product3 = cls.env["product.product"].create(
-            {"name": "Product 3", "type": "product"}
+            {"name": "Product 3", "type": "consu", "is_storable": True}
         )
         cls.product4 = cls.env["product.product"].create(
-            {"name": "Product 4", "type": "product"}
+            {"name": "Product 4", "type": "consu", "is_storable": True}
         )
         cls.uom_unit = cls.env.ref("uom.product_uom_unit")
         cls.partner_delta = cls.env.ref("base.res_partner_4")
@@ -141,9 +142,13 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         if product_qty:
             lines = picking.move_ids.move_line_ids
             for product, qty in product_qty:
-                line = lines.filtered(lambda m: m.product_id == product)
-                line.qty_done = qty
+                line = lines.filtered(
+                    lambda m, product=product: m.product_id == product
+                )
+                line.quantity = qty
+                line.is_inventory = True
+                line.picked = True
         else:
             for line in picking.mapped("move_ids.move_line_ids"):
-                line.qty_done = line.reserved_qty
+                line.picked = True
         picking._action_done()

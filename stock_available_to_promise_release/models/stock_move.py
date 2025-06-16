@@ -8,7 +8,7 @@ import logging
 import operator as py_operator
 from collections import defaultdict
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.tools import date_utils, float_compare, float_is_zero, float_round, groupby
@@ -111,7 +111,8 @@ class StockMove(models.Model):
         if printed_pickings:
             return printed_pickings
         return unreleasable_moves.filtered(
-            lambda m: not m.rule_id.allow_unrelease_return_done_move and m.quantity_done
+            lambda m: not m.rule_id.allow_unrelease_return_done_move
+            and any(ml.quantity > 0 and ml.picked for ml in m.move_line_ids)
         )
 
     def _is_unrelease_allowed_on_origin_moves(self, origin_moves):
@@ -127,7 +128,7 @@ class StockMove(models.Model):
             )
         origin_qty_done = sum(
             m.product_uom._compute_quantity(
-                m.quantity_done,
+                m.quantity,
                 m.product_id.uom_id,
                 rounding_method="HALF-UP",
             )
@@ -136,7 +137,7 @@ class StockMove(models.Model):
         dest_done_moves = origin_done_moves.move_dest_ids
         dest_qty_done = sum(
             m.product_uom._compute_quantity(
-                m.quantity_done,
+                sum(ml.quantity for ml in m.move_line_ids if ml.picked),
                 m.product_id.uom_id,
                 rounding_method="HALF-UP",
             )
@@ -152,7 +153,7 @@ class StockMove(models.Model):
         )
 
     def _unrelease_not_allowed_error(self):
-        message = _("You are not allowed to unrelease those deliveries:\n")
+        message = self.env._("You are not allowed to unrelease those deliveries:\n")
 
         for picking, forbidden_moves_by_picking in groupby(
             self, lambda m: m.picking_id
@@ -160,7 +161,7 @@ class StockMove(models.Model):
             forbidden_moves_by_picking = self.browse().concat(
                 *forbidden_moves_by_picking
             )
-            message += "\n\t- %s" % picking.name
+            message += f"\n\t- {picking.name}"
             forbidden_origin_pickings = self.picking_id.browse()
             for move in forbidden_moves_by_picking:
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
@@ -176,7 +177,7 @@ class StockMove(models.Model):
                             forbidden_origin_pickings |= origin_picking
             if forbidden_origin_pickings:
                 message += " "
-                message += _(
+                message += self.env._(
                     "- blocking transfer(s): %(picking_names)s",
                     picking_names=" ".join(forbidden_origin_pickings.mapped("name")),
                 )
@@ -288,7 +289,7 @@ class StockMove(models.Model):
 
     def _get_previous_promised_qties(self):
         self.env.flush_all()
-        self.env["stock.move.line"].flush_model(["move_id", "reserved_qty"])
+        self.env["stock.move.line"].flush_model(["move_id", "quantity"])
         self.env["stock.location"].flush_model(["parent_path"])
         previous_promised_qties = {}
         for warehouse, moves in self._group_by_warehouse():
@@ -376,7 +377,7 @@ class StockMove(models.Model):
 
     def _search_release_ready(self, operator, value):
         if operator != "=":
-            raise UserError(_("Unsupported operator %s") % (operator,))
+            raise UserError(self.env._("Unsupported operator %s", operator))
         moves = self.search([("ordered_available_to_promise_uom_qty", ">", 0)])
         moves = moves.filtered(lambda m: m.release_ready)
         return [("id", "in", moves.ids)]
@@ -396,7 +397,7 @@ class StockMove(models.Model):
             [[("product_id", "in", self.product_id.ids)], location_domain]
         )
         location_quants = self.env["stock.quant"].read_group(
-            domain_quant, ["product_id", "quantity"], ["product_id"], orderby="id"
+            domain_quant, ["product_id", "quantity"], ["product_id"]
         )
         quants_available = {
             item["product_id"][0]: item["quantity"] for item in location_quants
@@ -463,7 +464,7 @@ class StockMove(models.Model):
             "!=": py_operator.ne,
         }
         if operator not in operator_mapping:
-            raise UserError(_("Unsupported operator %s") % (operator,))
+            raise UserError(self.env._("Unsupported operator %s", operator))
         moves = self.search([("need_release", "=", True)])
         operator_func = operator_mapping[operator]
         # computed field has no depends set, invalidate cache before reading
@@ -476,7 +477,7 @@ class StockMove(models.Model):
     def _should_compute_ordered_available_to_promise(self):
         return (
             self.picking_code == "outgoing"
-            and not self.product_id.type == "consu"
+            and self.product_id.is_storable
             and not self.location_id.should_bypass_reservation()
         )
 
@@ -565,6 +566,7 @@ class StockMove(models.Model):
         for move in released_moves:
             move._before_release()
             values = move._prepare_procurement_values()
+            values["move_dest_ids"] = move
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
                     move.product_id,
@@ -688,11 +690,10 @@ class StockMove(models.Model):
             return_type = picking_type.return_picking_type_id
             wiz_values = {
                 "picking_id": fields.first(pickings).id,
-                "location_id": return_type.default_location_dest_id.id,
             }
             product_return_moves = []
             if not return_type:
-                message = _(
+                message = self.env._(
                     "The operation %(picking_names)s is done and cannot be returned",
                     picking_names=", ".join(pickings.mapped("name")),
                 )
@@ -716,9 +717,14 @@ class StockMove(models.Model):
                 product_return_moves.append((0, 0, return_move_vals))
             if product_return_moves:
                 wiz_values["product_return_moves"] = product_return_moves
-                return_wiz = self.env["stock.return.picking"].create(wiz_values)
-                action = return_wiz.create_returns()
+                location_id = return_type.default_location_dest_id.id
+                return_wiz = (
+                    self.env["stock.return.picking"]
+                    .with_context(return_loc_dest_id=location_id)
+                    .create(wiz_values)
+                )
 
+                action = return_wiz.action_create_returns()
                 cancel_picking = self.picking_id.browse(action["res_id"])
                 # Do not copy the responsible user from the source picking as somebody
                 # else could scan the new cancel picking
@@ -811,8 +817,8 @@ class StockMove(models.Model):
                 done_dest_moves = done_moves.move_dest_ids.filtered(
                     lambda m: m.state == "done"
                 )
-                returnable_qty = sum(done_moves.mapped("product_qty")) - sum(
-                    done_dest_moves.mapped("product_qty")
+                returnable_qty = sum(done_moves.mapped("quantity")) - sum(
+                    done_dest_moves.mapped("quantity")
                 )
                 qty_to_return = min(qty_to_return, returnable_qty)
                 if float_compare(qty_to_return, 0, precision_rounding=rounding) <= 0:
@@ -824,7 +830,7 @@ class StockMove(models.Model):
                         "move_name": move.name,
                         "done_move_names": ", ".join(done_moves.mapped("name")),
                     }
-                    message = _(
+                    message = self.env._(
                         (
                             "You cannot unrelease the move %(move_name)s "
                             "because some origin moves %(done_move_names)s are done"
@@ -843,6 +849,7 @@ class StockMove(models.Model):
             moves_to_cancel_for_move._action_cancel()
             # restore the procure_method overwritten by _action_cancel()
             move.procure_method = procure_method
+            move._recompute_state()
         self._return_quantity_in_stock(qty_to_return_per_move)
         moves_to_unrelease.write({"need_release": True})
         for picking, moves in itertools.groupby(
@@ -851,7 +858,7 @@ class StockMove(models.Model):
             if not picking:
                 continue
             move_names = "\n".join([m.display_name for m in moves])
-            body = _(
+            body = self.env._(
                 "The following moves have been un-released: \n%(move_names)s",
                 move_names=move_names,
             )
@@ -899,7 +906,9 @@ class StockMove(models.Model):
 
     def _get_new_picking_values(self):
         values = super()._get_new_picking_values()
-        values["release_policy"] = values["move_type"]
+        # Ensure move_type exists in values before accessing it
+        move_type = self.mapped("group_id").move_type or "direct"
+        values["release_policy"] = move_type
         return values
 
     def write(self, vals):
@@ -939,8 +948,9 @@ class StockMove(models.Model):
             )
             for candidates in candidate_moves
         ]
-        # filter given list of moves to keep only the new ones
-        candidate_moves[:] = new_candidate_moves
+        # clear and update the candidate set
+        candidate_moves.clear()
+        candidate_moves.update(new_candidate_moves)
         return res
 
     def _merge_moves(self, merge_into=False):

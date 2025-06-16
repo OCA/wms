@@ -77,7 +77,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         for pick in (picking, picking2, picking3, picking4, picking5):
             self.assertEqual(pick.state, "waiting")
-            self.assertEqual(pick.move_ids.reserved_availability, 0.0)
+            self.assertEqual(pick.move_ids.quantity, 0.0)
         return picking, picking2, picking3, picking4, picking5
 
     def test_ordered_available_to_promise_value_base(self):
@@ -211,7 +211,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
         self.assertEqual(moves, expected_moves)
 
-    def test_release_ready_search_wove_type_one(self):
+    def test_release_ready_search_move_type_one(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking = self._out_picking(
             self._create_picking_chain(
@@ -553,7 +553,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "assigned",
                     "product_qty": 7.0,
-                    "reserved_availability": 7.0,
+                    "quantity": 7.0,
                     "procure_method": "make_to_order",
                 }
             ],
@@ -565,7 +565,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "waiting",
                     "product_qty": 13.0,
-                    "reserved_availability": 0.0,
+                    "quantity": 0.0,
                     "procure_method": "make_to_order",
                 }
             ],
@@ -614,7 +614,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "assigned",
                     "product_qty": 13.0,
-                    "reserved_availability": 13.0,
+                    "quantity": 13.0,
                     "procure_method": "make_to_stock",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
@@ -763,13 +763,13 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "assigned",
                     "product_qty": 7.0,
-                    "reserved_availability": 7.0,
+                    "quantity": 7.0,
                     "procure_method": "make_to_order",
                 },
                 {
                     "state": "waiting",
                     "product_qty": 13.0,
-                    "reserved_availability": 0.0,
+                    "quantity": 0.0,
                     "procure_method": "make_to_order",
                 },
             ],
@@ -818,7 +818,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "assigned",
                     "product_qty": 13.0,
-                    "reserved_availability": 13.0,
+                    "quantity": 13.0,
                     "procure_method": "make_to_stock",
                     "location_id": self.wh.lot_stock_id.id,
                     "location_dest_id": self.wh.wh_output_stock_loc_id.id,
@@ -968,7 +968,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "assigned",
                     "product_qty": 12.0,
-                    "reserved_availability": 1.0,
+                    "quantity": 1.0,
                     "product_uom_qty": 1.0,
                 }
             ],
@@ -979,7 +979,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 {
                     "state": "waiting",
                     "product_qty": 12.0,
-                    "reserved_availability": 0.0,
+                    "quantity": 0.0,
                     "product_uom_qty": 1.0,
                 }
             ],
@@ -1148,12 +1148,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
 
         # partially process the picking
         pick_pick = pick.move_ids.move_orig_ids.picking_id
-        pick_pick.move_ids.quantity_done = 3.0
+        pick_pick.move_ids.quantity = 3.0
         pick_pick.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
         # process and validate the picking to create a backorder
-        pick.move_ids.quantity_done = 3.0
+        pick.move_ids.quantity = 3.0
         pick.picking_type_id.unrelease_on_backorder = True
         pick.with_context(skip_immediate=True, skip_backorder=True).button_validate()
         backorder = pick.backorder_ids

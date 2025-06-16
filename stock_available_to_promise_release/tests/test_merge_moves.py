@@ -46,7 +46,7 @@ class TestMergeMoves(PromiseReleaseCommonCase):
         values = {
             "company_id": self.wh.company_id,
             "group_id": self.shipping1.group_id,
-            "date_planned": self.shipping1.move_ids.date,
+            "date_planned": self.shipping1.move_ids[0].date,
             "warehouse_id": self.wh,
         }
         self.env["procurement.group"].run(
@@ -111,7 +111,8 @@ class TestMergeMoves(PromiseReleaseCommonCase):
 
         # partially process the picking
         move = self.picking1.move_ids
-        move.move_line_ids.qty_done = 2
+        move.move_line_ids.quantity = 2
+        move.move_line_ids.picked = True
         # run a new procurement for the same product in the shipment 1
         self._procure(2)
 
@@ -125,17 +126,21 @@ class TestMergeMoves(PromiseReleaseCommonCase):
 
         # the pick should still contain a move with the processed qty
         # and the qty to do should be the one from shipping2
-        move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
-        self.assertEqual(2, move.move_line_ids.qty_done)
+        move = self.picking1.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
+        self.assertEqual(2, move.move_line_ids.quantity)
         self.assertEqual(5, move.product_uom_qty)
 
         # if we release the ship 1 again, a new move should be created
         # and merged with the existing one
         self.shipping1.release_available_to_promise()
-        move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
+        move = self.picking1.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
         self.assertEqual(1, len(move))
         self.assertEqual(2 + original_qty_1 + original_qty_2, move.product_uom_qty)
-        self.assertEqual(2, move.move_line_ids.qty_done)
+        self.assertEqual(2, move.move_line_ids.quantity)
 
     def test_default_merge(self):
         # check that the merge is still working when the available_to_promise_defer_pull

@@ -14,9 +14,16 @@ class Company(models.Model):
     stock_release_max_prep_time = fields.Integer(
         string="Transfer Releases Max Prep. Time",
         default=180.0,
-        required=True,
         help="When your release transfers, their scheduled date is rescheduled "
         "to now + this preparation time (in minutes)."
         " Their scheduled date represents the latest the transfers should"
         " be done, and therefore, past this timestamp, considered late.",
     )
+
+    _sql_constraints = [
+        (
+            "check_stock_release_max_prep_time",
+            "CHECK(stock_release_max_prep_time > 0)",
+            "The 'Transfer Releases Max Prep. Time' must be greater than 0 minutes.",
+        ),
+    ]

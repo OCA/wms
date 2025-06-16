@@ -3,12 +3,12 @@
 
 {
     "name": "Stock Available to Promise Release",
-    "version": "16.0.3.7.1",
+    "version": "18.0.1.0.0",
     "summary": "Release Operations based on available to promise",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
-    "depends": ["stock"],
+    "depends": ["stock", "stock_warehouse_out_pull"],
     "data": [
         "security/ir.model.access.csv",
         "views/product_product_views.xml",

@@ -8,11 +8,13 @@
         <field name="inherit_id" ref="stock.res_config_settings_view_form" />
         <field name="arch" type="xml">
             <!-- TODO: is it good placed here? -->
-            <div id="production_lot_info" position="after">
-                <h2>Stock Allocations Releases</h2>
-                <div class="row mt16 o_settings_container" id="stock_reservation">
-                    <div class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_right_pane">
+            <xpath expr="//block[@id='production_lot_info']" position="after">
+                <block
+                    title="Stock Allocations Releases"
+                    name="stock_allocation_release"
+                >
+                    <setting name="stock_reservation_horizon">
+                        <div class="content">
                             <label for="stock_reservation_horizon" />
                             <div class="text-muted">
                             <!-- TODO: better help text -->
@@ -27,10 +29,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-12 col-lg-6 o_setting_box">
-                        <div class="o_setting_right_pane">
-                            <label for="stock_release_max_prep_time" />
+                    </setting>
+                    <setting name="stock_release_max_prep_time">
+                        <label for="stock_release_max_prep_time" />
+                        <div class="content">
                             <div class="text-muted">
                                 When your release transfers, their expected date
                                 is rescheduled to now + this preparation time (in minutes).
@@ -47,9 +49,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </setting>
+                </block>
+            </xpath>
         </field>
     </record>
 </odoo>

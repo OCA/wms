@@ -75,7 +75,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         """Check it's not possible to unrelease a move that has been partially
         processed"""
         line = self.picking.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty - 1
+        line.quantity = line.quantity - 1
         self.picking.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
@@ -85,17 +85,19 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             self.shipping.move_ids.unrelease()
 
     def test_unrelease_backorder_when_remaining_picking(self):
-        """Check the unrelease of a shipping backorder move
+        """
+        Check the unrelease of a shipping backorder move
 
-        The picking has been partially processed and a pick backorder has beeen created"""
+        The picking has been partially processed and a pick backorder has beeen
+        created
+        """
         line = self.picking.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty - 1
+        line.quantity = line.quantity - 1
         self.picking.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
         self.shipping.action_assign()
         line = self.shipping.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty
         self.shipping.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
@@ -125,19 +127,21 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         )
 
     def test_unrelease_backorder_when_canceled_picking(self):
-        """Check the unrelease of a shipping backorder move
+        """
+        Check the unrelease of a shipping backorder move
 
-        The picking has been partially processed and the pick backorder has beeen canceled"""
+        The picking has been partially processed and the pick backorder has beeen
+        canceled
+        """
         self.picking.picking_type_id.create_backorder = "never"
 
         line = self.picking.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty - 1
+        line.quantity = line.quantity - 1
         self.picking.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
         self.shipping.action_assign()
         line = self.shipping.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty
         self.shipping.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
@@ -165,13 +169,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         # we do a partial pick and validate the picking to create a backorder
         # a validation
         line = self.picking.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty - 1
+        line.quantity = line.quantity - 1
         self.picking.with_context(
             skip_immediate=True, skip_backorder=True
         ).button_validate()
         self.shipping.action_assign()
         line = self.shipping.move_ids.move_line_ids
-        line.qty_done = line.reserved_qty
         # at this stage, our ship move is linked to a pick move to do
         self.assertTrue(
             self.shipping.move_ids.move_orig_ids.filtered(
