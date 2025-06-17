@@ -17,7 +17,8 @@ class Common(TransactionCase):
             {
                 "name": "Test Storable Product",
                 "uom_id": cls.uom_unit.id,
-                "type": "product",
+                "type": "consu",
+                "is_storable": True,
             }
         )
 

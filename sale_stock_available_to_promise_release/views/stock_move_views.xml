@@ -15,7 +15,7 @@
                 <field name="carrier_id" string="Delivery Method" />
             </field>
             <field name="date" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="column_invisible">1</attribute>
             </field>
             <field name="date" position="after">
                 <field name="sale_date_expected" />
@@ -25,6 +25,7 @@
     <record id="view_move_release_form" model="ir.ui.view">
         <field name="name">stock.move.release.form</field>
         <field name="model">stock.move</field>
+        <field eval="100" name="priority" />
         <field
             name="inherit_id"
             ref="stock_available_to_promise_release.view_move_release_form"
@@ -33,6 +34,7 @@
             <field name="date" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
+            <xpath expr="//div[hasclass('o_td_label')]" position="replace" />
             <field name="date" position="after">
                 <field name="sale_date_expected" />
             </field>
@@ -82,7 +84,7 @@
         <field
             name="view_ids"
             eval="[(5, 0, 0),
-                     (0, 0, {'view_mode': 'tree', 'view_id': ref('view_move_release_tree')}),
+                     (0, 0, {'view_mode': 'list', 'view_id': ref('view_move_release_tree')}),
                      (0, 0, {'view_mode': 'kanban', 'view_id': ref('stock.view_move_kandan')}),
                      (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_release_form')}),
                      ]"
