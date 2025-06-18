@@ -85,6 +85,16 @@
                   <field name="unload_single_package" />
               </group>
               <group
+                    name="unload_single_package_choice"
+                    attrs="{'invisible': [('unload_single_package_choice_is_possible', '=', False)]}"
+                >
+                  <field
+                        name="unload_single_package_choice_is_possible"
+                        invisible="1"
+                    />
+                  <field name="unload_single_package_choice" />
+              </group>
+              <group
                     name="unload_at_destination"
                     attrs="{'invisible': [('unload_package_at_destination_is_possible', '=', False)]}"
                 >

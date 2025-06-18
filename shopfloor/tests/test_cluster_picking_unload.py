@@ -559,6 +559,32 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             message={"message_type": "error", "body": "Wrong bin"},
         )
 
+    def test_unload_scan_pack_ok_single_multi(self):
+        """Endpoint /unload_scan_pack is called, result ok"""
+        self.menu.sudo().unload_single_package = True
+        self.menu.sudo().unload_single_package_choice = True
+        self.move_lines[1].picking_id._put_in_pack(self.move_lines[1])
+
+        pack_2 = self.move_lines[1].result_package_id
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        location = self.move_lines[1].location_dest_id
+        data = self._data_for_batch(self.batch, location, pack=pack_2)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+
 
 class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase):
     """Tests covering the /unload_scan_destination endpoint

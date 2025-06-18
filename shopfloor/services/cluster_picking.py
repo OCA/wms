@@ -1235,6 +1235,13 @@ class ClusterPicking(Component):
 
         return self._unload_next_package(batch)
 
+    def _response_for_unload_single_wrong_bin(self, batch, package):
+        return self._response_for_unload_single(
+            batch,
+            package,
+            message={"message_type": "error", "body": _("Wrong bin")},
+        )
+
     def unload_scan_pack(self, picking_batch_id, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
 
@@ -1252,11 +1259,14 @@ class ClusterPicking(Component):
         if not package.exists():
             return self._unload_next_package(batch)
         if package.name != barcode:
-            return self._response_for_unload_single(
-                batch,
-                package,
-                message={"message_type": "error", "body": _("Wrong bin")},
-            )
+            wrong = True
+            if self.work.menu.unload_single_package_choice:
+                package_from_barcode = batch._get_package_from_barcode(barcode)
+                if package_from_barcode:
+                    package = package_from_barcode
+                    wrong = False
+            if wrong:
+                return self._response_for_unload_single_wrong_bin(batch, package)
         return self._response_for_unload_set_destination(batch, package)
 
     def unload_scan_destination(
