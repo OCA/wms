@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import api, fields, models
+from odoo.fields import first
 
 
 class StockPickingBatch(models.Model):
@@ -44,3 +45,14 @@ class StockPickingBatch(models.Model):
         if self.env.context.get("skip_batch_sanity_check"):
             return
         return super()._sanity_check()
+
+    def _get_package_from_barcode(self, barcode):
+        """
+        Returns the first package in batch lines from the barcode value
+        """
+        self.ensure_one()
+        return first(
+            self.move_line_ids.result_package_id.filtered(
+                lambda package: package.name == barcode
+            )
+        )
