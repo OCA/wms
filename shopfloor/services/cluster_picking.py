@@ -97,7 +97,7 @@ class ClusterPicking(Component):
         self, move_line, message=None, popup=None, sublocation=None
     ):
         kw = {"sublocation": self.data.location(sublocation)} if sublocation else {}
-        data = self._data_move_line(move_line, **kw)
+        data = self._data_move_line(move_line, with_qty_available=False, **kw)
         return self._response(
             next_state="start_line",
             data=data,
@@ -107,9 +107,14 @@ class ClusterPicking(Component):
 
     def _response_for_scan_destination(self, move_line, message=None, qty_done=None):
         if qty_done is None:
-            data = self._data_move_line(move_line)
+            data = self._data_move_line(
+                move_line,
+                with_qty_available=False,
+            )
         else:
-            data = self._data_move_line(move_line, qty_done=qty_done)
+            data = self._data_move_line(
+                move_line, with_qty_available=False, qty_done=qty_done
+            )
         last_picked_line = self._last_picked_line(move_line.picking_id)
         if last_picked_line:
             # suggest pack to be used for the next line
@@ -393,7 +398,7 @@ class ClusterPicking(Component):
     def _response_batch_does_not_exist(self):
         return self._response_for_start(message=self.msg_store.record_not_found())
 
-    def _data_move_line(self, line, **kw):
+    def _data_move_line(self, line, with_qty_available=True, **kw):
         picking = line.picking_id
         batch = picking.batch_id
         product = line.product_id
@@ -406,9 +411,10 @@ class ClusterPicking(Component):
         data["batch"] = self.data.picking_batch(batch)
         data["picking"] = self.data.picking(picking)
         data["postponed"] = line.shopfloor_postponed
-        data["product"]["qty_available"] = product.with_context(
-            location=line.location_id.id
-        ).qty_available
+        if with_qty_available:
+            data["product"]["qty_available"] = product.with_context(
+                location=line.location_id.id
+            ).qty_available
         data["scan_location_or_pack_first"] = self.work.menu.scan_location_or_pack_first
         data.update(kw)
         return data
