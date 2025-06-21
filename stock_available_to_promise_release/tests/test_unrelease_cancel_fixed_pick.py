@@ -79,7 +79,7 @@ class TestAvailableToPromiseReleaseCancelFixedPick(PromiseReleaseCommonCase):
         self._deliver(pick1)
         self.assertEqual(ship_picking1.state, "assigned")
         self.assertEqual(ship_picking2.state, "assigned")
-        ship2_product2_move = ship_picking2.move_lines.filtered(
+        ship2_product2_move = ship_picking2.move_ids.filtered(
             lambda m: m.product_id == self.product2
         )
         ship2_product2_move._action_cancel()
