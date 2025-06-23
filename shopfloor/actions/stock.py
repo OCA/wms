@@ -242,6 +242,7 @@ class StockAction(Component):
             lines_with_package_level.package_level_id.location_dest_id = location_dest
         if lines_without_package_level:
             lines_without_package_level.location_dest_id = location_dest
+            lines_without_package_level.move_id.location_dest_id = location_dest
 
     def _unload_package(self, lines):
         lines.result_package_id = False

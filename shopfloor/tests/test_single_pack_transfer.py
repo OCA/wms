@@ -186,7 +186,8 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         package_level = move_line.package_level_id
 
         self.assertTrue(package_level.is_done)
-
+        self.assertEqual(move_line.location_id, self.pack_a.location_id)
+        self.assertEqual(move_line.move_id.location_id, self.pack_a.location_id)
         expected_data = {
             "id": package_level.id,
             "name": package_level.package_id.name,
@@ -203,6 +204,60 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         }
 
         self.assert_response(response, next_state="scan_location", data=expected_data)
+
+    def test_start_validate_no_operation_create(self):
+        self.menu.sudo().allow_move_create = True
+        self.picking.do_unreserve()
+        barcode = self.pack_a.name
+        params = {"barcode": barcode}
+
+        # Simulate the client scanning a package's barcode, which
+        # in turns should start the operation in odoo
+        response = self.service.dispatch("start", params=params)
+
+        move_line = self.env["stock.move.line"].search(
+            [("package_id", "=", self.pack_a.id)]
+        )
+        package_level = move_line.package_level_id
+
+        response = self.service.dispatch(
+            "validate",
+            params={
+                "package_level_id": package_level.id,
+                "location_barcode": self.shelf2.barcode,
+            },
+        )
+
+        self.assert_response(
+            response,
+            next_state="start",
+            message={
+                "message_type": "success",
+                "body": "The pack has been moved, you can scan a new pack.",
+            },
+        )
+
+        self.assertRecordValues(
+            package_level.move_line_ids,
+            [
+                {
+                    "qty_done": 1.0,
+                    "location_dest_id": self.shelf2.id,
+                    "location_id": self.shelf1.id,
+                    "state": "done",
+                }
+            ],
+        )
+        self.assertRecordValues(
+            package_level.move_line_ids.move_id,
+            [
+                {
+                    "location_dest_id": self.shelf2.id,
+                    "location_id": self.shelf1.id,
+                    "state": "done",
+                }
+            ],
+        )
 
     def test_start_barcode_not_known(self):
         """Test /start when the barcode is unknown
@@ -449,11 +504,24 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
 
         self.assertRecordValues(
             package_level.move_line_ids,
-            [{"qty_done": 1.0, "location_dest_id": self.shelf2.id, "state": "done"}],
+            [
+                {
+                    "qty_done": 1.0,
+                    "location_dest_id": self.shelf2.id,
+                    "location_id": self.shelf1.id,
+                    "state": "done",
+                }
+            ],
         )
         self.assertRecordValues(
             package_level.move_line_ids.move_id,
-            [{"location_dest_id": self.shelf2.id, "state": "done"}],
+            [
+                {
+                    "location_dest_id": self.shelf2.id,
+                    "location_id": self.shelf1.location_id.id,
+                    "state": "done",
+                }
+            ],
         )
 
     def test_validate_completion_info(self):
