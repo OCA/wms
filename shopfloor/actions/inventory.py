@@ -59,7 +59,7 @@ class InventoryAction(Component):
             for quant in quants:
                 if quant.inventory_quantity_set:
                     continue
-                quants.write(
+                quant.write(
                     {
                         # Set an inventory quantity to prevent the zero quant cleanup
                         "inventory_quantity": quant.inventory_quantity + 1,
