@@ -8,7 +8,7 @@ class TestSetQuantity(CommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.location = cls.location_src
+        cls.location = cls.env.ref("stock.stock_location_components")
         cls.product = cls.product_a
         cls.packaging = cls.product_a_packaging
         cls.packaging.qty = 5
@@ -429,6 +429,10 @@ class TestSetQuantity(CommonCase):
         self.assert_response(
             response, next_state="select_product", message=expected_message, data=data
         )
+        self.assertEqual(move_line.location_dest_id, self.dispatch_location)
+        self.assertEqual(move_line.location_id, location)
+        self.assertEqual(move_line.move_id.location_dest_id, self.dispatch_location)
+        self.assertEqual(move_line.move_id.location_id, location)
 
     def test_set_quantity_scan_packaging_with_allow_move_create_and_no_prefill_qty(
         self,
@@ -725,6 +729,15 @@ class TestSetQuantity(CommonCase):
         self.assertFalse(picking.move_line_ids.result_package_id)
         self.assertEqual(picking.user_id.id, False)
         self.assertEqual(picking.move_line_ids.shopfloor_user_id.id, False)
+        self.assertEqual(picking.move_line_ids.location_dest_id, self.dispatch_location)
+        self.assertEqual(picking.move_line_ids.location_id, self.location)
+        self.assertEqual(
+            picking.move_line_ids.move_id.location_dest_id, self.dispatch_location
+        )
+        self.assertEqual(
+            picking.move_line_ids.move_id.location_id,
+            self.picking_type.default_location_src_id,
+        )
 
     def test_set_quantity_scan_location_allow_move_create(self):
         self.menu.sudo().allow_move_create = True
@@ -754,6 +767,15 @@ class TestSetQuantity(CommonCase):
         self.assertFalse(backorder)
         self.assertEqual(picking.move_line_ids.qty_done, 6.0)
         self.assertEqual(picking.move_line_ids.state, "done")
+        self.assertEqual(picking.move_line_ids.location_dest_id, self.dispatch_location)
+        self.assertEqual(picking.move_line_ids.location_id, self.location)
+        self.assertEqual(
+            picking.move_line_ids.move_id.location_dest_id, self.dispatch_location
+        )
+        self.assertEqual(
+            picking.move_line_ids.move_id.location_id,
+            self.picking_type.default_location_src_id,
+        )
 
     def test_set_quantity_scan_package_not_empty(self):
         # We scan a package that's not empty
