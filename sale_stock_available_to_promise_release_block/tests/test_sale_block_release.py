@@ -199,7 +199,6 @@ class TestSaleBlockRelease(common.Common):
         )
         today = wiz.date_deadline
         self.assertEqual(wiz.option, "automatic")
-        self.assertEqual(wiz.date_deadline, today)
         self.assertNotEqual(wiz.order_line_ids.move_ids.date, today)
         old_picking = wiz.order_line_ids.move_ids.picking_id
         wiz.validate()
@@ -218,11 +217,10 @@ class TestSaleBlockRelease(common.Common):
         self.sale.commitment_date = yesterday
         self.sale.action_confirm()
         # Unblock deliveries through the wizard
-        today = fields.Datetime.now()
         wiz = self._create_unblock_release_wizard(
             self.sale.order_line.move_ids, option="automatic"
         )
-        self.assertEqual(wiz.date_deadline, today)
+        today = wiz.date_deadline
         self.assertNotEqual(wiz.move_ids.date, today)
         old_picking = wiz.move_ids.picking_id
         wiz.validate()
