@@ -5,7 +5,7 @@
 {
     "name": "Stock Available to Promise Release - Block from Sales",
     "summary": """Block release of deliveries from sales orders.""",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.1.1",
     "license": "AGPL-3",
     "author": "Camptcamp, ACSONE SA/NV, BCIM, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
