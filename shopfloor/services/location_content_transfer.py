@@ -458,10 +458,9 @@ class LocationContentTransfer(Component):
         )
         return lines
 
-    # hook used in module shopfloor_checkout_sync
     def _write_destination_on_lines(self, lines, location, package=None):
-        lines.location_dest_id = location
-        lines.package_level_id.location_dest_id = location
+        stock = self._actions_for("stock")
+        stock.set_destination_and_unload_lines(lines, location)
         if package:
             lines.result_package_id = package
 

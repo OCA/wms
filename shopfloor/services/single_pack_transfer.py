@@ -1,6 +1,7 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2020 Akretion (http://www.akretion.com)
+# Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import fields
 
@@ -266,10 +267,10 @@ class SinglePackTransfer(Component):
         return self._response_for_start(message=message, popup=completion_info_popup)
 
     def _set_destination_and_done(self, package_level, scanned_location):
-        # when writing the destination on the package level, it writes
-        # on the move lines
-        package_level.location_dest_id = scanned_location
         stock = self._actions_for("stock")
+        stock.set_destination_and_unload_lines(
+            package_level.move_line_ids, scanned_location
+        )
         stock.put_package_level_in_move(package_level)
         stock.validate_moves(package_level.move_line_ids.move_id)
 

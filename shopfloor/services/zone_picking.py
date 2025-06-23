@@ -1036,7 +1036,7 @@ class ZonePicking(Component):
             )
             return (package_changed, response)
         stock = self._actions_for("stock")
-        self._lock_lines(move_line)
+        stock._lock_lines(move_line)
         try:
             stock.mark_move_line_as_picked(
                 move_line, quantity, package, check_user=True
@@ -1591,11 +1591,10 @@ class ZonePicking(Component):
         return self._set_destination_all_response(buffer_lines, message=message)
 
     def _write_destination_on_lines(self, lines, location):
-        self._lock_lines(lines)
-        lines.location_dest_id = location
-        lines.package_level_id.location_dest_id = location
-        if self.work.menu.unload_package_at_destination:
-            lines.result_package_id = False
+        stock = self._actions_for("stock")
+        stock.set_destination_and_unload_lines(
+            lines, location, unload=self.work.menu.unload_package_at_destination
+        )
 
     def unload_split(self):
         """Indicates that now the buffer must be treated line per line
@@ -1675,10 +1674,6 @@ class ZonePicking(Component):
         return self._unload_response(
             unload_single_message=self.msg_store.barcode_no_match(package.name),
         )
-
-    def _lock_lines(self, lines):
-        """Lock move lines"""
-        self._actions_for("lock").for_update(lines)
 
     def unload_set_destination(self, package_id, barcode, confirmation=None):
         """Scan the final destination for move lines in the buffer with the
