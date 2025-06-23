@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Reception Refund Return",
     "summary": "Mark created return as to refund",
-    "version": "14.0.1.0.0",
+    "version": "16.0.1.0.0",
     "category": "Inventory, Accounting",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",

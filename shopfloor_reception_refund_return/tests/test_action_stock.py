@@ -1,6 +1,6 @@
 # Copyright 2023 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
-
+# pylint: disable=missing-return
 from odoo.addons.shopfloor.tests.common import CommonCase
 
 
@@ -27,8 +27,8 @@ class TestActionsStock(CommonCase):
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)], confirm=True
         )
-        cls.move0 = cls.picking.move_lines[0]
-        cls.move1 = cls.picking.move_lines[1]
+        cls.move0 = cls.picking.move_ids[0]
+        cls.move1 = cls.picking.move_ids[1]
         cls._fill_stock_for_moves(cls.move0)
         cls._fill_stock_for_moves(cls.move1)
         cls.picking.action_assign()
@@ -40,7 +40,7 @@ class TestActionsStock(CommonCase):
             self.picking, self.picking_type_in, "potato"
         )
         return_moves = self.stock.create_return_move(
-            return_picking, self.picking.move_lines
+            return_picking, self.picking.move_ids
         )
         self.assertTrue(all(move.to_refund for move in return_moves))
         return_picking.action_assign()
