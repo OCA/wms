@@ -61,8 +61,9 @@ class InventoryAction(Component):
                     continue
                 quant.write(
                     {
-                        # Set an inventory quantity to prevent the zero quant cleanup
-                        "inventory_quantity": quant.inventory_quantity + 1,
+                        # Set a user to prevent the zero quant cleanup
+                        "user_id": self.env.user.id,
+                        "inventory_quantity": 0,
                         "inventory_date": fields.Date.today(),
                     }
                 )
