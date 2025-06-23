@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Reception",
     "summary": "Reception scenario for shopfloor",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.2.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
