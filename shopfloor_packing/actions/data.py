@@ -53,7 +53,9 @@ class DataAction(Component):
             ),
             "package_src": self.package(record.package_id, record.picking_id),
             "package_dest": self.package(
-                record.result_package_id.with_context(picking_id=record.picking_id.id),
+                record.result_package_id.with_context(
+                    picking_id=record.picking_id.id, no_quantity=True
+                ),
                 record.picking_id,
             ),
         }
