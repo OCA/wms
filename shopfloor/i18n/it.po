@@ -142,7 +142,8 @@ msgstr ""
 #, python-format
 msgid ""
 "%(message_code)s not found in the current transfer or already in a package."
-msgstr "%(message_code)s non trovato nel trasferimento attuale o già nel collo."
+msgstr ""
+"%(message_code)s non trovato nel trasferimento attuale o già nel collo."
 
 #. module: shopfloor
 #. odoo-python
@@ -611,6 +612,11 @@ msgstr "Ignorare inoltro non trovato non è consentito per il menu {}."
 #: model:ir.model,name:shopfloor.model_stock_location
 msgid "Inventory Locations"
 msgstr "Ubicazioni di inventario"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__is_shopfloor_created
+msgid "Is Shopfloor Created"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
