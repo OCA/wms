@@ -467,6 +467,11 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__is_shopfloor_created
+msgid "Is Shopfloor Created"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu____last_update
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_priority_postpone_mixin____last_update
