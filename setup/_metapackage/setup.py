@@ -42,6 +42,7 @@ setuptools.setup(
         'odoo14-addon-shopfloor_reception_packaging_dimension_mobile',
         'odoo14-addon-shopfloor_reception_purchase_partner_ref',
         'odoo14-addon-shopfloor_reception_purchase_partner_ref_mobile',
+        'odoo14-addon-shopfloor_reception_refund_return',
         'odoo14-addon-shopfloor_reception_vendor_packaging',
         'odoo14-addon-shopfloor_rest_log',
         'odoo14-addon-shopfloor_single_product_transfer',
