@@ -23,6 +23,7 @@ class StockPicking(models.Model):
         help="Technical field. "
         "Indicates number of move lines without package included.",
     )
+    is_shopfloor_created = fields.Boolean()
 
     @api.depends(
         "move_line_ids", "move_line_ids.reserved_qty", "move_line_ids.product_id.weight"
