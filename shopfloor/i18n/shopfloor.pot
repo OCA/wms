@@ -528,6 +528,11 @@ msgid "Inventory Locations"
 msgstr ""
 
 #. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_stock_picking__is_shopfloor_created
+msgid "Is Shopfloor Created"
+msgstr ""
+
+#. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/completion_info.py:0
 #, python-format
