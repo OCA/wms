@@ -10,6 +10,7 @@
     "license": "AGPL-3",
     "installable": True,
     "depends": ["shopfloor"],
+    "external_dependencies": {"python": ["openupgradelib"]},
     "data": [
         "data/shopfloor_scenario_data.xml",
     ],
