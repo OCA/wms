@@ -611,7 +611,11 @@ class LocationContentTransfer(Component):
             "lot": self._scan_line__by_lot,
             "none": self._scan_line__fallback,
         }
-        search_result = search.find(barcode, types=handlers.keys())
+        search_result = search.find(
+            barcode,
+            types=handlers.keys(),
+            handler_kw=dict(lot=dict(products=move_line.product_id)),
+        )
         handler = handlers.get(search_result.type, self._scan_line__fallback)
         # handler might've been called but returned no response.
         # I.E. package is scanned but doesn't matches move_line's package.
