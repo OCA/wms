@@ -99,15 +99,11 @@ const ClusterPicking = {
                         :record="state.data.package"
                         :color="'success'"
                 />
-                <v-card class="main">
-                    <v-card-title>
-                        <div class="main-info">
-                            <div class="destination">
-                                <span class="label">Destination:</span>
-                                {{ state.data.location_dest.name }}
-                            </div>
-                    </v-card-title>
-                </v-card>
+                <detail-location-destination-operation
+                    :color="'detail_main_card'"
+                    :record="state.data.selected_move_line"
+                    :state="'unload_single'"
+                />
 
             </div>
 
@@ -123,16 +119,11 @@ const ClusterPicking = {
                     :record="state.data.package"
                     :color="'detail_main_card'"
                 />
-                <v-card class="main">
-                    <v-card-title>
-                        <div class="main-info">
-                            <div class="destination">
-                                <span class="label">Destination:</span>
-                                {{ state.data.location_dest.name }}
-                            </div>
-                        </div>
-                    </v-card-title>
-                </v-card>
+
+                <detail-location-destination-operation
+                    :record="state.data.selected_move_line"
+                    :state="'unload_single'"
+                />
             </div>
 
             <div class="unload-all" v-if="state_is('unload_all')">
