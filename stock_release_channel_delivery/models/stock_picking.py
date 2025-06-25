@@ -7,7 +7,6 @@ from odoo.osv import expression
 
 
 class StockPicking(models.Model):
-
     _inherit = "stock.picking"
 
     @property

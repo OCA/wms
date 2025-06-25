@@ -5,7 +5,6 @@ from odoo import fields, models
 
 
 class StockReleaseChannel(models.Model):
-
     _inherit = "stock.release.channel"
 
     carrier_ids = fields.Many2many(
