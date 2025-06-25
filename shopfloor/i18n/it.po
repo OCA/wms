@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-05-28 10:54+0000\n"
+"PO-Revision-Date: 2025-06-25 06:54+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -616,7 +616,7 @@ msgstr "Ubicazioni di inventario"
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__is_shopfloor_created
 msgid "Is Shopfloor Created"
-msgstr ""
+msgstr "Il reparto è crato"
 
 #. module: shopfloor
 #. odoo-python
