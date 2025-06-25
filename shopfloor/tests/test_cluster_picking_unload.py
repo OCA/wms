@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo.fields import first
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
@@ -68,6 +69,12 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
             )
         )
 
+    def _get_line_to_unload(self, package):
+        line = first(
+            package.planned_move_line_ids.filtered(self.service._filter_for_unload)
+        )
+        return line
+
 
 class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
     """Tests covering the /prepare_unload endpoint
@@ -114,7 +121,8 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
         location = self.packing_location
-        data = self._data_for_batch(self.batch, location, self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -133,7 +141,8 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         )
         first_line = move_lines[0]
         location = first_line.location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -441,7 +450,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -621,7 +631,8 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
             "unload_split", params={"picking_batch_id": self.batch.id}
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             # the remaining move line still needs to be picked
             response,
@@ -658,7 +669,8 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = self.move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -676,7 +688,8 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = self.move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -703,7 +716,8 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = self.move_lines[1].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=pack_2)
+        line = self._get_line_to_unload(pack_2)
+        data = self._data_for_batch(self.batch, location, line, pack=pack_2)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -740,7 +754,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     def test_unload_scan_destination_ok(self):
         """Endpoint /unload_scan_destination is called, result ok"""
         dest_location = self.bin1_lines[0].location_dest_id
-
+        line = self._get_line_to_unload(self.bin2)
         response = self.service.dispatch(
             "unload_scan_destination",
             params={
@@ -790,7 +804,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
 
         location = self.bin2_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -858,7 +872,6 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self._set_dest_package_and_done(bin3_line, bin3)
 
         dest_location = bin2_line.location_dest_id
-
         response = self.service.dispatch(
             "unload_scan_destination",
             params={
@@ -898,7 +911,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         )
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
         location = bin3_line.location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=bin3)
+        line = self._get_line_to_unload(bin3)
+        data = self._data_for_batch(self.batch, location, line, pack=bin3)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -963,7 +977,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -989,7 +1004,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -1013,7 +1029,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -1033,7 +1050,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         data["confirmation"] = barcode
         self.assert_response(
             response,
@@ -1100,7 +1118,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin2_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -1167,7 +1186,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
 
         location = self.bin2_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
         self.assert_response(
             response,
             next_state="unload_single",
