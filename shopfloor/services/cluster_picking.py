@@ -871,6 +871,7 @@ class ClusterPicking(Component):
             {
                 "package": self.data.package(package),
                 "location_dest": self.data.location(line.location_dest_id),
+                "selected_move_line": self.data.move_line(line),
             }
         )
         return data
@@ -1655,6 +1656,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         schema = self.schemas.picking_batch()
         schema["package"] = self.schemas._schema_dict_of(self.schemas.package())
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        schema["selected_move_line"] = self.schemas._schema_dict_of(
+            self.schemas.move_line()
+        )
         schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
         return schema
 
