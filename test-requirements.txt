@@ -1,0 +1,2 @@
+odoo_test_helper
+odoo-addon-stock_release_channel @ git+https://github.com/OCA/stock-logistics-release-channel.git@refs/pull/2/head#subdirectory=stock_release_channel
