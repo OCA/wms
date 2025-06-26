@@ -78,6 +78,12 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self.product_a.tracking = "serial"
         self._simulate_batch_selected(self.batch, in_lot=True)
         line = self.batch.picking_ids.move_line_ids
+        lot = line.lot_id
+        self.assertTrue(lot)
+        lot_with_same_name = line.lot_id.copy(
+            {"product_id": self.product_b.id, "name": line.lot_id.name}
+        )
+        self.assertEqual(lot_with_same_name.name, lot.name)
         self._scan_line_ok(line, line.lot_id.name)
 
     def test_scan_line_error_product_tracked(self):
