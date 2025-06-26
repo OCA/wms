@@ -1,10 +1,12 @@
 # Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import Form, TransactionCase
+from odoo.tests import Form
+
+from odoo.addons.base.tests.common import BaseCommon
 
 
-class SaleStockReleaseChannelCommon(TransactionCase):
+class SaleStockReleaseChannelCommon(BaseCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
