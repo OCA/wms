@@ -77,8 +77,14 @@ class Reception(Component):
         return domain
 
     def _get_today_start_end_datetime(self, naive=True):
+        # TODO: Put warehouse tz retrieval in shopfloor module?
         company = self.env.company
-        tz = company.partner_id.tz or "UTC"
+        warehouse = self.picking_types.warehouse_id
+        tz = (
+            warehouse.partner_id.tz
+            if (len(warehouse) == 1 and warehouse.partner_id.tz)
+            else company.partner_id.tz or "UTC"
+        )
         today = fields.Datetime.today()
         today_start = today_start_localized = fields.Datetime.start_of(today, "day")
         today_end = today_end_localized = fields.Datetime.end_of(today, "day")
@@ -344,11 +350,9 @@ class Reception(Component):
             # could return more than one picking.
             # If there's only one picking due today, we go to the next screen.
             # Otherwise, we ask the user to scan a package instead.
-            today_start, today_end = self._get_today_start_end_datetime(naive=False)
+            today_start, today_end = self._get_today_start_end_datetime()
             picking_filter_result_due_today = picking_filter_result.filtered(
-                lambda p: today_start
-                <= p.scheduled_date.astimezone(pytz.utc)
-                < today_end
+                lambda p: today_start <= p.scheduled_date < today_end
             )
             if len(picking_filter_result_due_today) == 1:
                 return self._select_picking(picking_filter_result_due_today)
