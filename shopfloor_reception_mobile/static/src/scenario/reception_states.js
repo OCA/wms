@@ -8,6 +8,9 @@
     Define states for reception scenario.
     @param this VueJS component instance
 */
+
+import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
+
 export const reception_states = function () {
     return {
         init: {
@@ -129,13 +132,21 @@ export const reception_states = function () {
                 scan_placeholder: "Scan lot",
                 scan_input_placeholder_expiry: "Scan expiration date",
             },
+            enter: () => {
+                // Ensure the selected expiration date is reset
+                this.state.selected_expiration_date = null;
+            },
             on_scan: (barcode) => {
-                // Scan a lot
+                // The reception date could have been set manually and then a new
+                // lot name entered; we retrieve the expiration date from the line
+                // being handled if it exists
+                let expiration_date = this.state?.selected_expiration_date;
                 this.wait_call(
                     this.odoo.call("set_lot", {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
                         lot_name: barcode.text,
+                        expiration_date: expiration_date,
                     })
                 ).then(() => {
                     // We need to wait for the call to the backend to be over
@@ -152,7 +163,9 @@ export const reception_states = function () {
                         selected_line_id: this.line_being_handled.id,
                         expiration_date: expiration_date,
                     })
-                );
+                ).then(() => {
+                    this.state.selected_expiration_date = expiration_date;
+                });
             },
             on_confirm_action: () => {
                 this.wait_call(

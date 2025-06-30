@@ -6,7 +6,6 @@
 
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
-import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
 import {reception_states} from "./reception_states.js";
 
 const Reception = {
