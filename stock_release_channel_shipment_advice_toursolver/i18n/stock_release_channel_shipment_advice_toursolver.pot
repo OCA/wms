@@ -24,6 +24,11 @@ msgid "Release Channel"
 msgstr ""
 
 #. module: stock_release_channel_shipment_advice_toursolver
+#: model:ir.model,name:stock_release_channel_shipment_advice_toursolver.model_shipment_advice
+msgid "Shipment Advice"
+msgstr ""
+
+#. module: stock_release_channel_shipment_advice_toursolver
 #: model:ir.model,name:stock_release_channel_shipment_advice_toursolver.model_shipment_advice_planner
 msgid "Shipment Advice Planner"
 msgstr ""
