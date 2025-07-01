@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-04-22 09:34+0000\n"
+"PO-Revision-Date: 2025-07-01 12:25+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: stock_release_channel_shipment_advice_toursolver
 #: model:ir.model.fields,field_description:stock_release_channel_shipment_advice_toursolver.field_stock_release_channel__delivery_resource_ids
@@ -29,7 +29,7 @@ msgstr "Canale rilascio"
 #. module: stock_release_channel_shipment_advice_toursolver
 #: model:ir.model,name:stock_release_channel_shipment_advice_toursolver.model_shipment_advice
 msgid "Shipment Advice"
-msgstr ""
+msgstr "Avviso spedizione"
 
 #. module: stock_release_channel_shipment_advice_toursolver
 #: model:ir.model,name:stock_release_channel_shipment_advice_toursolver.model_shipment_advice_planner
