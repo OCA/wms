@@ -81,6 +81,7 @@ class TestSetLot(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "lot_name": lot.name,
+                "expiration_date": expiration_date,
             },
         )
         self.assertEqual(str(selected_move_line.expiration_date), expiration_date)
@@ -91,6 +92,11 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+            message={
+                "body": "The selected expiration date is in the past. Are you "
+                "sure you want to continue?",
+                "message_type": "warning",
             },
         )
 

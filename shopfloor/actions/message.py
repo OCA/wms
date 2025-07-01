@@ -538,6 +538,15 @@ class MessageAction(Component):
             "body": _("Missing expiration date."),
         }
 
+    def expiration_date_past(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "The selected expiration date is in the past. "
+                "Are you sure you want to continue?"
+            ),
+        }
+
     def multiple_picks_found_select_manually(self):
         return {
             "message_type": "error",
