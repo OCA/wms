@@ -17,6 +17,36 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor_reception
+#: model:ir.model.fields,help:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings
+msgid ""
+"\n"
+"By default, at first step, filter the available\n"
+"pickings with the ones that are scheduled for today.\n"
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/models/shopfloor_menu.py:0
+#, python-format
+msgid "Filter Today Pickings is not allowed for menu {}."
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings
+msgid "Filter Today Scheduled Pickings"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings_is_possible
+msgid "Filter Today Scheduled Pickings Is Possible"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model,name:shopfloor_reception.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
 #: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
