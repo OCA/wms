@@ -1,2 +1,2 @@
-from . import services
+from . import services, models
 from .hooks import post_init_hook, uninstall_hook
