@@ -12,6 +12,8 @@ class StockMove(models.Model):
     def _after_release_assign_moves(self):
         # Trigger the dynamic routing
         moves = super()._after_release_assign_moves()
+        if self.env.context.get("in_merge_mode"):
+            return moves
         # Check if moves can be merged. We do this after the call to
         # _action_assign in super as this could delete some records in self
         sorted_moves_by_rule = sorted(moves, key=lambda m: m.picking_id.id)

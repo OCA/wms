@@ -81,7 +81,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         )
         cust_picking.release_available_to_promise()
 
-        pick_moves = cust_picking.move_lines.move_orig_ids
+        pick_moves = cust_picking.move_ids.move_orig_ids
         self.assertEqual(len(pick_moves), 2)
         # this picking is created by standard 2-step rules
         pick_picking = pick_moves.picking_id
@@ -152,7 +152,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
         )
         cust_picking.release_available_to_promise()
 
-        pick_moves = cust_picking.move_lines.move_orig_ids
+        pick_moves = cust_picking.move_ids.move_orig_ids
         self.assertEqual(len(pick_moves), 2)
         # this picking has been created to change the picking type
         pick_picking = pick_moves.picking_id
@@ -215,7 +215,7 @@ class TestAvailableToPromiseReleaseDynamicRouting(PromiseReleaseCommonCase):
             [("picking_type_id", "=", out_type_routing.id)]
         )
 
-        self.assertEqual(len(new_cust_picking.move_lines), 2)
+        self.assertEqual(len(new_cust_picking.move_ids), 2)
         self.assertRecordValues(
             new_cust_picking,
             [
