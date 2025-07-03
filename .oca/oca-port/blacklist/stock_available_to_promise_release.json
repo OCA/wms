@@ -1,0 +1,9 @@
+{
+  "pull_requests": {
+    "OCA/wms#556": "Already ported",
+    "OCA/wms#604": "v14 migration update, not relevant",
+    "OCA/wms#686": "Already ported",
+    "OCA/wms#810": "Already ported + not relevant",
+    "OCA/wms#1015": "14.0 backport from 16.0 (already there, false positive)"
+  }
+}
