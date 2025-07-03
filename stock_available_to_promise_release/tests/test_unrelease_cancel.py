@@ -1,5 +1,6 @@
 # Copyright 2025 Camptocamp SA
 # Copyright 2025 Raumschmiede GmbH
+# Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 from datetime import datetime
 
@@ -155,7 +156,11 @@ class TestAvailableToPromiseReleaseCancel(PromiseReleaseCommonCase):
         ship_picking = self._out_picking(picking_chain)
         ship_picking.release_available_to_promise()
         # Creating a second move. Both moves thave the same origin (pack.move_line)
-        self.env["stock.move"].create(ship_picking.move_ids._split(4))
+        split_move_vals = ship_picking.move_ids._split(4)
+        split_move_vals[0]["date_deadline"] = datetime.now()
+        split_move = self.env["stock.move"].create(split_move_vals)
+        split_move._action_confirm()
+        split_move._action_assign()
         pack_picking = self._prev_picking(ship_picking)
         pick_picking = self._prev_picking(pack_picking)
         self._deliver(pick_picking)
