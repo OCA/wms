@@ -75,6 +75,8 @@ class SaleOrder(models.Model):
         domain_order = self._release_channel_possible_candidate_domain_base
         domain_partner = (
             self.partner_shipping_id._release_channel_possible_candidate_domain
+            if self.partner_shipping_id
+            else []
         )
         domain_channel = [("is_manual_assignment", "=", False)]
         domain = expression.AND([domain_order, domain_partner, domain_channel])
