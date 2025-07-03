@@ -49,9 +49,10 @@ class BarcodeParser(Component):
         Override this to implement specific parsing
 
         """
+        # Retrieve in any case the 'unknown' parsing with raw barcode
+        result = super().parse(barcode, types)
         parsed = self._parse_gs1(barcode, types)
         if parsed:
-            result = []
             for barcode_type in self.search_action._barcode_type_handler.keys():
                 for parsed_item in parsed:
                     if parsed_item.ai in MAPPING_TYPE_TO_AI.get(barcode_type, tuple()):
@@ -62,6 +63,4 @@ class BarcodeParser(Component):
                                 raw=parsed_item.raw_value,
                             )
                         )
-            if result:
-                return result
-        return super().parse(barcode, types)
+        return result
