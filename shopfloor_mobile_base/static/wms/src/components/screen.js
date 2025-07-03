@@ -57,12 +57,19 @@ Vue.component("Screen", {
             ].join(" ");
         },
         show_profile_not_ready() {
-            return (
+            let requires_profile =
                 this.$root.is_authenticated() &&
                 this.$route.meta.requiresProfile &&
                 !this.$root.has_profile &&
-                this.$root.app_info.profile_required
-            );
+                this.$root.app_info.profile_required;
+
+            // Set first profile by default if there is only one
+            if (requires_profile && this.$root.profiles.length == 1) {
+                this.$root.profile = this.$root.profiles[0];
+                return false;
+            }
+
+            return requires_profile;
         },
     },
     data: () => ({
