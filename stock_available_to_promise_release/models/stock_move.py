@@ -589,6 +589,9 @@ class StockMove(models.Model):
         assigned_moves = released_moves._after_release_assign_moves()
         assigned_moves._after_release_update_chain()
 
+        # We could have discrepancies regarding released moves state, recompute it
+        released_moves._recompute_state()
+
         return assigned_moves
 
     def _before_release(self):
