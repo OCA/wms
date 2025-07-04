@@ -199,3 +199,49 @@ class TestSetLot(CommonCase):
                 },
             )
         self.assertEqual(lot.expiration_date, expiration_date)
+
+    def test_set_lot_no_expiration(self):
+        # Check if message that requires expiration date
+        # is raised
+        picking = self._create_picking()
+        lot = self._create_lot()
+        self.product_a.use_expiration_date = True
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        response = self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "lot_name": lot.name,
+            },
+        )
+        message_reponse = response.get("message")
+        self.assertEqual("error", message_reponse.get("message_type"))
+        self.assertEqual("Missing expiration date.", message_reponse.get("body"))
+
+    def test_set_lot_messages(self):
+        # Check if message that requires expiration date
+        # is raised
+        picking = self._create_picking()
+        lot = self._create_lot()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        selected_move_line.qty_done = selected_move_line.reserved_uom_qty
+        selected_move_line.lot_id = lot
+        picking._action_done()
+        response = self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "lot_name": lot.name,
+            },
+        )
+        message_reponse = response.get("message")
+        self.assertEqual("info", message_reponse.get("message_type"))
+        self.assertEqual("Operation already processed.", message_reponse.get("body"))
