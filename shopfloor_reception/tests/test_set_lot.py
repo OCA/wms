@@ -1,6 +1,13 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # pylint: disable=missing-return
+from unittest import mock
+
+from odoo import fields
+
+from odoo.addons.shopfloor.actions.barcode_parser import BarcodeResult
+from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
+
 from .common import CommonCase
 
 
@@ -162,3 +169,33 @@ class TestSetLot(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
+
+    def test_set_lot_expiration_from_parse(self):
+        # Check if lot scanned contains expiration
+        # date information
+
+        picking = self._create_picking()
+        lot = self._create_lot()
+        expiration_date = fields.Datetime.from_string("2022-07-02")
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        with mock.patch.object(SearchAction, "find") as mock_find:
+            mock_find.return_value = SearchResult(
+                record=lot,
+                type="lot",
+                parse_result=[
+                    BarcodeResult(type="lot", value=lot.name),
+                    BarcodeResult(type="expiration_date", value=expiration_date),
+                ],
+            )
+            self.service.dispatch(
+                "set_lot",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "lot_name": lot.name,
+                },
+            )
+        self.assertEqual(lot.expiration_date, expiration_date)

@@ -1143,14 +1143,36 @@ class Reception(Component):
         if not selected_line.exists():
             message = self.msg_store.record_not_found()
             return self._response_for_set_lot(picking, selected_line, message=message)
+
+        find_types = ["lot", "expiration_date"]
+        # Do a first search if multi tenant barcode is used.
+        # If the lot name is passed, let the expiration date
+        # get from interface.
+
+        search = self._actions_for("search")
+        # Search for lot and add product from line as context
+        search_result = search.find(
+            lot_name,
+            find_types,
+            handler_kw=dict(lot=dict(products=selected_line.product_id)),
+        )
+
+        # Look for an expiration date
+        for result in search_result.parse_result:
+            if result.type == "expiration_date":
+                expiration_date = result.value
+
         use_expiration_date = selected_line.product_id.use_expiration_date
         if use_expiration_date and not expiration_date:
             message = self.msg_store.expiration_date_missing()
             return self._response_for_set_lot(picking, selected_line, message=message)
-        search = self._actions_for("search")
+        lot = (
+            search_result.record
+            if search_result.type == "lot"
+            else self.env["stock.lot"].browse()
+        )
         if lot_name:
             product = selected_line.product_id
-            lot = search.lot_from_scan(lot_name, products=product)
             if not lot:
                 lot = self.env["stock.lot"].create(
                     self._create_lot_values(product, lot_name)
