@@ -105,8 +105,11 @@ class PromiseReleaseCommonCase(common.TransactionCase):
         return pickings
 
     @classmethod
-    def _pickings_in_group(cls, group):
-        return cls.env["stock.picking"].search([("group_id", "=", group.id)])
+    def _pickings_in_group(cls, group, include_cancel=True):
+        domain = [("group_id", "=", group.id)]
+        if not include_cancel:
+            domain.append(("state", "!=", "cancel"))
+        return cls.env["stock.picking"].search(domain)
 
     @classmethod
     def _update_qty_in_location(cls, location, product, quantity):
