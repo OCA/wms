@@ -30,6 +30,7 @@ setuptools.setup(
         'odoo-addon-shopfloor_workstation_mobile>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release_block>=16.0dev,<16.1dev',
+        'odoo-addon-stock_available_to_promise_release_dynamic_routing>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release_exclude_location>=16.0dev,<16.1dev',
         'odoo-addon-stock_dynamic_routing>=16.0dev,<16.1dev',
         'odoo-addon-stock_full_location_reservation>=16.0dev,<16.1dev',
