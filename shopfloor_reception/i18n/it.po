@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2023-09-20 04:45+0000\n"
+"PO-Revision-Date: 2025-07-07 08:53+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: shopfloor_reception
 #: model:ir.model.fields,help:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings
@@ -23,28 +23,31 @@ msgid ""
 "By default, at first step, filter the available\n"
 "pickings with the ones that are scheduled for today.\n"
 msgstr ""
+"\n"
+"Per impostazione predefinita, al primo passaggio, filtra \n"
+"i prelievi disponibili con quelli programmati per oggi.\n"
 
 #. module: shopfloor_reception
 #. odoo-python
 #: code:addons/shopfloor_reception/models/shopfloor_menu.py:0
 #, python-format
 msgid "Filter Today Pickings is not allowed for menu {}."
-msgstr ""
+msgstr "Il filtro Prelievi odierni non è consentito per il menu {}."
 
 #. module: shopfloor_reception
 #: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings
 msgid "Filter Today Scheduled Pickings"
-msgstr ""
+msgstr "Filtro Prelievi schedulati oggi"
 
 #. module: shopfloor_reception
 #: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__filter_today_scheduled_pickings_is_possible
 msgid "Filter Today Scheduled Pickings Is Possible"
-msgstr ""
+msgstr "Filtro Possibili prelievi schedulati oggi"
 
 #. module: shopfloor_reception
 #: model:ir.model,name:shopfloor_reception.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
-msgstr ""
+msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
