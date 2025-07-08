@@ -318,13 +318,33 @@ const Reception = {
                         path: "product.barcode",
                         label: "Barcode",
                     },
-                    {path: "lot.name", label: "Lot", klass: "loud"},
                     {
-                        path: "lot.expiration_date",
+                        path: "lot.name",
+                        label: "Lot",
+                        klass: "loud",
+                    },
+                    {
+                        path: "lot_name",
+                        label: "Lot",
+                        klass: "loud",
+                        renderer: (rec, field) => {
+                            if (!rec.lot) {
+                                return rec.lot_name;
+                            } else {
+                                return "";
+                            }
+                        },
+                    },
+                    {
+                        path: "expiration_date",
                         label: "Expiry date",
                         klass: "loud",
                         renderer: (rec, field) => {
-                            return this.utils.display.render_field_date(rec, field);
+                            if (!rec.lot || !rec.lot.expiration_date) {
+                                return this.utils.display.render_field_date(rec, field);
+                            } else {
+                                return "";
+                            }
                         },
                     },
                 ],
@@ -348,6 +368,28 @@ const Reception = {
                         label: "Expiry date",
                         renderer: (rec, field) => {
                             return this.utils.display.render_field_date(rec, field);
+                        },
+                    },
+                    {
+                        path: "lot_name",
+                        label: "Lot",
+                        renderer: (rec, field) => {
+                            if (!rec.lot) {
+                                return rec.lot_name;
+                            } else {
+                                return "";
+                            }
+                        },
+                    },
+                    {
+                        path: "expiration_date",
+                        label: "Expiry date",
+                        renderer: (rec, field) => {
+                            if (!rec.lot || !rec.lot.expiration_date) {
+                                return this.utils.display.render_field_date(rec, field);
+                            } else {
+                                return "";
+                            }
                         },
                     },
                 ],
@@ -472,11 +514,17 @@ const Reception = {
         },
         lot_has_expiry_date: function () {
             // If there's a expiry date, it means there's a lot too.
-            const expiry_date = _.result(
+            var expiry_date = _.result(
                 this.line_being_handled,
                 "lot.expiration_date",
                 ""
             );
+            if (!expiry_date) {
+                // Lot is not defined, look for expiration date on move line
+                expiry_date = _.result(this.line_being_handled, "lot_name", "")
+                    ? _.result(this.line_being_handled, "expiration_date", "")
+                    : "";
+            }
             return !_.isEmpty(expiry_date);
         },
         get_expiration_date_from_lot: function (lot) {
