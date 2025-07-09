@@ -289,8 +289,8 @@ class Reception(Component):
 
     def _scan_line__assign_user(self, picking, line, qty_done):
         product = line.product_id
-        self._assign_user_to_line(line)
-        line.qty_done += qty_done
+        stock = self._actions_for("stock")
+        stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
         if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
             return self._before_state__set_quantity(picking, line)
         return self._response_for_set_lot(picking, line)
