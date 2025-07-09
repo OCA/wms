@@ -824,7 +824,9 @@ class Reception(Component):
         return self._response(
             next_state="set_lot",
             data={
-                "selected_move_line": self._data_for_move_lines(line),
+                "selected_move_line": self._data_for_move_lines(
+                    line, expiration_date=True, lot_name=True
+                ),
                 "picking": self.data.picking(picking),
             },
             message=message,
