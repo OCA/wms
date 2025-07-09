@@ -30,7 +30,7 @@ class ActionsDataCase(ActionsDataCaseBase):
                 "expiration_date": "2022-07-01",
             }
         )
-        data = self.data.move_line(move_line)
+        data = self.data.move_line(move_line, expiration_date=True)
         self.assert_schema(self.schema.move_line(), data)
         expected = {
             "id": move_line.id,
@@ -38,7 +38,6 @@ class ActionsDataCase(ActionsDataCaseBase):
             "quantity": 0.0,
             "product": self._expected_product(product),
             "lot": None,
-            "lot_name": None,
             "expiration_date": "2022-07-01T00:00:00",
             "package_src": None,
             "package_dest": None,
