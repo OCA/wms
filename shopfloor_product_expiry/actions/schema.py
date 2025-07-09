@@ -12,7 +12,11 @@ class ShopfloorSchemaAction(Component):
         )
         schema.update(
             {
-                "expiration_date": {"type": "string", "required": False},
+                "expiration_date": {
+                    "type": "string",
+                    "required": False,
+                    "nullable": True,
+                },
             }
         )
         return schema
