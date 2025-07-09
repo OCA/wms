@@ -53,6 +53,47 @@ class TestSetQuantity(CommonCase):
             },
         )
 
+    def test_set_quantity_scan_wrong_lot(self):
+        # create lot "4" for product b
+        self.env["stock.lot"].create(
+            {
+                "name": "4",
+                "product_id": self.product_b.id,
+            }
+        )
+        self.product_a.sudo().tracking = "lot"
+
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 10.0,
+                "barcode": "4",
+            },
+        )
+        self.assertEqual(selected_move_line.qty_done, 10.0)
+        data = self.data.picking(picking)
+        message = {
+            "message_type": "warning",
+            "body": "Create new PACK 4? Scan it again to confirm.",
+        }
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": "4",
+            },
+            message=message,
+        )
+
     def test_set_quantity_scan_packaging(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
