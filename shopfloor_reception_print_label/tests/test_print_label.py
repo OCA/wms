@@ -32,9 +32,10 @@ class TestSetDestinationPrinting(CommonCase):
                 },
             )
             mock_print.assert_called_once()
-            self.assertDictContainsSubset(
-                {"message_type": "success", "body": "Print job sent"},
-                response.get("message"),
+            message = {"message_type": "success", "body": "Print job sent"}
+            self.assertEqual(
+                message,
+                message | response.get("message"),
             )
 
     def test_print_labels_error(self):
@@ -53,7 +54,8 @@ class TestSetDestinationPrinting(CommonCase):
                 },
             )
             mock_print.assert_called_once()
-            self.assertDictContainsSubset(
-                {"message_type": "warning", "body": "Printing error"},
-                response.get("message"),
+            message = {"message_type": "warning", "body": "Printing error"}
+            self.assertEqual(
+                message,
+                message | response.get("message"),
             )
