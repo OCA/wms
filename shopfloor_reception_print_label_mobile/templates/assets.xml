@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+    @author Simone Orsi <simahawk@gmail.com>
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_reception_mobile.shopfloor_app_assets"
+    >
+        <script id="script_app_main" position="before">
+            <div>
+            <t
+                    t-set="mod_version"
+                    t-value="get_version('shopfloor_reception_print_label_mobile')"
+                />
+
+            <!-- Scenario -->
+            <script
+                    id="script_scenario_reception_print_label"
+                    t-attf-src="/shopfloor_reception_print_label_mobile/static/src/scenario/reception.js?v=#{mod_version}"
+                    type="module"
+                />
+            </div>
+        </script>
+    </template>
+
+</odoo>
