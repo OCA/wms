@@ -3,10 +3,9 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
-/* eslint-disable strict */
-/* eslint-disable no-implicit-globals */
-import {PickingDetailSelectMixin} from "./mixins.js";
+
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
+import {PickingDetailSelectMixin} from "./mixins.esm.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],

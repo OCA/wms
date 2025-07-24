@@ -4,10 +4,11 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+/* eslint-disable sort-imports */
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
-import {checkout_states} from "./checkout_states.js";
 import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {checkout_states} from "./checkout_states.esm.js";
 
 const Checkout = {
     mixins: [ScenarioBaseMixin],
