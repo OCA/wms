@@ -2,11 +2,10 @@
 <!-- Copyright 2022 Camptocamp SA
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-
-  <record id="scenario_single_product_transfer" model="shopfloor.scenario">
-      <field name="name">Single Product Transfer</field>
-      <field name="key">single_product_transfer</field>
-      <field name="options_edit">
+    <record id="scenario_single_product_transfer" model="shopfloor.scenario">
+        <field name="name">Single Product Transfer</field>
+        <field name="key">single_product_transfer</field>
+        <field name="options_edit">
 {
     "allow_create_moves": true,
     "allow_unreserve_other_moves": true,
@@ -15,6 +14,5 @@
     "no_prefill_qty": true
 }
       </field>
-  </record>
-
+    </record>
 </odoo>

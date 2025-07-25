@@ -2,7 +2,6 @@
 <!-- Copyright 2022 Camptocamp SA
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-
     <record id="shopfloor_menu_demo_single_product_transfer" model="shopfloor.menu">
         <field name="name">Single Product Transfer</field>
         <field name="sequence">45</field>
@@ -16,6 +15,4 @@
             eval="[(4, ref('shopfloor_single_product_transfer.picking_type_single_product_transfer_demo'))]"
         />
     </record>
-
-
 </odoo>

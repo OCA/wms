@@ -325,7 +325,6 @@ class ShopfloorSingleProductTransfer(Component):
     def _scan_product__create_move_line(
         self, product, location=None, package=None, lot=None, packaging=None
     ):
-
         available_quantity = product.with_context(
             location=location.id if location else None,
             package_id=package.id if package else None,

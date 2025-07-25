@@ -2,7 +2,6 @@
 <!-- Copyright 2022 Camptocamp SA
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-
     <record id="picking_type_single_product_transfer_demo" model="stock.picking.type">
         <field name="name">Single Product Transfer</field>
         <field name="sequence_code">SPT</field>
@@ -18,6 +17,4 @@
         <field name="show_operations" eval="1" />
         <field name="display_completion_info" eval="1" />
     </record>
-
-
 </odoo>
