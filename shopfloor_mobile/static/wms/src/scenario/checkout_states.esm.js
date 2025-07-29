@@ -24,6 +24,7 @@ export const checkout_states = function ($instance) {
                     $instance.odoo.call("scan_document", {barcode: scanned.text})
                 );
             },
+            // eslint-disable-next-line no-unused-vars
             on_manual_selection: (evt) => {
                 $instance.wait_call($instance.odoo.call("list_stock_picking"));
             },
@@ -150,7 +151,8 @@ export const checkout_states = function ($instance) {
                         );
                     })
                 );
-                let endpoint, move_line;
+                let endpoint = "",
+                    move_line = {};
                 if (to_unselect) {
                     endpoint = "reset_line_qty";
                     move_line = to_unselect;

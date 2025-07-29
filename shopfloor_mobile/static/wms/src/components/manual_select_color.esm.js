@@ -8,7 +8,7 @@ const Base = Vue.options.components["manual-select"];
 const Custom = Base.extend({
     methods: {
         selected_color_klass(rec, modifier) {
-            let color;
+            let color = "";
             if (rec && rec.qty_done && rec.quantity) {
                 if (rec.qty_done < rec.quantity)
                     color = this.utils.colors.color_for("item_selected_partial");

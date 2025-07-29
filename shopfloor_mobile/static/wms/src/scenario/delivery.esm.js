@@ -129,12 +129,13 @@ const Delivery = {
                     "package_src"
                 ),
                 group_color_maker: function (lines) {
-                    return self.utils.wms.move_lines_completeness(lines) == 100
+                    return self.utils.wms.move_lines_completeness(lines) === 100
                         ? "screen_step_done"
                         : "screen_step_todo";
                 },
             });
         },
+        /* eslint-disable no-unused-vars */
         deliver_move_line_list_options: function (picking) {
             return {
                 list_item_options: {
@@ -174,9 +175,8 @@ const Delivery = {
             const operation_progress = this._get_operation_progress_data();
             if (operation_progress.done === operation_progress.to_do) {
                 return this.utils.colors.color_for("screen_step_done");
-            } else {
-                return this.utils.colors.color_for("screen_step_todo");
             }
+            return this.utils.colors.color_for("screen_step_todo");
         },
         _get_operation_progress_data: function () {
             return _.result(this.state, "data.sublocation.operation_progress", false);
@@ -202,6 +202,7 @@ const Delivery = {
                 {
                     path: "move_line_count",
                     label: "Lines",
+
                     renderer: function (rec, field) {
                         return (
                             self.utils.wms.completed_move_lines(rec.move_lines) +
@@ -236,6 +237,7 @@ const Delivery = {
                             this.odoo.call("scan_deliver", {barcode: scanned.text})
                         );
                     },
+
                     on_manual_selection: (evt) => {
                         this.wait_call(this.odoo.call("list_stock_picking"));
                     },
@@ -257,6 +259,7 @@ const Delivery = {
                             })
                         );
                     },
+
                     on_manual_selection: (evt) => {
                         this.wait_call(
                             this.odoo.call("list_stock_picking", {
@@ -265,7 +268,8 @@ const Delivery = {
                         );
                     },
                     on_cancel: (data) => {
-                        let endpoint, endpoint_data;
+                        let endpoint = "";
+                        let endpoint_data = "";
                         // TODO: can't we have a single endpoint as per checkout.summary.destroy?
                         if (data.package_id) {
                             endpoint = "reset_qty_done_pack";

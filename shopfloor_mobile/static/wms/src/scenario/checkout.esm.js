@@ -298,7 +298,7 @@ const Checkout = {
                             path: "priority",
                             render_component: "priority-widget",
                             render_options: function (record) {
-                                const priority = parseInt(record.priority);
+                                const priority = parseInt(record.priority, 10) || 0;
                                 // We need to pass the label to the component as an option instead of using "display_no_value"
                                 // because pickings with no priority will still have a string value of "0"
                                 // and the label would always be displayed.
@@ -352,7 +352,7 @@ const Checkout = {
         select_line_detail_picking_select_props: function () {
             const picking = this.state.data.picking;
             const lines = picking.move_lines;
-            let grouped_lines = undefined;
+            let grouped_lines = [];
             if (this.state.data.group_lines_by_location) {
                 grouped_lines = this.select_line_manual_select_group_lines(lines);
             }

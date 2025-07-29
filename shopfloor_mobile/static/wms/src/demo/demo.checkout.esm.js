@@ -72,7 +72,7 @@ const DEMO_CHECKOUT = {
     scan_package_action: function (data) {
         const res = data_for_select_package;
         const line = res.data.select_package.selected_move_lines.find(function (x) {
-            return x.product.barcode == data.barcode;
+            return x.product.barcode === data.barcode;
         });
         line.qty_done++;
         return res;
@@ -102,7 +102,7 @@ const DEMO_CHECKOUT = {
     set_line_qty: function (data) {
         const res = data_for_set_line_qty;
         const line = res.data.select_package.selected_move_lines.filter(function (x) {
-            return x.id == data.move_line_id;
+            return x.id === data.move_line_id;
         })[0];
         line.qty_done = line.quantity;
         return res;
@@ -110,7 +110,7 @@ const DEMO_CHECKOUT = {
     reset_line_qty: function (data) {
         const res = data_for_set_line_qty;
         const line = res.data.select_package.selected_move_lines.filter(function (x) {
-            return x.id == data.move_line_id;
+            return x.id === data.move_line_id;
         })[0];
         line.qty_done = 0;
         return res;
