@@ -3,8 +3,6 @@
 
 import logging
 
-from odoo import SUPERUSER_ID, api
-
 from odoo.addons.shopfloor_base.utils import purge_endpoints, register_new_services
 
 from .services.single_product_transfer import ShopfloorSingleProductTransfer as Service
@@ -12,13 +10,11 @@ from .services.single_product_transfer import ShopfloorSingleProductTransfer as 
 _logger = logging.getLogger(__file__)
 
 
-def post_init_hook(cr, registry):
-    env = api.Environment(cr, SUPERUSER_ID, {})
+def post_init_hook(env):
     _logger.info("Register routes for %s", Service._usage)
     register_new_services(env, Service)
 
 
-def uninstall_hook(cr, registry):
-    env = api.Environment(cr, SUPERUSER_ID, {})
+def uninstall_hook(env):
     _logger.info("Refreshing routes for existing apps")
     purge_endpoints(env, Service._usage)

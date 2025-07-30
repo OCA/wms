@@ -5,6 +5,7 @@
 from odoo.addons.shopfloor.tests.common import CommonCase as BaseCommonCase
 
 
+# pylint: disable=missing-return
 class CommonCase(BaseCommonCase):
     def setUp(self):
         super().setUp()
@@ -70,19 +71,23 @@ class CommonCase(BaseCommonCase):
     @classmethod
     def _add_stock_to_product(cls, product, location, qty, lot=None):
         """Set the stock quantity of the product."""
-        values = {
-            "product_id": product.id,
-            "location_id": location.id,
-            "inventory_quantity": qty,
-        }
-        if lot:
-            values["lot_id"] = lot.id
-        cls.env["stock.quant"].sudo().with_context(inventory_mode=True).create(values)
+        cls._update_qty_in_location(location, product, qty, lot=lot)
+        # FIXME: can we drop this?
+        # values = {
+        #     "product_id": product.id,
+        #     "location_id": location.id,
+        #     "inventory_quantity": qty,
+        # }
+        # if lot:
+        #     values["lot_id"] = lot.id
+        # import pdb; pdb.set_trace()
+        # quant_model = cls.env["stock.quant"].sudo()
+        # quant = quant_model.with_context(inventory_mode=True).create(values)
         cls.cache_existing_record_ids()
 
     @classmethod
     def _create_lot_for_product(cls, product, name):
-        return cls.env["stock.production.lot"].create(
+        return cls.env["stock.lot"].create(
             {
                 "product_id": product.id,
                 "name": name,

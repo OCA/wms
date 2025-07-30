@@ -122,7 +122,7 @@ class ShopfloorSingleProductTransfer(Component):
             return self._response_for_select_location_or_package(message=message)
 
     def _scan_location__check_location(self, location, quants):
-        """Check that `location` belongs to the source location of the operation type."""
+        """Check that location belongs to the source location of the operation type."""
         if not self.is_src_location_valid(location):
             message = self.msg_store.location_content_unable_to_transfer(location)
             return self._response_for_select_location_or_package(message=message)
@@ -245,14 +245,11 @@ class ShopfloorSingleProductTransfer(Component):
         if move_line:
             stock = self._actions_for("stock")
             if self.work.menu.no_prefill_qty:
-                # First, mark move line as picked with qty_done = 0,
-                # so the move wont be split because 0 < qty_done < product_uom_qty
+                # First, mark move line as picked with qty_picked = 0,
+                # so the move wont be split because 0 < qty_picked < quantity
                 stock.mark_move_line_as_picked(move_line, quantity=0)
                 # Then, set the no prefill qty on the move line
-                qty_done = 1
-                if packaging:
-                    qty_done = packaging.qty
-                move_line.qty_done = qty_done
+                stock.move_line_increment_qty_picked(move_line, packaging=packaging)
             else:
                 stock.mark_move_line_as_picked(move_line)
             return self._response_for_set_quantity(move_line)
@@ -312,8 +309,9 @@ class ShopfloorSingleProductTransfer(Component):
                 packaging=packaging,
             )
         else:
-            # If we get there then no qty is available, and we are not allowed to unreserve
-            # other moves. No stock available for product.
+            # If we get there then no qty is available,
+            # and we are not allowed to unreserve other moves.
+            # No stock available for product.
             return self._scan_product__no_stock_available(
                 product,
                 location=location,
@@ -473,7 +471,8 @@ class ShopfloorSingleProductTransfer(Component):
         move._action_confirm(merge=False)
         picking = move.picking_id
         if package:
-            # When we create a package_level, we force the reservation of the scanned package.
+            # When we create a package_level,
+            # we force the reservation of the scanned package.
             package_level = self.env["stock.package_level"].create(
                 {
                     "picking_id": picking.id,
@@ -484,23 +483,18 @@ class ShopfloorSingleProductTransfer(Component):
                 }
             )
             move.package_level_id = package_level
-        move.with_context(
-            {"force_reservation": self.work.menu.allow_force_reservation}
-        )._action_assign()
+        ctx = {"force_reservation": self.work.menu.allow_force_reservation}
+        move.with_context(**ctx)._action_assign()
         assert move.state == "assigned", "The reservation of quantities has failed"
         # we expect to get only one move line as we are
         # moving only bulk products w/o lot or package.
         move_line = move.move_line_ids[0]
         stock = self._actions_for("stock")
         if self.work.menu.no_prefill_qty:
-            # We ensure the qty_done is 0 here, so we can set it manually after
+            # We ensure the qty_picked is 0 here, so we can set it manually after
             # to avoid the split of the move line by 'mark_move_line_as_picked'.
             stock.mark_move_line_as_picked(move_line, quantity=0)
-            # Set the initial qty_done to 1 for product and lot
-            qty_done = 1
-            if packaging:
-                qty_done = packaging.qty
-            move_line.qty_done = qty_done
+            stock.move_line_increment_qty_picked(move_line, packaging=packaging)
         else:
             stock.mark_move_line_as_picked(move_line)
         return move
@@ -521,43 +515,37 @@ class ShopfloorSingleProductTransfer(Component):
     def _set_quantity__check_quantity_done(
         self, move_line, location=None, package=None, confirmation=None
     ):
-        rounding = move_line.product_id.uom_id.rounding
-        qty_done = move_line.qty_done
-        qty_todo = move_line.product_uom_qty
-        # If qty done is >= qty todo, then there's nothing more to pick
-        if float_compare(qty_done, qty_todo, precision_rounding=rounding) > 0:
-            message = self.msg_store.unable_to_pick_more(qty_todo)
+        stock = self._actions_for("stock")
+        if not stock.move_line_check_qty_picked(move_line):
+            message = self.msg_store.unable_to_pick_more(move_line.quantity)
             return self._response_for_set_quantity(move_line, message=message)
 
     def _set_quantity__check_no_prefill_qty(
         self, move_line, product, lot=None, packaging=None
     ):
         if not self.work.menu.no_prefill_qty:
-            # If no_prefill_qty is False, then qty_done should have been prefilled
+            # If no_prefill_qty is False, then qty_picked should have been prefilled
             # with product_uom_qty in the select_product screen
             message = self.msg_store.unable_to_pick_more(move_line.product_uom_qty)
             return self._response_for_set_quantity(move_line, message=message)
 
-    def _set_quantity__increment_qty_done(
+    def _set_quantity__increment_qty_picked(
         self, move_line, product, lot=None, packaging=None
     ):
         """Increment the quantity done depending on the item scanned."""
+
+        # TODO: Implement an action move_line_increment
+
         # When we reach this handler, the 'no_prefill_qty' is enabled
         # For product or lot, we increment by 1 by default
-        qty_done = 1
-        if packaging:
-            qty_done = packaging.qty
-        move_line.qty_done += qty_done
+        stock = self._actions_for("stock")
+        stock.move_line_increment_qty_picked(move_line, packaging=packaging)
         return self._response_for_set_quantity(move_line)
-
-    def _set_quantity__set_picker_qty(self, move_line, quantity):
-        """Sets move_line qty_done according to picker quantity."""
-        move_line.qty_done = quantity
 
     def _set_quantity__scan_product_handlers(self):
         return (
             self._set_quantity__check_product_in_line,
-            self._set_quantity__increment_qty_done,
+            self._set_quantity__increment_qty_picked,
         )
 
     def _set_quantity__by_product(self, move_line, product, confirmation=False):
@@ -630,11 +618,15 @@ class ShopfloorSingleProductTransfer(Component):
                 move_line, message=message, asking_confirmation=confirmation or None
             )
 
-    def _write_destination_on_lines(self, lines, location):
-        stock = self._actions_for("stock")
-        stock.set_destination_and_unload_lines(lines, location)
+    def _write_destination_on_lines(self, lines, location, unload=False):
+        lines.picking_id.location_dest_id = location
+        if unload:
+            lines.result_package_id = False
+        # FIXME commit isn't migrated yet
+        # stock.set_destination_and_unload_lines(lines, location)
 
     def _set_quantity__post_move(self, move_line, location, confirmation=None):
+        # TODO still valid ?
         # TODO qty_done = 0: transfer_no_qty_done
         # TODO qty done < product_qty: transfer_confirm_done
         self._write_destination_on_lines(move_line, location)
@@ -655,7 +647,8 @@ class ShopfloorSingleProductTransfer(Component):
         )
 
     def _post_move(self, move_line):
-        move_line.picking_id.with_context({"cancel_backorder": True})._action_done()
+        ctx = {"cancel_backorder": True}
+        move_line.picking_id.with_context(**ctx)._action_done()
 
     def _split_move(self, move_line):
         # TODO: when we split the move, we still get a
@@ -663,24 +656,23 @@ class ShopfloorSingleProductTransfer(Component):
         # See if there's a way to identify the moves
         # generated through this mechanism and avoid creating them.
         new_move_line = move_line._split_partial_quantity()
-        new_move = move_line.move_id.split_other_move_lines(
-            move_line, intersection=True
-        )
-        if new_move:
+        move = move_line.move_id
+        if new_move_line:
             # A new move is created in case of partial quantity
+            new_move = move.split_other_move_lines(move_line, intersection=True)
             new_move.extract_and_action_done()
             stock = self._actions_for("stock")
             stock.unmark_move_line_as_picked(new_move_line)
             return
         # In case of full quantity, post the initial move
-        move_line.move_id.extract_and_action_done()
+        move.extract_and_action_done()
 
     def _find_user_move_line_domain(self, user):
         return [
             ("picking_id.user_id", "in", (False, self.env.uid)),
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
             ("state", "in", ("assigned", "partially_available")),
-            ("qty_done", ">", 0),
+            ("qty_picked", ">", 0),
         ]
 
     def _find_user_move_line(self):
@@ -860,11 +852,13 @@ class ShopfloorSingleProductTransfer(Component):
             # TODO Should probably return to scan_product or scan_location?
             return self._response_for_set_quantity(move_line)
 
-        self._actions_for("stock")._lock_lines(move_line)
+        self._actions_for("lock").for_update(move_line)
+        # FIXME commit isn't migrated yet
+        # stock._lock_lines(move_line)
         if move_line.state == "done":
             message = self.msg_store.move_already_done()
             return self._response_for_set_quantity(move_line, message=message)
-        self._set_quantity__set_picker_qty(move_line, quantity)
+        move_line.qty_picked = quantity
         handlers_by_type = {
             # Increment qty done if a product / lot / packaging is scanned
             "product": self._set_quantity__by_product,

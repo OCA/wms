@@ -22,8 +22,8 @@ class TestSetQuantity(CommonCase):
 
     @classmethod
     def _setup_chained_picking(cls, picking):
-        next_moves = picking.move_lines.browse()
-        for move in picking.move_lines:
+        next_moves = picking.move_ids.browse()
+        for move in picking.move_ids:
             next_moves |= move.copy(
                 {
                     "move_orig_ids": [(6, 0, move.ids)],
@@ -50,7 +50,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.quantity,
                 "barcode": "NOPE",
             },
         )
@@ -75,7 +75,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.quantity,
                 "barcode": self.dispatch_location.name,
             },
         )
@@ -86,7 +86,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.quantity,
                 "barcode": self.product.barcode,
             },
         )
@@ -109,13 +109,16 @@ class TestSetQuantity(CommonCase):
         )
         # Without no_prefill_qty, once selected, a moveline qty done is already
         # equal to the qty todo.
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertTrue(move_line.picked)
+        self.assertEqual(move_line.quantity, 10)
+        self.assertEqual(move_line.qty_picked, 10)
         # We do not prevent the user to set a bigger qty
+        # No qty check when scanning a product
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.product.barcode,
             },
         )
@@ -124,12 +127,13 @@ class TestSetQuantity(CommonCase):
             "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
-        # However, we prevent the user to post the line if qty_done > qty_todo
+        # However, we prevent the user to post the line if qty_picked > quantity
+        # quantity is checked when scanning a location
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.location.barcode,
             },
         )
@@ -139,7 +143,7 @@ class TestSetQuantity(CommonCase):
         }
         expected_message = {
             "message_type": "error",
-            "body": f"You must not pick more than {move_line.product_uom_qty} units.",
+            "body": f"You must not pick more than {move_line.quantity} units.",
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
@@ -154,7 +158,7 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": self.location.id, "barcode": self.product.barcode},
         )
-        self.assertEqual(move_line.qty_done, 1)
+        self.assertEqual(move_line.qty_picked, 1)
         # We can scan the same product 9 times, and the qty will increment by 1
         # each time.
         for expected_qty in range(2, 11):
@@ -162,7 +166,7 @@ class TestSetQuantity(CommonCase):
                 "set_quantity",
                 params={
                     "selected_line_id": move_line.id,
-                    "quantity": move_line.qty_done,
+                    "quantity": move_line.qty_picked,
                     "barcode": self.product.barcode,
                 },
             )
@@ -171,13 +175,13 @@ class TestSetQuantity(CommonCase):
                 "asking_confirmation": None,
             }
             self.assert_response(response, next_state="set_quantity", data=data)
-            self.assertEqual(move_line.qty_done, expected_qty)
-        # We do not prevent the user to set a qty_done > qty_todo in the picker
+            self.assertEqual(move_line.qty_picked, expected_qty)
+        # We do not prevent the user to set a qty_picked > quantity in the picker
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.product.barcode,
             },
         )
@@ -186,12 +190,12 @@ class TestSetQuantity(CommonCase):
             "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
-        # However, we prevent the user to post the line if qty_done > qty_todo
+        # However, we prevent the user to post the line if qty_picked > quantity
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.location.barcode,
             },
         )
@@ -201,7 +205,7 @@ class TestSetQuantity(CommonCase):
         }
         expected_message = {
             "message_type": "error",
-            "body": f"You must not pick more than {move_line.product_uom_qty} units.",
+            "body": f"You must not pick more than {move_line.quantity} units.",
         }
         self.assert_response(
             response, next_state="set_quantity", message=expected_message, data=data
@@ -215,7 +219,7 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": self.location.id, "barcode": self.product.barcode},
         )
-        self.assertEqual(move_line.qty_done, 1)
+        self.assertEqual(move_line.qty_picked, 1)
         response = self.service.dispatch(
             "set_quantity",
             params={
@@ -225,13 +229,13 @@ class TestSetQuantity(CommonCase):
             },
         )
         # Here, user manually set 5.0 as qty done and scanned a product,
-        # expected qty_done on move line is 6.0
+        # expected qty_picked on move line is 6.0
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
-        self.assertEqual(move_line.qty_done, 6.0)
+        self.assertEqual(move_line.qty_picked, 6.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
@@ -241,14 +245,14 @@ class TestSetQuantity(CommonCase):
             },
         )
         # Here user sets 10.0 then scans a product.
-        # Expected qty_done is 11.0
+        # Expected qty_picked is 11.0
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
-        self.assertEqual(move_line.qty_done, 11.0)
-        # When scanning a location, a qty_done is checked.
+        self.assertEqual(move_line.qty_picked, 11.0)
+        # When scanning a location, a qty_picked is checked.
         # Since qty done > qty todo, an error should be raised
 
     def test_set_quantity_scan_lot_prefill_qty_disabled(self):
@@ -260,12 +264,12 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": self.location.id, "barcode": lot.name},
         )
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertEqual(move_line.qty_picked, move_line.quantity)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": lot.name,
             },
         )
@@ -275,12 +279,12 @@ class TestSetQuantity(CommonCase):
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we shouldn't be able to confirm (scan a location)
-        # since qty_done > qty_todo (max is 10.0)
+        # since qty_picked > quantity (max is 10.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.location.barcode,
             },
         )
@@ -303,15 +307,15 @@ class TestSetQuantity(CommonCase):
             params={"location_id": self.location.id, "barcode": lot.name},
         )
         move_line = picking.move_line_ids
-        self.assertEqual(move_line.qty_done, 1)
-        # We can scan the same lot 9 times (until qty_done == product_uom_qty),
+        self.assertEqual(move_line.qty_picked, 1)
+        # We can scan the same lot 9 times (until qty_picked == quantity),
         # and the qty will increment by 1 each time.
         for expected_qty in range(2, 11):
             response = self.service.dispatch(
                 "set_quantity",
                 params={
                     "selected_line_id": move_line.id,
-                    "quantity": move_line.qty_done,
+                    "quantity": move_line.qty_picked,
                     "barcode": lot.name,
                 },
             )
@@ -320,13 +324,13 @@ class TestSetQuantity(CommonCase):
                 "asking_confirmation": None,
             }
             self.assert_response(response, next_state="set_quantity", data=data)
-            self.assertEqual(move_line.qty_done, expected_qty)
-        # Nothing prevents the user to set qty_done > qty_todo
+            self.assertEqual(move_line.qty_picked, expected_qty)
+        # Nothing prevents the user to set qty_picked > quantity
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": lot.name,
             },
         )
@@ -336,12 +340,12 @@ class TestSetQuantity(CommonCase):
         }
         self.assert_response(response, next_state="set_quantity", data=data)
         # However, we shouldn't be able to confirm (scan a location)
-        # since qty_done > qty_todo (max is 10.0)
+        # since qty_picked > quantity (max is 10.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.location.barcode,
             },
         )
@@ -363,12 +367,13 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": self.location.id, "barcode": self.packaging.barcode},
         )
-        self.assertEqual(move_line.qty_done, move_line.product_uom_qty)
+        self.assertEqual(move_line.qty_picked, move_line.quantity)
+        # picker qty is 10 + scanned packaging qty is 5 = 15
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.quantity,
                 "barcode": self.packaging.barcode,
             },
         )
@@ -377,14 +382,14 @@ class TestSetQuantity(CommonCase):
             "asking_confirmation": None,
         }
         self.assert_response(response, next_state="set_quantity", data=data)
-        self.assertEqual(move_line.qty_done, 15.0)
+        self.assertEqual(move_line.qty_picked, 15.0)
         # However, we shouldn't be able to confirm (scan a location)
-        # since qty_done > qty_todo (max is 10.0)
+        # since quantity_picked > quantity (max is 10.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.location.barcode,
             },
         )
@@ -413,12 +418,13 @@ class TestSetQuantity(CommonCase):
             self.product, location
         )
         move_line = self.env["stock.move.line"].search(domain, limit=1)
-        self.assertEqual(move_line.qty_done, 10.0)
+        self.assertTrue(move_line.quantity)
+        self.assertEqual(move_line.quantity, 10.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.dispatch_location.barcode,
             },
         )
@@ -453,16 +459,16 @@ class TestSetQuantity(CommonCase):
             self.product, location
         )
         move_line = self.env["stock.move.line"].search(domain, limit=1)
-        self.assertEqual(move_line.qty_done, 5.0)
+        self.assertEqual(move_line.qty_picked, 5.0)
         response = self.service.dispatch(
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.packaging.barcode,
             },
         )
-        self.assertEqual(move_line.qty_done, 10.0)
+        self.assertEqual(move_line.qty_picked, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
@@ -472,7 +478,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.dispatch_location.barcode,
             },
         )
@@ -496,7 +502,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": wrong_location.barcode,
             },
         )
@@ -523,7 +529,7 @@ class TestSetQuantity(CommonCase):
         # Scanning a child of the menu, shopfloor should ask for a confirmation
         params = {
             "selected_line_id": move_line.id,
-            "quantity": move_line.qty_done,
+            "quantity": move_line.qty_picked,
             "barcode": self.dispatch_location.barcode,
         }
         response = self.service.dispatch("set_quantity", params=params)
@@ -560,7 +566,7 @@ class TestSetQuantity(CommonCase):
         move_line.location_dest_id = self.env.ref("stock.stock_location_14")
         params = {
             "selected_line_id": move_line.id,
-            "quantity": move_line.qty_done,
+            "quantity": move_line.qty_picked,
             "barcode": self.dispatch_location.barcode,
         }
         # Setting the confirmation to another location barcode
@@ -601,7 +607,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.dispatch_location.name,
             },
         )
@@ -622,7 +628,7 @@ class TestSetQuantity(CommonCase):
             },
         )
         move_line = picking.move_line_ids
-        move_line.qty_done = 10.0
+        move_line._pick_qty(10.0)
         # Result here already tested in
         # `test_scan_product::TestScanProduct::test_scan_product_with_move_line`
         response = self.service.dispatch(
@@ -632,9 +638,9 @@ class TestSetQuantity(CommonCase):
         self.assert_response(
             response, next_state="select_location_or_package", data=data
         )
-        # Ensure the qty_done and user has been reset.
+        # Ensure qty_picked and user has been reset.
         self.assertFalse(move_line.picking_id.user_id)
-        self.assertEqual(move_line.qty_done, 0.0)
+        self.assertEqual(move_line.qty_picked, 0.0)
         # Ensure the picking is not cancelled if allow_move_create is not enabled
         self.assertTrue(move_line.picking_id.state == "assigned")
 
@@ -651,7 +657,7 @@ class TestSetQuantity(CommonCase):
             },
         )
         move_line = picking.move_line_ids
-        move_line.qty_done = 10.0
+        move_line._pick_qty(10.0)
         response = self.service.dispatch(
             "set_quantity__action_cancel", params={"selected_line_id": move_line.id}
         )
@@ -660,7 +666,8 @@ class TestSetQuantity(CommonCase):
             response, next_state="select_location_or_package", data=data
         )
         # Ensure the picking is cancelled if allow_move_create is enabled
-        self.assertTrue(move_line.picking_id.state == "cancel")
+        self.assertFalse(move_line.exists())
+        self.assertTrue(picking.state == "cancel")
 
     def test_set_quantity_done_with_completion_info(self):
         self.picking_type.sudo().display_completion_info = "next_picking_ready"
@@ -677,7 +684,7 @@ class TestSetQuantity(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.qty_done,
+                "quantity": move_line.qty_picked,
                 "barcode": self.dispatch_location.name,
             },
         )
@@ -702,7 +709,8 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": location.id, "barcode": self.product.barcode},
         )
-        # Change the destination on the move_line and take less than the total amount required.
+        # Change the destination on the move_line and take less than the total
+        # amount required.
         move_line = picking.move_line_ids
         self.service.dispatch(
             "set_quantity",
@@ -719,12 +727,12 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(
             backorder.move_line_ids.product_id, picking.move_line_ids.product_id
         )
-        self.assertEqual(backorder.move_line_ids.qty_done, 6.0)
+        self.assertEqual(backorder.move_line_ids.qty_picked, 6.0)
         self.assertEqual(backorder.move_line_ids.state, "done")
         self.assertEqual(backorder.user_id, self.env.user)
         self.assertEqual(backorder.move_line_ids.shopfloor_user_id, self.env.user)
-        self.assertEqual(picking.move_line_ids.product_uom_qty, 4.0)
-        self.assertEqual(picking.move_line_ids.qty_done, 0.0)
+        self.assertEqual(picking.move_line_ids.quantity, 4.0)
+        self.assertEqual(picking.move_line_ids.qty_picked, 0.0)
         self.assertEqual(picking.move_line_ids.state, "assigned")
         self.assertFalse(picking.move_line_ids.result_package_id)
         self.assertEqual(picking.user_id.id, False)
@@ -748,7 +756,8 @@ class TestSetQuantity(CommonCase):
             "scan_product",
             params={"location_id": location.id, "barcode": self.product.barcode},
         )
-        # Change the destination on the move_line and take less than the total amount required.
+        # Change the destination on the move_line and take less than the total
+        # amount required.
         move_line = picking.move_line_ids
 
         self.service.dispatch(
@@ -765,7 +774,7 @@ class TestSetQuantity(CommonCase):
             [("backorder_id", "=", picking.id)]
         )
         self.assertFalse(backorder)
-        self.assertEqual(picking.move_line_ids.qty_done, 6.0)
+        self.assertEqual(picking.move_line_ids.qty_picked, 6.0)
         self.assertEqual(picking.move_line_ids.state, "done")
         self.assertEqual(picking.move_line_ids.location_dest_id, self.dispatch_location)
         self.assertEqual(picking.move_line_ids.location_id, self.location)

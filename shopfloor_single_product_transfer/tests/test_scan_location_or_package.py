@@ -27,7 +27,10 @@ class TestScanLocation(CommonCase):
         )
         expected_message = {
             "message_type": "error",
-            "body": f"The content of {location.name} cannot be transferred with this scenario.",
+            "body": (
+                f"The content of {location.name} cannot be "
+                "transferred with this scenario."
+            ),
         }
         self.assert_response(
             response,
@@ -88,9 +91,10 @@ class TestScanLocation(CommonCase):
     def test_scan_location_only_lines_with_package(self):
         location = self.location_src
         package = self._create_empty_package()
-        for line in location.source_move_line_ids:
-            # There are no lines without a package in this location.
-            line.package_id = package
+        location.source_move_line_ids.package_id = package
+
+        # TODO No compute anymore, or doesn't work
+        package.location_id = location
 
         # Scan a location, user is asked to scan a package.
         response = self.service.dispatch(
