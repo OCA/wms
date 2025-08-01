@@ -2,7 +2,7 @@
 # Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
-from odoo.tools.float_utils import float_round
+from odoo.tools.float_utils import float_compare, float_round
 
 from odoo.addons.component.core import Component
 
@@ -275,3 +275,16 @@ class StockAction(Component):
     def set_destination_on_lines(self, lines, location_dest):
         self._lock_lines(lines)
         self._set_destination_on_lines(lines, location_dest)
+
+    def move_line_increment_qty_picked(self, move_line, packaging=False):
+        qty = packaging and packaging.qty or 1
+        move_line.qty_picked += qty
+
+    def move_line_check_qty_picked(self, move_line):
+        rounding = move_line.product_id.uom_id.rounding
+        qty_picked = move_line.qty_picked
+        qty_todo = move_line.quantity
+        # If qty picked is >= qty todo, then there's nothing more to pick
+        if float_compare(qty_picked, qty_todo, precision_rounding=rounding) > 0:
+            return False
+        return True
