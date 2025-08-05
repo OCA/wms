@@ -4,6 +4,7 @@
 from odoo.addons.shopfloor_reception.tests.common import CommonCase
 
 
+# pylint: disable=W8110
 class TestSetPackDimension(CommonCase):
     @classmethod
     def setUpClassBaseData(cls):
@@ -62,7 +63,7 @@ class TestSetPackDimension(CommonCase):
         )
         self.data.picking(self.picking)
         selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self._assert_response_set_dimension(
             response, self.picking, selected_move_line, self.product_a_packaging
@@ -71,7 +72,7 @@ class TestSetPackDimension(CommonCase):
     def test_scan_lot_ask_for_dimension(self):
         self.product_a.tracking = "none"
         selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.assertTrue(self.product_a.packaging_ids)
         response = self.service.dispatch(
@@ -83,7 +84,7 @@ class TestSetPackDimension(CommonCase):
         )
         self.data.picking(self.picking)
         selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self._assert_response_set_dimension(
             response, self.picking, selected_move_line, self.product_a_packaging
@@ -91,7 +92,7 @@ class TestSetPackDimension(CommonCase):
 
     def test_set_packaging_dimension(self):
         selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda li: li.product_id == self.product_a
         )
         self.service.dispatch(
             "set_packaging_dimension",
@@ -110,10 +111,10 @@ class TestSetPackDimension(CommonCase):
 
     def test_set_multiple_packaging_dimension(self):
         line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_c
+            lambda li: li.product_id == self.product_c
         )
         # Set the weight but other dimension are required
-        self.product_c_packaging_2.max_weight = 200
+        self.product_c_packaging_2.weight = 200
         response = self.service.dispatch(
             "set_packaging_dimension",
             params={
@@ -142,11 +143,11 @@ class TestSetPackDimension(CommonCase):
                 "selected_line_id": line.id,
                 "packaging_id": self.product_c_packaging_2.id,
                 "height": 200,
-                "max_weight": 1000,
+                "weight": 1000,
             },
         )
         self.assertEqual(self.product_c_packaging_2.height, 200)
-        self.assertEqual(self.product_c_packaging_2.max_weight, 1000)
+        self.assertEqual(self.product_c_packaging_2.weight, 1000)
         self.assert_response(
             response,
             next_state="set_quantity",

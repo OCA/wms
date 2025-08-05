@@ -32,8 +32,8 @@ class Reception(Component):
                 [("width", "=", False)],
                 [("height", "=", 0)],
                 [("height", "=", False)],
-                [("max_weight", "=", 0)],
-                [("max_weight", "=", False)],
+                [("weight", "=", 0)],
+                [("weight", "=", False)],
                 [("qty", "=", 0)],
                 [("qty", "=", False)],
                 [("barcode", "=", False)],
@@ -99,7 +99,7 @@ class Reception(Component):
         return self._before_state__set_quantity(picking, selected_line, message=message)
 
     def _check_dimension_to_update(self, dimensions):
-        """Return True if there is any dimension that needs to be updated on the packaging."""
+        """Return True if any dimension on the packaging needs to be updated"""
         return any([value is not None for key, value in dimensions.items()])
 
     def _get_dimension_fields_conversion_map(self):
@@ -144,7 +144,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "float",
                 "nullable": True,
             },
-            "max_weight": {
+            "weight": {
                 "coerce": to_float,
                 "required": False,
                 "type": "float",

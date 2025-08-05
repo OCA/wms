@@ -7,9 +7,8 @@
             <xpath expr="//group[@name='options']" position="inside">
                 <group
                     name="set_packaging_dimension"
-                    attrs="{'invisible': [('set_packaging_dimension_is_possible', '=', False)]}"
+                    invisible="not set_packaging_dimension_is_possible"
                 >
-                    <field name="set_packaging_dimension_is_possible" invisible="1" />
                     <field name="set_packaging_dimension" />
                 </group>
             </xpath>

@@ -4,8 +4,6 @@
 import json
 import logging
 
-from odoo import SUPERUSER_ID, api
-
 from odoo.addons.shopfloor_base.utils import purge_endpoints, register_new_services
 
 from .services.reception import Reception as Service
@@ -13,9 +11,8 @@ from .services.reception import Reception as Service
 _logger = logging.getLogger(__file__)
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     _logger.info("Add set packaging dimension option on reception scenario")
-    env = api.Environment(cr, SUPERUSER_ID, {})
     scenario = env.ref("shopfloor_reception.scenario_reception")
     options = scenario.options
     options.update({"set_packaging_dimension": True})
@@ -28,9 +25,8 @@ def post_init_hook(cr, registry):
     register_new_services(env, Service)
 
 
-def uninstall_hook(cr, registry):
+def uninstall_hook(env):
     _logger.info("Remove set packaging dimension option on reception scenario")
-    env = api.Environment(cr, SUPERUSER_ID, {})
     scenario = env.ref("shopfloor_reception.scenario_reception")
     options = scenario.options
     if "set_packaging_dimension" in options.keys():
