@@ -8,7 +8,7 @@
     "depends": ["shopfloor_mobile_base", "shopfloor_single_product_transfer"],
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["JuMiSanAr"],
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Warehouse Management",
     "license": "AGPL-3",
     "installable": True,
