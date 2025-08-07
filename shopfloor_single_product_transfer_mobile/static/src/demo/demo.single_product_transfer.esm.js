@@ -3,11 +3,7 @@
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
  */
 
-import {demotools} from "/shopfloor_mobile_base/static/wms/src/demo/demo.core.js";
-
-const DEMO_CASE = {
-    by_menu_id: {},
-};
+import {demotools} from "/shopfloor_mobile_base/static/src/demo/demo.core.esm.js";
 
 const location_src = demotools.makeLocation();
 const picking = demotools.makePicking(
@@ -27,8 +23,20 @@ const single_product_transfer_menu_case = demotools.addAppMenu(
 
 const DEMO_SINGLE_PRODUCT_TRANSFER = {
     start: {
-        next_state: "scan_location",
-        data: {},
+        next_state: "select_location_or_package",
+        data: {
+            select_location_or_package: {
+                location: location_src,
+            },
+        },
+    },
+    scan_location_or_package: {
+        next_state: "select_product",
+        data: {
+            select_product: {
+                location: location_src,
+            },
+        },
     },
     scan_location: {
         next_state: "select_product",
@@ -43,7 +51,16 @@ const DEMO_SINGLE_PRODUCT_TRANSFER = {
         data: {
             set_quantity: {
                 picking,
-                selected_move_line,
+                move_line: selected_move_line,
+            },
+        },
+    },
+    scan_product__action_cancel: {
+        next_state: "set_quantity",
+        data: {
+            set_quantity: {
+                picking,
+                move_line: selected_move_line,
             },
         },
     },
@@ -86,6 +103,8 @@ const DEMO_SINGLE_PRODUCT_TRANSFER = {
     },
 };
 
-DEMO_CASE.by_menu_id[single_product_transfer_menu_case] = DEMO_SINGLE_PRODUCT_TRANSFER;
-
-demotools.add_case("single_product_transfer", DEMO_CASE);
+demotools.add_case(
+    "single_product_transfer",
+    single_product_transfer_menu_case,
+    DEMO_SINGLE_PRODUCT_TRANSFER
+);
