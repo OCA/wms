@@ -272,8 +272,8 @@ const SingleProductTransfer = {
                         );
                     },
                     on_back: () => {
-                        $instance.state_to("set_quantity");
-                        $instance.reset_notification();
+                        this.state_to("set_quantity");
+                        this.reset_notification();
                     },
                 },
                 show_completion_info: {
