@@ -302,6 +302,13 @@ const Reception = {
         picking_detail_options_for_set_lot: function () {
             return {
                 key_title: "product.display_name",
+                title_action_field: {
+                    action_val_path: function (record, field) {
+                        return record.product.barcode
+                            ? "product.barcode"
+                            : "product.default_code";
+                    },
+                },
                 fields: [
                     {
                         path: "product.supplier_code",
