@@ -3,8 +3,8 @@
  * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
  */
 
-import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/src/scenario/mixins.esm.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const SingleProductTransfer = {
     mixins: [ScenarioBaseMixin],
