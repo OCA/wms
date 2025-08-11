@@ -1147,7 +1147,7 @@ class ClusterPicking(Component):
 
     def _unload_write_destination_on_lines(self, lines, location):
         stock = self._actions_for("stock")
-        stock.set_destination_and_unload_lines(lines, location)
+        stock.set_destination_on_lines(lines, location)
         lines.write({"shopfloor_unloaded": True})
         for picking in lines.batch_id.picking_ids:
             picking_lines = lines.filtered(lambda x, p=picking: x.picking_id == p)

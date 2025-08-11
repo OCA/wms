@@ -266,11 +266,9 @@ class StockAction(Component):
             lines_without_package_level.location_dest_id = location_dest
             lines_without_package_level.move_id.location_dest_id = location_dest
 
-    def _unload_package(self, lines):
+    def unload_package(self, lines):
         lines.result_package_id = False
 
-    def set_destination_and_unload_lines(self, lines, location_dest, unload=False):
+    def set_destination_on_lines(self, lines, location_dest):
         self._lock_lines(lines)
         self._set_destination_on_lines(lines, location_dest)
-        if unload:
-            self._unload_package(lines)

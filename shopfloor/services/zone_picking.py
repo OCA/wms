@@ -1586,9 +1586,9 @@ class ZonePicking(Component):
 
     def _write_destination_on_lines(self, lines, location):
         stock = self._actions_for("stock")
-        stock.set_destination_and_unload_lines(
-            lines, location, unload=self.work.menu.unload_package_at_destination
-        )
+        stock.set_destination_on_lines(lines, location)
+        if self.work.menu.unload_package_at_destination:
+            stock.unload_package(lines)
 
     def unload_split(self):
         """Indicates that now the buffer must be treated line per line

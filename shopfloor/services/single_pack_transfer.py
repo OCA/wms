@@ -267,9 +267,7 @@ class SinglePackTransfer(Component):
 
     def _set_destination_and_done(self, package_level, scanned_location):
         stock = self._actions_for("stock")
-        stock.set_destination_and_unload_lines(
-            package_level.move_line_ids, scanned_location
-        )
+        stock.set_destination_on_lines(package_level.move_line_ids, scanned_location)
         stock.put_package_level_in_move(package_level)
         stock.validate_moves(package_level.move_line_ids.move_id)
 
