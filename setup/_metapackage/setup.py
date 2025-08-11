@@ -62,6 +62,7 @@ setuptools.setup(
         'odoo14-addon-stock_dynamic_routing_checkout_sync',
         'odoo14-addon-stock_dynamic_routing_reserve_rule',
         'odoo14-addon-stock_full_location_reservation',
+        'odoo14-addon-stock_full_location_reservation_on_assign',
         'odoo14-addon-stock_move_source_relocate',
         'odoo14-addon-stock_move_source_relocate_dynamic_routing',
         'odoo14-addon-stock_picking_completion_info',
