@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-07-22 09:36+0000\n"
+"PO-Revision-Date: 2025-08-16 13:25+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -1661,7 +1661,7 @@ msgstr "Il record su cui si stava lavorando non esiste più."
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
 msgid "The split order {} has been created."
-msgstr "L'ordine sddiviso {} è stato creato."
+msgstr "L'ordine suddiviso {} è stato creato."
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
