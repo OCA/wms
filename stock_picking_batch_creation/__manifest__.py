@@ -5,7 +5,7 @@
     "name": "Stock Picking Batch Creation",
     "summary": """
         Create a batch of pickings to be processed all together""",
-    "version": "16.0.1.0.0",
+    "version": "16.0.2.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
@@ -16,6 +16,7 @@
         "delivery",  # weight on picking
         "stock_picking_batch",
         "stock_picking_volume",  # OCA/stock-logistics-warehouse
+        "stock_split_picking_dimension",  # OCA/stock-logistics-workflow
     ],
     "data": [
         "views/stock_device_type.xml",

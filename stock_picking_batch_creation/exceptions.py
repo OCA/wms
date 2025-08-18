@@ -6,7 +6,8 @@ from odoo.exceptions import UserError
 
 
 class NoPickingCandidateError(UserError):
-    def __init__(self):
+    def __init__(self, env):
+        self.env = env
         super(NoPickingCandidateError, self).__init__(
             _("no candidate pickings to batch")
         )
@@ -14,6 +15,7 @@ class NoPickingCandidateError(UserError):
 
 class PickingCandidateNumberLineExceedError(UserError):
     def __init__(self, picking, max_line):
+        self.env = picking.env
         self.picking = picking
         super(PickingCandidateNumberLineExceedError, self).__init__(
             _(
@@ -28,7 +30,8 @@ class PickingCandidateNumberLineExceedError(UserError):
 
 
 class NoSuitableDeviceError(UserError):
-    def __init__(self, pickings):
+    def __init__(self, env, pickings):
+        self.env = env
         self.pickings = pickings
         message = _("No device found for batch picking.")
         if pickings:
@@ -37,3 +40,12 @@ class NoSuitableDeviceError(UserError):
                 names=", ".join(self.pickings.mapped("name")),
             )
         super(NoSuitableDeviceError, self).__init__(message)
+
+
+class PickingSplitNotPossibleError(UserError):
+    def __init__(self, picking):
+        self.env = picking.env
+        self.picking = picking
+        super(PickingSplitNotPossibleError, self).__init_(
+            _("Picking %(name)s cannot be split", name=self.picking.name)
+        )
