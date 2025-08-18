@@ -52,9 +52,29 @@
                         t-elif="line.availability_status == 'no'"
                         name="availability_status_no"
                     >No</span>
-            </t>
-          </td>
-      </xpath>
+                </t>
+            </td>
+        </xpath>
+
+        <xpath expr="//div[@name='expiration_date']" position="after">
+            <div
+                t-if="doc.is_ok_expected_delivery_date"
+                class="col"
+                name="expected_delivery_date"
+            >
+                <strong>Expected delivery</strong>
+                <div
+                    t-if="doc.commitment_date"
+                    t-field="doc.commitment_date"
+                    t-options="{'widget': 'date'}"
+                />
+                <div
+                    t-else=""
+                    t-field="doc.expected_date"
+                    t-options="{'widget': 'date'}"
+                />
+            </div>
+        </xpath>
     </template>
 
 </odoo>

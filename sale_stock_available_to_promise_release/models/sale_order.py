@@ -10,6 +10,9 @@ class SaleOrder(models.Model):
     move_need_release_count = fields.Integer(
         string="Moves Need Release", compute="_compute_move_need_release_count"
     )
+    is_ok_expected_delivery_date = fields.Boolean(
+        compute="_compute_is_ok_expected_delivery_date"
+    )
 
     @api.depends("picking_ids.move_ids.need_release")
     def _compute_move_need_release_count(self):
@@ -17,6 +20,24 @@ class SaleOrder(models.Model):
             sale.move_need_release_count = len(
                 sale.picking_ids.move_ids.filtered("need_release")
             )
+
+    @api.depends("expected_date", "order_line.availability_status")
+    def _compute_is_ok_expected_delivery_date(self):
+        for sale in self:
+            if not (sale.commitment_date or sale.expected_date):
+                sale.is_ok_expected_delivery_date = False
+                continue
+            for line in sale.order_line:
+                if (
+                    not line.display_type
+                    and not line.is_delivery
+                    and not line.product_id.type == "service"
+                    and line.availability_status in ("full", "partial", "on_order")
+                ):
+                    sale.is_ok_expected_delivery_date = True
+                    break
+            else:
+                sale.is_ok_expected_delivery_date = False
 
     def action_open_move_need_release(self):
         self.ensure_one()
