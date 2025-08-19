@@ -195,3 +195,11 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "schema": self.schemas_detail.packaging_detail(),
             },
         }
+
+    def _set_packaging_dimension_next_states(self):
+        return {"set_packaging_dimension", "set_quantity"}
+
+    def set_packaging_dimension(self):
+        return self._response_schema(
+            next_states=self._set_packaging_dimension_next_states()
+        )
