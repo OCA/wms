@@ -11,7 +11,9 @@ from odoo.addons.shopfloor.utils import to_float
 class Reception(Component):
     _inherit = "shopfloor.reception"
 
-    packaging_update_done = False
+    def __init__(self, work_context):
+        super().__init__(work_context)
+        self.packaging_update_done = False
 
     def _before_state__set_quantity(self, picking, line, message=None):
         """Show the packaging dimension screen before the set quantity screen."""
