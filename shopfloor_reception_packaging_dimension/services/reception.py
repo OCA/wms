@@ -72,7 +72,7 @@ class Reception(Component):
         """Set the dimension on a product packaging.
 
         If the user cancel the dimension update we still propose the next
-        possible packgaging.
+        possible packaging.
 
         Transitions:
             - set_packaging_dimension: if more packaging needs dimension
