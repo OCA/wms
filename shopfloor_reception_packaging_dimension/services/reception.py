@@ -61,10 +61,15 @@ class Reception(Component):
             data={
                 "picking": self.data.picking(picking),
                 "selected_move_line": self.data.move_line(line),
-                "packaging": self.data_detail.packaging_detail(packaging),
+                "packaging": self._set_packaging_dimension_data_for_packaging(
+                    packaging
+                ),
             },
             message=message,
         )
+
+    def _set_packaging_dimension_data_for_packaging(self, packaging):
+        return self.data_detail.packaging_detail(packaging)
 
     def set_packaging_dimension(
         self, picking_id, selected_line_id, packaging_id, cancel=False, **kwargs
@@ -192,10 +197,13 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {"type": "dict", "schema": self.schemas.move_line()},
-            "packaging": {
-                "type": "dict",
-                "schema": self.schemas_detail.packaging_detail(),
-            },
+            "packaging": self._schema_packaging(),
+        }
+
+    def _schema_packaging(self):
+        return {
+            "type": "dict",
+            "schema": self.schemas_detail.packaging_detail(),
         }
 
     def _set_packaging_dimension_next_states(self):
