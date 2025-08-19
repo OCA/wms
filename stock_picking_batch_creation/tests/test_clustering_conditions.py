@@ -1,7 +1,12 @@
 # Copyright 2021 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from ..exceptions import NoSuitableDeviceError, PickingCandidateNumberLineExceedError
+from odoo.tests import RecordCapturer
+
+from ..exceptions import (
+    NoSuitableDeviceError,
+    PickingCandidateNumberLineExceedError,
+)
 from .common import ClusterPickingCommonFeatures
 
 
@@ -447,8 +452,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(PickingCandidateNumberLineExceedError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
 
     def test_picking_split_with_weight_exceed(self):
@@ -484,8 +491,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(NoSuitableDeviceError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
 
     def test_picking_split_with_volume_exceed(self):
@@ -529,8 +538,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(NoSuitableDeviceError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
 
     def test_picking_split_priority(self):
@@ -580,5 +591,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         # if the split_picking_exceeding_limits is set to True.
         # then pick3 should be split and processed first
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
