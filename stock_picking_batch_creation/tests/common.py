@@ -145,27 +145,23 @@ class ClusterPickingCommonFeatures(TransactionCase):
         return cls.env["res.partner"].create({"name": name, "ref": ref})
 
     @classmethod
-    def _create_product(
-        cls, name, weight, length, height, width, uom_id=None, product_type=None
-    ):
-        if not uom_id:
-            uom_id = cls.uom_id
-        if not product_type:
-            product_type = "product"
-        volume = length * height * width
-        return cls.env["product.product"].create(
-            {
-                "name": name,
-                "uom_id": uom_id,
-                "type": product_type,
-                "weight": weight,
-                "product_length": length,
-                "product_height": height,
-                "product_width": width,
-                "volume": volume,
-                "dimensional_uom_id": cls.uom_m.id,
-            }
-        )
+    def _create_product(cls, name, weight, length, height, width, **kwargs):
+        vals = {
+            "name": name,
+            "weight": weight,
+            "product_length": length,
+            "product_height": height,
+            "product_width": width,
+            "dimensional_uom_id": cls.uom_m.id,
+            **kwargs,
+        }
+        if vals.get("type", "consu") == "consu" and "is_storable" not in vals:
+            vals["is_storable"] = True
+        if "uom_id" not in vals:
+            vals["uom_id"] = cls.uom_id
+        if "volume" not in vals:
+            vals["volume"] = length * height * width
+        return cls.env["product.product"].create(vals)
 
     @classmethod
     def _create_device(
