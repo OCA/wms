@@ -11,8 +11,11 @@
     "maintainers": ["TDu"],
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["shopfloor_reception"],
-    "data": ["views/shopfloor_menu.xml"],
+    "depends": ["shopfloor_reception", "product_packaging_level"],
+    "data": [
+        "views/product_packaging_level.xml",
+        "views/shopfloor_menu.xml",
+    ],
     "post_init_hook": "post_init_hook",
     "uninstall_hook": "uninstall_hook",
 }

@@ -14,6 +14,17 @@ class TestSetPackDimension(CommonCase):
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )
+        cls.default_packaging_level = cls.env[
+            "product.packaging"
+        ].default_packaging_level_id()
+        cls.default_packaging_level.sudo().write(
+            {
+                "shopfloor_collect_length": True,
+                "shopfloor_collect_width": True,
+                "shopfloor_collect_height": True,
+                "shopfloor_collect_weight": True,
+            }
+        )
         # Picking has 3 products
         # Product A with one packaging
         # Product B with no packaging
@@ -67,6 +78,66 @@ class TestSetPackDimension(CommonCase):
         )
         self._assert_response_set_dimension(
             response, self.picking, selected_move_line, self.product_a_packaging
+        )
+
+    def test_scan_product_dimension_already_defined(self):
+        self.product_a.tracking = "none"
+        self.product_a_packaging.write(
+            {
+                "packaging_length": 10.0,
+                "width": 5.0,
+                "height": 2.0,
+                "weight": 1.5,
+            }
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": self.picking.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        selected_move_line = self.picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "confirmation_required": None,
+                "picking": self.data.picking(self.picking),
+                "selected_move_line": [self.data.move_line(selected_move_line)],
+            },
+        )
+
+    def test_scan_product_dimension_not_needed(self):
+        self.product_a.tracking = "none"
+        self.default_packaging_level.sudo().write(
+            {
+                "shopfloor_collect_length": False,
+                "shopfloor_collect_width": False,
+                "shopfloor_collect_height": False,
+                "shopfloor_collect_weight": False,
+            }
+        )
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": self.picking.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        selected_move_line = self.picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "confirmation_required": None,
+                "picking": self.data.picking(self.picking),
+                "selected_move_line": [self.data.move_line(selected_move_line)],
+            },
         )
 
     def test_scan_lot_ask_for_dimension(self):

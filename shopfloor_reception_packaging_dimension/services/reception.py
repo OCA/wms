@@ -28,16 +28,30 @@ class Reception(Component):
     def _get_domain_packaging_needs_dimension(self):
         return expression.OR(
             [
-                [("packaging_length", "=", 0)],
-                [("packaging_length", "=", False)],
-                [("width", "=", 0)],
-                [("width", "=", False)],
-                [("height", "=", 0)],
-                [("height", "=", False)],
-                [("weight", "=", 0)],
-                [("weight", "=", False)],
-                [("qty", "=", 0)],
-                [("qty", "=", False)],
+                [
+                    ("packaging_level_id.shopfloor_collect_length", "=", True),
+                    "|",
+                    ("packaging_length", "=", 0),
+                    ("packaging_length", "=", False),
+                ],
+                [
+                    ("packaging_level_id.shopfloor_collect_width", "=", True),
+                    "|",
+                    ("width", "=", 0),
+                    ("width", "=", False),
+                ],
+                [
+                    ("packaging_level_id.shopfloor_collect_height", "=", True),
+                    "|",
+                    ("height", "=", 0),
+                    ("height", "=", False),
+                ],
+                [
+                    ("packaging_level_id.shopfloor_collect_weight", "=", True),
+                    "|",
+                    ("weight", "=", 0),
+                    ("weight", "=", False),
+                ],
                 [("barcode", "=", False)],
             ]
         )
@@ -93,7 +107,6 @@ class Reception(Component):
         elif not cancel and self._check_dimension_to_update(kwargs):
             self._update_packaging_dimension(packaging, kwargs)
             message = self.msg_store.packaging_dimension_updated(packaging)
-
         if packaging:
             next_packaging = self._get_next_packaging_to_set_dimension(
                 selected_line.product_id, packaging
