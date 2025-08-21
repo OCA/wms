@@ -1,0 +1,1 @@
+In a warehouse where the pickings are released based on the available to promise, it could happen that between the release of a picking and its processing, changes in the stock levels make the products no longer available to promise. In this case, it could be useful to automatically unrelease the related moves to avoid keeping into your pickings moves that cannot be processed.

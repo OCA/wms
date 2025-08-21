@@ -1,0 +1,1 @@
+To enable automatic unrelease of stock moves, you need to tick the "Unrelease on unavailable to promise"" option in the picking type configuration where this process should apply.
