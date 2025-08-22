@@ -101,6 +101,10 @@ class Reception(Component):
     def filter_today_scheduled_pickings(self):
         return self.work.menu.filter_today_scheduled_pickings
 
+    @property
+    def reception_display_move_lines(self):
+        return self.work.menu.reception_display_move_lines
+
     # DOMAIN METHODS
 
     def _domain_move_line_by_packaging(self, packaging):
@@ -150,7 +154,12 @@ class Reception(Component):
         return self._response_for_select_move(picking)
 
     def _response_for_select_move(self, picking, message=None):
-        data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
+        if self.reception_display_move_lines:
+            data = {
+                "picking": self._data_for_stock_picking(picking, with_move_lines=True)
+            }
+        else:
+            data = {"picking": self._data_for_stock_picking(picking, with_lines=True)}
         return self._response(next_state="select_move", data=data, message=message)
 
     def _response_for_confirm_done(self, picking, message=None):
@@ -714,12 +723,18 @@ class Reception(Component):
 
     # DATA METHODS
 
-    def _data_for_stock_picking(self, picking, with_lines=False, **kw):
+    def _data_for_stock_picking(
+        self, picking, with_lines=False, with_move_lines=False, **kw
+    ):
         if "with_progress" not in kw:
             kw["with_progress"] = True
         data = self.data.picking(picking, **kw)
         if with_lines:
             data.update({"moves": self._data_for_moves(picking.move_ids)})
+        if with_move_lines:
+            data.update(
+                {"move_lines": self._data_for_move_lines(picking.move_line_ids)}
+            )
         return data
 
     def _data_for_stock_pickings(self, pickings, with_lines=False):
@@ -973,6 +988,11 @@ class Reception(Component):
         move = self.env["stock.move"].browse(move_id)
         picking = move.picking_id
         return self._scan_line__find_or_create_line(picking, move)
+
+    def manual_select_move_line(self, move_line_id):
+        move_line = self.env["stock.move.line"].browse(move_line_id)
+        picking = move_line.picking_id
+        return self._scan_line__assign_user(picking, move_line, move_line.qty_done)
 
     def done_action(self, picking_id, confirmation=False):
         """Mark a picking as done
@@ -1473,6 +1493,11 @@ class ShopfloorReceptionValidator(Component):
             "move_id": {"required": True, "type": "integer"},
         }
 
+    def manual_select_move_line(self):
+        return {
+            "move_line_id": {"required": True, "type": "integer"},
+        }
+
     def set_lot(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1777,6 +1802,11 @@ class ShopfloorReceptionValidatorResponse(Component):
         # instead of this method.
         schema = self.schemas.picking()
         schema.update({"moves": self.schemas._schema_list_of(self.schemas.move())})
+        schema["moves"].update({"required": False})
+        schema.update(
+            {"move_lines": self.schemas._schema_list_of(self.schemas.move_line())}
+        )
+        schema["move_lines"].update({"required": False})
         return schema
 
     # ENDPOINTS

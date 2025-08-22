@@ -17,8 +17,17 @@
                     />
                     <field name="filter_today_scheduled_pickings" />
                 </group>
+                <group
+                    name="reception_display_move_lines"
+                    attrs="{'invisible': [('reception_display_move_lines_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="reception_display_move_lines_is_possible"
+                        invisible="1"
+                    />
+                    <field name="reception_display_move_lines" />
+                </group>
             </group>
         </field>
     </record>
-
 </odoo>

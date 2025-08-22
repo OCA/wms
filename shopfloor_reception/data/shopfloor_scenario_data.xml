@@ -11,7 +11,8 @@
       "auto_post_line": true,
       "allow_return": true,
       "scan_location_or_pack_first": true,
-      "allow_filter_today_scheduled_pickings": true
+      "allow_filter_today_scheduled_pickings": true,
+      "allow_reception_display_move_lines": false
 }
       </field>
   </record>
