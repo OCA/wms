@@ -85,12 +85,21 @@ export const reception_states = function () {
                 );
             },
             on_select: (selected) => {
-                this.wait_call(
-                    this.odoo.call("manual_select_move", {
-                        move_id: selected.id,
-                    })
-                );
+                if (_.has(selected, "qty_done")) {
+                    this.wait_call(
+                        this.odoo.call("manual_select_move_line", {
+                            move_line_id: selected.id,
+                        })
+                    );
+                } else {
+                    this.wait_call(
+                        this.odoo.call("manual_select_move", {
+                            move_id: selected.id,
+                        })
+                    );
+                }
             },
+
             on_cancel: () => {
                 // TODO: this endpoing is currently missing in the backend,
                 // and it's currently in the roadmap.
