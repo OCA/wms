@@ -11,6 +11,14 @@ pickings with the ones that are scheduled for today.
 class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
 
+    dont_use_packs_in_reception = fields.Boolean(
+        compute="_compute_dont_use_packs_in_reception",
+        store=True,
+        readonly=False,
+    )
+    dont_use_packs_in_reception_is_possible = fields.Boolean(
+        compute="_compute_dont_use_packs_in_reception_is_possible",
+    )
     filter_today_scheduled_pickings_is_possible = fields.Boolean(
         compute="_compute_filter_today_scheduled_pickings_is_possible"
     )
@@ -18,6 +26,20 @@ class ShopfloorMenu(models.Model):
         default=False,
         help=FILTER_TODAY_SCHEDULED_PICKINGS_HELP,
     )
+
+    @api.depends("scenario_id")
+    def _compute_dont_use_packs_in_reception_is_possible(self):
+        for menu in self:
+            menu.dont_use_packs_in_reception_is_possible = bool(
+                menu.scenario_id.has_option("allow_dont_use_packs_in_reception")
+            )
+
+    @api.depends("dont_use_packs_in_reception_is_possible")
+    def _compute_dont_use_packs_in_reception(self):
+        for menu in self:
+            menu.dont_use_packs_in_reception = (
+                menu.dont_use_packs_in_reception_is_possible
+            )
 
     @api.depends("scenario_id")
     def _compute_filter_today_scheduled_pickings_is_possible(self):

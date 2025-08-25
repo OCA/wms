@@ -132,6 +132,33 @@ class TestSetQuantity(CommonCase):
         )
         self.assertEqual(selected_move_line.qty_done, 4.0)
 
+    def test_scan_product_dont_use_packs(self):
+        self.service.work.menu.sudo().dont_use_packs_in_reception = True
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": None,
+                "dont_use_packs": True,
+            },
+        )
+
     def test_scan_packaging(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(

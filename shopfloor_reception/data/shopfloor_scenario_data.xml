@@ -8,6 +8,7 @@
       <field name="key">reception</field>
       <field name="options_edit">
 {
+      "allow_dont_use_packs_in_reception": false,
       "auto_post_line": true,
       "allow_return": true,
       "scan_location_or_pack_first": true,

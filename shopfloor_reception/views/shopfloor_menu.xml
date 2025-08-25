@@ -8,6 +8,16 @@
         <field name="arch" type="xml">
             <group name="options" position="inside">
                 <group
+                    name="dont_use_packs_in_reception"
+                    attrs="{'invisible': [('dont_use_packs_in_reception_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="dont_use_packs_in_reception_is_possible"
+                        invisible="1"
+                    />
+                    <field name="dont_use_packs_in_reception" />
+                </group>
+                <group
                     name="filter_today_scheduled_pickings"
                     attrs="{'invisible': [('filter_today_scheduled_pickings_is_possible', '=', False)]}"
                 >

@@ -817,13 +817,17 @@ class Reception(Component):
     def _response_for_set_quantity(
         self, picking, line, message=None, asking_confirmation=None
     ):
+        data = {
+            "selected_move_line": self._data_for_move_lines(line),
+            "picking": self.data.picking(picking),
+            "confirmation_required": asking_confirmation,
+        }
+        dont_use_packs = self.work.menu.dont_use_packs_in_reception
+        if dont_use_packs:
+            data.update({"dont_use_packs": True})
         response = self._response(
             next_state="set_quantity",
-            data={
-                "selected_move_line": self._data_for_move_lines(line),
-                "picking": self.data.picking(picking),
-                "confirmation_required": asking_confirmation,
-            },
+            data=data,
             message=message,
         )
         return self._align_display_product_uom_qty(line, response)
@@ -1717,6 +1721,11 @@ class ShopfloorReceptionValidatorResponse(Component):
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "confirmation_required": {
                 "type": "string",
+                "nullable": True,
+                "required": False,
+            },
+            "dont_use_packs": {
+                "type": "boolean",
                 "nullable": True,
                 "required": False,
             },
