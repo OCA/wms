@@ -134,19 +134,24 @@ const Reception = {
                     />
                 </v-card>
                 <div class="button-list button-vertical-list full">
-                    <v-row align="center">
+                    <v-row v-if="use_packs" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_add_to_existing_pack">Existing pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row v-if="use_packs" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_create_new_pack">New pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row v-if="use_packs" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_process_without_pack">Process without pack</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="!use_packs" align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action @click="state.on_process_without_pack">Process</btn-action>
                         </v-col>
                     </v-row>
                     <div class="button-list button-vertical-list full">
@@ -213,6 +218,10 @@ const Reception = {
         </Screen>
     `,
     computed: {
+        use_packs: function () {
+            var dont_use_packs = _.result(this.state, "data.dont_use_packs", false);
+            return !dont_use_packs;
+        },
         visible_pickings: function () {
             return !_.isEmpty(this.filtered_pickings)
                 ? this.filtered_pickings
