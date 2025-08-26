@@ -45,6 +45,93 @@ class TestSelectLine(CommonCase):
             },
         )
 
+    def test_scan_product_partial(self):
+        # Scan a line
+        # Set a partial quantity done
+        # Try to scan the product again
+        # The selected line should be the other one
+        picking = self._create_picking()
+        lot = self._create_lot()
+        self.assertFalse(picking.printed)
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+
+        # Activate INPUT location
+        selected_move_line.location_dest_id.sudo().active = True
+
+        selected_move_line.lot_id = lot
+        response = self.service.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": lot.name},
+        )
+        data = self.data.picking(picking)
+
+        self.assertTrue(selected_move_line.picking_id.printed)
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": None,
+            },
+        )
+
+        selected_move_line.shopfloor_user_id = self.env.uid
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 5.0,
+            },
+        )
+
+        response = self.service.dispatch(
+            "process_without_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 5.0,
+            },
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_destination",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+        )
+
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": "INPUT",
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+        )
+        lines = picking.move_line_ids.filtered(lambda l: l.product_id == self.product_a)
+        self.assertEqual(2, len(lines))
+        previous_line = selected_move_line
+
+        response = self.service.dispatch(
+            "scan_line",
+            params={"picking_id": picking.id, "barcode": lot.name},
+        )
+
+        self.assertNotEqual(
+            previous_line.id, response["data"]["set_lot"]["selected_move_line"][0]["id"]
+        )
+
     def test_scan_packaging(self):
         picking = self._create_picking()
         self._add_package(picking)
