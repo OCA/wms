@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* shopfloor_packing
+#	* shopfloor_cluster_picking_repack
 #
 msgid ""
 msgstr ""
@@ -15,81 +15,81 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
-#. module: shopfloor_packing
-#: model:ir.model.fields,help:shopfloor_packing.field_stock_picking_is_shopfloor_packing_todo
-#: model:ir.model.fields,help:shopfloor_packing.field_stock_picking_wave_is_shopfloor_packing_todo
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_stock_picking_is_shopfloor_packing_todo
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_stock_picking_wave_is_shopfloor_packing_todo
 msgid "If set, some operations need to be packed by the operator"
 msgstr "Si coché, le contenu des bacs doit encore être mis en boîte par l'opérateur"
 
-#. module: shopfloor_packing
-#: model:ir.model.fields,help:shopfloor_packing.field_shopfloor_menu_pack_pickings
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_shopfloor_menu_pack_pickings
 msgid "If you tick this box, all the picked item will be put in pack before the transfer."
 msgstr "Si cochée, les produits devront être mis en boîte à la fin de la préparation."
 
-#. module: shopfloor_packing
-#: model:ir.model,name:shopfloor_packing.model_shopfloor_menu
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
 msgstr "Menu affiché dans l'application du scanner"
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/actions/message.py:27
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:27
 #, python-format
 msgid "Not able to put in pack transfer {}."
 msgstr "Impossible d'emballer le transfert {}."
 
-#. module: shopfloor_packing
-#: model:ir.model.fields,field_description:shopfloor_packing.field_stock_picking_is_shopfloor_packing_todo
-#: model:ir.model.fields,field_description:shopfloor_packing.field_stock_picking_wave_is_shopfloor_packing_todo
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_stock_picking_is_shopfloor_packing_todo
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_stock_picking_wave_is_shopfloor_packing_todo
 msgid "Operations need to be packed"
 msgstr "Des produits doivent être emballés"
 
-#. module: shopfloor_packing
-#: model:ir.model.fields,field_description:shopfloor_packing.field_shopfloor_menu_pack_pickings
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_shopfloor_menu_pack_pickings
 msgid "Pack pickings"
 msgstr "Emballer les préparations"
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/models/shopfloor_menu.py:33
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/models/shopfloor_menu.py:33
 #, python-format
 msgid "Pack pickings is not allowed for menu {}."
 msgstr "L'emballage des préparations n'est pas supporté par le menu {}."
 
-#. module: shopfloor_packing
-#: model:ir.model.fields,field_description:shopfloor_packing.field_shopfloor_menu_pack_pickings_is_possible
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_shopfloor_menu_pack_pickings_is_possible
 msgid "Pack pickings is possible"
 msgstr "L'emballage des préparations n'est pas possible"
 
-#. module: shopfloor_packing
-#: model:ir.model,name:shopfloor_packing.model_stock_picking_wave
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_stock_picking_wave
 msgid "Picking Wave"
 msgstr "Vague de préparation"
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/actions/message.py:21
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:21
 #, python-format
 msgid "The number of packages must be greater than 0."
 msgstr "Le nombre de boîtes doit est > 0."
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/actions/message.py:33
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:33
 #, python-format
 msgid "The scanned package '{}' must be internal."
 msgstr "The scanned package '{}' must be internal."
 
-#. module: shopfloor_packing
-#: model:ir.model,name:shopfloor_packing.model_stock_picking
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_stock_picking
 msgid "Transfer"
 msgstr "Transfert"
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/actions/message.py:15
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:15
 #, python-format
 msgid "Transfer {} already packed."
 msgstr "La préparation {} est déjà emballée."
 
 
-#. module: shopfloor_packing
-#: code:addons/shopfloor_packing/actions/message.py:49
+#. module: shopfloor_cluster_picking_repack
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:49
 #, python-format
 msgid "Transfer {} has been packed successfully."
 msgstr "La préparation {} a été emballée avec succès."
