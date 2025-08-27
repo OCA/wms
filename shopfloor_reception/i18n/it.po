@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-07-07 08:53+0000\n"
+"PO-Revision-Date: 2025-08-27 15:25+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -52,7 +52,7 @@ msgstr "Menu visualizzato nell'applicazione di scansione"
 #. module: shopfloor_reception
 #: model:ir.model,name:shopfloor_reception.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr ""
+msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
