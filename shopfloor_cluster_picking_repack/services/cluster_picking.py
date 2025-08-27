@@ -14,7 +14,6 @@ from .packing import PackingAction
 
 
 class ClusterPicking(Component):
-
     _inherit = "shopfloor.cluster.picking"
 
     # PUBLIC METHODS - ENDPOINTS

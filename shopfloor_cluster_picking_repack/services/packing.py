@@ -9,7 +9,6 @@ from odoo.addons.stock.models.stock_picking import Picking
 
 
 class PackingAction(Component):
-
     _name = "shopfloor.packing.action"
     _inherit = "shopfloor.process.action"
     _usage = "packing"

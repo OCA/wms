@@ -5,7 +5,6 @@ from odoo.addons.component.core import Component
 
 
 class ShopfloorSchemaAction(Component):
-
     _inherit = "shopfloor.schema.action"
 
     def package(self, with_packaging=False):
