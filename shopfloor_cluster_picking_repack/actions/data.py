@@ -27,7 +27,9 @@ class DataAction(Component):
             "selected_move_lines": self.move_lines(lines.sorted()),
             "picking": self.picking(picking),
             "packing_info": self._data_for_packing_info(picking),
-            # "no_package_enabled": not self.options.get("checkout__disable_no_package"),
+            # "no_package_enabled": (
+            #     not self.options.get("checkout__disable_no_package"),
+            # )
             # Used by inheriting module
             "package_allowed": True,
         }
@@ -47,7 +49,7 @@ class DataAction(Component):
     def _pack_picking_move_lines(self, record):
         return {
             "id": record.id,
-            "qty_done": record.qty_done,
+            "qty_done": record.qty_picked,
             "product": self.product(
                 record.product_id or record.package_id.single_product_id
             ),

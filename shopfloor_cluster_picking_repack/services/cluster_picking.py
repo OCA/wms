@@ -40,7 +40,7 @@ class ClusterPicking(Component):
                 selected_lines,
                 message=self.msg_store.no_delivery_packaging_available(),
             )
-        response = self._check_allowed_qty_done(picking, selected_lines)
+        response = self._check_allowed_qty_picked(picking, selected_lines)
         if response:
             return response
         return self._response_for_select_delivery_package_type(
@@ -55,8 +55,8 @@ class ClusterPicking(Component):
         of a selected line, the package is set to be the destination package of
         all the lines to pack.
 
-        When a product is scanned, it selects (set qty_done = reserved qty) or
-        deselects (set qty_done = 0) the move lines for this product. Only
+        When a product is scanned, it selects (set qty_picked = reserved qty) or
+        deselects (set qty_picked = 0) the move lines for this product. Only
         products not tracked by lot can use this.
 
         When a lot is scanned, it does the same as for the products but based
@@ -66,7 +66,7 @@ class ClusterPicking(Component):
         package is created and set as destination of the lines to pack.
 
         Lines to pack are move lines in the list of ``selected_line_ids``
-        where ``qty_done`` > 0 and have not been packed yet
+        where ``picked`` is set and have not been packed yet
         (``shopfloor_checkout_done is False``).
 
         Transitions:
@@ -275,11 +275,11 @@ class ClusterPicking(Component):
         # TODO: Add a hook to avoid re-writing this
         return fields.first(
             picking.move_line_ids.filtered(
-                lambda l: l.qty_done > 0
-                and l.result_package_id.is_internal
+                lambda line: line.picked
+                and line.result_package_id.is_internal
                 # if we are moving the entire package, we shouldn't
                 # add stuff inside it, it's not a new package
-                and l.package_id != l.result_package_id
+                and line.package_id != line.result_package_id
             ).sorted(key="write_date", reverse=True)
         )
 
@@ -371,16 +371,16 @@ class ClusterPicking(Component):
     def _data_for_delivery_package_type(self, packaging, **kw):
         return self.data.delivery_packaging_list(packaging, **kw)
 
-    def _check_allowed_qty_done(self, picking, lines) -> dict:
+    def _check_allowed_qty_picked(self, picking, lines) -> dict:
         for line in lines:
-            # Do not allow to proceed if the qty_done of
+            # Do not allow to proceed if the picked qty of
             # any of the selected lines
             # is higher than the quantity to do.
-            if line.qty_done > line.reserved_uom_qty:
+            if line.qty_picked > line.quantity:
                 return self._response_for_select_package(
                     picking,
                     lines,
-                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(
+                    message=self.msg_store.selected_lines_qty_picked_higher_than_allowed(
                         line
                     ),
                 )

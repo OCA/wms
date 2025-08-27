@@ -10,7 +10,7 @@
                 <group
                     name="pack_pickings"
                     string="Packing"
-                    attrs="{'invisible': [('scenario', '!=', 'cluster_picking')]}"
+                    invisible="scenario_key != 'cluster_picking'"
                 >
                     <field name="pack_pickings" />
                     <field name="default_pack_pickings_action" />

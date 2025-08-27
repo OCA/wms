@@ -322,7 +322,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             data=data,
         )
         line = first(picking.move_line_ids)
-        line.qty_done = line.reserved_qty + 1
+        line.qty_picked = line.quantity + 1
         # Delivery is already done
         response = self.service.dispatch(
             "list_delivery_package_types",
@@ -332,12 +332,8 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "selected_line_ids": lines.ids,
             },
         )
-        message = {
-            "message_type": "warning",
-            "body": "The quantity scanned for one or more lines "
-            "cannot be higher than the maximum allowed. (%s : %s > %s)"
-            % (line.product_id.name, line.qty_done, line.reserved_qty),
-        }
+        msg_store = self.service.msg_store
+        message = msg_store.selected_lines_qty_picked_higher_than_allowed(line)
         data = self.data.select_package(picking, lines.sorted())
         # data  = self.data.pack_picking(next_picking)
         self.assert_response(
