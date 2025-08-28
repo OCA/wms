@@ -122,6 +122,7 @@ const ClusterPicking = {
                 />
 
                 <detail-location-destination-operation
+                    :color="'detail_main_card'"
                     :record="state.data.selected_move_line"
                     :state="'unload_single'"
                 />
