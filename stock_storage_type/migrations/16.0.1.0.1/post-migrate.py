@@ -61,6 +61,16 @@ def _move_location_storage_type(env):
             WHERE slst.id = sscc.old_location_storage_type_id
     """
     openupgrade.logged_query(env.cr, query)
+    query = """
+        UPDATE stock_storage_category ssc
+            SET max_height = slst.max_height
+            FROM stock_location_storage_type slst,
+                 stock_storage_category_capacity sscc
+            WHERE slst.id = sscc.old_location_storage_type_id
+            AND sscc.storage_category_id = ssc.id
+            AND slst.max_height > 0
+    """
+    openupgrade.logged_query(env.cr, query)
 
 
 def _update_location_sequence(env):
