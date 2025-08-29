@@ -17,14 +17,24 @@ msgstr ""
 "X-Generator: Weblate 4.17\n"
 
 #. module: shopfloor_reception_packaging_dimension
-#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__display_name
-msgid "Display Name"
-msgstr "Nome visualizzato"
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+msgid "Collect height"
+msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
-#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__id
-msgid "ID"
-msgstr "ID"
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+msgid "Collect length"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+msgid "Collect weight"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid "Collect width"
+msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
@@ -36,9 +46,9 @@ msgstr ""
 "dell'imballo, chiede di compilarla."
 
 #. module: shopfloor_reception_packaging_dimension
-#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu____last_update
-msgid "Last Modified on"
-msgstr "Ultima modifica il"
+#: model:ir.model,name:shopfloor_reception_packaging_dimension.model_product_packaging_level
+msgid "Level management for product.packaging"
+msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
 #: model:ir.model,name:shopfloor_reception_packaging_dimension.model_shopfloor_menu
@@ -54,3 +64,27 @@ msgstr "È possibile impostare la dimensione dell'imballo"
 #: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
 msgid "Set packaging dimension"
 msgstr "Imposta dimensione imballo"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model_terms:ir.ui.view,arch_db:shopfloor_reception_packaging_dimension.view_product_packaging_level_form
+msgid "Shopfloor"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid ""
+"When marked, shopfloor will require to set this dimension during reception "
+"if undefined on the packaging"
+msgstr ""
+
+#~ msgid "Display Name"
+#~ msgstr "Nome visualizzato"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Ultima modifica il"
