@@ -6,6 +6,7 @@
 import logging
 from collections import defaultdict
 from copy import deepcopy
+from datetime import timedelta
 from operator import itemgetter
 
 import pytz
@@ -20,6 +21,9 @@ from odoo.tools.safe_eval import (
     test_python_expr,
     time as safe_time,
 )
+
+# This limit is arbitrary but we expect to have a delivery slot within this limit
+DELIVERY_DATE_COMPUTATION_LIMIT_DAYS = 120  # in days
 
 _logger = logging.getLogger(__name__)
 
@@ -949,10 +953,12 @@ class StockReleaseChannel(models.Model):
         """
         self.ensure_one()
         best_dt = order_dt
+        limit_dt = order_dt + timedelta(days=DELIVERY_DATE_COMPUTATION_LIMIT_DAYS)
         for step in self._delivery_date_steps:
             funcs = self._delivery_date_generators.get(step)
             if not funcs:
                 continue
+            _logger.debug(f"Compute earliest delivery date for {step}")
             generators = []
             best_generators = []
             start_dt = best_dt
@@ -968,14 +974,23 @@ class StockReleaseChannel(models.Model):
                     best_generators.append(gen)
             # loop until all generators return the same last date
             while len(generators) != len(best_generators):
+                if best_dt > limit_dt:
+                    _logger.debug(
+                        "Computation for earliest delivery date reached the limit"
+                    )
+                    best_dt = None
+                    break
                 for gen in generators:
                     if gen in best_generators:
                         continue
                     best_dt = gen.send(previous_dt := best_dt)
                     if best_dt != previous_dt:
+                        _logger.debug(f"New {step} date {best_dt} from {gen}")
                         best_generators = [gen]
                     else:
                         best_generators.append(gen)
             for gen in generators:
                 gen.close()
+            if best_dt is None:
+                break
         return best_dt

@@ -5,7 +5,12 @@ from freezegun import freeze_time
 
 from odoo import fields
 
-from .common import ReleaseChannelCase, StockReleaseChannelDeliveryDateCommon
+from .common import (
+    FakeModelLoader,
+    ReleaseChannelCase,
+    StockReleaseChannelDeliveryDateCommon,
+    TransactionCase,
+)
 
 to_datetime = fields.Datetime.to_datetime
 
@@ -17,6 +22,32 @@ class TestReleaseChannelDeliveryDateFake(StockReleaseChannelDeliveryDateCommon):
         now = fields.Datetime.now()
         dt = self.channel._get_earliest_delivery_date(self.partner, now)
         self.assertEqual(dt, to_datetime("2025-01-04 10:00:00"))
+
+
+class TestReleaseChannelDeliveryDateImpossible(TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.loader = FakeModelLoader(cls.env, cls.__module__)
+        cls.loader.backup_registry()
+        from .models.generator_test_impossible import StockReleaseChannel
+
+        cls.loader.update_registry((StockReleaseChannel,))
+
+        cls.partner = cls.env.ref("base.main_partner")
+        cls.channel = cls.env.ref("stock_release_channel.stock_release_channel_default")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.loader.restore_registry()
+        return super().tearDownClass()
+
+    @freeze_time("2025-01-02 10:00:00")
+    def test_delivery_date(self):
+        """Test generator on channel object"""
+        now = fields.Datetime.now()
+        dt = self.channel._get_earliest_delivery_date(self.partner, now)
+        self.assertEqual(dt, None)
 
 
 class TestReleaseChannelDeliveryDate(ReleaseChannelCase):
