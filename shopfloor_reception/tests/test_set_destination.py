@@ -17,6 +17,13 @@ class TestSetDestination(CommonCase):
         # for move's dest_location and pick type's dest_location
         line.location_dest_id = cls.location_dest
 
+    @classmethod
+    def _change_dest(cls, move):
+        # Modify the location dest on the move, so we have different children
+        # for move's dest_location and pick type's dest_location
+        move.location_dest_id = cls.location_dest
+        move.picking_id.location_dest_id = cls.location_dest
+
     def test_scan_location_child_of_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
@@ -31,9 +38,17 @@ class TestSetDestination(CommonCase):
                 "location_name": self.shelf2.name,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.shelf2)
+        # scanned location should be child of picking destination or picking type one
+        self.assertEqual(selected_move_line.location_dest_id, self.stock_location)
+        data = self.data.picking(picking)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="set_destination",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+            message={"message_type": "error", "body": "You cannot place it here"},
         )
 
     def test_scan_location_child_of_pick_type_dest_location(self):
@@ -41,7 +56,7 @@ class TestSetDestination(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        self._change_line_dest(selected_move_line)
+        self._change_dest(selected_move_line.move_id)
         response = self.service.dispatch(
             "set_destination",
             params={

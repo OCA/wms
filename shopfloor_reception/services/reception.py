@@ -718,14 +718,11 @@ class Reception(Component):
         if location.usage == "view":
             return (False, False)
 
-        move_dest_location = selected_line.location_dest_id
-        pick_type_dest_location = picking.picking_type_id.default_location_dest_id
-
-        move_dest_location_ok = location.parent_path.startswith(
-            move_dest_location.parent_path
+        move_dest_location_ok = self.is_dest_location_valid(
+            selected_line.move_id, location
         )
-        pick_type_dest_location_ok = location.parent_path.startswith(
-            pick_type_dest_location.parent_path
+        pick_type_dest_location_ok = self.is_dest_location_valid(
+            selected_line.move_id, location, pick_type=True
         )
         if move_dest_location_ok or pick_type_dest_location_ok:
             return (move_dest_location_ok, pick_type_dest_location_ok)
