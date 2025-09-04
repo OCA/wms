@@ -41,7 +41,9 @@ class TestSetQuantityReturn(CommonCaseReturn):
         return {
             "confirmation_required": None,
             "picking": self.data.picking(self.return_picking),
-            "selected_move_line": self.data.move_lines(self.selected_move_line),
+            "selected_move_line": self.data.move_lines(
+                self.selected_move_line, expiration_date=True, lot_name=True
+            ),
         }
 
     def test_set_quantity(self):

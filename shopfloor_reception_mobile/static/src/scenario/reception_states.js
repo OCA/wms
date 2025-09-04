@@ -8,6 +8,9 @@
     Define states for reception scenario.
     @param this VueJS component instance
 */
+
+import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
+
 export const reception_states = function () {
     return {
         init: {
@@ -141,18 +144,24 @@ export const reception_states = function () {
                     // We need to wait for the call to the backend to be over
                     // to update the date-picker-input component
                     // with the expiration_date of the selected lot.
-                    event_hub.$emit("datepicker:newdate", this.line_being_handled.lot);
+                    event_hub.$emit("datepicker:newdate");
                 });
             },
             on_date_picker_selected: (expiration_date) => {
                 // Select expiration_date
-                this.wait_call(
-                    this.odoo.call("set_lot", {
-                        picking_id: this.state.data.picking.id,
-                        selected_line_id: this.line_being_handled.id,
-                        expiration_date: expiration_date,
-                    })
-                );
+                let current_reception_date = this.line_being_handled.expiration_date;
+                if (current_reception_date) {
+                    current_reception_date = current_reception_date.slice(0, 10);
+                }
+                if (expiration_date != current_reception_date) {
+                    this.wait_call(
+                        this.odoo.call("set_lot", {
+                            picking_id: this.state.data.picking.id,
+                            selected_line_id: this.line_being_handled.id,
+                            expiration_date: expiration_date,
+                        })
+                    );
+                }
             },
             on_confirm_action: () => {
                 this.wait_call(

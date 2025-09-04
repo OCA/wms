@@ -6,7 +6,6 @@
 
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
-import event_hub from "/shopfloor_mobile_base/static/wms/src/services/event_hub.js";
 import {reception_states} from "./reception_states.js";
 
 const Reception = {
@@ -23,7 +22,7 @@ const Reception = {
             />
             <date-picker-input
                 v-if="state_is('set_lot')"
-                :handler_to_update_date="get_expiration_date_from_lot"
+                :handler_to_update_date="get_expiration_date_from_line"
                 v-on:date_picker_selected="state.on_date_picker_selected"
             />
             <template v-if="state_is('select_move')">
@@ -319,28 +318,16 @@ const Reception = {
                         label: "Barcode",
                     },
                     {
-                        path: "lot.name",
-                        label: "Lot",
-                        klass: "loud",
-                    },
-                    {
                         path: "lot_name",
                         label: "Lot",
                         klass: "loud",
-                        renderer: (rec, field) => {
-                            if (!rec.lot) {
-                                return rec.lot_name;
-                            } else {
-                                return "";
-                            }
-                        },
                     },
                     {
                         path: "expiration_date",
                         label: "Expiry date",
                         klass: "loud",
                         renderer: (rec, field) => {
-                            if (!rec.lot || !rec.lot.expiration_date) {
+                            if (rec.expiration_date) {
                                 return this.utils.display.render_field_date(rec, field);
                             } else {
                                 return "";
@@ -362,23 +349,19 @@ const Reception = {
                         path: "product.supplier_code",
                         label: "Vendor code",
                     },
-                    {path: "lot.name", label: "Lot"},
                     {
                         path: "lot_name",
                         label: "Lot",
-                        renderer: (rec, field) => {
-                            if (!rec.lot) {
-                                return rec.lot_name;
-                            } else {
-                                return "";
-                            }
-                        },
                     },
                     {
                         path: "expiration_date",
                         label: "Expiry date",
                         renderer: (rec, field) => {
-                            return this.utils.display.render_field_date(rec, field);
+                            if (rec.expiration_date) {
+                                return this.utils.display.render_field_date(rec, field);
+                            } else {
+                                return "";
+                            }
                         },
                     },
                 ],
@@ -516,11 +499,11 @@ const Reception = {
             }
             return !_.isEmpty(expiry_date);
         },
-        get_expiration_date_from_lot: function (lot) {
-            if (!lot.expiration_date) {
+        get_expiration_date_from_line: function () {
+            if (!this.line_being_handled.expiration_date) {
                 return;
             }
-            return lot.expiration_date.split("T")[0];
+            return this.line_being_handled.expiration_date.split("T")[0];
         },
         move_card_color: function (move) {
             if (move.progress === 100) {

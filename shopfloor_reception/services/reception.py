@@ -15,6 +15,8 @@ from odoo.addons.component.core import Component
 from odoo.addons.shopfloor.actions.search import SearchResult
 from odoo.addons.shopfloor.utils import to_float
 
+UNSET = object()
+
 
 class Reception(Component):
     """
@@ -820,17 +822,22 @@ class Reception(Component):
         return self._response(next_state="manual_selection", data=data)
 
     def _response_for_set_lot(self, picking, line, message=None):
-        self._set_lot_from_parse(picking, line)
-        return self._response(
-            next_state="set_lot",
-            data={
-                "selected_move_line": self._data_for_move_lines(
-                    line, expiration_date=True, lot_name=True
-                ),
-                "picking": self.data.picking(picking),
-            },
-            message=message,
-        )
+        # maybe our search result on scan_lne is a multi-tenant barcode
+        # and the lot and expiration date are availabe into the parsed
+        # result
+        response = self._set_lot_from_parse(picking, line)
+        if not response:
+            response = self._response(
+                next_state="set_lot",
+                data={
+                    "selected_move_line": self._data_for_move_lines(
+                        line, expiration_date=True, lot_name=True
+                    ),
+                    "picking": self.data.picking(picking),
+                },
+                message=message,
+            )
+        return response
 
     def _set_lot_from_parse(self, picking, line):
         """
@@ -842,7 +849,7 @@ class Reception(Component):
             - on lot_name if record is not found
             - set expiration date if found in parse result
         """
-        if line.shopfloor_should_create_lot and self.search_result.parse_result:
+        if self.search_result.parse_result:
             expiration_date = None
             lot_name = None
             found = False
@@ -860,7 +867,8 @@ class Reception(Component):
                     and line.product_id.use_expiration_date
                 ):
                     expiration_date = result.value
-
+            # reset the search result to ensure no recursion
+            self.search_result = SearchResult()
             if found:
                 return self.set_lot(picking.id, line.id, lot_name, expiration_date)
 
@@ -911,7 +919,9 @@ class Reception(Component):
         response = self._response(
             next_state="set_quantity",
             data={
-                "selected_move_line": self._data_for_move_lines(line),
+                "selected_move_line": self._data_for_move_lines(
+                    line, expiration_date=True, lot_name=True
+                ),
                 "picking": self.data.picking(picking),
                 "confirmation_required": asking_confirmation,
             },
@@ -1120,8 +1130,9 @@ class Reception(Component):
             # Remove user_id on backorder, if any
             backorders_after.user_id = False
 
+    # flake8: noqa: C901
     def set_lot(
-        self, picking_id, selected_line_id, lot_name=None, expiration_date=None
+        self, picking_id, selected_line_id, lot_name=UNSET, expiration_date=UNSET
     ):
         """Set lot and its expiration date
 
@@ -1146,49 +1157,137 @@ class Reception(Component):
             message = self.msg_store.record_not_found()
             return self._response_for_set_lot(picking, selected_line, message=message)
 
+        # The following combinations are possible:
+        # - lot_name is set, expiration_date is not set
+        # - lot_name is not set, expiration_date is set
+        # - both lot_name and expiration_date are set
+        # To these combinations, we need to add the previously
+        # scanned_lot and expiration_date
+        # It results a lot of possbile combinations for which
+        # we must ensure:
+        # - the unicity of the lot for the product
+        # - the respect of the previously provided values
+        # - the help of the user by providing suggestions
+        # Last but not least, in some cases, the lot_name
+        # could be a multi-tenant barcode providing in addition
+        # to the lot_name the expiration_date.
+
+        # We first start by processing the lot_name. It could
+        # be:
+        # - a single value providing the lot_name
+        # - a multi-tenant barcode providing in addition
+        #   to the lot_name the expiration_date.
+        # If a lot_name is provided:
+        # - we must ensure its unicity for the product
+        # The unicity must be checked against the expiration_date
+        # provided by the user OR already set on the line.
+        # If the unicity is not respected, we must ask the user
+        # to provide a new lot_name or expiration_date.
         find_types = ["lot", "expiration_date"]
-        # Do a first search if multi tenant barcode is used.
-        # If the lot name is passed, let the expiration date
-        # get from interface.
-
         search = self._actions_for("search")
+        scanned_lot = self.env["stock.lot"]
+
         # Search for lot and add product from line as context
-        search_result = search.find(
-            lot_name,
-            find_types,
-            handler_kw=dict(lot=dict(products=selected_line.product_id)),
-        )
+        scanned_expiration_date = UNSET
+        if lot_name != UNSET:
+            search_result = search.find(
+                lot_name,
+                find_types,
+                # no limit to get all lot... may be could get lot with the
+                # different expiration date
+                handler_kw=dict(lot=dict(products=selected_line.product_id)),
+            )
 
-        # Look for an expiration date
-        for result in search_result.parse_result:
-            if result.type == "expiration_date":
-                expiration_date = result.value
+            # Look for an expiration date
+            for result in search_result.parse_result:
+                if result.type == "expiration_date":
+                    scanned_expiration_date = result.value
 
+            if search_result.type == "lot":
+                scanned_lot = search_result.record
+                lot_name = search_result.code
+        else:
+            scanned_lot = selected_line.lot_id or UNSET
+
+        # If scanned_expiration_date is set
+        # and expiration_date is set
+        # and scanned_expiration_date != expiration_date
+        # we warm the user:
+        if scanned_expiration_date != UNSET and expiration_date != UNSET:
+            if fields.Date.to_date(scanned_expiration_date) != fields.Date.to_date(
+                expiration_date
+            ):
+                message = self.msg_store.expiration_date_different_than_scanned(
+                    scanned_expiration_date, expiration_date
+                )
+                return self._response_for_set_lot(
+                    picking, selected_line, message=message
+                )
+
+        # If expiration_date is passed to the method, the priority is:
+        # 1. The scanned_expiration_date if set
+        # 2. The one from the lot if available
+        # 3. The one previously set on the line
+        if expiration_date == UNSET:
+            expiration_date = scanned_expiration_date
+        if expiration_date == UNSET:
+            expiration_date = (
+                scanned_lot.expiration_date or selected_line.expiration_date
+            )
+
+        # If the lot_name is not passed to the method, the priority is:
+        # 1. The one from the first lot found for the expiration_date if specified
+        # 2. The one previously set on the line
+        if lot_name == UNSET:
+            if expiration_date != UNSET:
+                scanned_lot = self.env["stock.lot"].search(
+                    [
+                        (
+                            "expiration_date",
+                            "=",
+                            fields.Date.from_string(expiration_date),
+                        ),
+                        ("product_id", "=", selected_line.product_id.id),
+                        ("company_id", "=", selected_line.env.company.id),
+                    ],
+                    limit=1,
+                )
+            lot_name = scanned_lot.name or selected_line.lot_name
+
+        # Check if we need to use the expiration date
         use_expiration_date = selected_line.product_id.use_expiration_date
-        if use_expiration_date and not expiration_date:
+        if use_expiration_date and (not expiration_date or expiration_date == UNSET):
             message = self.msg_store.expiration_date_missing()
             return self._response_for_set_lot(picking, selected_line, message=message)
-        lot = (
-            search_result.record
-            if search_result.type == "lot"
-            else self.env["stock.lot"].browse()
-        )
-        if lot_name:
-            product = selected_line.product_id
-            if not lot:
-                lot = self.env["stock.lot"].create(
-                    self._create_lot_values(product, lot_name)
+
+        expiration_date = fields.Date.from_string(expiration_date)
+
+        # we check for duplicate:
+        if scanned_lot:
+            if fields.Date.from_string(scanned_lot.expiration_date) != expiration_date:
+                # If the lot has an expiration date, it must be the same
+                message = self.msg_store.lot_already_exists_different_expiration_date(
+                    scanned_lot, expiration_date
                 )
-            selected_line.lot_id = lot.id
+                return self._response_for_set_lot(
+                    picking, selected_line, message=message
+                )
+
+        if scanned_lot:
+            selected_line.lot_id = scanned_lot.id
+            selected_line.expiration_date = False
+            selected_line.lot_name = False
             selected_line._onchange_lot_id()
-        if expiration_date:
-            selected_line.write({"expiration_date": expiration_date})
-            selected_line.lot_id.write({"expiration_date": expiration_date})
+
+        else:
+            selected_line.lot_id = False
+            if lot_name != UNSET:
+                selected_line.lot_name = lot_name
+            if expiration_date != UNSET:
+                selected_line.expiration_date = expiration_date
+
         message = None
-        if (
-            use_expiration_date
-            and fields.Date.to_date(expiration_date) <= fields.Date.today()
-        ):
+        if use_expiration_date and expiration_date <= fields.Date.today():
             message = self.msg_store.expiration_date_past()
         return self._response_for_set_lot(picking, selected_line, message=message)
 

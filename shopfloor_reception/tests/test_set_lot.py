@@ -41,7 +41,7 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(
-                    selected_move_line, lot_name=True
+                    selected_move_line, lot_name=True, expiration_date=True
                 ),
             },
         )
@@ -72,7 +72,7 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(
-                    selected_move_line, lot_name=True
+                    selected_move_line, lot_name=True, expiration_date=True
                 ),
             },
         )
@@ -103,7 +103,7 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(
-                    selected_move_line, lot_name=True
+                    selected_move_line, lot_name=True, expiration_date=True
                 ),
             },
             message={
@@ -127,7 +127,7 @@ class TestSetLot(CommonCase):
                 "lot_name": "FooBar",
             },
         )
-        self.assertEqual(selected_move_line.lot_id.name, "FooBar")
+        self.assertEqual(selected_move_line.lot_name, "FooBar")
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -135,7 +135,7 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(
-                    selected_move_line, lot_name=True
+                    selected_move_line, lot_name=True, expiration_date=True
                 ),
             },
         )
@@ -157,7 +157,7 @@ class TestSetLot(CommonCase):
             },
         )
         # Then, set the expiration date
-        expiration_date = "2022-08-24 12:00:00"
+        expiration_date = "2022-08-24 00:00:00"
         response = self.service.dispatch(
             "set_lot",
             params={
@@ -166,7 +166,6 @@ class TestSetLot(CommonCase):
                 "expiration_date": expiration_date,
             },
         )
-        self.assertEqual(str(lot.expiration_date), expiration_date)
         self.assertEqual(str(selected_move_line.expiration_date), expiration_date)
         data = self.data.picking(picking)
         self.assert_response(
@@ -175,18 +174,49 @@ class TestSetLot(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(
-                    selected_move_line, lot_name=True
+                    selected_move_line, lot_name=True, expiration_date=True
                 ),
             },
         )
+
+    def test_set_lot_expiration_find_date(self):
+        # Check if we start by entering a date, and a lot
+        # already exists with that date, it is used
+        picking = self._create_picking()
+        self.product_a.use_expiration_date = True
+        lot = self._create_lot()
+        expiration_date = fields.Datetime.from_string("2222-07-02")
+        lot.expiration_date = expiration_date
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+        response = self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "expiration_date": "2222-07-02",
+            },
+        )
+
+        message_reponse = response.get("message")
+        self.assertIsNone(message_reponse)
+        self.assertEqual(selected_move_line.lot_id, lot)
+        data = response.get("data").get("set_lot").get("selected_move_line")
+        data = data and data[0] or {}
+        self.assertEqual(data["lot_name"], lot.name)
+        self.assertEqual(data["expiration_date"], "2222-07-02")
 
     def test_set_lot_expiration_from_parse(self):
         # Check if lot scanned contains expiration
         # date information
 
         picking = self._create_picking()
+        self.product_a.use_expiration_date = True
         lot = self._create_lot()
-        expiration_date = fields.Datetime.from_string("2022-07-02")
+        expiration_date = fields.Datetime.from_string("2222-07-02")
+        lot.expiration_date = expiration_date
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
@@ -200,7 +230,7 @@ class TestSetLot(CommonCase):
                     BarcodeResult(type="expiration_date", value=expiration_date),
                 ],
             )
-            self.service.dispatch(
+            response = self.service.dispatch(
                 "set_lot",
                 params={
                     "picking_id": picking.id,
@@ -208,13 +238,17 @@ class TestSetLot(CommonCase):
                     "lot_name": lot.name,
                 },
             )
-        self.assertEqual(lot.expiration_date, expiration_date)
+        message_reponse = response.get("message")
+        self.assertIsNone(message_reponse)
+
+        self.assertEqual(selected_move_line.expiration_date, expiration_date)
 
     def test_set_lot_no_expiration(self):
         # Check if message that requires expiration date
         # is raised
         picking = self._create_picking()
         lot = self._create_lot()
+        lot.expiration_date = False
         self.product_a.use_expiration_date = True
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -231,6 +265,33 @@ class TestSetLot(CommonCase):
         message_reponse = response.get("message")
         self.assertEqual("error", message_reponse.get("message_type"))
         self.assertEqual("Missing expiration date.", message_reponse.get("body"))
+
+        # if the selected lot has an expiration date, it should be used
+        expiration_date = lot.expiration_date = fields.Datetime.from_string(
+            "2220-07-02"
+        )
+        response = self.service.dispatch(
+            "set_lot",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "lot_name": lot.name,
+            },
+        )
+        self.assertEqual(lot.expiration_date, expiration_date)
+        self.assertEqual(selected_move_line.expiration_date, expiration_date)
+        self.assertEqual(selected_move_line.lot_id, lot)
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_lot",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, lot_name=True, expiration_date=True
+                ),
+            },
+        )
 
     def test_set_lot_messages(self):
         # Check if message that requires expiration date

@@ -45,7 +45,9 @@ class TestScanLineReturn(CommonCaseReturn):
             data={
                 "confirmation_required": None,
                 "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, expiration_date=True, lot_name=True
+                ),
             },
         )
         self.assertEqual(selected_move_line.qty_done, 1.0)
@@ -89,7 +91,9 @@ class TestScanLineReturn(CommonCaseReturn):
             },
         )
         selected_move_line = self.get_new_move_lines()
-        move_line_data = self.data.move_lines(selected_move_line)
+        move_line_data = self.data.move_lines(
+            selected_move_line, expiration_date=True, lot_name=True
+        )
         move_line_data[0]["quantity"] = 20.0
         # Displayed qtu todo is modified by _align_display_product_uom_qty
         data = self.data.picking(return_picking)

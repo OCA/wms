@@ -12,7 +12,7 @@ class DataAction(Component):
         if "lot_name" in kw:
             result.update(
                 {
-                    "lot_name": record.lot_name or None,
+                    "lot_name": record.lot_name or record.lot_id.name or None,
                 }
             )
         return result

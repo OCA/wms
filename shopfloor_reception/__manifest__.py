@@ -9,7 +9,7 @@
     "maintainers": ["mmequignon", "JuMiSanAr"],
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["shopfloor"],
+    "depends": ["shopfloor", "shopfloor_product_expiry"],
     "external_dependencies": {"python": ["openupgradelib"]},
     "data": [
         "data/shopfloor_scenario_data.xml",
