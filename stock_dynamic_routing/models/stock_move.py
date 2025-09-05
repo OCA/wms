@@ -505,7 +505,7 @@ class StockMove(models.Model):
         )
         if dest_moves:
             dest_moves.write({"move_orig_ids": [(3, self.id), (4, routing_move.id)]})
-        routing_move._action_confirm(merge=False)
+        routing_move = routing_move._action_confirm(merge=False)
         return routing_move
 
     def _prepare_routing_move_values(self, picking_type, source, destination):
