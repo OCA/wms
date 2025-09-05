@@ -1,1 +1,2 @@
 * Thierry Ducrest <thierry.ducrest@camptocamp.com>
+* Denis Roussel <denis.roussel@acsone.eu>
