@@ -6,7 +6,7 @@
     "version": "18.0.1.1.0",
     "development_status": "Beta",
     "category": "Inventory",
-    "website": "https://github.com/OCA/stock-logistics-shopfloor",
+    "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["TDu"],
     "license": "AGPL-3",
