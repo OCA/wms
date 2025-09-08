@@ -2,10 +2,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Shopfloor Packing",
+    "name": "Shopfloor Cluster Picking Repack",
     "version": "18.0.1.0.0",
-    "summary": """ Manage Packing into cluster picking""",
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "summary": """Build delivery packages at the end of the cluster picking""",
+    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Stock Management",
     "depends": [

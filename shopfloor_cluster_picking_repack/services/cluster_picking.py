@@ -33,18 +33,18 @@ class ClusterPicking(Component):
         if message:
             return self._response_for_start(message=message)
         selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
-        delivery_packaging = self._get_available_delivery_package_type(picking)
-        if not delivery_packaging:
+        delivery_package_type = self._get_available_delivery_package_type(picking)
+        if not delivery_package_type:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message=self.msg_store.no_delivery_packaging_available(),
+                message=self.msg_store.no_package_type_available(),
             )
         response = self._check_allowed_qty_picked(picking, selected_lines)
         if response:
             return response
         return self._response_for_select_delivery_package_type(
-            picking, delivery_packaging, selected_lines
+            picking, delivery_package_type, selected_lines
         )
 
     def scan_package_action(self, picking_id, selected_line_ids, barcode) -> dict:
@@ -72,7 +72,7 @@ class ClusterPicking(Component):
         Transitions:
         * select_package: when a product or lot is scanned to select/deselect,
         the client app has to show the same screen with the updated selection
-        * select_line: when a package or packaging type is scanned, move lines
+        * select_line: when a package or package type is scanned, move lines
         have been put in package and we can return back to this state to handle
         the other lines
         * summary: if there is no other lines, go to the summary screen to be able
@@ -93,7 +93,7 @@ class ClusterPicking(Component):
                 selected_lines,
                 message=message,
             )
-        if search_result and search_result.type == "delivery_packaging":
+        if search_result and search_result.type == "package_type":
             package_type_id = search_result.record.id
         else:
             return self._response_for_select_package(
@@ -368,8 +368,8 @@ class ClusterPicking(Component):
         # TODO: This could be avoided if included in the picking parser.
         return ""
 
-    def _data_for_delivery_package_type(self, packaging, **kw):
-        return self.data.delivery_packaging_list(packaging, **kw)
+    def _data_for_delivery_package_type(self, package_type, **kw):
+        return self.data.package_type_list(package_type, **kw)
 
     def _check_allowed_qty_picked(self, picking, lines) -> dict:
         for line in lines:
@@ -424,7 +424,7 @@ class ClusterPicking(Component):
         packages_data = self.data.packages(
             packages.with_context(picking_id=picking.id).sorted(),
             picking=picking,
-            with_packaging=True,
+            with_package_type=True,
             with_package_move_line_count=True,
         )
         return self._response(
@@ -438,14 +438,14 @@ class ClusterPicking(Component):
         )
 
     def _response_for_select_delivery_package_type(
-        self, picking, packaging, selected_lines, message=None
+        self, picking, package_type, selected_lines, message=None
     ) -> dict:
         return self._response(
-            next_state="select_delivery_packaging",
+            next_state="select_delivery_package_type",
             data={
                 "picking": self.data.picking(picking),
                 "selected_lines_for_packing": self.data.move_lines(selected_lines),
-                "packaging": self._data_for_delivery_package_type(packaging),
+                "package_type": self._data_for_delivery_package_type(package_type),
             },
             message=message,
         )
@@ -530,7 +530,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         states["pack_picking_put_in_pack"] = self.schemas.pack_picking()
         states["pack_picking_scan_pack"] = self.schemas.pack_picking()
         states["select_package"] = self.schemas.select_package()
-        states["select_delivery_packaging"] = self._schema_select_delivery_packaging
+        states["select_delivery_package_type"] = (
+            self._schema_select_delivery_package_type
+        )
         return states
 
     @property
@@ -562,7 +564,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     def select_package(self) -> dict:
         res = self._response_schema(
-            next_states={"select_delivery_packaging", "select_package"}
+            next_states={"select_delivery_package_type", "select_package"}
         )
         res["data"]["schema"]["select_package"] = self._schema_select_package
         return res
@@ -586,19 +588,17 @@ class ShopfloorClusterPickingValidatorResponse(Component):
 
     def list_delivery_package_types(self) -> dict:
         return self._response_schema(
-            next_states={"select_delivery_packaging", "select_package"}
+            next_states={"select_delivery_package_type", "select_package"}
         )
 
     @property
-    def _schema_select_delivery_packaging(self) -> dict:
+    def _schema_select_delivery_package_type(self) -> dict:
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_lines_for_packing": self.schemas._schema_list_of(
                 self.schemas.move_line()
             ),
-            "packaging": self.schemas._schema_list_of(
-                self.schemas.delivery_packaging()
-            ),
+            "package_type": self.schemas._schema_list_of(self.schemas.package_type()),
         }
 
     def scan_package_action(self) -> dict:

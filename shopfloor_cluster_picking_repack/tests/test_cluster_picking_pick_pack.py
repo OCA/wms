@@ -396,11 +396,11 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         )
         data = {}
         data["selected_lines_for_packing"] = self.data.move_lines(lines)
-        data["packaging"] = self.data.delivery_packaging_list(self.package_types)
+        data["package_type"] = self.data.package_type_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         self.assert_response(
             response,
-            next_state="select_delivery_packaging",
+            next_state="select_delivery_package_type",
             data=data,
         )
 
@@ -546,7 +546,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         data = {}
-        data["packaging"] = self.data.delivery_packaging_list(self.package_types)
+        data["package_type"] = self.data.package_type_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         message = {"message_type": "info", "body": "Operation already processed."}
         data = {}

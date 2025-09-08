@@ -7,8 +7,8 @@ from odoo.addons.component.core import Component
 class ShopfloorSchemaAction(Component):
     _inherit = "shopfloor.schema.action"
 
-    def package(self, with_packaging=False):
-        schema = super().package(with_packaging=with_packaging)
+    def package(self, with_package_type=False):
+        schema = super().package(with_package_type=with_package_type)
         schema["is_internal"] = {"required": False, "type": "boolean"}
         return schema
 
@@ -65,10 +65,10 @@ class ShopfloorSchemaAction(Component):
                             "schema": self.lot(),
                         },
                         "package_dest": self._schema_dict_of(
-                            self.package(with_packaging=False), required=False
+                            self.package(with_package_type=False), required=False
                         ),
                         "package_src": self._schema_dict_of(
-                            self.package(with_packaging=False), required=False
+                            self.package(with_package_type=False), required=False
                         ),
                         "product": self._schema_dict_of(self.product()),
                     },

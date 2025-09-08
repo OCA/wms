@@ -1,5 +1,5 @@
-# Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
-# Copyright 2020-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2024 ACSONE SA/NV (https://www.acsone.eu)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
@@ -10,7 +10,7 @@ from odoo.addons.stock.models.stock_picking import Picking
 
 class PackingAction(Component):
     _name = "shopfloor.packing.action"
-    _inherit = "shopfloor.process.action"
+    _inherit = "shopfloor.packing.action"
     _usage = "packing"
     _description = "This is the service to put products in pack"
 
@@ -61,7 +61,7 @@ class PackingAction(Component):
             "packaging",
             "lot",
             "serial",
-            "delivery_packaging",
+            "package_type",
         )
         return search.find(
             barcode,
