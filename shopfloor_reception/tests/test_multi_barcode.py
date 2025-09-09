@@ -34,7 +34,7 @@ class TestStructuredBarcode(CommonCase):
                 BarcodeResult(type="lot", value=lot.name, raw=lot.name),
                 BarcodeResult(
                     type="expiration_date",
-                    value=fields.Date.to_date("2225-04-15"),
+                    value=self._date_as_input_date("2225-04-15"),
                     raw="250415",
                 ),
             ]
@@ -80,7 +80,7 @@ class TestStructuredBarcode(CommonCase):
                 BarcodeResult(type="lot", value=lot.name, raw=lot.name),
                 BarcodeResult(
                     type="expiration_date",
-                    value=fields.Date.to_date("2225-04-15"),
+                    value=self._date_as_input_date("2225-04-15"),
                     raw="250415",
                 ),
             ]
@@ -99,7 +99,7 @@ class TestStructuredBarcode(CommonCase):
             response,
             next_state="set_lot",
             message=self.service.msg_store.lot_already_exists_different_expiration_date(
-                lot, fields.Date.to_date("2225-04-15")
+                lot, fields.Datetime.to_datetime("2225-04-15")
             ),
             data={
                 "picking": data,

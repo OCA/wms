@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 # pylint: disable=missing-return
+import pytz
+
 from odoo import fields
 
 from odoo.addons.shopfloor.tests.common import CommonCase as BaseCommonCase
@@ -168,3 +170,23 @@ class CommonCase(BaseCommonCase):
         vals = super()._shopfloor_manager_values()
         vals["groups_id"] = [(6, 0, [cls.env.ref("stock.group_stock_user").id])]
         return vals
+
+    def _date_as_input_date(self, date):
+        """Convert a UTC date as an UTC datetime string according to
+        the warehouse's timezone.
+
+        IF we have a date like "2024-06-10", we consider it as
+        "2024-06-10 00:00:00" as UTC and convert it to the
+        warehouse timezone before returning the ISO string as
+        it would be entered by the user using a datetime picker.
+
+        If warehouse timezone is UTC, this is a no-op.
+        If warehouse timezone is UTC+2, "2024-06-10" becomes
+        "2024-06-10T02:00:00" so when it's converted back to UTC we get
+        back "2024-06-10 00:00:00"
+        """
+        dt = fields.Datetime.from_string(date)
+        tz_name = self.service._get_input_tz_name()
+        offset = pytz.timezone(tz_name).utcoffset(dt)
+        local_dt = dt + offset
+        return local_dt.isoformat()

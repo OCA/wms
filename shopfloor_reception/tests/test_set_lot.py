@@ -157,16 +157,18 @@ class TestSetLot(CommonCase):
             },
         )
         # Then, set the expiration date
-        expiration_date = "2022-08-24 00:00:00"
         response = self.service.dispatch(
             "set_lot",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "expiration_date": expiration_date,
+                "expiration_date": self._date_as_input_date("2022-08-24"),
             },
         )
-        self.assertEqual(str(selected_move_line.expiration_date), expiration_date)
+        self.assertEqual(
+            selected_move_line.expiration_date,
+            fields.Datetime.to_datetime("2022-08-24"),
+        )
         data = self.data.picking(picking)
         self.assert_response(
             response,
@@ -196,7 +198,7 @@ class TestSetLot(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "expiration_date": "2222-07-02",
+                "expiration_date": self._date_as_input_date("2222-07-02"),
             },
         )
 
@@ -206,7 +208,7 @@ class TestSetLot(CommonCase):
         data = response.get("data").get("set_lot").get("selected_move_line")
         data = data and data[0] or {}
         self.assertEqual(data["lot_name"], lot.name)
-        self.assertEqual(data["expiration_date"], "2222-07-02")
+        self.assertEqual(data["expiration_date"], "2222-07-02T00:00:00")
 
     def test_set_lot_expiration_from_parse(self):
         # Check if lot scanned contains expiration
@@ -227,7 +229,10 @@ class TestSetLot(CommonCase):
                 type="lot",
                 parse_result=[
                     BarcodeResult(type="lot", value=lot.name),
-                    BarcodeResult(type="expiration_date", value=expiration_date),
+                    BarcodeResult(
+                        type="expiration_date",
+                        value=self._date_as_input_date(expiration_date),
+                    ),
                 ],
             )
             response = self.service.dispatch(
