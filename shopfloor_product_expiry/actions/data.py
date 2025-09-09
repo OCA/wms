@@ -18,6 +18,6 @@ class DataAction(Component):
         if "expiration_date" in kw:
             value = record.expiration_date or ""
             if value:
-                value = fields.Date.to_date(value).isoformat()
+                value = fields.Datetime.to_datetime(value).isoformat()
             data["expiration_date"] = value
         return data
