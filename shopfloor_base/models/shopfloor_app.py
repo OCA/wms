@@ -163,7 +163,8 @@ class ShopfloorApp(models.Model):
 
     def _registered_endpoint_rule_keys(self):
         # `endpoint.route.sync.mixin` api
-        return [x[0] for x in self._registered_routes()]
+        # TODO: add tests
+        return [x.key for x in self._registered_routes()]
 
     def _register_hook(self):
         super()._register_hook()
