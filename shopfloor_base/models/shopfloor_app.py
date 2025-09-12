@@ -253,6 +253,12 @@ class ShopfloorApp(models.Model):
         method_name = vals.pop("_method_name")
         route_handler = self.env["endpoint.route.handler.tool"]
         new_route = route_handler.new(vals)
+        # SF endpoints must use the ``restapi`` dispatcher provided by base_rest.
+        # NOTE: this ``route_type`` value
+        # is not declared on `endpoint.route.handler.route_type` field selection,
+        # but is not relevant in this case
+        # because the value is set only on a in memory recordset.
+        new_route.route_type = "restapi"
         new_route._refresh_endpoint_data()
         options = {
             "handler": {

@@ -55,6 +55,7 @@ class TestShopfloorApp(CommonCase):
         routes = rec._registered_routes()
         _check = {}
         for rule in routes:
+            self.assertEqual(rule.routing["type"], "restapi")
             self.assertEqual(rule.route_group, rec._route_group())
             self.assertTrue(rule.endpoint_hash)
             service, endpoint = rule.route.split("/")[-2:]
