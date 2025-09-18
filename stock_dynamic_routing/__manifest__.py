@@ -8,7 +8,10 @@
     "category": "Warehouse Management",
     "version": "16.0.1.0.4",
     "license": "AGPL-3",
-    "depends": ["stock", "stock_helper"],
+    "depends": [
+        # core
+        "stock",
+    ],
     "demo": [
         "demo/stock_location_demo.xml",
         "demo/stock_picking_type_demo.xml",
