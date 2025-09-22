@@ -66,9 +66,9 @@ class StockReleaseChannel(models.Model):
         for channel in self:
             shipment_date = False
             if channel.process_end_date:
-                shipment_date = channel._add_shipment_lead_time(
-                    channel.process_end_date
-                )
+                shipment_date = self._localize(
+                    channel._add_shipment_lead_time(channel.process_end_date)
+                ).date()
             channel.shipment_date = shipment_date
 
     @property
