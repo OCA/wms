@@ -221,9 +221,13 @@ class Reception(Component):
         )
         pickings = move_lines.move_id.picking_id
         if pickings:
+            message = None
+            # Don't display error message if just one picking has been found
+            if len(pickings) > 1:
+                message = self.msg_store.multiple_picks_found_select_manually()
             return self._response_for_select_document(
                 pickings=pickings,
-                message=self.msg_store.multiple_picks_found_select_manually(),
+                message=message,
             )
         return self._response_for_select_document(
             pickings=pickings,

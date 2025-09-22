@@ -149,6 +149,19 @@ class TestSelectDocument(CommonCase):
             message={"message_type": "error", "body": body},
         )
 
+    def test_scan_product_one_picking(self):
+        # next step is select_document, with document filtered based on the product
+        p1 = self._create_picking()
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": self.product_a.barcode}
+        )
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": self._data_for_pickings(p1)},
+            message=None,
+        )
+
     def test_scan_product_no_picking(self):
         # next_step is select_document, with an error message
         picking = self._create_picking()
