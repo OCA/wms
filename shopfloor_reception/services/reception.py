@@ -1175,7 +1175,11 @@ class Reception(Component):
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
         search = self._actions_for("search")
-        search_result = search.find(barcode, handlers_by_type.keys())
+        search_result = search.find(
+            barcode,
+            handlers_by_type.keys(),
+            handler_kw=dict(lot=dict(products=selected_line.product_id)),
+        )
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(picking, selected_line, search_result.record)
