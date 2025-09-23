@@ -23,6 +23,7 @@ class TestSetPackDimension(CommonCase):
                 "shopfloor_collect_width": True,
                 "shopfloor_collect_height": True,
                 "shopfloor_collect_weight": True,
+                "shopfloor_collect_barcode": True,
             }
         )
         # Picking has 3 products
@@ -88,6 +89,7 @@ class TestSetPackDimension(CommonCase):
                 "width": 5.0,
                 "height": 2.0,
                 "weight": 1.5,
+                "barcode": "BARCODE",
             }
         )
         response = self.service.dispatch(
@@ -110,25 +112,54 @@ class TestSetPackDimension(CommonCase):
             },
         )
 
-    def test_scan_product_dimension_not_needed(self):
+    def test_show_set_dimension_screen(self):
         self.product_a.tracking = "none"
-        self.default_packaging_level.sudo().write(
+        # Configure product so it should hit every condition
+        self.product_a.packaging_ids.write(
             {
-                "shopfloor_collect_length": False,
-                "shopfloor_collect_width": False,
-                "shopfloor_collect_height": False,
-                "shopfloor_collect_weight": False,
+                "packaging_length": 0,
+                "width": 0,
+                "height": 0,
+                "weight": 0,
+                "barcode": False,
             }
         )
+        # Set collect values to false
+        collect_field_names = [
+            "shopfloor_collect_length",
+            "shopfloor_collect_width",
+            "shopfloor_collect_height",
+            "shopfloor_collect_weight",
+            "shopfloor_collect_barcode",
+        ]
+        no_collect_dict = {field: False for field in collect_field_names}
+        selected_move_line = self.picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        for field_name in no_collect_dict.keys():
+            # For each field, set only this condition to true, and ensure next screen
+            # is set_dimension
+            vals = dict(no_collect_dict, **{field_name: True})
+            self.default_packaging_level.sudo().write(vals)
+            response = self.service.dispatch(
+                "scan_line",
+                params={
+                    "picking_id": self.picking.id,
+                    "barcode": self.product_a.barcode,
+                },
+            )
+            self._assert_response_set_dimension(
+                response, self.picking, selected_move_line, self.product_a_packaging
+            )
+        # when all collect values are False, no dimension is needed, next screen
+        # is set_dimension
+        self.default_packaging_level.sudo().write(no_collect_dict)
         response = self.service.dispatch(
             "scan_line",
             params={
                 "picking_id": self.picking.id,
                 "barcode": self.product_a.barcode,
             },
-        )
-        selected_move_line = self.picking.move_line_ids.filtered(
-            lambda li: li.product_id == self.product_a
         )
         self.assert_response(
             response,
@@ -138,27 +169,6 @@ class TestSetPackDimension(CommonCase):
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": [self.data.move_line(selected_move_line)],
             },
-        )
-
-    def test_scan_lot_ask_for_dimension(self):
-        self.product_a.tracking = "none"
-        selected_move_line = self.picking.move_line_ids.filtered(
-            lambda li: li.product_id == self.product_a
-        )
-        self.assertTrue(self.product_a.packaging_ids)
-        response = self.service.dispatch(
-            "set_lot_confirm_action",
-            params={
-                "picking_id": self.picking.id,
-                "selected_line_id": selected_move_line.id,
-            },
-        )
-        self.data.picking(self.picking)
-        selected_move_line = self.picking.move_line_ids.filtered(
-            lambda li: li.product_id == self.product_a
-        )
-        self._assert_response_set_dimension(
-            response, self.picking, selected_move_line, self.product_a_packaging
         )
 
     def test_set_packaging_dimension(self):

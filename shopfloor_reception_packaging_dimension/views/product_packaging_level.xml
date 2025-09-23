@@ -15,6 +15,7 @@
                         <field name="shopfloor_collect_width" />
                         <field name="shopfloor_collect_height" />
                         <field name="shopfloor_collect_weight" />
+                        <field name="shopfloor_collect_barcode" />
                     </group>
                 </group>
             </group>

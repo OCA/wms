@@ -52,7 +52,10 @@ class Reception(Component):
                     ("weight", "=", 0),
                     ("weight", "=", False),
                 ],
-                [("barcode", "=", False)],
+                [
+                    ("packaging_level_id.shopfloor_collect_barcode", "=", True),
+                    ("barcode", "=", False),
+                ],
             ]
         )
 

@@ -3,7 +3,7 @@
 from odoo import fields, models
 
 HELP_TEXT = (
-    "When marked, shopfloor will require to set this dimension during "
+    "When marked, shopfloor will require to set dimensions during "
     "reception if undefined on the packaging"
 )
 
@@ -28,6 +28,11 @@ class ProductPackagingLevel(models.Model):
     )
     shopfloor_collect_weight = fields.Boolean(
         "Collect weight",
+        default=True,
+        help=HELP_TEXT,
+    )
+    shopfloor_collect_barcode = fields.Boolean(
+        "Collect Barcode",
         default=True,
         help=HELP_TEXT,
     )
