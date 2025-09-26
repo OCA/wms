@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2025-09-26 15:00+0000\n"
+"Last-Translator: davidbeckercbl <becker@cbl-computer.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: shopfloor_mobile_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_main
@@ -22,8 +24,13 @@ msgid ""
 "          Please enable it to continue.\n"
 "        </strong>"
 msgstr ""
+"<strong>\n"
+"          Es tut uns leid, aber das Lagerverwaltungssystem funktioniert "
+"nicht richtig, wenn JavaScript nicht aktiviert ist.\n"
+"          Bitte aktivieren Sie es, um fortzufahren.\n"
+"        </strong>"
 
 #. module: shopfloor_mobile_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_mobile_base.shopfloor_app_assets
 msgid "Hook to this element to inject your own scenario"
-msgstr ""
+msgstr "Hängen Sie sich in dieses Element mit Ihrem eigenen Szenario ein"
