@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-stock-picking-backorder-reason @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/1199/head#subdirectory=setup/stock_picking_backorder_reason
