@@ -2,9 +2,9 @@ import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/servic
 
 translation_registry.load(
     "fr-FR",
-    "/shopfloor_mobile_packing/static/src/js/i18n/fr.json"
+    "/shopfloor_cluster_picking_repack_mobile/static/src/js/i18n/fr.json"
 );
 translation_registry.load(
     "en-US",
-    "/shopfloor_mobile_packing/static/src/js/i18n/en.json"
+    "/shopfloor_cluster_picking_repack_mobile/static/src/js/i18n/en.json"
 );
