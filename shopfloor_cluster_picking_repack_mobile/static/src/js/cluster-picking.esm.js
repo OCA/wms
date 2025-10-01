@@ -3,12 +3,12 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const registry_key = "cluster_picking";
 const ClusterPickingBase = process_registry.get(registry_key);
 
-let template = ClusterPickingBase.component.template;
+const template = ClusterPickingBase.component.template;
 ClusterPickingBase.component.template = template.replace(
     "</Screen>",
     `
@@ -63,12 +63,12 @@ ClusterPickingBase.component.template = template.replace(
             </v-row>
         </div>
     </div>
-    <div v-if="state_is('select_delivery_packaging')">
+    <div v-if="state_is('select_delivery_package_type')">
 
         <manual-select
-            :records="state.data.packaging"
-            :options="select_delivery_packaging_manual_select_options()"
-            :key="make_state_component_key(['cluster_picking', 'select-delivery-packaging'])"
+            :records="state.data.package_type"
+            :options="select_delivery_package_manual_select_options()"
+            :key="make_state_component_key(['cluster_picking', 'select-delivery-package'])"
             />
         <div class="button-list button-vertical-list full">
             <v-row align="center">
@@ -83,7 +83,7 @@ ClusterPickingBase.component.template = template.replace(
 );
 
 // Keep the pointer to the orginal method
-let data_result_method = ClusterPickingBase.component.data;
+const data_result_method = ClusterPickingBase.component.data;
 
 ClusterPickingBase.component.computed.searchbar_input_type = function () {
     if (this.state_is("pack_picking_put_in_pack")) {
@@ -110,7 +110,7 @@ ClusterPickingBase.component.methods.select_package_manual_select_opts = functio
     };
 };
 
-ClusterPickingBase.component.methods.select_delivery_packaging_manual_select_options =
+ClusterPickingBase.component.methods.select_delivery_package_manual_select_options =
     function () {
         return {
             showActions: false,
@@ -147,12 +147,12 @@ ClusterPickingBase.component.methods.selectable_lines_for_packing = function () 
 
 // Replace the data method with our new method to add
 // our new state
-let component = ClusterPickingBase.component;
-let data = function () {
-    // we must bin the original method to this to put it into
+const component = ClusterPickingBase.component;
+const data = function () {
+    // We must bin the original method to this to put it into
     // the object context
-    let result = data_result_method.bind(this)();
-    // add our new state
+    const result = data_result_method.bind(this)();
+    // Add our new state
     result.states.pack_picking_put_in_pack = {
         display_info: {
             title: this.$t("cluster_picking.pack_picking_put_in_pack.title"),
@@ -167,6 +167,9 @@ let data = function () {
             endpoint_data = {
                 picking_batch_id: this.current_batch().id,
                 picking_id: data.id,
+                selected_line_ids: data.move_lines.map((line) => {
+                    return line.id;
+                }),
                 nbr_packages: parseInt(scanned.text, 10),
             };
             this.wait_call(this.odoo.call(endpoint, endpoint_data));
@@ -305,7 +308,7 @@ let data = function () {
             $instance.reset_notification();
         },
     };
-    result.states.select_delivery_packaging = {
+    result.states.select_delivery_package_type = {
         /**
          * This will catch user events when selecting the delivery packaging type
          * from:
