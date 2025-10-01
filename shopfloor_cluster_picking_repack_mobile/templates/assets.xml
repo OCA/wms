@@ -2,26 +2,26 @@
 <!-- Copyright 2021 ACSONE SA/NV
      License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
-  <template
+    <template
         id="shopfloor_app_assets"
         inherit_id="shopfloor_mobile.shopfloor_app_assets"
     >
-    <script id="script_scenario_cluster_picking" position="after">
-      <script
+        <script id="script_scenario_cluster_picking" position="after">
+            <script
                 id="script_translations"
                 t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/translation_registry.js?v=#{mod_version}"
                 type="module"
             />
-      <script
+            <script
                 id="script_component_batch_picking_line"
                 t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/components/pack_picking.js?v=#{mod_version}"
                 type="module"
             />
-      <script
+            <script
                 id="script_scenario_cluster_picking_packing"
                 t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/cluster-picking.js?v=#{mod_version}"
                 type="module"
             />
-    </script>
-  </template>
+        </script>
+    </template>
 </odoo>
