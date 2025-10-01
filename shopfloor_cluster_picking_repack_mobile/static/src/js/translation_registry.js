@@ -1,4 +1,4 @@
-import {translation_registry} from "/shopfloor_mobile_base/static/wms/src/services/translation_registry.js";
+import {translation_registry} from "/shopfloor_mobile_base/static/src/services/translation_registry.esm.js";
 
 translation_registry.load(
     "fr-FR",
