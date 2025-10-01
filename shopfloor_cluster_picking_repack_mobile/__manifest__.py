@@ -8,7 +8,7 @@
     Shopfloor mobile extension for packing operation into cluster picking
     """,
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/wms",
+    "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Stock Management",
     "depends": ["shopfloor_mobile", "shopfloor_packing"],
     "data": ["templates/assets.xml"],
