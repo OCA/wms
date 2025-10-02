@@ -169,6 +169,8 @@ class TestSetDestination(CommonCase):
         self.assertNotEqual(picking, selected_move_line.picking_id)
         # Its qty_done is 3.
         self.assertEqual(selected_move_line.qty_done, 3)
+        # The destination location is dispatch_location
+        self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
         # The new picking is marked as done.
         self.assertEqual(selected_move_line.picking_id.state, "done")
 
