@@ -32,7 +32,7 @@ Vue.component("pack-picking", {
             };
         },
         line_list_fields() {
-            self = this;
+            const self = this;
             return [
                 {
                     path: "product.display_name",
@@ -60,7 +60,7 @@ Vue.component("pack-picking", {
         grouped_lines() {
             const groups = this.utils.wms.group_by_pack(
                 this.record.move_lines.filter((op) => {
-                    if (op.package_dest != null && op.package_dest.is_internal) {
+                    if (op.package_dest !== null && op.package_dest.is_internal) {
                         return op;
                     }
                 })
