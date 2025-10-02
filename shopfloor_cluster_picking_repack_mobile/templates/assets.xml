@@ -9,7 +9,7 @@
         <script id="script_scenario_cluster_picking" position="after">
             <script
                 id="script_translations"
-                t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/translation_registry.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/translation_registry.esm.js?v=#{mod_version}"
                 type="module"
             />
             <script

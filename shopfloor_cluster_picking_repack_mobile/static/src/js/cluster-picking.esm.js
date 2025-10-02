@@ -3,6 +3,9 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
+/* eslint-disable no-unused-vars */
+/* global $instance*/
+
 import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
 const registry_key = "cluster_picking";
@@ -147,7 +150,7 @@ ClusterPickingBase.component.methods.selectable_lines_for_packing = function () 
 
 // Replace the data method with our new method to add
 // our new state
-const component = ClusterPickingBase.component;
+// const component = ClusterPickingBase.component;
 const data = function () {
     // We must bin the original method to this to put it into
     // the object context
@@ -161,10 +164,9 @@ const data = function () {
             ),
         },
         on_scan: (scanned) => {
-            let endpoint, endpoint_data;
             const data = this.state.data;
-            endpoint = "put_in_pack";
-            endpoint_data = {
+            const endpoint = "put_in_pack";
+            const endpoint_data = {
                 picking_batch_id: this.current_batch().id,
                 picking_id: data.id,
                 selected_line_ids: data.move_lines.map((line) => {
@@ -183,10 +185,9 @@ const data = function () {
             ),
         },
         on_scan: (scanned) => {
-            let endpoint, endpoint_data;
             const data = this.state.data;
-            endpoint = "scan_packing_to_pack";
-            endpoint_data = {
+            const endpoint = "scan_packing_to_pack";
+            const endpoint_data = {
                 picking_batch_id: this.current_batch().id,
                 picking_id: data.id,
                 barcode: scanned.text,
@@ -273,10 +274,9 @@ const data = function () {
              * Trigger the call to list delivery package types
              * as user wants to put products in a new pack.
              */
-            let endpoint, endpoint_data;
             const data = this.state.data;
-            endpoint = "list_delivery_package_types";
-            endpoint_data = {
+            const endpoint = "list_delivery_package_types";
+            const endpoint_data = {
                 picking_batch_id: this.current_batch().id,
                 picking_id: data.picking.id,
                 selected_line_ids: this.selectable_line_ids(),
@@ -324,7 +324,6 @@ const data = function () {
             back: "on_back",
         },
         on_select: (selected) => {
-            const picking = this.current_doc().record;
             const data = this.state.data.picking;
             const ids = this.selected_line_ids_for_packing();
             this.wait_call(
@@ -337,7 +336,6 @@ const data = function () {
             );
         },
         on_scan: (scanned) => {
-            const picking = this.current_doc().record;
             const data = this.state.data;
             this.wait_call(
                 this.odoo.call("scan_package_action", {
