@@ -19,7 +19,7 @@
             />
             <script
                 id="script_scenario_cluster_picking_packing"
-                t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/cluster-picking.esm.js?v=#{mod_version}"
+                t-attf-src="/shopfloor_cluster_picking_repack_mobile/static/src/js/cluster_picking.esm.js?v=#{mod_version}"
                 type="module"
             />
         </script>

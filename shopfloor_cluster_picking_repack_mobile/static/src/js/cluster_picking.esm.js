@@ -4,7 +4,6 @@
  */
 
 /* eslint-disable no-unused-vars */
-/* global $instance*/
 
 import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
 
@@ -302,10 +301,6 @@ const data = function () {
             //         selected_line_ids: $instance.selectable_line_ids(),
             //     })
             // );
-        },
-        on_back: () => {
-            $instance.state_to("select_line");
-            $instance.reset_notification();
         },
     };
     result.states.select_delivery_package_type = {
