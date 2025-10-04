@@ -25,9 +25,6 @@ class SaleOrder(models.Model):
     def _compute_expected_date(self):
         res = super()._compute_expected_date()
         for order in self:
-            if not order.partner_shipping_id:
-                # do not recompute
-                continue
             if order.order_line:
                 # will be managed at line level
                 continue
@@ -35,12 +32,16 @@ class SaleOrder(models.Model):
                 order_dt = order.date_order
             else:
                 order_dt = fields.Datetime.now()
-
-            order.expected_date = order._get_release_channel_expected_date(order_dt)
+            expected_date = order._get_release_channel_expected_date(order_dt)
+            if expected_date:
+                order.expected_date = expected_date
         return res
 
     def _get_release_channel_expected_date(self, order_dt):
         self.ensure_one()
+        if not self.partner_shipping_id:
+            # do not compute
+            return
         # If the carrier is not set, assume the partner default carrier
         carrier = (
             self.carrier_id or self.partner_shipping_id.property_delivery_carrier_id
