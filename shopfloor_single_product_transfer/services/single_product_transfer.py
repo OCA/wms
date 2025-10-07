@@ -115,32 +115,41 @@ class ShopfloorSingleProductTransfer(Component):
 
     # Handlers
 
-    def _scan_location__location_found(self, location, quants):
+    def _scan_location__quant_domain(self, location):
+        return [("location_id", "=", location.id), ("quantity", ">", 0)]
+
+    def _scan_location__location_found(self, location):
         """Check that the location exists."""
         if not location:
             message = self.msg_store.no_location_found()
             return self._response_for_select_location_or_package(message=message)
 
-    def _scan_location__check_location(self, location, quants):
+    def _scan_location__check_location(self, location):
         """Check that location belongs to the source location of the operation type."""
         if not self.is_src_location_valid(location):
             message = self.msg_store.location_content_unable_to_transfer(location)
             return self._response_for_select_location_or_package(message=message)
 
-    def _scan_location__check_stock(self, location, quants):
+    def _scan_location__check_stock(self, location):
         """Check that the location has products to move."""
+        quants = self.env["stock.quant"].search(
+            self._scan_location__quant_domain(location), limit=1
+        )
         if not quants:
             message = self.msg_store.location_empty(location)
             return self._response_for_select_location_or_package(message=message)
 
-    def _scan_location__check_stock_packages(self, location, quants):
+    def _scan_location__check_stock_packages(self, location):
         """Check that there are quants without an assigned package."""
-        quant_packages = [quant.package_id for quant in quants]
-        if all(quant_packages):
+        domain = AND(
+            [self._scan_location__quant_domain(location), [("package_id", "=", False)]]
+        )
+        quant_without_package = self.env["stock.quant"].search(domain, limit=1)
+        if not quant_without_package:
             message = self.msg_store.location_contains_only_packages_scan_one()
             return self._response_for_select_location_or_package(message=message)
 
-    def _scan_location__check_line_packages(self, location, quants):
+    def _scan_location__check_line_packages(self, location):
         """Check that the location has lines without an assigned package."""
         if not self.is_allow_move_create():
             lines_without_package = self.env["stock.move.line"].search(
@@ -755,9 +764,6 @@ class ShopfloorSingleProductTransfer(Component):
         )
 
     def _scan_location_or_package__by_location(self, location):
-        quants_in_location = self.env["stock.quant"].search(
-            [("location_id", "=", location.id), ("quantity", ">", 0)]
-        )
         handlers = [
             self._scan_location__location_found,
             self._scan_location__check_location,
@@ -765,7 +771,7 @@ class ShopfloorSingleProductTransfer(Component):
             self._scan_location__check_stock_packages,
             self._scan_location__check_line_packages,
         ]
-        response = self._use_handlers(handlers, location, quants_in_location)
+        response = self._use_handlers(handlers, location)
         if response:
             return response
         return self._response_for_select_product(location=location)
