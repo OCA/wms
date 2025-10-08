@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-09-29 08:28+0000\n"
+"PO-Revision-Date: 2025-10-08 08:42+0000\n"
 "Last-Translator: davidbeckercbl <becker@cbl-computer.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -39,34 +39,34 @@ msgstr "%s aktualisiert."
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_app
 msgid "A Shopfloor application"
-msgstr ""
+msgstr "Eine Lagerverwaltungssystemanwendung"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__active
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__active
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__active
 msgid "Active"
-msgstr ""
+msgstr "Aktiv"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_docs_url
 msgid "Api Docs Url"
-msgstr ""
+msgstr "API-Dokumentations-URL"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__api_route
 msgid "Api Route"
-msgstr ""
+msgstr "API-Route"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__app_version
 msgid "App Version"
-msgstr ""
+msgstr "App-Version"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -75,33 +75,33 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_profile_form_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_profile_search_view
 msgid "Archived"
-msgstr ""
+msgstr "Archiviert"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Auth"
-msgstr ""
+msgstr "Authentifizierung"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__auth_type
 msgid "Auth Type"
-msgstr ""
+msgstr "Authentifizierungsart"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_ids
 msgid "Available languages"
-msgstr ""
+msgstr "Verfügbare Sprachen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__category
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_scenario__options_edit
 msgid "Configure options via JSON"
-msgstr ""
+msgstr "Optionen über JSON konfigurieren"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__create_uid
@@ -109,7 +109,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__create_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Erstellt von"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__create_date
@@ -117,32 +117,32 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__create_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Erzeugt am"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__lang_id
 msgid "Default language"
-msgstr ""
+msgstr "Standardsprache"
 
 #. module: shopfloor_base
 #: model:shopfloor.profile,name:shopfloor_base.profile_demo_1
 msgid "Demo Profile 1"
-msgstr ""
+msgstr "Demoprofil 1"
 
 #. module: shopfloor_base
 #: model:shopfloor.profile,name:shopfloor_base.profile_demo_2
 msgid "Demo Profile 2"
-msgstr ""
+msgstr "Demoprofil 2"
 
 #. module: shopfloor_base
 #: model:shopfloor.scenario,name:shopfloor_base.shopfloor_scenario_demo_1
 msgid "Demo scenario 1"
-msgstr ""
+msgstr "Demoszenario 1"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Developer"
-msgstr ""
+msgstr "Entwickler"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__display_name
@@ -150,18 +150,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__display_name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Anzeigname"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 msgid "Group By"
-msgstr ""
+msgstr "Gruppiere nach"
 
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_ir_http
 msgid "HTTP Routing"
-msgstr ""
+msgstr "HTTP-Weiterleitung"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__id
@@ -169,7 +169,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__id
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__scenario_key
