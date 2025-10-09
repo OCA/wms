@@ -99,32 +99,12 @@ export var DatePicker = Vue.component("date-picker-input", {
         });
     },
     methods: {
-        parseInput() {
-            if (!this.dateInput) return null;
-
-            // Detects separator (first non # in the mask)
-            const sepMatch = this.mask.match(/[^#]/);
-            const sep = sepMatch ? sepMatch[0] : "/";
-
-            const parts = this.dateInput.split(sep);
-            const order = this.format.split(sep); // Ex: ["dd","MM","yyyy"]
-
-            let day = null,
-                month = null,
-                year = null;
-            order.forEach((token, i) => {
-                if (token === "dd") day = parts[i];
-                if (token === "MM") month = parts[i];
-                if (token === "yyyy") year = parts[i];
-            });
-
-            if (!day || !month || !year) return null;
-
-            const parsed = new Date(`${year}-${month}-${day}`);
-            return isNaN(parsed.getTime()) ? null : parsed.toISOString().substr(0, 10);
+        onEnter(event) {
+            event.preventDefault();
+            this.validateInput();
         },
 
-        onBlur() {
+        validateInput() {
             if (!this.dateInput) {
                 this.date = "";
                 return;
@@ -145,6 +125,10 @@ export var DatePicker = Vue.component("date-picker-input", {
                 if (token === "month") month = values[i];
                 if (token === "year") year = values[i];
             });
+
+            if (year.length === 2) {
+                year = String(2000 + parseInt(year, 10));
+            }
 
             const parsed = new Date(`${year}-${month}-${day}`);
             if (!isNaN(parsed.getTime())) {
@@ -174,7 +158,8 @@ export var DatePicker = Vue.component("date-picker-input", {
           v-bind="attrs"
           v-on="on"
           clearable
-          @blur="onBlur"
+          @blur="validateInput"
+          @keydown.enter="onEnter"
         />
       </template>
       <v-date-picker
