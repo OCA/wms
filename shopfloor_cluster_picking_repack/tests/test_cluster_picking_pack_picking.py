@@ -15,13 +15,14 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
                 "move_line_id": move_line.id,
                 # this bin is used for the other picking
                 "barcode": self.bin2.name,
-                "quantity": move_line.quantity,
+                # ensure quantity is kept the same
+                "quantity": 1,
             },
         )
         self.assert_response(
             response,
             next_state="scan_destination",
-            data=self._line_data(move_line),
+            data=self._line_data(move_line, qty_done=1),
             message=self.service.msg_store.bin_should_be_internal(self.bin2),
         )
 

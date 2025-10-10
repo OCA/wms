@@ -125,7 +125,9 @@ class ClusterPicking(Component):
                     batch, message=self.msg_store.operation_not_found()
                 )
             return self._response_for_scan_destination(
-                move_line, message=self.msg_store.bin_should_be_internal(bin_package)
+                move_line,
+                message=self.msg_store.bin_should_be_internal(bin_package),
+                qty_done=quantity,
             )
         return super().scan_destination_pack(
             picking_batch_id, move_line_id, barcode, quantity
