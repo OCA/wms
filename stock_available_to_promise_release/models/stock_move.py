@@ -488,8 +488,10 @@ class StockMove(models.Model):
         )
 
     def _action_cancel(self):
-        # Unrelease moves that must be, before canceling them.
-        self.unrelease()
+        if not self.env.context.get("from_merge_no_need_release"):
+            # Unrelease moves that must be, before canceling them.
+            # We skip this when merging moves that are all released.
+            self.unrelease()
         super()._action_cancel()
         self.write({"need_release": False})
         return True
@@ -563,6 +565,7 @@ class StockMove(models.Model):
         unreleased_moves = released_pickings.move_ids - released_moves
         unreleased_moves_to_bo = unreleased_moves.filtered(
             lambda m: m.state not in ("done", "cancel")
+            and m.need_release
             and not m.rule_id.no_backorder_at_release
         )
         if unreleased_moves_to_bo:
@@ -591,6 +594,15 @@ class StockMove(models.Model):
 
         # We could have discrepancies regarding released moves state, recompute it
         released_moves._recompute_state()
+
+        # some moves may have been already released but not merged because of
+        # an ongoing quantity on the pick step. Now that both are released, try
+        # to merge them
+        prereleased_moves = unreleased_moves.filtered(
+            lambda m: m.state not in ("done", "cancel") and not m.need_release
+        )
+        if prereleased_moves:
+            prereleased_moves._merge_moves()
 
         return assigned_moves
 
@@ -924,7 +936,10 @@ class StockMove(models.Model):
 
     def write(self, vals):
         released_moves = self.browse()
-        if self.env.context.get("in_merge_mode") and "product_uom_qty" in vals:
+        if (
+            self.env.context.get("from_merge_need_release")
+            and "product_uom_qty" in vals
+        ):
             # when a move is merged, we need to unrelease it if the quantity
             # is changed and the move is unreleasable
             released_moves = self.filtered(lambda m: m._is_unreleaseable())
@@ -942,17 +957,28 @@ class StockMove(models.Model):
 
     def _is_mergeable(self):
         self.ensure_one()
-        return self.state not in ("done", "cancel") and (
-            not self._is_unreleaseable() or self.unrelease_allowed
+        return self.state not in ("draft", "done", "cancel") and (
+            self.need_release or self.unrelease_allowed
         )
 
+    def _prepare_merge_moves_distinct_fields(self):
+        fields = super()._prepare_merge_moves_distinct_fields()
+        if self.env.context.get("from_merge_no_need_release"):
+            # when we merge moves that do not need release, ensure candidates
+            # have the same value for need release (i.e. False)
+            fields.append("need_release")
+        return fields
+
     def _update_candidate_moves_list(self, candidate_moves):
-        # filter out the moves that are not unreleasable
-        res = super()._update_candidate_moves_list(candidate_moves)
         # candidate_moves is a list of recordset of moves
         # it contains one recordset per move to merge
         # each recordset contains the moves that we want to merge (an item of self)
         # and the candidate moves to merge into
+        res = super()._update_candidate_moves_list(candidate_moves)
+        if not self.env.context.get("from_merge_need_release"):
+            return res
+        # when merging a move that needs release, filter out the moves that are
+        # not unreleasable
         new_candidate_moves = [
             candidates.filtered(
                 lambda m, moves_to_merge=self: m in moves_to_merge or m._is_mergeable()
@@ -964,13 +990,36 @@ class StockMove(models.Model):
         return res
 
     def _merge_moves(self, merge_into=False):
-        # From here any write on the moves are done in the context of a merge
-        # and we need to unrelease them if the quantity is changed
-        self_ctx = self.with_context(in_merge_mode=True)
-        if merge_into:
-            merge_into = merge_into.filtered(lambda m: m._is_mergeable())
-        return (
-            super(StockMove, self_ctx)
-            ._merge_moves(merge_into=merge_into)
-            .with_context(in_merge_mode=False)
-        )
+        res = self.browse()
+        no_need_release = self.filtered(lambda m: not m.need_release)
+        if no_need_release:
+            # For moves that do not need release, search moves that also do not
+            # need release
+            from_merge_no_need_release = self.env.context.get(
+                "from_merge_no_need_release", False
+            )
+            res |= (
+                super(
+                    StockMove,
+                    no_need_release.with_context(from_merge_no_need_release=True),
+                )
+                ._merge_moves(merge_into=merge_into)
+                .with_context(from_merge_no_need_release=from_merge_no_need_release)
+            )
+        need_release = self - no_need_release
+        if need_release:
+            # For moves that do need release, search moves that also need
+            # release or are unreleasable
+            from_merge_need_release = self.env.context.get(
+                "from_merge_need_release", False
+            )
+            if merge_into:
+                merge_into = merge_into.filtered(lambda m: m._is_mergeable())
+            res |= (
+                super(
+                    StockMove, need_release.with_context(from_merge_need_release=True)
+                )
+                ._merge_moves(merge_into=merge_into)
+                .with_context(from_merge_need_release=from_merge_need_release)
+            )
+        return res
