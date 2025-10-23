@@ -849,3 +849,56 @@ class TestSetQuantity(CommonCase):
             data=expected_data,
         )
         self.assertEqual(package, move_line.result_package_id)
+
+    def test_return_lot_from_customer(self):
+        product = self.product
+        self._set_product_tracking_by_lot(product)
+        self._enable_create_move_line()
+        quant_model = self.env["stock.quant"]
+        # Set picking type locations for returns
+        customer_location = self.customer_location
+        stock_location = self.stock_location
+        self.picking_type.sudo().write(
+            {
+                "default_location_src_id": customer_location.id,
+                "default_location_dest_id": stock_location.id,
+            }
+        )
+        # A lot has been shipped to customer, in a pack
+        lot = self._create_lot_for_product(product, "LOTABCD")
+        package = self._create_empty_package(name="PACKABCD")
+        self._add_stock_to_product(
+            product, customer_location, 1, lot=lot, package=package
+        )
+        qty_customer = quant_model._get_available_quantity(
+            product, customer_location, lot_id=lot, package_id=package
+        )
+        self.assertEqual(qty_customer, 1)
+        # Now try to return it in stock, scan the product, and ensure it creates a
+        # new move line
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": customer_location.id, "barcode": lot.name},
+        )
+        move_line = self.get_new_move_line()
+        self.assertTrue(move_line)
+        self.assertEqual(move_line.lot_id, lot)
+        self.assertEqual(move_line.qty_picked, 1)
+        self.assertEqual(move_line.move_id.picking_type_id, self.picking_type)
+        # Move qty to stock
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 1,
+                "barcode": stock_location.barcode,
+            },
+        )
+        qty_customer = quant_model._get_available_quantity(
+            product, customer_location, lot_id=lot
+        )
+        self.assertEqual(qty_customer, 0)
+        qty_stock = quant_model._get_available_quantity(
+            product, stock_location, lot_id=lot
+        )
+        self.assertEqual(qty_stock, 1)

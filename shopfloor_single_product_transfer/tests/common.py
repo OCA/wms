@@ -69,9 +69,9 @@ class CommonCase(BaseCommonCase):
         cls.existing_move_line_ids = cls.env["stock.move.line"].search([]).ids
 
     @classmethod
-    def _add_stock_to_product(cls, product, location, qty, lot=None):
+    def _add_stock_to_product(cls, product, location, qty, lot=None, package=None):
         """Set the stock quantity of the product."""
-        cls._update_qty_in_location(location, product, qty, lot=lot)
+        cls._update_qty_in_location(location, product, qty, lot=lot, package=package)
         # FIXME: can we drop this?
         # values = {
         #     "product_id": product.id,

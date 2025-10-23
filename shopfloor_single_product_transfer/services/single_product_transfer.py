@@ -498,6 +498,8 @@ class ShopfloorSingleProductTransfer(Component):
         # we expect to get only one move line as we are
         # moving only bulk products w/o lot or package.
         move_line = move.move_line_ids[0]
+        if lot:
+            move_line.lot_id = lot
         stock = self._actions_for("stock")
         if self.work.menu.no_prefill_qty:
             # We ensure the qty_picked is 0 here, so we can set it manually after
