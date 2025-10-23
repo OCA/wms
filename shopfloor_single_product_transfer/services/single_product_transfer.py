@@ -11,6 +11,7 @@ from odoo.tools import float_compare
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.component.exception import NoComponentError
 from odoo.addons.shopfloor.utils import to_float
 
 _logger = logging.getLogger("shopfloor.services.single_product_transfer")
@@ -630,11 +631,32 @@ class ShopfloorSingleProductTransfer(Component):
             )
 
     def _write_destination_on_lines(self, lines, location, unload=False):
+        # TODO A commit isn't yet ported to 14.0.
+        # In the meantime restore this
+        # '_write_destination_on_lines' is implemented in:
+        #
+        #   - 'location_content_transfer'
+        #   - 'zone_picking'
+        #   - 'cluster_picking' (but it is called '_unload_write_destination_on_lines')
+        #
+        # And all of them has a different implementation,
+        # To refactor later.
+        try:
+            # TODO lose dependency on 'shopfloor_checkout_sync' to avoid having
+            # yet another glue module. In the long term we should make
+            # 'shopfloor_checkout_sync' use events and trash the overrides made
+            # on all scenarios.
+            checkout_sync = self._actions_for("checkout.sync")
+        except NoComponentError:
+            self._actions_for("lock").for_update(lines)
+        else:
+            self._actions_for("lock").for_update(
+                checkout_sync._all_lines_to_lock(lines)
+            )
+            checkout_sync._sync_checkout(lines, location)
         lines.picking_id.location_dest_id = location
         if unload:
             lines.result_package_id = False
-        # FIXME commit isn't migrated yet
-        # stock.set_destination_and_unload_lines(lines, location)
 
     def _set_quantity__post_move(self, move_line, location, confirmation=None):
         # TODO still valid ?

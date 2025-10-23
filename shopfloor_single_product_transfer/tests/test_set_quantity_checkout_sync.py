@@ -56,8 +56,8 @@ class TestSetQuantityCheckoutSync(CommonCase):
             return
         picking1 = self._setup_picking()
         picking2 = self._setup_picking()
-        move1 = picking1.move_lines
-        move2 = picking2.move_lines
+        move1 = picking1.move_ids
+        move2 = picking2.move_ids
         pack_move1 = self._add_pack_move_after_pick_move(move1, self.wh.pack_type_id)
         pack_move2 = self._add_pack_move_after_pick_move(move2, self.wh.pack_type_id)
         (pack_move1 | pack_move2)._assign_picking()
