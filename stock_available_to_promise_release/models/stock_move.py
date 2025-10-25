@@ -221,14 +221,7 @@ class StockMove(models.Model):
                 OR (
                     m.priority = move.priority
                     AND m.date_priority = move.date_priority
-                    AND m.picking_type_id = move.picking_type_id
                     AND m.id < move.id
-                )
-                OR (
-                    m.priority = move.priority
-                    AND m.date_priority = move.date_priority
-                    AND m.picking_type_id != move.picking_type_id
-                    AND m.id > move.id
                 )
             )
         """.format(
