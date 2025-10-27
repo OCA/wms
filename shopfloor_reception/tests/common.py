@@ -144,6 +144,9 @@ class CommonCase(BaseCommonCase):
         for key, value in expected_message.items():
             self.assertEqual(message.get(key), value)
 
+    def assertNotMessage(self, response, expected_message):
+        self.assertMessage(response, expected_message)
+
     @classmethod
     def _get_move_ids_from_response(cls, response):
         state = response.get("next_state")

@@ -8,7 +8,7 @@ import pytz
 from decorator import contextmanager
 
 from odoo import fields
-from odoo.tools import float_compare
+from odoo.tools import float_compare, float_is_zero
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -285,17 +285,14 @@ class Reception(Component):
         If none are found create a new line.
 
         """
-        line = None
         unassigned_lines = self.env["stock.move.line"]
-        for move_line in move.move_line_ids:
-            if move_line.result_package_id:
-                continue
-            if move_line.shopfloor_user_id.id == self.env.uid:
-                line = move_line
-                break
-            elif not move_line.shopfloor_user_id:
-                unassigned_lines |= move_line
-        if not line and unassigned_lines:
+        for line in move.move_line_ids:
+            if line.shopfloor_user_id.id == self.env.uid:
+                return self._scan_line__recover(picking, line, qty_done)
+            elif not line.shopfloor_user_id:
+                unassigned_lines |= line
+        line = None
+        if unassigned_lines:
             lock = self._actions_for("lock")
             for move_line in unassigned_lines:
                 if lock.for_update(move_line, skip_locked=True):
@@ -305,6 +302,24 @@ class Reception(Component):
             values = move._prepare_move_line_vals()
             line = self.env["stock.move.line"].create(values)
         return self._scan_line__assign_user(picking, line, qty_done)
+
+    def _scan_line__recover(self, picking, line, default_qty):
+        product = line.product_id
+        message = self.msg_store.recovered_previous_session()
+        # Do not restore further than set_destination, because a destination location
+        # might be set by default, and we want the user to be allowed to change it.
+        if line.result_package_id:
+            # Destination package is set, go to set_destination
+            return self._response_for_set_destination(picking, line, message=message)
+        if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
+            # If lot already set, go to set_quantity
+            rounding = line.product_uom_id.rounding
+            if float_is_zero(line.qty_done, precision_rounding=rounding):
+                # If no qty_done, set default qty_done
+                line.qty_done = default_qty
+            return self._before_state__set_quantity(picking, line, message=message)
+        # Otherwise go to select_lot
+        return self._response_for_set_lot(picking, line, message=message)
 
     def _scan_line__assign_user(self, picking, line, qty_done):
         product = line.product_id
@@ -1706,7 +1721,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     def _scan_line_next_states(self):
-        return {"select_move", "set_lot", "set_quantity"}
+        return {"select_move", "set_lot", "set_quantity", "set_destination"}
 
     def _set_lot_next_states(self):
         return {"select_move", "set_lot", "set_quantity"}
