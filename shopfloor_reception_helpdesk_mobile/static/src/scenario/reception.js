@@ -15,7 +15,7 @@ const new_template =
     template.substring(0, pos) +
     `
  <template v-if="state_is('set_destination')">
-    <div class="button-list button-vertical-list full">
+    <div v-if="state.data.picking.helpdesk_ticket_allowed" class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
                 <btn-action @click="state.on_declare_helpdesk"><v-icon>mdi-lifebuoy</v-icon>Helpdesk</btn-action>
