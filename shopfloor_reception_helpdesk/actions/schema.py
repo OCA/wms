@@ -12,3 +12,19 @@ class ShopfloorSchemaAction(Component):
             {"helpdesk_ticket_allowed": {"required": False, "type": "boolean"}}
         )
         return schema
+
+    def helpdesk_wizard(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "description": {
+                "type": "string",
+                "nullable": True,
+            },
+            "motive": self._schema_dict_of(self.helpdesk_motive(), required=False),
+        }
+
+    def helpdesk_motive(self):
+        return {
+            "id": {"required": True, "type": "integer"},
+            "name": {"type": "string", "nullable": False, "required": True},
+        }

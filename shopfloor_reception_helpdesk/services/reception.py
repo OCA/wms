@@ -2,6 +2,9 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.helpdesk_mgmt_stock.wizards.stock_helpdesk_ticket_create import (
+    StockHelpdeskTicketCreate,
+)
 from odoo.addons.stock.models.stock_move_line import StockMoveLine
 from odoo.addons.stock.models.stock_picking import Picking
 
@@ -16,21 +19,35 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id).exists()
         line = self.env["stock.move.line"].browse(selected_line_id).exists()
+        # Create wizard in order to keep information through screens
+        wizard = self._create_helpdesk_wizard(picking, line)
         return self._response(
             next_state="start_helpdesk",
             data={
                 "selected_move_line": self._data_for_move_lines(line),
                 "picking": self.data.picking(picking),
+                "helpdesk_wizard": self.data.helpdesk_wizard(wizard),
             },
         )
 
-    def create_helpdesk(self, picking_id: int, selected_line_id: int, description: str):
+    def create_helpdesk(
+        self,
+        picking_id: int,
+        selected_line_id: int,
+        helpdesk_wizard_id: int,
+        description: str,
+    ):
         """
         Endpoint to create the hdelpdesk ticket
         """
         picking = self.env["stock.picking"].browse(picking_id).exists()
         line = self.env["stock.move.line"].browse(selected_line_id).exists()
-        ticket = self._create_helpdesk(picking, line, description)
+        wizard = (
+            self.env["stock.helpdesk.ticket.create"].browse(helpdesk_wizard_id).exists()
+        )
+        wizard.description = description
+
+        ticket = self._create_helpdesk(picking, line, wizard)
         message = {}
         if ticket:
             message = self.msg_store.helpdesk_ticket_created(ticket)
@@ -43,23 +60,24 @@ class Reception(Component):
             message=message,
         )
 
-    def _prepare_ticket_wizard_values(
-        self, picking: Picking, line: StockMoveLine, description: str, **kwargs
-    ):
-        return {"description": description}
+    def _prepare_ticket_wizard_values(self, picking: Picking, line: StockMoveLine):
+        return {}
 
-    def _create_helpdesk(
-        self, picking: Picking, line: StockMoveLine, description: str, **kwargs
-    ):
+    def _create_helpdesk_wizard(self, picking: Picking, line: StockMoveLine):
         wizard = (
             self.env["stock.helpdesk.ticket.create"]
             .with_context(active_model="stock.move", active_id=line.move_id.id)
-            .create(
-                self._prepare_ticket_wizard_values(
-                    picking, line, description=description, **kwargs
-                )
-            )
+            .create(self._prepare_ticket_wizard_values(picking, line))
         )
+        return wizard
+
+    def _create_helpdesk(
+        self,
+        picking: Picking,
+        line: StockMoveLine,
+        wizard: StockHelpdeskTicketCreate,
+        **kwargs
+    ):
         tickets_before = line.move_id.helpdesk_ticket_ids
         wizard.create_helpdesk_ticket()
         ticket = line.move_id.helpdesk_ticket_ids - tickets_before
@@ -83,6 +101,11 @@ class ShopfloorReceptionValidator(Component):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_id": {
+                "coerce": to_int,
+                "type": "integer",
+                "required": True,
+            },
+            "helpdesk_wizard_id": {
                 "coerce": to_int,
                 "type": "integer",
                 "required": True,
@@ -112,6 +135,10 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "helpdesk_wizard": {
+                "type": "dict",
+                "schema": self.schemas.helpdesk_wizard(),
+            },
         }
 
     @property

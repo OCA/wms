@@ -8,9 +8,5 @@
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
-    "depends": [
-        "shopfloor_reception",
-        "helpdesk_mgmt_stock",
-        # "helpdesk_mgmt_motive"
-    ],
+    "depends": ["shopfloor_reception", "helpdesk_mgmt_stock", "helpdesk_motive"],
 }
