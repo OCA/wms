@@ -26,7 +26,7 @@ const new_template =
  </template>
 
  <template v-if="state_is('start_helpdesk')">
-    <v-text-field label="Description" placeholder="Ticket Description" class="current-value" :type="input_type" v-model="helpdesk_description" />
+    <v-text-field label="Description" placeholder="Ticket Description" class="current-value" :type="input_type" v-model="state.data.helpdesk_wizard.description" />
     <div class="button-list button-vertical-list full">
         <v-row align="center">
 
@@ -69,7 +69,8 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
                     self.odoo.call("create_helpdesk", {
                         picking_id: self.state.data.picking.id,
                         selected_line_id: self.state.data.selected_move_line[0].id,
-                        description: self._props["helpdesk_description"],
+                        helpdesk_wizard_id: self.state.data.helpdesk_wizard.id,
+                        description: self.state.data.helpdesk_wizard.description,
                     })
                 );
             },
