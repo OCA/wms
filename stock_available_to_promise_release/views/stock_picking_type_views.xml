@@ -5,9 +5,6 @@
         <field name="model">stock.picking.type</field>
         <field name="inherit_id" ref="stock.stock_picking_type_kanban" />
         <field name="arch" type="xml">
-            <field name="count_picking_waiting" position="before">
-                <field name="count_picking_need_release" />
-            </field>
             <xpath
                 expr="//a[@name='get_action_picking_tree_waiting']/../.."
                 position="before"
