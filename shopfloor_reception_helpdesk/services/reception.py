@@ -10,7 +10,6 @@ from odoo.addons.stock.models.stock_picking import Picking
 
 
 class Reception(Component):
-
     _inherit = "shopfloor.reception"
 
     def start_helpdesk(self, picking_id: int, selected_line_id: int):
@@ -27,6 +26,7 @@ class Reception(Component):
                 "selected_move_line": self._data_for_move_lines(line),
                 "picking": self.data.picking(picking),
                 "helpdesk_wizard": self.data.helpdesk_wizard(wizard),
+                "available_motives": self._get_available_motives(picking),
             },
         )
 
@@ -36,9 +36,10 @@ class Reception(Component):
         selected_line_id: int,
         helpdesk_wizard_id: int,
         description: str,
+        motive_id: int,
     ):
         """
-        Endpoint to create the hdelpdesk ticket
+        Endpoint to create the helpdesk ticket
         """
         picking = self.env["stock.picking"].browse(picking_id).exists()
         line = self.env["stock.move.line"].browse(selected_line_id).exists()
@@ -46,6 +47,7 @@ class Reception(Component):
             self.env["stock.helpdesk.ticket.create"].browse(helpdesk_wizard_id).exists()
         )
         wizard.description = description
+        wizard.motive_id = motive_id
 
         ticket = self._create_helpdesk(picking, line, wizard)
         message = {}
@@ -76,12 +78,18 @@ class Reception(Component):
         picking: Picking,
         line: StockMoveLine,
         wizard: StockHelpdeskTicketCreate,
-        **kwargs
+        **kwargs,
     ):
         tickets_before = line.move_id.helpdesk_ticket_ids
         wizard.create_helpdesk_ticket()
         ticket = line.move_id.helpdesk_ticket_ids - tickets_before
         return ticket
+
+    def _get_available_motives(self, picking: Picking) -> list[dict]:
+        domain = []
+        if default_helpdesk_team := picking.picking_type_id.default_helpdesk_team_id:
+            domain.append(("team_id", "=", default_helpdesk_team.id))
+        return self.env["helpdesk.ticket.motive"].search_read(domain, ["id", "name"])
 
 
 class ShopfloorReceptionValidator(Component):
@@ -111,6 +119,7 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
             },
             "description": {"type": "string", "required": True},
+            "motive_id": {"coerce": to_int, "type": "integer", "required": False},
         }
 
 
@@ -138,6 +147,10 @@ class ShopfloorReceptionValidatorResponse(Component):
             "helpdesk_wizard": {
                 "type": "dict",
                 "schema": self.schemas.helpdesk_wizard(),
+            },
+            "available_motives": {
+                "type": "list",
+                "schema": {"type": "dict", "schema": self.schemas.helpdesk_motive()},
             },
         }
 

@@ -24,6 +24,11 @@ class TestReceptionHelpdesk(CommonCase):
             }
         )
         cls.env.user.groups_id |= cls.env.ref("helpdesk_mgmt.group_helpdesk_user")
+        cls.motive = (
+            cls.env["helpdesk.ticket.motive"]
+            .sudo()
+            .create({"name": "Test Motive", "team_id": cls.purchase_team.id})
+        )
 
     def test_set_done_backorder_urgent(self):
         self.menu.sudo().picking_type_ids = self.type_rec
@@ -50,10 +55,18 @@ class TestReceptionHelpdesk(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": line.id,
+                "helpdesk_wizard_id": response["data"]["start_helpdesk"][
+                    "helpdesk_wizard"
+                ]["id"],
                 "description": "Test Helpdesk",
+                "motive_id": self.motive.id,
             },
         )
-        self.assertTrue(line.move_id.helpdesk_ticket_ids)
+
+        helpdesk_ticket = line.move_id.helpdesk_ticket_ids
+        self.assertTrue(helpdesk_ticket)
+        self.assertEqual(helpdesk_ticket.motive_id, self.motive)
+
         message = f"Helpdesk ticket ({line.move_id.helpdesk_ticket_ids.display_name}) created!"
         self.assert_response(
             response,
