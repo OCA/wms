@@ -27,11 +27,16 @@ const new_template =
 
  <template v-if="state_is('start_helpdesk')">
     <v-text-field label="Description" placeholder="Ticket Description" class="current-value" :type="input_type" v-model="state.data.helpdesk_wizard.description" />
+        <v-combobox
+            label="Motive"
+            :items="state.data.available_motives"
+            item-text="name"
+            v-model="state.data.helpdesk_wizard.motive"
+        ></v-combobox>
     <div class="button-list button-vertical-list full">
         <v-row align="center">
-
             <v-col class="text-center" cols="12">
-                <btn-action @click="state.on_create_helpdesk">Helpdesk</btn-action>
+                <btn-action @click="state.on_create_helpdesk">Create Helpdesk Ticket</btn-action>
             </v-col>
             <v-col class="text-center" cols="12">
                 <btn-back />
@@ -63,14 +68,17 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
                 })
             );
         };
+
         states["start_helpdesk"] = {
             on_create_helpdesk: () => {
+                const motive = self.state.data.helpdesk_wizard.motive;
                 self.wait_call(
                     self.odoo.call("create_helpdesk", {
                         picking_id: self.state.data.picking.id,
                         selected_line_id: self.state.data.selected_move_line[0].id,
                         helpdesk_wizard_id: self.state.data.helpdesk_wizard.id,
                         description: self.state.data.helpdesk_wizard.description,
+                        motive_id: motive ? motive.id : false,
                     })
                 );
             },
