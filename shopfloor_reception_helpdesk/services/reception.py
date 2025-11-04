@@ -86,10 +86,10 @@ class Reception(Component):
         return ticket
 
     def _get_available_motives(self, picking: Picking) -> list[dict]:
-        domain = []
-        if default_helpdesk_team := picking.picking_type_id.default_helpdesk_team_id:
-            domain.append(("team_id", "=", default_helpdesk_team.id))
-        return self.env["helpdesk.ticket.motive"].search_read(domain, ["id", "name"])
+        default_helpdesk_team = picking.picking_type_id.default_helpdesk_team_id
+        return self.env["helpdesk.ticket.motive"].search_read(
+            [("team_id", "in", default_helpdesk_team.ids + [False])], ["id", "name"]
+        )
 
 
 class ShopfloorReceptionValidator(Component):

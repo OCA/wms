@@ -29,6 +29,11 @@ class TestReceptionHelpdesk(CommonCase):
             .sudo()
             .create({"name": "Test Motive", "team_id": cls.purchase_team.id})
         )
+        cls.motive_no_team = (
+            cls.env["helpdesk.ticket.motive"]
+            .sudo()
+            .create({"name": "Test Motive", "team_id": False})
+        )
 
     def test_set_done_backorder_urgent(self):
         self.menu.sudo().picking_type_ids = self.type_rec
@@ -41,13 +46,19 @@ class TestReceptionHelpdesk(CommonCase):
             "start_helpdesk",
             params={"picking_id": picking.id, "selected_line_id": line.id},
         )
+        start_helpdesk_data = response["data"]["start_helpdesk"]
 
         self.assertEqual(
-            response["data"]["start_helpdesk"]["selected_move_line"],
+            start_helpdesk_data["selected_move_line"],
             self.data.move_lines(line),
         )
-        self.assertEqual(
-            response["data"]["start_helpdesk"]["picking"], self.data.picking(picking)
+        self.assertEqual(start_helpdesk_data["picking"], self.data.picking(picking))
+        self.assertIn(
+            self.motive_no_team.id,
+            [m["id"] for m in start_helpdesk_data["available_motives"]],
+        )
+        self.assertIn(
+            self.motive.id, [m["id"] for m in start_helpdesk_data["available_motives"]]
         )
 
         response = self.service.dispatch(
@@ -55,9 +66,7 @@ class TestReceptionHelpdesk(CommonCase):
             params={
                 "picking_id": picking.id,
                 "selected_line_id": line.id,
-                "helpdesk_wizard_id": response["data"]["start_helpdesk"][
-                    "helpdesk_wizard"
-                ]["id"],
+                "helpdesk_wizard_id": start_helpdesk_data["helpdesk_wizard"]["id"],
                 "description": "Test Helpdesk",
                 "motive_id": self.motive.id,
             },
