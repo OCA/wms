@@ -621,11 +621,9 @@ class StockMove(models.Model):
 
         This will be propagated to the chain of moves"""
         for move in self:
-            if not new_expected_date:
-                new_expected_date = move._release_get_expected_date()
-            if not new_expected_date:
-                continue
-            move.date = new_expected_date
+            expected_date = new_expected_date or move._release_get_expected_date()
+            if expected_date:
+                move.date = expected_date
 
     def _after_release_update_chain(self):
         picking_ids = set()
