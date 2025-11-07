@@ -57,8 +57,8 @@ class StockQuantPackage(models.Model):
         return res
 
     @api.model_create_multi
-    def create(self, vals):
-        records = super().create(vals)
+    def create(self, vals_list):
+        records = super().create(vals_list)
         records._sync_package_type_from_packaging()
         return records
 
