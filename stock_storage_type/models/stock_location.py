@@ -308,6 +308,7 @@ class StockLocation(models.Model):
         "quant_ids.quantity",
         "in_move_ids",
         "in_move_line_ids",
+        "out_move_line_ids",
         "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
@@ -316,18 +317,53 @@ class StockLocation(models.Model):
                 no_product = self.env["product.product"].browse()
                 rec.location_will_contain_product_ids = no_product
             else:
-                products = (
-                    rec.mapped("quant_ids")
-                    .filtered(lambda q: q.quantity > 0)
-                    .product_id
-                    | rec.mapped("in_move_ids.product_id")
-                    | rec.mapped("in_move_line_ids.product_id")
+                non_fully_reserved_quants = rec.quant_ids.filtered(
+                    lambda q: float_compare(
+                        q.quantity, 0, precision_rounding=q.product_uom_id.rounding
+                    )
+                    > 0
+                    and float_compare(
+                        q.reserved_quantity,
+                        q.quantity,
+                        precision_rounding=q.product_uom_id.rounding,
+                    )
+                    < 0
                 )
+                # Products that are obviously in the location
+                products = (
+                    non_fully_reserved_quants.product_id
+                    | rec.mapped("in_move_line_ids.product_id")
+                    | rec.mapped("in_move_ids.product_id")
+                )
+                # For fully reserved quants, ensure the product is not being emptied
+                remaining_quants = rec.quant_ids.filtered(
+                    lambda q, products=products: q.product_id not in products
+                )
+                if remaining_quants:
+                    for product, quants_by_product in groupby(
+                        remaining_quants, lambda q: q.product_id
+                    ):
+                        quantity = sum(map(lambda q: q.quantity, quants_by_product))
+                        picked_quantity = sum(
+                            ml.qty_done
+                            for ml in rec.out_move_line_ids
+                            if ml.product_id == product
+                        )
+                        if (
+                            float_compare(
+                                quantity,
+                                picked_quantity,
+                                precision_rounding=product.uom_id.rounding,
+                            )
+                            > 0
+                        ):
+                            products |= product
                 rec.location_will_contain_product_ids = products
 
     @api.depends(
         "quant_ids.quantity",
         "in_move_line_ids",
+        "out_move_line_ids",
         "do_not_mix_lots",
     )
     def _compute_location_will_contain_lot_ids(self):
@@ -336,9 +372,45 @@ class StockLocation(models.Model):
                 no_lot = self.env["stock.lot"].browse()
                 rec.location_will_contain_lot_ids = no_lot
             else:
-                lots = rec.mapped("quant_ids").filtered(
-                    lambda q: q.quantity > 0
-                ).lot_id | rec.mapped("in_move_line_ids.lot_id")
+                non_fully_reserved_quants = rec.quant_ids.filtered(
+                    lambda q: float_compare(
+                        q.quantity, 0, precision_rounding=q.product_uom_id.rounding
+                    )
+                    > 0
+                    and float_compare(
+                        q.reserved_quantity,
+                        q.quantity,
+                        precision_rounding=q.product_uom_id.rounding,
+                    )
+                    < 0
+                )
+                # Lots that are obviously in the location
+                lots = non_fully_reserved_quants.lot_id | rec.mapped(
+                    "in_move_line_ids.lot_id"
+                )
+                # For fully reserved quants, ensure the lot is not being emptied
+                remaining_quants = rec.quant_ids.filtered(
+                    lambda q, lots=lots: q.lot_id and q.lot_id not in lots
+                )
+                if remaining_quants:
+                    for lot, quants_by_product in groupby(
+                        remaining_quants, lambda q: q.lot_id
+                    ):
+                        quantity = sum(map(lambda q: q.quantity, quants_by_product))
+                        picked_quantity = sum(
+                            ml.qty_done
+                            for ml in rec.out_move_line_ids
+                            if ml.lot_id == lot
+                        )
+                        if (
+                            float_compare(
+                                quantity,
+                                picked_quantity,
+                                precision_rounding=lot.product_id.uom_id.rounding,
+                            )
+                            > 0
+                        ):
+                            lots |= lot
                 rec.location_will_contain_lot_ids = lots
 
     # method provided by "stock_putaway_hook"
