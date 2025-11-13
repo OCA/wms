@@ -30,58 +30,14 @@ class StockQuant(models.Model):
                         "Location {location}"
                     ).format(storage=package_type.name, location=location.name)
                 )
+            package = quant.package_id
             package_weight_kg = (
-                quant.package_id.pack_weight_in_kg
-                or quant.package_id.estimated_pack_weight_kg
+                package.pack_weight_in_kg or package.estimated_pack_weight_kg
             )
-            package_quants = quant.package_id.mapped("quant_ids")
-            package_products = package_quants.mapped("product_id")
-            package_lots = package_quants.mapped("lot_id")
-            other_quants_in_location = self.search(
-                [
-                    ("location_id", "=", location.id),
-                    ("id", "not in", package_quants.ids),
-                    ("quantity", ">", 0),
-                ]
-            )
-            products_in_location = other_quants_in_location.mapped("product_id")
-            lots_in_location = other_quants_in_location.mapped("lot_id")
             error = None
             category = location.computed_storage_category_id
-            allow_new_product = category.get_allow_new_product(
-                product=quant.product_id,
-                package_type=package_type,
-                package=quant.package_id,
-                quants=quant,
-            )
-            # Check content constraints
-            if allow_new_product == "empty" and other_quants_in_location:
-                error = _(
-                    "Storage Category {category} is flagged "
-                    "'only empty' with other quants in location."
-                ).format(category=category.display_name)
-            elif allow_new_product == "same" and (
-                len(package_products) > 1
-                or len(products_in_location) >= 1
-                and package_products != products_in_location
-            ):
-                error = _(
-                    "Storage Category {category} is flagged 'do not mix"
-                    " products' but there are other products in "
-                    "location."
-                ).format(category=category.display_name)
-            elif allow_new_product == "same_lot" and (
-                len(package_lots) > 1
-                or len(lots_in_location) >= 1
-                and package_lots != lots_in_location
-            ):
-                error = _(
-                    "Storage Category {category} is flagged 'do not mix"
-                    " lots' but there are other lots in "
-                    "location."
-                ).format(category=category.display_name)
             # Check size constraint
-            elif (
+            if (
                 category.max_height_in_m
                 and quant.package_id.height_in_m > category.max_height_in_m
             ):
@@ -94,7 +50,7 @@ class StockQuant(models.Model):
                     max_h=category.max_height_in_m,
                     height=quant.package_id.height_in_m,
                 )
-            elif (
+            if (
                 category.max_weight_in_kg
                 and package_weight_kg > category.max_weight_in_kg
             ):
@@ -107,8 +63,6 @@ class StockQuant(models.Model):
                     max_w=category.max_weight_in_kg,
                     weight_kg=package_weight_kg,
                 )
-            # If we get here, it means there is a storage category
-            #  allowing the package into the location
             if error:
                 raise ValidationError(
                     _(
@@ -116,7 +70,7 @@ class StockQuant(models.Model):
                         " because there isn't any rules that allows"
                         " package type {type} into it:\n\n{error}"
                     ).format(
-                        package=quant.package_id.name,
+                        package=package.name,
                         location=location.complete_name,
                         type=package_type.name,
                         error=error,

@@ -1,6 +1,5 @@
 # Copyright 2020 Camptocamp SA
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
-from odoo.exceptions import ValidationError
 from odoo.tools.safe_eval import const_eval
 
 from .common import TestStorageTypeCommon
@@ -374,14 +373,6 @@ class TestStorageTypeMove(TestStorageTypeCommon):
                 pack_level.allowed_location_dest_ids,
                 _get_possible_locations(pack_level),
             )
-
-            # Set the quantities done in order to avoid immediate transfer wizard
-            for move_line in pack_level.move_line_ids:
-                move_line.qty_done = move_line.reserved_qty
-
-        second_level.location_dest_id = third_level.location_dest_id
-        with self.assertRaises(ValidationError):
-            int_picking.button_validate()
 
     def test_stock_move_no_package(self):
         """
