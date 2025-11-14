@@ -471,7 +471,17 @@ class StockMove(models.Model):
         }
         if operator not in operator_mapping:
             raise UserError(_("Unsupported operator %s") % (operator,))
-        moves = self.search([("need_release", "=", True)])
+
+        moves = self.search(
+            [
+                (
+                    "state",
+                    "in",
+                    ["waiting", "confirmed", "partially_available", "assigned"],
+                ),
+                ("need_release", "=", True),
+            ]
+        )
         operator_func = operator_mapping[operator]
         # computed field has no depends set, invalidate cache before reading
         moves.invalidate_recordset(["ordered_available_to_promise_uom_qty"])
