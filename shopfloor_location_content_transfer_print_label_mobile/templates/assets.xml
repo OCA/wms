@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <script id="script_app_main" position="before">
+            <div>
+                <t
+                    t-set="mod_version"
+                    t-value="get_version('shopfloor_location_content_transfer_print_label_mobile')"
+                />
+
+                <!-- Scenario -->
+                <script
+                    id="script_scenario_location_content_transfer_print_label"
+                    t-attf-src="/shopfloor_location_content_transfer_print_label_mobile/static/src/scenario/location_content_transfer.js?v=#{mod_version}"
+                    type="module"
+                />
+            </div>
+        </script>
+    </template>
+
+</odoo>
