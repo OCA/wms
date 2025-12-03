@@ -402,6 +402,9 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         package_type_7 = pt_model.create({"name": "PT7", "number_of_parcels": 7})
         self.product_a.package_type_id = package_type_7
         move_line = self._product_put_in_pack()
+        # The _assign_packaging function will in a last resort, set the package type
+        # from the product if there is none on the package
+        move_line.product_id.package_type_id = False
         self.assertEqual(move_line.result_package_id.number_of_parcels, 4)
         self.assertFalse(move_line.result_package_id.package_type_id)
         move_line.picking_id._action_done()
