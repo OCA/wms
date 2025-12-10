@@ -43,11 +43,16 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id).exists()
         line = self.env["stock.move.line"].browse(selected_line_id).exists()
+
         wizard = (
             self.env["stock.helpdesk.ticket.create"].browse(helpdesk_wizard_id).exists()
         )
-        wizard.description = description
-        wizard.motive_id = motive_id
+        wizard.write(
+            {
+                "description": description,
+                "motive_id": motive_id,
+            }
+        )
 
         ticket = self._create_helpdesk(picking, line, wizard)
         message = {}
@@ -81,7 +86,7 @@ class Reception(Component):
         **kwargs,
     ):
         tickets_before = line.move_id.helpdesk_ticket_ids
-        wizard.create_helpdesk_ticket()
+        wizard.action_create_helpdesk_ticket()
         ticket = line.move_id.helpdesk_ticket_ids - tickets_before
         return ticket
 
