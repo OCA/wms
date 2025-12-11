@@ -26,7 +26,7 @@ const new_template =
  </template>
 
  <template v-if="state_is('start_helpdesk')">
-    <v-text-field label="Description" placeholder="Ticket Description" class="current-value" :type="input_type" v-model="state.data.helpdesk_wizard.description" />
+    <v-text-field label="Description" placeholder="Ticket Description" class="current-value" v-model="state.data.helpdesk_wizard.description" />
         <v-combobox
             label="Motive"
             :items="state.data.available_motives"
