@@ -5,7 +5,7 @@
     "name": "Shopfloor Cluster Picking Repack",
     "version": "18.0.1.0.0",
     "summary": """Build delivery packages at the end of the cluster picking""",
-    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV,BCIM,Camptocamp,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Stock Management",
     "depends": [
