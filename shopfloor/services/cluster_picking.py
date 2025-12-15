@@ -1146,8 +1146,9 @@ class ClusterPicking(Component):
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
     def _unload_write_destination_on_lines(self, lines, location):
-        lines.write({"shopfloor_unloaded": True, "location_dest_id": location.id})
-        lines.package_level_id.location_dest_id = location
+        stock = self._actions_for("stock")
+        stock.set_destination_on_lines(lines, location)
+        lines.write({"shopfloor_unloaded": True})
         for picking in lines.batch_id.picking_ids:
             picking_lines = lines.filtered(lambda x, p=picking: x.picking_id == p)
             self._unload_set_picking_to_done(picking, picking_lines)
@@ -1283,15 +1284,11 @@ class ClusterPicking(Component):
             batch, package, lines, barcode, confirmation=confirmation
         )
 
-    def _lock_lines(self, lines):
-        """Lock move lines"""
-        self._actions_for("lock").for_update(lines)
-
     def _unload_scan_destination_lines(
         self, batch, package, lines, barcode, confirmation=None
     ):
         # Lock move lines that will be updated
-        self._lock_lines(lines)
+        self._actions_for("lock").for_update(lines)
         first_line = fields.first(lines)
         scanned_location = self._actions_for("search").location_from_scan(barcode)
         if not scanned_location:
