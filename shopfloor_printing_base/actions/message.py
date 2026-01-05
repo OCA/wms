@@ -13,3 +13,12 @@ class MessageAction(Component):
 
     def print_error(self):
         return {"message_type": "warning", "body": _("Printing error")}
+
+    def print_no_report(self):
+        return {
+            "message_type": "warning",
+            "body": _(
+                "No report found to be printed. Check your scenario menu "
+                "configuration with your Administrator!"
+            ),
+        }
