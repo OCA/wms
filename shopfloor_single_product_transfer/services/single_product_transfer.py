@@ -631,16 +631,6 @@ class ShopfloorSingleProductTransfer(Component):
             )
 
     def _write_destination_on_lines(self, lines, location, unload=False):
-        # TODO A commit isn't yet ported to 14.0.
-        # In the meantime restore this
-        # '_write_destination_on_lines' is implemented in:
-        #
-        #   - 'location_content_transfer'
-        #   - 'zone_picking'
-        #   - 'cluster_picking' (but it is called '_unload_write_destination_on_lines')
-        #
-        # And all of them has a different implementation,
-        # To refactor later.
         try:
             # TODO lose dependency on 'shopfloor_checkout_sync' to avoid having
             # yet another glue module. In the long term we should make
@@ -654,7 +644,8 @@ class ShopfloorSingleProductTransfer(Component):
                 checkout_sync._all_lines_to_lock(lines)
             )
             checkout_sync._sync_checkout(lines, location)
-        lines.picking_id.location_dest_id = location
+        stock = self._actions_for("stock")
+        stock.set_destination_on_lines(lines, location, lock_lines=False)
         if unload:
             lines.result_package_id = False
 
