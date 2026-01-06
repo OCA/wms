@@ -21,11 +21,7 @@ class Reception(Component):
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
 
         printing = self._printing_for("reception")
-        result = printing.print(record_ids=selected_line.ids, quantity=quantity)
-        if result:
-            message = self.msg_store.print_job_sent()
-        else:
-            message = self.msg_store.print_error()
+        message = printing.print(record_ids=selected_line.ids, quantity=quantity)
         return self._response_for_set_destination(
             picking, selected_line, message=message
         )
