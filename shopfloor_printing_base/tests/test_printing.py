@@ -33,10 +33,15 @@ class TestPrinting(BaseCommonCase):
         )
         cls.env.user.printing_printer_id = cls.printer
         cls.menu = cls.env.ref("shopfloor_base.shopfloor_menu_demo_1")
-        from .models import ShopFloorPrintingAction, ShopfloorTestFlow
+        from .models import (
+            ShopFloorPrintingAction,
+            ShopfloorTestFlow,
+            ShopfloorTestValidator,
+        )
 
         ShopFloorPrintingAction._build_component(cls._components_registry)
         ShopfloorTestFlow._build_component(cls._components_registry)
+        ShopfloorTestValidator._build_component(cls._components_registry)
 
         cls.loader = FakeModelLoader(cls.env, cls.__module__)
         cls.loader.backup_registry()
@@ -143,3 +148,9 @@ class TestPrinting(BaseCommonCase):
                 {"message_type": "warning", "body": "Printing error"},
                 response,
             )
+
+    def test_response(self):
+        self.service.work.menu.sudo().display_print_label_button = True
+        response = self.service._response(data={"id": id})
+        allow = response.get("allow_print_label")
+        self.assertTrue(allow)

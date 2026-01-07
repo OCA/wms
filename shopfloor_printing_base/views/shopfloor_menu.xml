@@ -9,6 +9,7 @@
 
           <xpath expr="//group[@name='options']" position="inside">
               <group name="print_label">
+                  <field name="display_print_label_button" />
                   <field name="label_print_report_id" />
               </group>
           </xpath>

@@ -13,3 +13,4 @@ class ShopfloorMenu(models.Model):
         help="Choose here the report to print. "
         "Only reports with 'label' field checked will be available.",
     )
+    display_print_label_button = fields.Boolean()
