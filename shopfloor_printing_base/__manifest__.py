@@ -9,6 +9,12 @@
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "maintainers": ["rousseldenis"],
     "website": "https://github.com/OCA/wms",
-    "depends": ["shopfloor_base", "base_report_to_label_printer"],
-    "data": ["views/shopfloor_menu.xml"],
+    "depends": [
+        "shopfloor_base",
+        "shopfloor_mobile_base",
+        "base_report_to_label_printer",
+    ],
+    "data": [
+        "views/shopfloor_menu.xml",
+    ],
 }
