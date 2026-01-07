@@ -23,11 +23,15 @@ class BaseShopfloorService(AbstractComponent):
     _collection = "shopfloor.app"
     _expose_model = None
 
-    def __init__(self, work_context):
-        super().__init__(work_context)
+    @property
+    def _menu(self):
         # User private attributes to not mess up w/ public endpoints
-        self._profile = getattr(self.work, "profile", self.env["shopfloor.profile"])
-        self._menu = getattr(self.work, "menu", self.env["shopfloor.menu"])
+        return getattr(self.work, "menu", self.env["shopfloor.menu"])
+
+    @property
+    def _profile(self):
+        # User private attributes to not mess up w/ public endpoints
+        return getattr(self.work, "profile", self.env["shopfloor.profile"])
 
     def _get_api_spec(self, **params):
         return ShopfloorRestServiceAPISpec(self, **params)
