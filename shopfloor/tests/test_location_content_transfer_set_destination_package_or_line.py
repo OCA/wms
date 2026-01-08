@@ -187,7 +187,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
         for move in package_level.move_line_ids.mapped("move_id"):
@@ -235,7 +235,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
             popup=completion_info_popup,
         )
@@ -385,7 +385,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
 
@@ -436,7 +436,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
             popup=completion_info_popup,
         )
@@ -485,7 +485,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
             response,
             done_picking.backorder_ids,
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
         self.assertEqual(move_line_c.move_id.state, "done")
@@ -754,7 +754,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
 
@@ -812,7 +812,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
         # Process the other move lines (lines w/o package + package levels)
@@ -1047,7 +1047,7 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
             response,
             backorder,
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )
         # check that the next operation has the appropriate attributes
@@ -1071,6 +1071,6 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
             response,
             self.picking,
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.dest_location
+                self.content_loc, self.dest_location
             ),
         )

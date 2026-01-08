@@ -573,7 +573,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         backorder = self.picking3.backorder_ids
         self.assertTrue(backorder)
         message = {
-            "body": "Content transfer to Shelf 1 completed",
+            "body": "Content line transferred from Content Location to Shelf 1",
             "message_type": "success",
         }
 
