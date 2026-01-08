@@ -6,6 +6,7 @@ import logging
 from odoo import _
 
 from odoo.addons.component.core import Component
+from odoo.addons.stock.models.stock_location import Location
 
 _logger = logging.getLogger(__name__)
 
@@ -191,8 +192,22 @@ class MessageAction(Component):
     def location_not_allowed(self):
         return {"message_type": "error", "body": _("Location not allowed here.")}
 
-    def dest_location_not_allowed(self):
-        return {"message_type": "error", "body": _("You cannot place it here")}
+    def dest_location_not_allowed(
+        self, location: (Location | None) = None, extra_message: str = ""
+    ) -> dict:
+        """
+        This returns the message that destination location is incorrect
+        """
+        if location:
+            body = _(
+                "You cannot place it here (%(location_name)s)",
+                location_name=location.name,
+            )
+        else:
+            body = _("You cannot place it here")
+        if extra_message:
+            body += "\n" + extra_message
+        return {"message_type": "error", "body": body}
 
     def need_confirmation(self):
         return {"message_type": "warning", "body": _("Are you sure?")}

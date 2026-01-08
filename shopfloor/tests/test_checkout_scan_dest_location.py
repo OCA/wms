@@ -95,5 +95,7 @@ class CheckoutSelectChildLocationCase(CheckoutCommonCase):
                     self.picking, done=True, with_lines=False, with_location=True
                 ),
             },
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.child_location_view
+            ),
         )

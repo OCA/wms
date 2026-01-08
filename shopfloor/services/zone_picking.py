@@ -909,7 +909,7 @@ class ZonePicking(Component):
         if not self.is_dest_location_valid(move_line.move_id, location):
             return self._response_for_set_line_destination(
                 move_line,
-                message=self.msg_store.dest_location_not_allowed(),
+                message=self.msg_store.dest_location_not_allowed(location),
                 qty_done=quantity,
             )
 
@@ -1702,7 +1702,7 @@ class ZonePicking(Component):
             if not self.is_dest_location_valid(moves, location):
                 return self._response_for_unload_set_destination(
                     first(buffer_lines),
-                    message=self.msg_store.dest_location_not_allowed(),
+                    message=self.msg_store.dest_location_not_allowed(location),
                 )
             # check if the destination location is not the expected one
             #   - OK if the scanned destination is a child of the current

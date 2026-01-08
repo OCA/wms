@@ -696,7 +696,10 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="scan_location",
             data=self.ANY,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message={
+                "message_type": "error",
+                "body": f"You cannot place it here ({self.dispatch_location.name})",
+            },
         )
 
     def test_validate_location_move_not_child_of_picking_allowed(self):

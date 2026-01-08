@@ -1142,7 +1142,8 @@ class ClusterPicking(Component):
             )
         if not self.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_all(
-                batch, message=self.msg_store.dest_location_not_allowed()
+                batch,
+                message=self.msg_store.dest_location_not_allowed(scanned_location),
             )
 
         if confirmation != barcode and self.is_dest_location_to_confirm(
@@ -1329,7 +1330,9 @@ class ClusterPicking(Component):
             )
         if not self.is_dest_location_valid(lines.move_id, scanned_location):
             return self._response_for_unload_set_destination(
-                batch, package, message=self.msg_store.dest_location_not_allowed()
+                batch,
+                package,
+                message=self.msg_store.dest_location_not_allowed(scanned_location),
             )
         if confirmation != barcode and self.is_dest_location_to_confirm(
             first_line.location_dest_id, scanned_location

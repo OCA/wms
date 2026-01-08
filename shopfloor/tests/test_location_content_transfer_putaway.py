@@ -133,9 +133,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
             response,
             next_state="scan_location",
             data=self.ANY,
-            message=self.service.msg_store.location_content_unable_to_transfer(
-                self.test_loc
-            ),
+            message=self.service.msg_store.dest_location_not_allowed(self.test_loc),
         )
         current_moves = self.env["stock.move"].search(
             [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]

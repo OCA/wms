@@ -352,7 +352,10 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_all",
             data=data,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message={
+                "message_type": "error",
+                "body": f"You cannot place it here ({self.dispatch_location.name})",
+            },
         )
 
     def test_set_destination_all_error_location_move_invalid(self):
@@ -379,7 +382,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_all",
             data=data,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.packing_b_location
+            ),
         )
 
     def test_set_destination_all_need_confirmation(self):
@@ -827,7 +832,10 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_set_destination",
             data=data,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message={
+                "message_type": "error",
+                "body": f"You cannot place it here ({self.dispatch_location.name})",
+            },
         )
 
     def test_unload_scan_destination_error_location_move_invalid(self):
@@ -851,7 +859,9 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_set_destination",
             data=data,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.packing_b_location
+            ),
         )
 
     def test_unload_scan_destination_need_confirmation(self):

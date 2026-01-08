@@ -234,7 +234,8 @@ class SinglePackTransfer(Component):
 
         if not self.is_dest_location_valid(moves, scanned_location):
             return self._response_for_scan_location(
-                package_level, message=self.msg_store.dest_location_not_allowed()
+                package_level,
+                message=self.msg_store.dest_location_not_allowed(scanned_location),
             )
 
         if confirmation != location_barcode and self.is_dest_location_to_confirm(
