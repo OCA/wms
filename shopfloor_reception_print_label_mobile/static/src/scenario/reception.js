@@ -15,7 +15,7 @@ const pos = template.indexOf("</Screen>");
 const new_template =
     template.substring(0, pos) +
     `
- <template v-if="state_is('set_destination')">
+ <template v-if="state_is('set_destination') && this._print_label_allowed()">
 
     <label-printer v-on:print_labels="state.print_labels($event)" buttonLabel="Print Labels"/>
 
