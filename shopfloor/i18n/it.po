@@ -417,8 +417,9 @@ msgstr "Conferma modifica ubicazione da %(location_from)s a %(location_to)s?"
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transfer to {} completed"
-msgstr "Tasferimento contenuto a {} completato"
+msgid ""
+"Content line transferred from %(location_name)s to %(location_dest_name)s"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -2363,6 +2364,10 @@ msgstr "Prelievo per area"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid "Content transfer to {} completed"
+#~ msgstr "Tasferimento contenuto a {} completato"
 
 #, python-format
 #~ msgid ""

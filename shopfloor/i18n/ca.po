@@ -355,8 +355,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transfer to {} completed"
-msgstr "Transferència de contingut a {} competada"
+msgid ""
+"Content line transferred from %(location_name)s to %(location_dest_name)s"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -2192,6 +2193,10 @@ msgstr ""
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr ""
+
+#, python-format
+#~ msgid "Content transfer to {} completed"
+#~ msgstr "Transferència de contingut a {} competada"
 
 #, python-format
 #~ msgid "A draft inventory has been created for control."

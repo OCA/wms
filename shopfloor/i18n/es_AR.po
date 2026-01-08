@@ -387,8 +387,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transfer to {} completed"
-msgstr "Transferencia de contenido a {} completada"
+msgid ""
+"Content line transferred from %(location_name)s to %(location_dest_name)s"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
@@ -2298,6 +2299,10 @@ msgstr "Zona de Entreda"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} no es un paquete de destino válido."
+
+#, python-format
+#~ msgid "Content transfer to {} completed"
+#~ msgstr "Transferencia de contenido a {} completada"
 
 #, python-format
 #~ msgid "Package {} is not in the current transfer."

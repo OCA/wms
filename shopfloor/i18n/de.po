@@ -353,7 +353,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Content transfer to {} completed"
+msgid ""
+"Content line transferred from %(location_name)s to %(location_dest_name)s"
 msgstr ""
 
 #. module: shopfloor
