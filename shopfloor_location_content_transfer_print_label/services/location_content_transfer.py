@@ -28,7 +28,7 @@ class LocationContentTransfer(Component):
         return self._response_for_scan_destination_all(picking, message=message)
 
 
-class ShopfloorReceptionValidator(Component):
+class ShopfloorLocationContentTransferValidator(Component):
     _inherit = "shopfloor.location.content.transfer.validator"
 
     def print_labels(self) -> dict:
@@ -49,7 +49,7 @@ class ShopfloorReceptionValidator(Component):
         }
 
 
-class ShopfloorReceptionValidatorResponse(Component):
+class ShopfloorLocationContentTransferValidatorResponse(Component):
     _inherit = "shopfloor.location.content.transfer.validator.response"
 
     def print_labels(self) -> dict:
