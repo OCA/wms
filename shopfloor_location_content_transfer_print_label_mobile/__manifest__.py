@@ -10,6 +10,7 @@
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": [
+        "shopfloor_mobile",
         "shopfloor_location_content_transfer_print_label",
         "shopfloor_mobile_printing_base",
     ],
