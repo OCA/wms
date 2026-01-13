@@ -7,7 +7,7 @@
         Create a batch of pickings to be processed all together""",
     "version": "16.0.2.1.0",
     "license": "AGPL-3",
-    "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
+    "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
     "application": False,
@@ -26,6 +26,6 @@
         "security/ir.model.access.csv",
     ],
     "development_status": "Beta",
-    "maintainers": ["lmignon"],
+    "maintainers": ["lmignon", "jbaudoux"],
     "pre_init_hook": "pre_init_hook",
 }
