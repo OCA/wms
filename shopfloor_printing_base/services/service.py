@@ -13,9 +13,8 @@ class BaseShopfloorService(AbstractComponent):
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
     ):
-        if self._menu.display_print_label_button:
-            data = data or {}
-            data["allow_print_label"] = True
+        data = data or {}
+        data["allow_print_label"] = self._menu.display_print_label_button
 
         return super()._response(
             base_response=base_response,
