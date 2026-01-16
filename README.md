@@ -16,7 +16,7 @@ There are several repositories where you can find modules and contribute to.
 Repository | Description
 | --------------------------------- | --- |
 [delivery-carrier](https://github.com/OCA/delivery-carrier) | Delivery method providers and all enhancements around delivery method in sales and stock
-[product-attribute](https://github.com/OCA/product-attribute) | Extend the product model (incl uom, packaging, pricelist) or lot but that do not touch sales or stock models
+[product-attribute](https://github.com/OCA/product-attribute) | Extend the product model (incl uom, packaging, pricelist) but that do not touch sales or stock models
 [stock-logistics-availability](https://github.com/OCA/stock-logistics-availability) | Compute quantity available in stock
 [stock-logistics-barcode](https://github.com/OCA/stock-logistics-barcode) | Product and product packaging barcodes
 [stock-logistics-interfaces](https://github.com/OCA/stock-logistics-interfaces) | Interfaces to interact with physical devices (vertical lift, measurement device...)
@@ -29,7 +29,7 @@ Repository | Description
 [stock-logistics-shopfloor](https://github.com/OCA/stock-logistics-shopfloor) | Shopfloor. Warehouse barcode applications to support operators in the warehouse
 [stock-logistics-tracking](https://github.com/OCA/stock-logistics-tracking) | Enhance packages (stock.quant.package)
 [stock-logistics-transport](https://github.com/OCA/stock-logistics-transport) | Manage incoming and outgoing transports
-[stock-logistics-warehouse](https://github.com/OCA/stock-logistics-warehouse) | Extend the stock related models (warehouse, location, picking, move...) but without impacting flows and processes. It's mainly adding fields or buttons.
+[stock-logistics-warehouse](https://github.com/OCA/stock-logistics-warehouse) | Extend the stock related models (warehouse, location, picking, move, lot...) but without impacting flows and processes. It's mainly adding fields or buttons.
 [stock-logistics-workflow](https://github.com/OCA/stock-logistics-workflow) | Enhance the way flows and processes are working. Modules that do not have their place in the other more specialized repositories
 [stock-weighing](https://github.com/OCA/stock-weighing) | Support products managed by weight
 [wms](https://github.com/OCA/wms) | Bundle modules for a complete WMS solution
