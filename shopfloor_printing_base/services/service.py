@@ -10,6 +10,16 @@ class BaseShopfloorService(AbstractComponent):
 
     _inherit = "base.shopfloor.service"
 
+    def _printing_for(self, usage):
+        """
+        Return the good printing component for
+        the current usage.
+        """
+        printings = self.work.components_registry.lookup(
+            collection_name="shopfloor.printing", usage=usage
+        )
+        return printings[0](self.work)
+
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
     ):
