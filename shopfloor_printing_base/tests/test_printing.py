@@ -152,5 +152,5 @@ class TestPrinting(BaseCommonCase):
     def test_response(self):
         self.service.work.menu.sudo().display_print_label_button = True
         response = self.service._response(data={"id": id})
-        allow = response.get("allow_print_label")
+        allow = response.get("data", {}).get("allow_print_label")
         self.assertTrue(allow)
