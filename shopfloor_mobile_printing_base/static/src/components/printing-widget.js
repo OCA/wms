@@ -7,33 +7,30 @@
 
 export var LabelPrinterWidget = Vue.component("label-printer", {
     template: `
-<div :class="['number-spinner', 'spinner-' + mode]">
- <v-row dense align="center">
-        <v-col>
+<v-card class="d-flex flex-column pb-2 pl-2 pr-2">
+    <v-card-title class="overline">
+        Label Printing
+    </v-card-title>
 
-         <div class="input-wrapper">
-            <v-text-field class="current-value" :type="input_type" v-model="value" :disabled="!editable" />
-            <div v-if="show_init_value" class="init-value">
-                <span>{{ original_value }}</span>
-            </div>
-        </div>
+    <div class="d-flex mb-2 ">
+        <v-btn rounded outlined color="primary" @click="decrease">
+            <v-icon small>mdi-minus</v-icon>
+        </v-btn>
 
-        </v-col>
-        <v-col>
-        <div class="spinner-btn minus" v-on:click="decrease()">
-            <slot name="minus"><span>-</span></slot>
-        </div>
-        </v-col>
-        <v-col>
-        <div class="spinner-btn plus" v-on:click="increase()">
-            <slot name="plus"><span>+</span></slot>
-        </div>
-        </v-col>
-        <v-col >
-           <btn-action class="x-small" action="todo" @click="$emit('print_labels', value)">{{ get_label() }}</btn-action>
-        </v-col>
-    </v-row>
-</div>
+        <v-text-field
+            v-model.number="value"
+            :rules="numberRules"
+            dense
+            class="centered-input"
+        />
+
+        <v-btn rounded outlined color="primary" @click="increase">
+            <v-icon small>mdi-plus</v-icon>
+        </v-btn>
+    </div>
+
+    <btn-action class="x-small" action="todo" @click="$emit('print_labels', value)">{{ get_label() }}</btn-action>
+</v-card>
 `,
     props: {
         input_type: {
@@ -73,6 +70,12 @@ export var LabelPrinterWidget = Vue.component("label-printer", {
         return {
             value: 1,
             original_value: 0,
+
+            // Data validation for the number input field
+            numberRules: [
+                (v) => !!v || "Required",
+                (v) => Number.isInteger(Number(v)) || "Must be a number",
+            ],
         };
     },
     methods: {
