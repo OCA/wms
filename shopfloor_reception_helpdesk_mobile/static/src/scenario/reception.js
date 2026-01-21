@@ -26,17 +26,32 @@ const new_template =
  </template>
 
  <template v-if="state_is('start_helpdesk')">
-    <v-text-field label="Description" placeholder="Ticket Description" class="current-value" v-model="state.data.helpdesk_wizard.description" />
-        <v-combobox
-            label="Motive"
-            :items="state.data.available_motives"
-            item-text="name"
-            v-model="state.data.helpdesk_wizard.motive"
-        ></v-combobox>
+    <v-text-field
+        label="Description"
+        placeholder="Ticket Description"
+        class="current-value"
+        v-model="state.data.helpdesk_wizard.description"
+        :rules="[v => !!v || 'Description is required']"
+        required
+    />
+
+    <v-combobox
+        label="Motive"
+        clearable
+        :items="state.data.available_motives"
+        item-text="name"
+        v-model="state.data.helpdesk_wizard.motive"
+    ></v-combobox>
+
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action @click="state.on_create_helpdesk">Create Helpdesk Ticket</btn-action>
+                <btn-action
+                    @click="state.on_create_helpdesk"
+                    :disabled="!state.data.helpdesk_wizard.description || !state.data.helpdesk_wizard.description.trim()"
+                >
+                    Create Helpdesk Ticket
+                </btn-action>
             </v-col>
             <v-col class="text-center" cols="12">
                 <btn-back />
