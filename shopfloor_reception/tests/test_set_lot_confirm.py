@@ -8,7 +8,30 @@ class TestSetLotConfirm(CommonCase):
     @classmethod
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
-        cls.product_a.tracking = "lot"
+
+    def test_ensure_lot(self):
+        picking = self._create_picking()
+        self.product_a.tracking = "lot"
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        response = self.service.dispatch(
+            "set_lot_confirm_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        message = self.msg_store.scan_lot_on_product_tracked_by_lot()
+        self.assert_response(
+            response,
+            next_state="set_lot",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+            message=message,
+        )
 
     def test_ensure_expiry_date(self):
         picking = self._create_picking()

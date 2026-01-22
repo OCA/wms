@@ -1149,10 +1149,22 @@ class Reception(Component):
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
-        message = self._check_expiry_date(selected_line)
-        if message:
-            return self._response_for_set_lot(picking, selected_line, message=message)
+        checks = [
+            self._check_expiry_date,
+            self._check_lot,
+        ]
+        for check in checks:
+            message = check(selected_line)
+            if message:
+                return self._response_for_set_lot(
+                    picking, selected_line, message=message
+                )
         return self._before_state__set_quantity(picking, selected_line)
+
+    def _check_lot(self, line):
+        need_lot = line.product_id.tracking == "lot"
+        if need_lot and not line.lot_id:
+            return self.msg_store.scan_lot_on_product_tracked_by_lot()
 
     def _check_expiry_date(self, line):
         use_expiration_date = (
