@@ -429,7 +429,7 @@ const Reception = {
             return values;
         },
         select_dest_package_display_name: function (rec) {
-            var values = this.select_dest_package_display_name_values();
+            var values = this.select_dest_package_display_name_values(rec);
             return values.join(" - ");
         },
         picking_detail_options_for_select_dest_package: function () {
