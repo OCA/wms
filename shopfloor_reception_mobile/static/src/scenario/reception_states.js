@@ -296,5 +296,29 @@ export const reception_states = function () {
                 this.reset_notification();
             },
         },
+        confirm_over_reception: {
+            display_info: {
+                title: "Confirm over reception",
+                message: "You are about to receive more than expected. Are you sure?",
+            },
+            events: {
+                confirm: "on_confirm",
+                go_back: "on_back",
+            },
+            on_confirm: () => {
+                this.wait_call(
+                    this.odoo.call(this.state.data.callback, {
+                        picking_id: this.state.data.picking.id,
+                        selected_line_id: this.line_being_handled.id,
+                        quantity: this.state.data.quantity,
+                        is_over_reception_confirmed: true,
+                    })
+                );
+            },
+            on_back: () => {
+                this.state_to("set_quantity");
+                this.reset_notification();
+            },
+        },
     };
 };
