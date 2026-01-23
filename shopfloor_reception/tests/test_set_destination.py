@@ -107,9 +107,10 @@ class TestSetDestination(CommonCase):
             message={"message_type": "error", "body": "You cannot place it here"},
         )
 
-    def test_auto_posting(self):
+    def test_auto_posting_partial(self):
         self.menu.sudo().auto_post_line = True
-        picking = self._create_picking()
+        # Creating a picking with a single move, with qty todo = 10
+        picking = self._create_picking(lines=[(self.product_a, 10)])
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
@@ -129,13 +130,17 @@ class TestSetDestination(CommonCase):
         # and dest package & dest location are set,
         # a line with 3 demand will be automatically extracted
         # in a new picking, which will be marked as done.
-        self.service.dispatch(
+        response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "location_name": self.dispatch_location.name,
             },
+        )
+        # Next screen is select move, because picking is not done
+        self.assert_response(
+            response, next_state="select_move", data=self._data_for_select_move(picking)
         )
         # The line has been moved to a different picking.
         self.assertNotEqual(picking, selected_move_line.picking_id)
@@ -151,6 +156,74 @@ class TestSetDestination(CommonCase):
         self.assertEqual(line_in_picking.reserved_uom_qty, 7)
         self.assertEqual(line_in_picking.qty_done, 0)
         self.assertEqual(picking.state, "assigned")
+
+    def test_auto_posting_full_one_line(self):
+        self.menu.sudo().auto_post_line = True
+        # Create a picking with a single move with qty todo = 10
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        # User has previously scanned the full qty
+        # A new pack has been created and assigned to the line.
+        self.service.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 10,
+            },
+        )
+        # Full qty processed, picking is done, and next screen is select document.
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.dispatch_location.name,
+            },
+        )
+        message = self.msg_store.transfer_done_success(picking)
+        self.assert_response(
+            response, next_state="select_document", data=self.ANY, message=message
+        )
+
+    def test_auto_posting_full_two_lines(self):
+        self.menu.sudo().auto_post_line = True
+        # Create a picking with a two moves with qty todo = 10
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_a
+        )
+        # User has previously scanned the full qty
+        # A new pack has been created and assigned to the line.
+        self.service.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 10,
+            },
+        )
+        # Full qty processed, but one more line to process,
+        # next screen is select_move
+        response = self.service.dispatch(
+            "set_destination",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "location_name": self.dispatch_location.name,
+            },
+        )
+        self.assert_response(
+            response, next_state="select_move", data=self._data_for_select_move(picking)
+        )
+        # Lines has been moved in another picking
+        self.assertNotEqual(picking, selected_move_line.picking_id)
+        # Fully processed
+        self.assertEqual(selected_move_line.picking_id.state, "done")
+        # One move remaining in the picking, for product b, still to be processed
+        self.assertEqual(picking.move_ids.product_id, self.product_b)
 
     def test_auto_posting_concurent_work(self):
         """Check 2 users working on the same move.
