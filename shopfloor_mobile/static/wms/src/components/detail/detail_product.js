@@ -136,9 +136,10 @@ Vue.component("detail-product", {
                         </template>
                     </item-detail-card>
               </v-expansion-panel-header>
-              <v-expansion-panel-content v-for="(lot, i) in location.lots">
+              <v-expansion-panel-content>
                 <separator-title v-if="location.lots.length > 0">Lots</separator-title>
                 <item-detail-card
+                v-for="(lot, i) in location.lots"
                 :record="lot"
                 v-bind="$props"
                 :key="make_component_key(['lot', lot.id])"
