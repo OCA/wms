@@ -148,6 +148,9 @@ export const reception_states = function () {
                 });
             },
             on_date_picker_selected: (expiration_date) => {
+                // Prevents double calls to backend due to event emission
+                if (expiration_date === undefined) return;
+
                 // Select expiration_date
                 let current_reception_date = this.line_being_handled.expiration_date;
                 if (current_reception_date) {
