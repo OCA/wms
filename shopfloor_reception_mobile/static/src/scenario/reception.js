@@ -21,11 +21,6 @@ const Reception = {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
-            <date-picker-input
-                v-if="state_is('set_lot')"
-                :handler_to_update_date="get_expiration_date_from_lot"
-                v-on:date_picker_selected="state.on_date_picker_selected"
-            />
             <template v-if="state_is('select_move')">
                 <item-detail-card
                     :record="state.data.picking"
@@ -100,6 +95,10 @@ const Reception = {
                 </div>
             </template>
             <template v-if="state_is('set_lot')">
+                <date-picker-input
+                    :handler_to_update_date="get_expiration_date_from_lot"
+                    v-on:date_picker_selected="state.on_date_picker_selected"
+                />
                 <item-detail-card
                     :record="line_being_handled"
                     :options="picking_detail_options_for_set_lot()"
