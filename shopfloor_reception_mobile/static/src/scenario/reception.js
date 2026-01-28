@@ -407,6 +407,9 @@ const Reception = {
                             path: "quantity_done",
                             label: "Qty done",
                             display_no_value: true,
+                            renderer: function (rec, field) {
+                                return rec.quantity_done + " / " + rec.quantity;
+                            },
                         },
                     ],
                 },
