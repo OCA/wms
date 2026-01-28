@@ -1043,7 +1043,7 @@ class Reception(Component):
     def manual_select_move(self, move_id):
         move = self.env["stock.move"].browse(move_id)
         picking = move.picking_id
-        return self._scan_line__find_or_create_line(picking, move)
+        return self._scan_line__find_or_create_line(picking, move, qty_done=0)
 
     def done_action(self, picking_id, confirmation=False):
         """Mark a picking as done

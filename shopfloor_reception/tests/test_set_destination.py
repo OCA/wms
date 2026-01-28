@@ -250,13 +250,12 @@ class TestSetDestination(CommonCase):
         # User 1 finishes his work
         move_line_data = res_u1["data"]["set_quantity"]["selected_move_line"][0]
         line_id_u1 = move_line_data["id"]
-        qty_done_u1 = move_line_data["qty_done"]
         res_u1 = service_u1.dispatch(
             "process_without_pack",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": line_id_u1,
-                "quantity": qty_done_u1,
+                "quantity": 1,
             },
         )
         res_u1 = service_u1.dispatch(
