@@ -180,6 +180,36 @@ class TestSelectLine(CommonCase):
             },
         )
 
+    def test_scan_lot_concurrent(self):
+        """
+        If 2 operators work on the same lot, the second operator
+        should not steal the move line of the first.
+        """
+        picking = self._create_picking()
+        lot = self._create_lot()
+
+        service_u1 = self.service
+        res_u1 = service_u1.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+            },
+        )
+        # User 2 starts working on the same move
+        service_u2 = self._get_service_for_user(self.shopfloor_manager)
+        res_u2 = service_u2.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+            },
+        )
+        self.assertNotEqual(
+            res_u1["data"]["set_lot"]["selected_move_line"][0]["id"],
+            res_u2["data"]["set_lot"]["selected_move_line"][0]["id"],
+        )
+
     def test_scan_not_tracked_product(self):
         self.product_a.tracking = "none"
         picking = self._create_picking()
