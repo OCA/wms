@@ -287,7 +287,7 @@ class Reception(Component):
         """
         unassigned_lines = self.env["stock.move.line"]
         for line in move.move_line_ids:
-            if line.progress == 100.0:
+            if line.shopfloor_unloaded:
                 continue
             if line.shopfloor_user_id.id == self.env.uid:
                 return self._scan_line__recover(picking, line, qty_done)
@@ -335,7 +335,7 @@ class Reception(Component):
         return_line = fields.first(
             lines.filtered(
                 lambda l: not l.package_id.product_packaging_id
-                and not l.result_package_id
+                and not l.shopfloor_unloaded
                 and l.shopfloor_user_id.id in (False, self.env.uid)
             )
         )
@@ -352,7 +352,7 @@ class Reception(Component):
         return fields.first(
             lines.filtered(
                 lambda l: l.package_id.product_packaging_id == packaging
-                and not l.result_package_id
+                and not l.shopfloor_unloaded
                 and l.shopfloor_user_id.id in [False, self.env.uid]
             )
         )
@@ -550,8 +550,7 @@ class Reception(Component):
                     lot == l.lot_id
                     or (lot.name == l.lot_name and lot.product_id == l.product_id)
                 )
-                and not l.progress == 100.0
-                and not l.result_package_id
+                and not l.shopfloor_unloaded
             )
         )
         if not lines:
@@ -573,7 +572,7 @@ class Reception(Component):
     def _scan_line__fallback(self, picking, barcode):
         # We might have lines with no lot, but with a lot_name.
         lines = picking.move_line_ids.filtered(
-            lambda l: l.lot_name == barcode and not l.result_package_id
+            lambda l: l.lot_name == barcode and not l.shopfloor_unloaded
         )
         if not lines:
             return self._response_for_select_move(
@@ -1385,7 +1384,11 @@ class Reception(Component):
         return self._response_for_set_destination(picking, selected_line)
 
     def _post_line(self, selected_line):
+        """
+        Called when the product is unloaded at destination.
+        """
         selected_line.reserved_uom_qty = selected_line.qty_done
+        selected_line.shopfloor_unloaded = True
         if (
             selected_line.picking_id.is_shopfloor_created
             and self.work.menu.allow_return
