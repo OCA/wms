@@ -878,7 +878,9 @@ class Reception(Component):
                     expiration_date = result.value
 
             if found:
-                return self.set_lot(picking.id, line.id, lot_name, expiration_date)
+                return self.set_lot_confirm_action(
+                    picking.id, line.id, lot_name, expiration_date
+                )
 
     def _align_display_product_uom_qty(self, line, response):
         # This method aligns product uom qties on move lines.
@@ -1136,8 +1138,8 @@ class Reception(Component):
             # Remove user_id on backorder, if any
             backorders_after.user_id = False
 
-    def set_lot(
-        self, picking_id, selected_line_id, lot_name=None, expiration_date=None
+    def set_lot_confirm_action(
+        self, picking_id, selected_line_id, lot_name, expiration_date=None
     ):
         """Set lot and its expiration date
 
@@ -1159,60 +1161,43 @@ class Reception(Component):
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
         if not selected_line.exists():
-            message = self.msg_store.record_not_found()
-            return self._response_for_set_lot(picking, selected_line, message=message)
+            return self._response_for_set_lot(
+                picking, selected_line, message=self.msg_store.record_not_found()
+            )
+
         search = self._actions_for("search")
-        if lot_name:
-            product = selected_line.product_id
-            lot = search.lot_from_scan(lot_name, products=product)
-            if not lot:
-                lot = self.env["stock.lot"].create(
-                    self._create_lot_values(product, lot_name)
-                )
-            selected_line.lot_id = lot.id
-            selected_line._onchange_lot_id()
+        product = selected_line.product_id
+        lot = search.lot_from_scan(lot_name, products=product)
+
+        if selected_line.product_id.use_expiration_date and (
+            not expiration_date and not lot.expiration_date
+        ):
+            return self._response_for_set_lot(
+                picking,
+                selected_line,
+                message=self.msg_store.expiration_date_missing(),
+            )
+
+        if not lot:
+            lot = self.env["stock.lot"].new(self._create_lot_values(product, lot_name))
         if expiration_date:
-            selected_line.write({"expiration_date": expiration_date})
-            selected_line.lot_id.write({"expiration_date": expiration_date})
-        return self._response_for_set_lot(picking, selected_line)
+            lot.expiration_date = expiration_date
+
+        # Convert in-memory record into real record
+        if not lot._origin:
+            lot_vals = lot._convert_to_write(lot._cache)
+            lot = self.env["stock.lot"].create(lot_vals)
+        selected_line.lot_id = lot.id
+        selected_line._onchange_lot_id()
+
+        return self._before_state__set_quantity(picking, selected_line)
 
     def _create_lot_values(self, product, lot_name):
         return {
             "name": lot_name,
             "product_id": product.id,
             "company_id": self.env.company.id,
-            "use_expiration_date": product.use_expiration_date,
         }
-
-    def set_lot_confirm_action(self, picking_id, selected_line_id):
-        picking = self.env["stock.picking"].browse(picking_id)
-        message = self._check_picking_processible(picking)
-        selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        if message:
-            return self._response_for_set_lot(picking, selected_line, message=message)
-        checks = [
-            self._check_expiry_date,
-            self._check_lot,
-        ]
-        for check in checks:
-            message = check(selected_line)
-            if message:
-                return self._response_for_set_lot(
-                    picking, selected_line, message=message
-                )
-        return self._before_state__set_quantity(picking, selected_line)
-
-    def _check_lot(self, line):
-        need_lot = line.product_id.tracking == "lot"
-        if need_lot and not line.lot_id:
-            return self.msg_store.scan_lot_on_product_tracked_by_lot()
-
-    def _check_expiry_date(self, line):
-        use_expiration_date = (
-            line.product_id.use_expiration_date or line.lot_id.use_expiration_date
-        )
-        if use_expiration_date and not line.expiration_date:
-            return self.msg_store.expiration_date_missing()
 
     def _set_quantity__get_handlers_by_type(self):
         return {
@@ -1613,7 +1598,7 @@ class ShopfloorReceptionValidator(Component):
             "move_id": {"required": True, "type": "integer"},
         }
 
-    def set_lot(self):
+    def set_lot_confirm_action(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
             "selected_line_id": {
@@ -1621,7 +1606,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "integer",
                 "required": True,
             },
-            "lot_name": {"type": "string"},
+            "lot_name": {"type": "string", "required": True},
             "expiration_date": {"type": "string"},
         }
 
@@ -1711,16 +1696,6 @@ class ShopfloorReceptionValidator(Component):
             "confirmation": {"type": "boolean"},
         }
 
-    def set_lot_confirm_action(self):
-        return {
-            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "selected_line_id": {
-                "coerce": to_int,
-                "type": "integer",
-                "required": True,
-            },
-        }
-
 
 class ShopfloorReceptionValidatorResponse(Component):
     _inherit = "base.shopfloor.validator.response"
@@ -1790,9 +1765,6 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def _done_next_states(self):
         return {"select_document", "select_move", "confirm_done"}
-
-    def _set_lot_confirm_action_next_states(self):
-        return {"set_lot", "set_quantity"}
 
     def _process_with_existing_pack_next_states(self):
         return {"set_quantity", "select_dest_package"}
@@ -1938,13 +1910,8 @@ class ShopfloorReceptionValidatorResponse(Component):
     def manual_select_move(self):
         return self._response_schema(next_states=self._scan_line_next_states())
 
-    def set_lot(self):
-        return self._response_schema(next_states=self._set_lot_next_states())
-
     def set_lot_confirm_action(self):
-        return self._response_schema(
-            next_states=self._set_lot_confirm_action_next_states()
-        )
+        return self._response_schema(next_states=self._set_lot_next_states())
 
     def set_quantity(self):
         return self._response_schema(next_states=self._set_quantity_next_states())
