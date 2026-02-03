@@ -3,7 +3,6 @@ from . import test_select_document
 from . import test_manual_selection
 from . import test_select_move
 from . import test_reception_done
-from . import test_set_lot
 from . import test_set_lot_confirm
 from . import test_set_quantity
 from . import test_set_quantity_action
