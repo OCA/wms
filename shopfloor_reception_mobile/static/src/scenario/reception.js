@@ -96,19 +96,20 @@ const Reception = {
             </template>
             <template v-if="state_is('set_lot')">
                 <date-picker-input
+                    v-if="line_being_handled.product.use_expiration_date"
                     :handler_to_update_date="get_expiration_date_from_lot"
-                    v-on:date_picker_selected="state.on_date_picker_selected"
+                    @date_picker_selected="state.on_date_picker_selected"
                 />
                 <item-detail-card
                     :record="line_being_handled"
                     :options="picking_detail_options_for_set_lot()"
-                    :card_color="lot_has_expiry_date() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
+                    :card_color="is_set_lot_possible() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_confirm_action">Continue</btn-action>
+                            <btn-action @click="state.on_confirm_lot" :disabled="!is_set_lot_possible()">Continue</btn-action>
                         </v-col>
                     </v-row>
                     <v-row align="center">
@@ -469,14 +470,13 @@ const Reception = {
         reset_picking_filter: function () {
             this.filtered_pickings = [];
         },
-        lot_has_expiry_date: function () {
-            // If there's a expiry date, it means there's a lot too.
-            const expiry_date = _.result(
-                this.line_being_handled,
-                "lot.expiration_date",
-                ""
-            );
-            return !_.isEmpty(expiry_date);
+        is_set_lot_possible: function () {
+            if (!this.line_being_handled.lot) return false;
+
+            let lot_name = this.line_being_handled.lot.name;
+            if (!lot_name) return false;
+
+            return true;
         },
         get_expiration_date_from_lot: function (lot) {
             if (!lot.expiration_date) {

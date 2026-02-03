@@ -130,35 +130,27 @@ export const reception_states = function () {
                 scan_input_placeholder_expiry: "Scan expiration date",
             },
             on_scan: (barcode) => {
-                // Scan a lot
-                this.wait_call(
-                    this.odoo.call("set_lot", {
-                        picking_id: this.state.data.picking.id,
-                        selected_line_id: this.line_being_handled.id,
-                        lot_name: barcode.text,
-                    })
-                ).then(() => {
-                    // We need to wait for the call to the backend to be over
-                    // to update the date-picker-input component
-                    // with the expiration_date of the selected lot.
-                    event_hub.$emit("datepicker:newdate", this.line_being_handled.lot);
-                });
+                // We merge the new name with whatever is already in .lot
+                // If .lot is null/undefined, we start with an empty object
+                this.line_being_handled.lot = {
+                    ...(this.line_being_handled.lot || {}),
+                    name: barcode.text,
+                };
             },
             on_date_picker_selected: (expiration_date) => {
-                // Select expiration_date
-                this.wait_call(
-                    this.odoo.call("set_lot", {
-                        picking_id: this.state.data.picking.id,
-                        selected_line_id: this.line_being_handled.id,
-                        expiration_date: expiration_date,
-                    })
-                );
+                // We merge the new date with whatever is already in .lot
+                this.line_being_handled.lot = {
+                    ...(this.line_being_handled.lot || {}),
+                    expiration_date: expiration_date,
+                };
             },
-            on_confirm_action: () => {
+            on_confirm_lot: () => {
                 this.wait_call(
                     this.odoo.call("set_lot_confirm_action", {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
+                        lot_name: this.line_being_handled.lot.name,
+                        expiration_date: this.line_being_handled.lot.expiration_date,
                     })
                 );
             },
