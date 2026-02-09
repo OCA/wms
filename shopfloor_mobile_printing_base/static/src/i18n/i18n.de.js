@@ -1,7 +1,6 @@
 /**
- * Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
- * @author Simone Orsi <simahawk@gmail.com>
- * License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+ * Copyright 2026 ACSONE SA/NV (https://acsone.eu)
+ * License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
  */
 
 import {translation_registry} from "../services/translation_registry.js";
