@@ -181,7 +181,7 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
         return self._actions_for("schema_detail")
 
     def _get_global_fields_schemas(self) -> dict:
-        "Returns schemas of fields to be added in all next states data schemas"
+        """Returns schemas of fields to be added in all next states data schemas"""
         return {}
 
     def _validate_next_states(self, next_states: set, states_schemas: dict):
