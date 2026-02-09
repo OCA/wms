@@ -130,15 +130,17 @@ export const reception_states = function () {
                 scan_input_placeholder_expiry: "Scan expiration date",
             },
             on_scan: (barcode) => {
-                // We merge the new name with whatever is already in .lot
-                // If .lot is null/undefined, we start with an empty object
-                this.line_being_handled.lot = {
-                    ...(this.line_being_handled.lot || {}),
-                    name: barcode.text,
-                };
+                this.wait_call(
+                    this.odoo.call("scan_lot_name", {
+                        picking_id: this.state.data.picking.id,
+                        selected_line_id: this.line_being_handled.id,
+                        lot_name: barcode.text,
+                    })
+                );
             },
             on_date_picker_selected: (expiration_date) => {
                 // We merge the new date with whatever is already in .lot
+                // If .lot is null/undefined, we start with an empty object
                 this.line_being_handled.lot = {
                     ...(this.line_being_handled.lot || {}),
                     expiration_date: expiration_date,
