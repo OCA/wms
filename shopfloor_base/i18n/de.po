@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-11 08:49+0000\n"
+"PO-Revision-Date: 2026-02-11 11:09+0000\n"
 "Last-Translator: Artur Machura <artur@artur-machura.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
@@ -232,7 +232,7 @@ msgstr ""
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
 msgid "Menu Options"
-msgstr ""
+msgstr "Menüoptionen"
 
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_menu
@@ -366,6 +366,8 @@ msgid ""
 "Registry out of sync. Likely the record has been modified but not sync'ed "
 "with the routing registry."
 msgstr ""
+"Die Registry ist nicht synchron. Wahrscheinlich wurde der Datensatz "
+"geändert, aber nicht mit der Routing-Registry synchronisiert."
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_scenario
@@ -373,55 +375,55 @@ msgstr ""
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_scenario
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 msgid "Scenario"
-msgstr ""
+msgstr "Szenario"
 
 #. module: shopfloor_base
 #: model:ir.model.constraint,message:shopfloor_base.constraint_shopfloor_scenario_key
 msgid "Scenario key must be unique"
-msgstr ""
+msgstr "Der Szenarioschlüssel muss eindeutig sein"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__sequence
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__sequence
 msgid "Sequence"
-msgstr ""
+msgstr "Reihenfolge"
 
 #. module: shopfloor_base
 #: model:ir.module.category,name:shopfloor_base.module_category_shopfloor
 #: model:ir.ui.menu,name:shopfloor_base.menu_shopfloor_root
 msgid "Shopfloor"
-msgstr ""
+msgstr "Shopfloor"
 
 #. module: shopfloor_base
 #: model:res.groups,name:shopfloor_base.group_shopfloor_manager
 msgid "Shopfloor Manager"
-msgstr ""
+msgstr "Shopfloor Manager"
 
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_scenario
 msgid "Shopfloor Scenario"
-msgstr ""
+msgstr "Shopfloor Szenario"
 
 #. module: shopfloor_base
 #: model:res.groups,name:shopfloor_base.group_shopfloor_user
 msgid "Shopfloor User"
-msgstr ""
+msgstr "Shopfloor Benutzer"
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_app
 #: model:ir.ui.menu,name:shopfloor_base.menu_action_shopfloor_app
 msgid "Shopfloor apps"
-msgstr ""
+msgstr "Shopfloor Apps"
 
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_profile
 msgid "Shopfloor profile settings"
-msgstr ""
+msgstr "Shopfloor Profileinstellungen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__short_name
 msgid "Short Name"
-msgstr ""
+msgstr "Kurzname"
 
 #. module: shopfloor_base
 #: model:shopfloor.menu,name:shopfloor_base.shopfloor_menu_demo_1
@@ -431,35 +433,37 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.actions.server,name:shopfloor_base.server_action_registry_sync
 msgid "Sync registry"
-msgstr ""
+msgstr "Registry synchronisieren"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__tech_name
 msgid "Tech Name"
-msgstr ""
+msgstr "Technischer Name"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__registered_routes
 msgid ""
 "Technical field to allow developers to check registered routes on the form"
 msgstr ""
+"Technisches Feld, das es Entwicklern ermöglicht, registrierte Routen im "
+"Formular zu überprüfen"
 
 #. module: shopfloor_base
 #. odoo-python
 #: code:addons/shopfloor_base/services/service.py:0
 #, python-format
 msgid "The record {model} {_id} does not exist"
-msgstr ""
+msgstr "Der Datensatz {model} {_id} existiert nicht"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_search_view
 msgid "To sync"
-msgstr ""
+msgstr "Zu synchronisieren"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__url
 msgid "Url"
-msgstr ""
+msgstr "URL"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -467,16 +471,18 @@ msgid ""
 "Use the action \"Sync registry\" to make changes effective once you are done"
 " with edits and creates."
 msgstr ""
+"Verwenden Sie die Aktion „Registry synchronisieren“, um Änderungen nach "
+"Abschluss der Bearbeitungen und Erstellungen wirksam werden zu lassen."
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "View api docs"
-msgstr ""
+msgstr "Schnittstellendokumentation ansehen"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "View menu items"
-msgstr ""
+msgstr "Menüeinträge ansehen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__profile_id
@@ -486,4 +492,4 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.constraint,message:shopfloor_base.constraint_shopfloor_app_tech_name
 msgid "tech_name must be unique"
-msgstr ""
+msgstr "tech_name muss einzigartig sein"
