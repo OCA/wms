@@ -171,12 +171,18 @@ class TestSetLotConfirm(CommonCase):
                 "lot_name": lot_name,
             },
         )
+
+        excepted_selected_move_line_data = self.data.move_lines(selected_move_line)
+        # The expected response should contain the lot name even if the lot is
+        # not defined on the move line already
+        excepted_selected_move_line_data[0]["lot"] = {"name": lot_name}
+
         self.assert_response(
             response,
             next_state="set_lot",
             data={
                 "picking": self.data.picking(picking),
-                "selected_move_line": self.data.move_lines(selected_move_line),
+                "selected_move_line": excepted_selected_move_line_data,
             },
             message=self.msg_store.expiration_date_missing(),
         )

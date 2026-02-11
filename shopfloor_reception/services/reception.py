@@ -1222,6 +1222,7 @@ class Reception(Component):
                 picking,
                 selected_line,
                 message=self.msg_store.expiration_date_missing(),
+                lot_name=lot_name,
             )
 
         if not lot:
