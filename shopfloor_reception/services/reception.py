@@ -837,12 +837,12 @@ class Reception(Component):
         data = {"pickings": self._data_for_stock_pickings(pickings, with_lines=False)}
         return self._response(next_state="manual_selection", data=data)
 
-    def _response_for_set_lot(self, picking, line, message=None):
+    def _response_for_set_lot(self, picking, line, message=None, **kw):
         self._set_lot_from_parse(picking, line)
         return self._response(
             next_state="set_lot",
             data={
-                "selected_move_line": self._data_for_move_lines(line),
+                "selected_move_line": self._data_for_move_lines(line, **kw),
                 "picking": self.data.picking(picking),
             },
             message=message,
@@ -1137,6 +1137,27 @@ class Reception(Component):
             backorders_after = picking.backorder_ids - backorders_before
             # Remove user_id on backorder, if any
             backorders_after.user_id = False
+
+    def scan_lot_name(self, picking_id, selected_line_id, lot_name):
+        picking = self.env["stock.picking"].browse(picking_id)
+        selected_line = self.env["stock.move.line"].browse(selected_line_id)
+        message = self._check_picking_processible(picking)
+        if message:
+            return self._response_for_set_lot(picking, selected_line, message=message)
+        if not selected_line.exists():
+            return self._response_for_set_lot(
+                picking, selected_line, message=self.msg_store.record_not_found()
+            )
+
+        existing_lot = self.env["stock.lot"].search(
+            [("name", "=", lot_name), ("product_id", "=", selected_line.product_id.id)]
+        )
+
+        res = self._response_for_set_lot(
+            picking, selected_line, lot=existing_lot, lot_name=lot_name
+        )
+
+        return res
 
     def set_lot_confirm_action(
         self, picking_id, selected_line_id, lot_name, expiration_date=None
@@ -1610,6 +1631,17 @@ class ShopfloorReceptionValidator(Component):
             "expiration_date": {"type": "string"},
         }
 
+    def scan_lot_name(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_id": {
+                "coerce": to_int,
+                "type": "integer",
+                "required": True,
+            },
+            "lot_name": {"type": "string", "required": True},
+        }
+
     def set_quantity(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -1750,6 +1782,9 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def _set_lot_next_states(self):
         return {"select_move", "set_lot", "set_quantity"}
+
+    def _scan_lot_name_next_states(self):
+        return {"set_lot"}
 
     def _set_quantity_next_states(self):
         return {"set_quantity", "select_move", "set_destination"}
@@ -1912,6 +1947,9 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def set_lot_confirm_action(self):
         return self._response_schema(next_states=self._set_lot_next_states())
+
+    def scan_lot_name(self):
+        return self._response_schema(next_states=self._scan_lot_name_next_states())
 
     def set_quantity(self):
         return self._response_schema(next_states=self._set_quantity_next_states())

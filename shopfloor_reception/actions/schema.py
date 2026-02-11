@@ -18,3 +18,15 @@ class ShopfloorSchemaAction(Component):
             }
         )
         return res
+
+    def lot(self):
+        res = super().lot()
+
+        # We need to be able to send lot name and expiration date info
+        # for "virtual lot" not yet created -> not yet an id
+        res.update(
+            {
+                "id": {"required": False, "type": "integer"},
+            }
+        )
+        return res
