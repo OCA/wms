@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-10-08 08:42+0000\n"
-"Last-Translator: davidbeckercbl <becker@cbl-computer.de>\n"
+"PO-Revision-Date: 2026-02-11 08:49+0000\n"
+"Last-Translator: Artur Machura <artur@artur-machura.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_route
@@ -182,18 +182,18 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__lang_id
 msgid "If set, the app will be first loaded with this lang."
-msgstr ""
+msgstr "Falls gesetzt, wird die App zunächst in dieser Sprache geladen."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario_key
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__key
 msgid "Key"
-msgstr ""
+msgstr "Schlüssel"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Language"
-msgstr ""
+msgstr "Sprache"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app____last_update
@@ -201,7 +201,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile____last_update
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Zuletzt geändert am"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__write_uid
@@ -209,7 +209,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__write_uid
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Zuletzt aktualisiert von"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__write_date
@@ -217,7 +217,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__write_date
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Zuletzt aktualisiert am"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario
@@ -257,12 +257,12 @@ msgstr "Für dieses Profil sichtbare Menüs"
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_profile__name
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__name
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__short_name
 msgid "Needed for app manifest"
-msgstr ""
+msgstr "Für das Manifest der App notwendig"
 
 #. module: shopfloor_base
 #: model:ir.model.fields.selection,name:shopfloor_base.selection__shopfloor_app__category__
@@ -281,23 +281,23 @@ msgstr ""
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Open app"
-msgstr ""
+msgstr "App öffnen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__options
 msgid "Options"
-msgstr ""
+msgstr "Optionen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_scenario__options_edit
 msgid "Options Edit"
-msgstr ""
+msgstr "Optionen editiern"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__profile_id
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_search_view
 msgid "Profile"
-msgstr ""
+msgstr "Profil"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_required
@@ -327,7 +327,7 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_docs_url
 msgid "Public URL for api docs."
-msgstr ""
+msgstr "Öffentliche URL für Schnittstellendokumentation."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__url
@@ -339,7 +339,7 @@ msgstr ""
 #: code:addons/shopfloor_base/actions/message.py:0
 #, python-format
 msgid "Record not found."
-msgstr ""
+msgstr "Datensatz nicht gefunden."
 
 #. module: shopfloor_base
 #. odoo-python
@@ -353,7 +353,7 @@ msgstr ""
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registered_routes
 msgid "Registered Routes"
-msgstr ""
+msgstr "Registrierte Routen"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registry_sync
