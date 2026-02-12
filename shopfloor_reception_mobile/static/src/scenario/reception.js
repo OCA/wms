@@ -298,6 +298,23 @@ const Reception = {
                 },
             };
         },
+        _get_lot_expiration_date_klass: function () {
+            let klass = "loud";
+            const expiryValue = _.result(
+                this.line_being_handled,
+                "lot.expiration_date"
+            );
+
+            if (expiryValue) {
+                const expiryDate = new Date(expiryValue);
+                const now = new Date();
+                if (expiryDate < now) {
+                    klass += " red";
+                }
+            }
+            return klass;
+        },
+
         picking_detail_options_for_set_lot: function () {
             return {
                 key_title: "product.display_name",
@@ -321,7 +338,7 @@ const Reception = {
                     {
                         path: "lot.expiration_date",
                         label: "Expiry date",
-                        klass: "loud",
+                        klass: this._get_lot_expiration_date_klass(),
                         renderer: (rec, field) => {
                             return this.utils.display.format_date_display(
                                 _.result(rec, field.path),
