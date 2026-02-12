@@ -123,6 +123,38 @@ class TestSetLotConfirm(CommonCase):
         )
 
     @freeze_time("2020-01-01 11:00:00")
+    def test_set_existing_lot_overwrite_expiration_date(self):
+        self.product_a.use_expiration_date = True
+        picking = self._create_picking()
+        lot_expiration_date = "2022-08-23 12:00:00"
+        lot = self._create_lot(expiration_date=lot_expiration_date)
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+
+        new_expiration_date = "2022-08-27 12:00:00"
+        response = self.service.dispatch(
+            "set_lot_confirm_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "lot_name": lot.name,
+                "expiration_date": new_expiration_date,
+            },
+        )
+        self.assertEqual(str(selected_move_line.expiration_date), new_expiration_date)
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": None,
+            },
+        )
+
+    @freeze_time("2020-01-01 11:00:00")
     def test_set_new_lot_and_expiration_date(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
