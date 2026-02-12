@@ -1149,12 +1149,37 @@ class Reception(Component):
                 picking, selected_line, message=self.msg_store.record_not_found()
             )
 
-        existing_lot = self.env["stock.lot"].search(
-            [("name", "=", lot_name), ("product_id", "=", selected_line.product_id.id)]
+        existing_lot = self.env["stock.lot"]
+        lot_expiration_date = None
+
+        search = self._actions_for("search")
+        search_result = search.find(
+            barcode=lot_name,
+            types=["lot", "expiration_date"],
+            handler_kw={"lot": {"products": selected_line.product_id}},
         )
 
+        if search_result.type == "lot":
+            existing_lot = search_result.record
+
+        # Look for more info in the barcode
+        for result in search_result.parse_result:
+            if result.type == "expiration_date":
+                lot_expiration_date = result.value
+
+        message = None
+        if lot_expiration_date and existing_lot.expiration_date != lot_expiration_date:
+            message = self.msg_store.lot_already_exists_different_expiration_date(
+                existing_lot, lot_expiration_date
+            )
+
         res = self._response_for_set_lot(
-            picking, selected_line, lot=existing_lot, lot_name=lot_name
+            picking,
+            selected_line,
+            message=message,
+            lot=existing_lot,
+            lot_name=lot_name,
+            lot_expiration_date=lot_expiration_date,
         )
 
         return res
@@ -1202,7 +1227,7 @@ class Reception(Component):
         if not lot:
             lot = self.env["stock.lot"].new(self._create_lot_values(product, lot_name))
         if expiration_date:
-            lot.expiration_date = expiration_date
+            lot.expiration_date = expiration_date.replace("T", " ")
 
         # Convert in-memory record into real record
         if not lot._origin:

@@ -33,7 +33,7 @@ class TestStructuredBarcode(CommonCase):
                 BarcodeResult(type="lot", value=lot.name, raw=lot.name),
                 BarcodeResult(
                     type="expiration_date",
-                    value=fields.Date.to_date("2025-04-15"),
+                    value="2025-04-15",
                     raw="250415",
                 ),
             ]

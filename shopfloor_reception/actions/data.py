@@ -24,8 +24,11 @@ class DataAction(Component):
         lot_data = {}
         if lot := kw.get("lot"):
             lot_data = self._jsonify(lot, self._lot_parser)
-        elif lot_name := kw.get("lot_name"):
-            lot_data["name"] = lot_name
+        else:
+            if lot_name := kw.get("lot_name"):
+                lot_data["name"] = lot_name
+            if lot_expiration_date := kw.get("lot_expiration_date"):
+                lot_data["expiration_date"] = lot_expiration_date.isoformat()
 
         if lot_data:
             data["lot"] = data.get("lot") or {}
