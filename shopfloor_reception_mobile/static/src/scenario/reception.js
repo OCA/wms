@@ -323,7 +323,17 @@ const Reception = {
                         label: "Expiry date",
                         klass: "loud",
                         renderer: (rec, field) => {
-                            return this.utils.display.render_field_date(rec, field);
+                            return this.utils.display.format_date_display(
+                                _.result(rec, field.path),
+                                {
+                                    // Overwrite defaults to only show date and not time
+                                    format: {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                    },
+                                }
+                            );
                         },
                     },
                 ],
