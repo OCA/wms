@@ -97,7 +97,6 @@ const Reception = {
             <template v-if="state_is('set_lot')">
                 <date-picker-input
                     v-if="line_being_handled.product.use_expiration_date"
-                    :handler_to_update_date="get_expiration_date_from_lot"
                     @date_picker_selected="state.on_date_picker_selected"
                 />
                 <item-detail-card
@@ -477,12 +476,6 @@ const Reception = {
             if (!lot_name) return false;
 
             return true;
-        },
-        get_expiration_date_from_lot: function (lot) {
-            if (!lot.expiration_date) {
-                return;
-            }
-            return lot.expiration_date.split("T")[0];
         },
         move_card_color: function (move) {
             if (move.progress === 100) {
