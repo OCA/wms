@@ -7,17 +7,27 @@ export var DatePicker = Vue.component("date-picker-input", {
     data: function () {
         return {
             date: "",
+
+            // Control menu state manually to prevent closing during month/year navigation.
+            menu: false,
         };
     },
     computed: {
         userLocale: function () {
             const lang = this.$root.user?.lang || "en-US";
-            // Vuetify works with kebab-case (en-us instead of en_US)
             return lang.replace("_", "-").toLowerCase();
+        },
+    },
+    methods: {
+        onDateChange(newDate) {
+            this.menu = false;
+            this.$emit("dateChange", newDate);
         },
     },
     template: `
     <v-menu
+        v-model="menu"
+        :close-on-content-click="false"
         transition="scale-transition"
         offset-y
         min-width="auto"
@@ -34,8 +44,8 @@ export var DatePicker = Vue.component("date-picker-input", {
         </template>
         <v-date-picker
             v-model="date"
-            @change="$emit('dateChange', date)"
             :locale="userLocale"
+            @change="onDateChange"
         />
     </v-menu>
     `,
