@@ -9,6 +9,13 @@ export var DatePicker = Vue.component("date-picker-input", {
             date: "",
         };
     },
+    computed: {
+        userLocale: function () {
+            const lang = this.$root.user?.lang || "en-US";
+            // Vuetify works with kebab-case (en-us instead of en_US)
+            return lang.replace("_", "-").toLowerCase();
+        },
+    },
     template: `
     <v-menu
         transition="scale-transition"
@@ -28,6 +35,7 @@ export var DatePicker = Vue.component("date-picker-input", {
         <v-date-picker
             v-model="date"
             @change="$emit('dateChange', date)"
+            :locale="userLocale"
         />
     </v-menu>
     `,
