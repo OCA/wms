@@ -107,8 +107,10 @@ export var DatePicker = Vue.component("date-picker-input", {
             this.dateInput = maskedValue;
         },
         validateAndSync() {
-            console.log("validate and sync");
-            if ((this.dateInput?.length || 0) !== this.dateMask.length) {
+            if (!this.dateInput) {
+                return;
+            }
+            if (this.dateInput.length !== this.dateMask.length) {
                 this.showInvalidDateInputMessage = true;
                 return;
             }
