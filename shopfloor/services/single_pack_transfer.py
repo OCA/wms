@@ -180,14 +180,25 @@ class SinglePackTransfer(Component):
 
         return self._response_for_scan_location(package_level)
 
+    def _prepare_picking_vals_for_package(self, package):
+        vals = {}
+        if package.owner_id:
+            vals["owner_id"] = package.owner_id.id
+        return vals
+
+    def _create_picking_for_package(self, package):
+        picking_vals = self._prepare_picking_vals_for_package(package)
+        StockPicking = self.env["stock.picking"].with_context(
+            default_picking_type_id=self.picking_types.id
+        )
+        picking = StockPicking.create(picking_vals)
+        return picking
+
     def _create_package_level(self, package):
         # this method can be called only if we have one picking type
         # (allow_move_create==True on menu)
         assert self.picking_types.ensure_one()
-        StockPicking = self.env["stock.picking"].with_context(
-            default_picking_type_id=self.picking_types.id
-        )
-        picking = StockPicking.create({})
+        picking = self._create_picking_for_package(package)
         package_level = self.env["stock.package_level"].create(
             {
                 "picking_id": picking.id,
