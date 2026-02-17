@@ -193,7 +193,7 @@ class SinglePackTransfer(Component):
                 "picking_id": picking.id,
                 "package_id": package.id,
                 "location_dest_id": picking.location_dest_id.id,
-                "company_id": self.env.company.id,
+                "company_id": picking.company_id.id,
             }
         )
         picking.action_confirm()
