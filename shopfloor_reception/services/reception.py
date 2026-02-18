@@ -1194,10 +1194,6 @@ class Reception(Component):
             expiration_date: The expiration_date
 
         transitions:
-          - select_move: User clicked on back
-          - set_lot: Barcode not found. Ask user to create one from barcode
-          - set_lot: expiration_date has been set on the selected line
-          - set_lot: lot_it has been set on the selected line
           - set_lot: Error: expiration_date is required
           - set_quantity: User clicked on the confirm button
         """
@@ -1806,8 +1802,8 @@ class ShopfloorReceptionValidatorResponse(Component):
     def _scan_line_next_states(self):
         return {"select_move", "set_lot", "set_quantity", "set_destination"}
 
-    def _set_lot_next_states(self):
-        return {"select_move", "set_lot", "set_quantity"}
+    def _set_lot_confirm_action_next_states(self):
+        return {"set_lot", "set_quantity"}
 
     def _scan_lot_name_next_states(self):
         return {"set_lot"}
@@ -1972,7 +1968,9 @@ class ShopfloorReceptionValidatorResponse(Component):
         return self._response_schema(next_states=self._scan_line_next_states())
 
     def set_lot_confirm_action(self):
-        return self._response_schema(next_states=self._set_lot_next_states())
+        return self._response_schema(
+            next_states=self._set_lot_confirm_action_next_states()
+        )
 
     def scan_lot_name(self):
         return self._response_schema(next_states=self._scan_lot_name_next_states())
