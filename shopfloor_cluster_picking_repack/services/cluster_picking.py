@@ -80,11 +80,15 @@ class ClusterPicking(Component):
         """
         packing_action: PackingAction = self._actions_for("packing")
         picking = self.env["stock.picking"].browse(picking_id)
+        selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         message = self._check_picking_status(picking)
         if message:
-            return self._response_for_select_document(message=message)
+            return self._response_for_select_package(
+                picking,
+                selected_lines,
+                message=message,
+            )
 
-        selected_lines = self.env["stock.move.line"].browse(selected_line_ids).exists()
         search_result = packing_action._scan_package_find(picking, barcode)
         message = packing_action._check_scan_package_find(picking, search_result)
         if message:

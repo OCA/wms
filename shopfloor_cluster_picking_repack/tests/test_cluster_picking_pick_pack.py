@@ -487,6 +487,25 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             response, next_state="pack_picking_scan_pack", message=message, data=data
         )
 
+    def test_scan_package_wrong_picking_status(self):
+        move_line = self.move_lines[-1]
+        picking = move_line.picking_id
+        picking.action_cancel()  #  to trigger error in _check_picking_status
+        response = self.service.dispatch(
+            "scan_package_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_ids": move_line.ids,
+                "barcode": "BOX-5",
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="select_package",
+            data=self.ANY,
+            message=self.msg_store.transfer_canceled(),
+        )
+
     def test_pack_package_type_no_picking(self):
         self._create_package_type()
         self.menu.sudo().write(
