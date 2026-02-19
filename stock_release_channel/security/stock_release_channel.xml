@@ -31,4 +31,10 @@
         <field name="perm_unlink" eval="1" />
     </record>
 
+    <record model="ir.rule" id="stock_release_channel_comp_rule">
+        <field name="name">Stock Release Channel multi-company</field>
+        <field name="model_id" ref="model_stock_release_channel" />
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
 </odoo>

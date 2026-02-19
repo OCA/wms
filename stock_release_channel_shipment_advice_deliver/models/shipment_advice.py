@@ -76,8 +76,8 @@ class ShipmentAdvice(models.Model):
             )
         return True
 
-    def _postprocess_action_done(self):
-        res = super()._postprocess_action_done()
+    def _postprocess_action_done(self, backorder_policy):
+        res = super()._postprocess_action_done(backorder_policy)
         if not self.release_channel_id:
             return res
         if self.state == "error":
