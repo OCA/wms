@@ -19,7 +19,7 @@ const new_template =
     <item-detail-card
         :key="make_state_component_key(['packaging', state.data.packaging.id])"
         :record="state.data.packaging"
-        :options="{main: true, key_title: 'name', title_icon: 'mdi-package-variant'}"
+        :options="packaging_detail_options()"
     />
 
      <v-form ref="form_dimension">
@@ -43,7 +43,7 @@ const new_template =
                 <v-text-field
                     label="Length"
                     type="number"
-                    :suffix="state.data.packaging.length_uom"
+                    :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Length"
                     v-model="state.data.packaging.length"
                 ></v-text-field>
@@ -52,7 +52,7 @@ const new_template =
                 <v-text-field
                     label="Width"
                     type="number"
-                    :suffix="state.data.packaging.length_uom"
+                    :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Width"
                     v-model="state.data.packaging.width"
                 ></v-text-field>
@@ -61,7 +61,7 @@ const new_template =
                 <v-text-field
                     label="Height"
                     type="number"
-                    :suffix="state.data.packaging.length_uom"
+                    :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Height"
                     v-model="state.data.packaging.height"
                 ></v-text-field>
@@ -70,7 +70,7 @@ const new_template =
                 <v-text-field
                     label="Weight"
                     type="number"
-                    :suffix="state.data.packaging.weight_uom"
+                    :suffix="state.data.packaging.weight_uom_name"
                     placeholder="Packaging Weight"
                     v-model="state.data.packaging.weight"
                 ></v-text-field>
@@ -105,6 +105,54 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
     template: new_template,
     "methods.get_packaging_measurements": function () {
         return ["length", "width", "height", "weight", "qty", "barcode"];
+    },
+    "methods.packaging_detail_options": function () {
+        const options = {
+            main: true,
+            key_title: "name",
+            title_icon: "mdi-package-variant",
+            fields: [
+                {path: "barcode", label: "Barcode"},
+                {path: "qty", label: "Quantity"},
+                {
+                    path: "length",
+                    label: "Length",
+                    renderer: function (rec, field) {
+                        const value = _.result(rec, "length", "");
+                        const uom = _.result(rec, "length_uom_name", "");
+                        return value + " " + uom;
+                    },
+                },
+                {
+                    path: "width",
+                    label: "Width",
+                    renderer: function (rec, field) {
+                        const value = _.result(rec, "width", "");
+                        const uom = _.result(rec, "length_uom_name", "");
+                        return value + " " + uom;
+                    },
+                },
+                {
+                    path: "height",
+                    label: "Height",
+                    renderer: function (rec, field) {
+                        const value = _.result(rec, "height", "");
+                        const uom = _.result(rec, "length_uom_name", "");
+                        return value + " " + uom;
+                    },
+                },
+                {
+                    path: "weight",
+                    label: "Weight",
+                    renderer: function (rec, field) {
+                        const value = _.result(rec, "weight", "");
+                        const uom = _.result(rec, "weight_uom_name", "");
+                        return value + " " + uom;
+                    },
+                },
+            ],
+        };
+        return options;
     },
     "methods._get_states": function () {
         let states = _get_states.bind(this)();
