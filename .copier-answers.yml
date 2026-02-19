@@ -1,6 +1,6 @@
 # Do NOT update manually; changes here will be overwritten by Copier
-_commit: v1.29
-_src_path: gh:oca/oca-addons-repo-template
+_commit: v1.38
+_src_path: https://github.com/OCA/oca-addons-repo-template.git
 ci: GitHub
 convert_readme_fragments_to_markdown: false
 enable_checklog_odoo: false
@@ -18,7 +18,7 @@ org_name: Odoo Community Association (OCA)
 org_slug: OCA
 rebel_module_groups: []
 repo_description: WMS modules for Odoo
-repo_name: wms
+repo_name: Warehouse Management System (WMS)
 repo_slug: wms
 repo_website: https://github.com/OCA/wms
 use_pyproject_toml: false
