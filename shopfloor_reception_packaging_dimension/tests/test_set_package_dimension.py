@@ -216,9 +216,7 @@ class TestSetPackDimension(CommonCase):
             self.picking,
             line,
             self.product_c_packaging_2,
-            message=self.msg_store.packaging_dimension_updated(
-                self.product_c_packaging
-            ),
+            message=self.msg_store.packaging_updated(self.product_c_packaging),
         )
         response = self.service.dispatch(
             "set_packaging_dimension",
@@ -240,7 +238,5 @@ class TestSetPackDimension(CommonCase):
                 "selected_move_line": self.data.move_lines(line),
                 "confirmation_required": None,
             },
-            message=self.msg_store.packaging_dimension_updated(
-                self.product_c_packaging_2
-            ),
+            message=self.msg_store.packaging_updated(self.product_c_packaging_2),
         )

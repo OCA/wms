@@ -109,7 +109,7 @@ class Reception(Component):
             message = self.msg_store.record_not_found()
         elif not cancel and self._check_dimension_to_update(kwargs):
             self._update_packaging_dimension(packaging, kwargs)
-            message = self.msg_store.packaging_dimension_updated(packaging)
+            message = self.msg_store.packaging_updated(packaging)
         if packaging:
             next_packaging = self._get_next_packaging_to_set_dimension(
                 selected_line.product_id, packaging
