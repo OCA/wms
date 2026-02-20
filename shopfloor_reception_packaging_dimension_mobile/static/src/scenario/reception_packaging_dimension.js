@@ -28,7 +28,7 @@ const new_template =
                 <v-text-field
                     label="Barcode"
                     placeholder="Packaging Barcode"
-                    v-model="state.data.packaging.barcode"
+                    v-model="state.data.packaging.barcode_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -36,7 +36,7 @@ const new_template =
                     label="Quantiy"
                     type="number"
                     placeholder="Packaging Quantity"
-                    v-model="state.data.packaging.qty"
+                    v-model="state.data.packaging.qty_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -45,7 +45,7 @@ const new_template =
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Length"
-                    v-model="state.data.packaging.length"
+                    v-model="state.data.packaging.length_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -54,7 +54,7 @@ const new_template =
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Width"
-                    v-model="state.data.packaging.width"
+                    v-model="state.data.packaging.width_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -63,7 +63,7 @@ const new_template =
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
                     placeholder="Packaging Height"
-                    v-model="state.data.packaging.height"
+                    v-model="state.data.packaging.height_input"
                 ></v-text-field>
             </v-row>
             <v-row>
@@ -72,7 +72,7 @@ const new_template =
                     type="number"
                     :suffix="state.data.packaging.weight_uom_name"
                     placeholder="Packaging Weight"
-                    v-model="state.data.packaging.weight"
+                    v-model="state.data.packaging.weight_input"
                 ></v-text-field>
             </v-row>
             <!-- extend -->
@@ -103,20 +103,41 @@ const new_template =
 //   - the js code for the new state
 const ReceptionPackageDimension = process_registry.extend("reception", {
     template: new_template,
-    "methods.get_packaging_measurements": function () {
-        return ["length", "width", "height", "weight", "qty", "barcode"];
+    "methods.get_packaging_measurements_inputs": function () {
+        return [
+            "length_input",
+            "width_input",
+            "height_input",
+            "weight_input",
+            "qty_input",
+            "barcode_input",
+        ];
     },
     "methods.packaging_detail_options": function () {
+        const pkg = this.state.data.packaging;
+        const _is_field_changed = (fieldName) => {
+            const inputKey = fieldName + "_input";
+            return pkg[inputKey] && pkg[inputKey] != pkg[fieldName];
+        };
         const options = {
             main: true,
             key_title: "name",
             title_icon: "mdi-package-variant",
             fields: [
-                {path: "barcode", label: "Barcode"},
-                {path: "qty", label: "Quantity"},
+                {
+                    path: "barcode",
+                    label: "Barcode",
+                    klass: _is_field_changed("barcode") ? "accent" : "",
+                },
+                {
+                    path: "qty",
+                    label: "Quantity",
+                    klass: _is_field_changed("qty") ? "accent" : "",
+                },
                 {
                     path: "length",
                     label: "Length",
+                    klass: _is_field_changed("length") ? "accent" : "",
                     renderer: function (rec, field) {
                         const value = _.result(rec, "length", "");
                         const uom = _.result(rec, "length_uom_name", "");
@@ -126,6 +147,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 {
                     path: "width",
                     label: "Width",
+                    klass: _is_field_changed("width") ? "accent" : "",
                     renderer: function (rec, field) {
                         const value = _.result(rec, "width", "");
                         const uom = _.result(rec, "length_uom_name", "");
@@ -135,6 +157,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 {
                     path: "height",
                     label: "Height",
+                    klass: _is_field_changed("height") ? "accent" : "",
                     renderer: function (rec, field) {
                         const value = _.result(rec, "height", "");
                         const uom = _.result(rec, "length_uom_name", "");
@@ -144,6 +167,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 {
                     path: "weight",
                     label: "Weight",
+                    klass: _is_field_changed("weight") ? "accent" : "",
                     renderer: function (rec, field) {
                         const value = _.result(rec, "weight", "");
                         const uom = _.result(rec, "weight_uom_name", "");
@@ -169,14 +193,15 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     selected_line_id: this.state.data.selected_move_line.id,
                     packaging_id: this.state.data.packaging.id,
                 };
-                for (const measurement of this.get_packaging_measurements()) {
-                    values[measurement] = this.state.data.packaging[measurement];
+                for (const measurement of this.get_packaging_measurements_inputs()) {
+                    values[measurement.replace("_input", "")] =
+                        this.state.data.packaging[measurement];
                 }
                 return values;
             },
             on_skip: () => {
                 const payload = this.state.get_payload_set_packaging_dimension();
-                payload["cancel"] = true;
+                payload["skip"] = true;
                 this.wait_call(this.odoo.call("set_packaging_dimension", payload));
             },
             on_done: () => {
