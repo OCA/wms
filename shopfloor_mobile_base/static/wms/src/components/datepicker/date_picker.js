@@ -155,8 +155,8 @@ export var DatePicker = Vue.component("date-picker-input", {
                 :label="\`Select expiry date (\${dateFormat})\`"
                 prepend-icon="mdi-calendar"
                 v-bind="attrs"
-                v-on="on"
                 clearable
+                @click:prepend="menu=true"
                 @keyup.enter="validateAndSync"
                 @blur="validateAndSync"
             />
