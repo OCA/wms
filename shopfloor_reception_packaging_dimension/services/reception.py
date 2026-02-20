@@ -92,11 +92,11 @@ class Reception(Component):
         return self.data.packaging_dimensions(packaging)
 
     def set_packaging_dimension(
-        self, picking_id, selected_line_id, packaging_id, cancel=False, **kwargs
+        self, picking_id, selected_line_id, packaging_id, skip=False, **kwargs
     ):
         """Set the dimension on a product packaging.
 
-        If the user cancel the dimension update we still propose the next
+        If the user skip the dimension update we still propose the next
         possible packaging.
 
         Transitions:
@@ -114,7 +114,7 @@ class Reception(Component):
 
         message = None
 
-        if not cancel and self._check_dimension_to_update(kwargs):
+        if not skip and self._check_dimension_to_update(kwargs):
             self._update_packaging_dimension(packaging, kwargs)
             message = self.msg_store.packaging_updated(packaging)
 
@@ -205,7 +205,7 @@ class ShopfloorReceptionValidator(Component):
                 "nullable": True,
             },
             "barcode": {"type": "string", "required": False, "nullable": True},
-            "cancel": {"type": "boolean"},
+            "skip": {"type": "boolean"},
         }
 
 

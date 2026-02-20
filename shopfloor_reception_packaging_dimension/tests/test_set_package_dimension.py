@@ -240,3 +240,6 @@ class TestSetPackDimension(CommonCase):
             },
             message=self.msg_store.packaging_updated(self.product_c_packaging_2),
         )
+
+    # TODO: Test that skipping dimension entry (skip=True) for one packaging
+    # correctly transitions to the next pending packaging without saving changes.
