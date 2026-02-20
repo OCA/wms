@@ -17,13 +17,16 @@ class Reception(Component):
 
     def _before_state__set_quantity(self, picking, line, message=None):
         """Show the packaging dimension screen before the set quantity screen."""
-        if self.work.menu.set_packaging_dimension and not self.packaging_update_done:
-            packaging = self._get_next_packaging_to_set_dimension(line.product_id)
-            if packaging:
-                return self._response_for_set_packaging_dimension(
-                    picking, line, packaging, message=message
-                )
-        return super()._before_state__set_quantity(picking, line, message=message)
+        if not self.work.menu.set_packaging_dimension or self.packaging_update_done:
+            return super()._before_state__set_quantity(picking, line, message=message)
+
+        packaging = self._get_next_packaging_to_set_dimension(line.product_id)
+        if not packaging:
+            return super()._before_state__set_quantity(picking, line, message=message)
+
+        return self._response_for_set_packaging_dimension(
+            picking, line, packaging, message=message
+        )
 
     def _get_domain_packaging_needs_dimension(self):
         return expression.OR(
@@ -103,38 +106,54 @@ class Reception(Component):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         packaging = self.env["product.packaging"].sudo().browse(packaging_id)
-        message = None
-        next_packaging = None
+
         if not packaging:
-            message = self.msg_store.record_not_found()
-        elif not cancel and self._check_dimension_to_update(kwargs):
+            return self._before_state__set_quantity(
+                picking, selected_line, message=self.msg_store.record_not_found()
+            )
+
+        message = None
+
+        if not cancel and self._check_dimension_to_update(kwargs):
             self._update_packaging_dimension(packaging, kwargs)
             message = self.msg_store.packaging_updated(packaging)
-        if packaging:
-            next_packaging = self._get_next_packaging_to_set_dimension(
-                selected_line.product_id, packaging
-            )
+
+        next_packaging = self._get_next_packaging_to_set_dimension(
+            selected_line.product_id, packaging
+        )
         if next_packaging:
             return self._response_for_set_packaging_dimension(
                 picking, selected_line, next_packaging, message=message
             )
+
         self.packaging_update_done = True
         return self._before_state__set_quantity(picking, selected_line, message=message)
 
     def _check_dimension_to_update(self, dimensions):
-        """Return True if any dimension on the packaging needs to be updated"""
-        return any([value is not None for key, value in dimensions.items()])
+        """Check if the Shopfloor payload contains data for a packaging update."""
+        return any(value is not None for value in dimensions.values())
 
     def _get_dimension_fields_conversion_map(self):
+        """
+        Get the mapping between JSON keys from the Shopfloor interface
+        and the technical field names of the product.packaging model.
+        """
         return {"length": "packaging_length"}
 
     def _update_packaging_dimension(self, packaging, dimensions_to_update):
         """Update dimension on the packaging."""
-        fields_conv_map = self._get_dimension_fields_conversion_map()
-        for dimension, value in dimensions_to_update.items():
-            if value is not None:
-                dimension = fields_conv_map.get(dimension, dimension)
-                packaging[dimension] = value
+        field_map = self._get_dimension_fields_conversion_map()
+        values_to_update = {}
+
+        for key, value in dimensions_to_update.items():
+            if value is None:
+                continue
+
+            odoo_field = field_map.get(key, key)
+            values_to_update[odoo_field] = value
+
+        if values_to_update:
+            packaging.write(values_to_update)
 
 
 class ShopfloorReceptionValidator(Component):
