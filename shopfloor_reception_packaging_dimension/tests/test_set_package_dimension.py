@@ -241,5 +241,32 @@ class TestSetPackDimension(CommonCase):
             message=self.msg_store.packaging_updated(self.product_c_packaging_2),
         )
 
-    # TODO: Test that skipping dimension entry (skip=True) for one packaging
-    # correctly transitions to the next pending packaging without saving changes.
+    def test_skip_packaging_dimension_skips_to_next(self):
+        line = self.picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_c
+        )
+        original_height = self.product_c_packaging.height
+
+        response = self.service.dispatch(
+            "set_packaging_dimension",
+            params={
+                "picking_id": self.picking.id,
+                "selected_line_id": line.id,
+                "packaging_id": self.product_c_packaging.id,
+                "height": 999.0,  # This value should be ignored
+                "skip": True,
+            },
+        )
+
+        self.assertEqual(
+            self.product_c_packaging.height,
+            original_height,
+            "Packaging height should not change when skipped",
+        )
+        self._assert_response_set_dimension(
+            response,
+            self.picking,
+            line,
+            self.product_c_packaging_2,
+            message=None,  # No 'Updated' message should be returned when skipping
+        )
