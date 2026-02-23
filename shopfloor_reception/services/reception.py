@@ -4,7 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 
-from datetime import datetime, time
+from datetime import UTC, datetime, time
 
 import pytz
 from decorator import contextmanager
@@ -875,7 +875,7 @@ class Reception(Component):
                     result.type == "expiration_date"
                     and line.product_id.use_expiration_date
                 ):
-                    expiration_date = result.value
+                    expiration_date = datetime.fromisoformat(result.value)
 
             if found:
                 return self.set_lot_confirm_action(
@@ -1185,7 +1185,7 @@ class Reception(Component):
         return res
 
     def set_lot_confirm_action(
-        self, picking_id, selected_line_id, lot_name, expiration_date=None
+        self, picking_id, selected_line_id, lot_name, expiration_date: datetime = None
     ):
         """Set lot and its expiration date
 
@@ -1224,7 +1224,8 @@ class Reception(Component):
         if not lot:
             lot = self.env["stock.lot"].new(self._create_lot_values(product, lot_name))
         if expiration_date:
-            lot.expiration_date = expiration_date.replace("T", " ")
+            # Odoo only accepts tz unaware datetimes
+            lot.expiration_date = expiration_date.astimezone(UTC).replace(tzinfo=None)
 
         # Convert in-memory record into real record
         if not lot._origin:
@@ -1650,7 +1651,10 @@ class ShopfloorReceptionValidator(Component):
                 "required": True,
             },
             "lot_name": {"type": "string", "required": True},
-            "expiration_date": {"type": "string"},
+            "expiration_date": {
+                "type": "datetime",
+                "coerce": datetime.fromisoformat,
+            },
         }
 
     def scan_lot_name(self):

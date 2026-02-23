@@ -17,13 +17,27 @@ class DataAction(Component):
         res = super(DataAction, self)._product_parser
         return res + ["use_expiration_date"]
 
+    @property
+    def _lot_parser_reception(self):
+        return self._simple_record_parser() + [
+            "ref",
+            (
+                "expiration_date",
+                lambda rec, fname:
+                # Odoo Datetime fields are stored as naive UTC in the DB.
+                # Appending 'Z' (Zulu) explicitly tells the frontend the
+                # offset is +00:00
+                rec.expiration_date.isoformat() + "Z" if rec.expiration_date else None,
+            ),
+        ]
+
     @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
         data = super().move_line(record, with_picking, **kw)
 
         lot_data = {}
         if lot := kw.get("lot"):
-            lot_data = self._jsonify(lot, self._lot_parser)
+            lot_data = self._jsonify(lot, self._lot_parser_reception)
         else:
             if lot_name := kw.get("lot_name"):
                 lot_data["name"] = lot_name

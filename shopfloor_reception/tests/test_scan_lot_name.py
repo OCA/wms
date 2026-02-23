@@ -1,7 +1,7 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from unittest import mock
 
 from odoo import fields
@@ -98,8 +98,12 @@ class TestScanLotName(CommonCase):
             )
 
         self.assertEqual(
-            res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
-            expiration_date.isoformat(),
+            datetime.fromisoformat(
+                res["data"]["set_lot"]["selected_move_line"][0]["lot"][
+                    "expiration_date"
+                ]
+            ),
+            expiration_date.replace(tzinfo=UTC),
         )
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
