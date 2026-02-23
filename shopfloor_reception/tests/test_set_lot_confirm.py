@@ -123,7 +123,7 @@ class TestSetLotConfirm(CommonCase):
         )
 
     @freeze_time("2020-01-01 11:00:00")
-    def test_set_existing_lot_overwrite_expiration_date(self):
+    def test_set_existing_lot_try_overwrite_expiration_date_error(self):
         self.product_a.use_expiration_date = True
         picking = self._create_picking()
         lot_expiration_date = "2022-08-23 12:00:00"
@@ -143,15 +143,29 @@ class TestSetLotConfirm(CommonCase):
                 "expiration_date": new_expiration_date,
             },
         )
-        self.assertEqual(str(selected_move_line.expiration_date), new_expiration_date)
+        self.assertEqual(
+            str(lot.expiration_date),
+            lot_expiration_date,
+            "Existing lot expiration date should not be overwritten",
+        )
+
+        # The error should send back the selected lot name and expiration date so
+        # to prevent clearing the UI fields after error message
+        move_line_response_data = self.data.move_lines(selected_move_line)
+        move_line_response_data[0]["lot"] = {
+            "name": lot.name,
+            "expiration_date": new_expiration_date.replace(" ", "T"),
+        }
         self.assert_response(
             response,
-            next_state="set_quantity",
+            next_state="set_lot",
             data={
                 "picking": self.data.picking(picking),
-                "selected_move_line": self.data.move_lines(selected_move_line),
-                "confirmation_required": None,
+                "selected_move_line": move_line_response_data,
             },
+            message=self.msg_store.lot_already_exists_different_expiration_date(
+                lot, new_expiration_date
+            ),
         )
 
     @freeze_time("2020-01-01 11:00:00")

@@ -1222,15 +1222,31 @@ class Reception(Component):
             )
 
         if not lot:
-            lot = self.env["stock.lot"].new(self._create_lot_values(product, lot_name))
-        if expiration_date:
-            # Odoo only accepts tz unaware datetimes
-            lot.expiration_date = expiration_date.astimezone(UTC).replace(tzinfo=None)
-
-        # Convert in-memory record into real record
-        if not lot._origin:
-            lot_vals = lot._convert_to_write(lot._cache)
+            lot_vals = self._create_lot_values(product, lot_name)
+            if expiration_date:
+                lot_vals["expiration_date"] = expiration_date.astimezone(UTC).replace(
+                    tzinfo=None
+                )
             lot = self.env["stock.lot"].create(lot_vals)
+        else:
+            if not expiration_date:
+                pass
+            elif not lot.expiration_date:
+                lot.expiration_date = expiration_date.astimezone(UTC).replace(
+                    tzinfo=None
+                )
+            elif lot.expiration_date.astimezone(UTC) != expiration_date.astimezone(UTC):
+                # Prevent user from overwritting an existing expiration date on an existing lot
+                return self._response_for_set_lot(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.lot_already_exists_different_expiration_date(
+                        lot, expiration_date
+                    ),
+                    lot_name=lot_name,
+                    lot_expiration_date=expiration_date,
+                )
+
         selected_line.lot_id = lot.id
         selected_line._onchange_lot_id()
 
