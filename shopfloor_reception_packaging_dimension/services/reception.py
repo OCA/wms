@@ -136,11 +136,15 @@ class Reception(Component):
     def _update_packaging_dimension(self, packaging, dimensions_to_update):
         """Update dimension on the packaging."""
         values_to_update = {}
+        packaging_values = packaging.read(dimensions_to_update.keys())[0]
 
         for key, value in dimensions_to_update.items():
             if value is None:
                 continue
-            values_to_update[key] = value
+            # Skip updating fields with unchanged values to prevent unnecessary
+            # triggers of compute methods or other side effects
+            if packaging_values[key] != value:
+                values_to_update[key] = value
 
         if values_to_update:
             packaging.write(values_to_update)
