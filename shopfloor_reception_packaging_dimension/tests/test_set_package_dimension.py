@@ -206,7 +206,7 @@ class TestSetPackDimension(CommonCase):
                 "selected_line_id": line.id,
                 "packaging_id": self.product_c_packaging.id,
                 "height": 55,
-                "length": 233,
+                "packaging_length": 233,
             },
         )
         self.assertEqual(self.product_c_packaging.height, 55)

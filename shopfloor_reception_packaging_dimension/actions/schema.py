@@ -9,7 +9,7 @@ class ShopfloorSchemaAction(Component):
             "id": {"required": True, "type": "integer"},
             "name": {"type": "string", "nullable": False, "required": True},
             "qty": {"type": "float", "required": True},
-            "length": {"type": "float", "nullable": True, "required": False},
+            "packaging_length": {"type": "float", "nullable": True, "required": False},
             "width": {"type": "float", "nullable": True, "required": False},
             "height": {"type": "float", "nullable": True, "required": False},
             "weight": {"type": "float", "nullable": True, "required": False},

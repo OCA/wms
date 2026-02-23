@@ -11,7 +11,7 @@ class DataAction(Component):
             "id",
             "name",
             "qty",
-            "packaging_length:length",
+            "packaging_length",
             "width",
             "height",
             "weight",

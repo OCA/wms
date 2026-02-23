@@ -133,24 +133,14 @@ class Reception(Component):
         """Check if the Shopfloor payload contains data for a packaging update."""
         return any(value is not None for value in dimensions.values())
 
-    def _get_dimension_fields_conversion_map(self):
-        """
-        Get the mapping between JSON keys from the Shopfloor interface
-        and the technical field names of the product.packaging model.
-        """
-        return {"length": "packaging_length"}
-
     def _update_packaging_dimension(self, packaging, dimensions_to_update):
         """Update dimension on the packaging."""
-        field_map = self._get_dimension_fields_conversion_map()
         values_to_update = {}
 
         for key, value in dimensions_to_update.items():
             if value is None:
                 continue
-
-            odoo_field = field_map.get(key, key)
-            values_to_update[odoo_field] = value
+            values_to_update[key] = value
 
         if values_to_update:
             packaging.write(values_to_update)
@@ -174,7 +164,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "float",
                 "nullable": True,
             },
-            "length": {
+            "packaging_length": {
                 "coerce": to_float,
                 "required": False,
                 "type": "float",
