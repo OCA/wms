@@ -141,30 +141,17 @@ export const reception_states = function () {
             on_date_change: (expiration_date) => {
                 if (!expiration_date) return;
 
-                // We split and use the constructor to avoid JS auto-converting to UTC
-                // NB: JS uses the timezone info of the device
-                // NB: Yes, months are 0-indexed in JS, this is not a bug...
+                // NB: Months are 0-indexed in JS
                 const [year, month, day] = expiration_date.split("-");
-                const localDate = new Date(year, month - 1, day, 0, 0, 0);
 
-                // 2. Convert local midnight to a UTC string. Odoo expects 'naive' UTC datetimes
-                // in the database. By converting here, we ensure data consistency: the
-                // backend stores the exact UTC moment, while the UI remains responsible
-                // for localizing that timestamp back to the user's specific timezone.
-                const utcYear = localDate.getUTCFullYear();
-                const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-                const utcDay = String(localDate.getUTCDate()).padStart(2, "0");
-                const utcHours = String(localDate.getUTCHours()).padStart(2, "0");
-                const utcMinutes = String(localDate.getUTCMinutes()).padStart(2, "0");
-                const utcSeconds = String(localDate.getUTCSeconds()).padStart(2, "0");
-                // use the same format as odoo
-                const utcString = `${utcYear}-${utcMonth}-${utcDay} ${utcHours}:${utcMinutes}:${utcSeconds}`;
+                // JS will determine the time zone based on user's device
+                const localDate = new Date(year, month - 1, day, 0, 0, 0);
 
                 // We merge the new date with whatever is already in .lot
                 // If .lot is null/undefined, we start with an empty object
                 this.line_being_handled.lot = {
                     ...(this.line_being_handled.lot || {}),
-                    expiration_date: utcString,
+                    expiration_date: localDate.toISOString(),
                 };
             },
             on_confirm_lot: () => {
