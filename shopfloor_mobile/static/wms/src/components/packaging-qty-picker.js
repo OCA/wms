@@ -282,7 +282,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
                     </v-col>
                     <v-col>
                         <div class="pkg-name"> {{ pkg[pkgNameKey] }}</div>
-                        <div v-if="contained_packaging[pkg.id]" class="pkg-qty">(x{{ contained_packaging[pkg.id].qty }} {{ contained_packaging[pkg.id].pkg.name }})</div>
+                        <div v-if="pkg.id !== unit_uom.id" class="pkg-qty">(x{{ _.round(pkg.qty / unit_uom.qty, unit_uom.rounding || 3) }} {{ unit_uom.name }})</div>
                     </v-col>
                 </v-row>
             </v-expansion-panel-content>
