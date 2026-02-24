@@ -48,10 +48,11 @@ class TestStructuredBarcode(CommonCase):
         data = self.data.picking(picking)
         self.assert_response(
             response,
-            next_state="set_lot",
+            next_state="set_quantity",
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation_required": None,
             },
         )
         self.assertEqual(

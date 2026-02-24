@@ -847,9 +847,14 @@ class Reception(Component):
         return self._response(next_state="manual_selection", data=data)
 
     def _response_for_set_lot(self, picking, line, message=None, **kw):
-        self._set_lot_from_parse(picking, line)
+        # Bypass "set_lot" screen and send lot info to endpoint directly if
+        # lot info have been found when parsing
+        response = self._set_lot_from_parse(picking, line)
+        if response:
+            return response
 
-        # Resolve existing lot from name to pre-fill metadata on the mobile UI.
+        # In case the lot_name has been filled on the move line (but not the lot_id)
+        # Send lot values to frontend to allow pre-fill the screen
         if kw.get("lot_name") and not kw.get("lot_expiration_date"):
             search = self._actions_for("search")
             search_result = search.find(kw.get("lot_name"), types=["lot"])
