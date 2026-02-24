@@ -434,3 +434,35 @@ class TestSelectLine(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
         )
+
+    def test_select_move_next_state_ignores_lot_name(self):
+        picking = self._create_picking()
+
+        self.product_a.tracking = "lot"
+        self.product_b.tracking = "lot"
+
+        move_a = picking.move_ids.filtered(lambda m: m.product_id == self.product_a)
+        move_line_a = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        move_line_a.lot_id = self._create_lot()
+
+        move_b = picking.move_ids.filtered(lambda m: m.product_id == self.product_b)
+        move_line_b = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_b
+        )
+        move_line_b.lot_name = "Pre-Configured Lot Name"
+
+        # There is already a lot -> we skip "set_lot"
+        response_a = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": move_a.id},
+        )
+        self.assertEqual(response_a.get("next_state"), "set_quantity")
+
+        # There is a lot name but no lot record -> enter "set_lot"
+        response_b = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": move_b.id},
+        )
+        self.assertEqual(response_b.get("next_state"), "set_lot")

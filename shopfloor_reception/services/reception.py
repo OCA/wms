@@ -75,6 +75,11 @@ class Reception(Component):
             states.append("draft")
         return super()._check_picking_processible(pickings, states=states)
 
+    def _move_line_needs_lot(self, move_line):
+        return (
+            move_line.product_id.tracking in ("lot", "serial") and not move_line.lot_id
+        )
+
     def _move_line_by_product(self, product):
         return self.env["stock.move.line"].search(
             self._domain_move_line_by_product(product)
@@ -200,13 +205,10 @@ class Reception(Component):
     def _select_document_from_move_lines(self, move_lines, msg_func):
         pickings = move_lines.move_id.picking_id
         if len(pickings) == 1:
-            if (
-                move_lines.product_id.tracking not in ("lot", "serial")
-                or move_lines.lot_id
-                or move_lines.lot_name
-            ):
-                return self._response_for_set_quantity(pickings, move_lines)
-            return self._response_for_set_lot(pickings, move_lines)
+            for line in move_lines:
+                if self._move_line_needs_lot(line):
+                    return self._response_for_set_lot(pickings, line)
+            return self._response_for_set_quantity(pickings, move_lines)
         elif len(pickings) > 1:
             return self._response_for_select_document(
                 pickings=pickings,
@@ -319,30 +321,31 @@ class Reception(Component):
         return self._scan_line__assign_user(picking, line, qty_done)
 
     def _scan_line__recover(self, picking, line, default_qty):
-        product = line.product_id
         message = self.msg_store.recovered_previous_session()
         # Do not restore further than set_destination, because a destination location
         # might be set by default, and we want the user to be allowed to change it.
         if line.result_package_id:
             # Destination package is set, go to set_destination
             return self._response_for_set_destination(picking, line, message=message)
-        if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
-            # If lot already set, go to set_quantity
-            rounding = line.product_uom_id.rounding
-            if float_is_zero(line.qty_done, precision_rounding=rounding):
-                # If no qty_done, set default qty_done
-                line.qty_done = default_qty
-            return self._before_state__set_quantity(picking, line, message=message)
-        # Otherwise go to select_lot
-        return self._response_for_set_lot(picking, line, message=message)
+
+        if self._move_line_needs_lot(line):
+            return self._response_for_set_lot(picking, line, message=message)
+
+        # If lot already set, go to set_quantity
+        rounding = line.product_uom_id.rounding
+        if float_is_zero(line.qty_done, precision_rounding=rounding):
+            # If no qty_done, set default qty_done
+            line.qty_done = default_qty
+        return self._before_state__set_quantity(picking, line, message=message)
 
     def _scan_line__assign_user(self, picking, line, qty_done):
-        product = line.product_id
         stock = self._actions_for("stock")
         stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
-        if product.tracking not in ("lot", "serial") or (line.lot_id or line.lot_name):
-            return self._before_state__set_quantity(picking, line)
-        return self._response_for_set_lot(picking, line)
+
+        if self._move_line_needs_lot(line):
+            return self._response_for_set_lot(picking, line)
+
+        return self._before_state__set_quantity(picking, line)
 
     def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
         return_line = fields.first(
