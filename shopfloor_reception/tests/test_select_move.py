@@ -452,6 +452,11 @@ class TestSelectLine(CommonCase):
             lambda l: l.product_id == self.product_b
         )
         move_line_b.lot_name = "Pre-Configured Lot Name"
+        self._create_lot(
+            product_id=self.product_b.id,
+            name="Pre-Configured Lot Name",
+            expiration_date="2020-02-02 12:00:00",
+        )
 
         # There is already a lot -> we skip "set_lot"
         response_a = self.service.dispatch(
@@ -466,3 +471,15 @@ class TestSelectLine(CommonCase):
             params={"move_id": move_b.id},
         )
         self.assertEqual(response_b.get("next_state"), "set_lot")
+
+        # The UI should receive the lot metadata so as to be able to prefill
+        self.assertEqual(
+            response_b["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
+            "Pre-Configured Lot Name",
+        )
+        self.assertEqual(
+            response_b["data"]["set_lot"]["selected_move_line"][0]["lot"][
+                "expiration_date"
+            ],
+            "2020-02-02T12:00:00+00:00",
+        )

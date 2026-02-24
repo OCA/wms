@@ -207,7 +207,9 @@ class Reception(Component):
         if len(pickings) == 1:
             for line in move_lines:
                 if self._move_line_needs_lot(line):
-                    return self._response_for_set_lot(pickings, line)
+                    return self._response_for_set_lot(
+                        pickings, line, lot_name=line.lot_name
+                    )
             return self._response_for_set_quantity(pickings, move_lines)
         elif len(pickings) > 1:
             return self._response_for_select_document(
@@ -329,7 +331,9 @@ class Reception(Component):
             return self._response_for_set_destination(picking, line, message=message)
 
         if self._move_line_needs_lot(line):
-            return self._response_for_set_lot(picking, line, message=message)
+            return self._response_for_set_lot(
+                picking, line, message=message, lot_name=line.lot_name
+            )
 
         # If lot already set, go to set_quantity
         rounding = line.product_uom_id.rounding
@@ -343,7 +347,7 @@ class Reception(Component):
         stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
 
         if self._move_line_needs_lot(line):
-            return self._response_for_set_lot(picking, line)
+            return self._response_for_set_lot(picking, line, lot_name=line.lot_name)
 
         return self._before_state__set_quantity(picking, line)
 
@@ -844,6 +848,14 @@ class Reception(Component):
 
     def _response_for_set_lot(self, picking, line, message=None, **kw):
         self._set_lot_from_parse(picking, line)
+
+        # Resolve existing lot from name to pre-fill metadata on the mobile UI.
+        if kw.get("lot_name") and not kw.get("lot_expiration_date"):
+            search = self._actions_for("search")
+            search_result = search.find(kw.get("lot_name"), types=["lot"])
+            if lot := search_result.record:
+                kw["lot"] = lot
+
         return self._response(
             next_state="set_lot",
             data={
