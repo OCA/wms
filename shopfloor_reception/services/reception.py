@@ -1224,6 +1224,16 @@ class Reception(Component):
             )
 
         if not lot:
+            if not picking.picking_type_id.use_create_lots:
+                return self._response_for_set_lot(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.lot_creation_disabled(
+                        picking.picking_type_id
+                    ),
+                    lot_name=lot_name,
+                    lot_expiration_date=expiration_date,
+                )
             lot_vals = self._create_lot_values(product, lot_name)
             if expiration_date:
                 lot_vals["expiration_date"] = expiration_date.astimezone(UTC).replace(
