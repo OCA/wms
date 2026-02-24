@@ -1,7 +1,7 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from odoo import fields
@@ -10,6 +10,8 @@ from odoo.addons.shopfloor.actions.barcode_parser import BarcodeResult
 from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
 
 from .common import CommonCase
+
+UTC = timezone.utc
 
 
 class TestScanLotName(CommonCase):

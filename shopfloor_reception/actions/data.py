@@ -25,9 +25,9 @@ class DataAction(Component):
                 "expiration_date",
                 lambda rec, fname:
                 # Odoo Datetime fields are stored as naive UTC in the DB.
-                # Appending 'Z' (Zulu) explicitly tells the frontend the
-                # offset is +00:00
-                rec.expiration_date.isoformat() + "Z" if rec.expiration_date else None,
+                rec.expiration_date.isoformat() + "+00:00"
+                if rec.expiration_date
+                else None,
             ),
         ]
 

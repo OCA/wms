@@ -4,7 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 
-from datetime import UTC, datetime, time
+from datetime import datetime, time, timezone
 
 import pytz
 from decorator import contextmanager
@@ -16,6 +16,8 @@ from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.shopfloor.actions.search import SearchResult
 from odoo.addons.shopfloor.utils import to_float
+
+UTC = timezone.utc
 
 
 class Reception(Component):
