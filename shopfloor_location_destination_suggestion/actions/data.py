@@ -15,12 +15,13 @@ class DataAction(Component):
         picking type configuration (see: stock_picking_operation_destination_suggest).
         """
         data = super().move_line(record, with_picking, **kw)
-        data.update(
-            {
-                "location_destination_suggestions": ", ".join(
-                    location.name
-                    for location in record.picking_id.destination_location_suggestion_ids
-                )
-            }
-        )
+        if data:
+            data.update(
+                {
+                    "location_destination_suggestions": ", ".join(
+                        location.name
+                        for location in record.picking_id.destination_location_suggestion_ids
+                    )
+                }
+            )
         return data
