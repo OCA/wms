@@ -107,27 +107,34 @@ export var DatePicker = Vue.component("date-picker-input", {
             this.dateInput = maskedValue;
         },
         validateAndSync() {
-            if (!this.dateInput) {
-                return;
-            }
-            if (this.dateInput.length !== this.dateMask.length) {
+            if (!this.dateInput) return;
+
+            const sep = this.dateMask.match(/[^#]/)[0];
+
+            const dateParts = this.dateInput.split(sep);
+            const fmtParts = this.dateFormat.split(sep);
+
+            if (dateParts.length !== fmtParts.length) {
                 this.showInvalidDateInputMessage = true;
                 return;
             }
 
-            const sep = this.dateMask.match(/[^#]/)[0];
+            let year, month, day;
+            for (let i = 0; i < dateParts.length; i++) {
+                switch (fmtParts[i]) {
+                    case "dd":
+                        day = dateParts[i];
+                        break;
+                    case "MM":
+                        month = dateParts[i];
+                        break;
+                    default:
+                        year = dateParts[i];
+                }
+            }
 
-            const fmtParts = this.dateFormat.split(sep);
-            const yearIdx = fmtParts.indexOf("yyyy");
-            const monthIdx = fmtParts.indexOf("MM");
-            const dayIdx = fmtParts.indexOf("dd");
-
-            const parts = this.dateInput.split(sep);
-            // ↓ suppose 2000s in case of 2 digits year
-            const year = parts[yearIdx].padStart(4, "20");
-            const month = parts[monthIdx].padStart(2, "0");
-            const day = parts[dayIdx].padStart(2, "0");
-
+            // ↓ suppose 2000s in case of < 4 digits year
+            year = year.padStart(4, "20");
             const isoDate = `${year}-${month}-${day}`;
             if (!isNaN(Date.parse(isoDate))) {
                 this.date = isoDate;
