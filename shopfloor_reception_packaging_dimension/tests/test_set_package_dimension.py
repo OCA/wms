@@ -151,6 +151,9 @@ class TestSetPackDimension(CommonCase):
             self._assert_response_set_dimension(
                 response, self.picking, selected_move_line, self.product_a_packaging
             )
+            # To avoid the message about recovering a session
+            selected_move_line.shopfloor_user_id = False
+
         # when all collect values are False, no dimension is needed, next screen
         # is set_dimension
         self.default_packaging_level.sudo().write(no_collect_dict)
