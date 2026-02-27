@@ -437,7 +437,10 @@ class TestSetQuantity(CommonCase):
         )
         self.assertEqual(move_line.location_dest_id, self.dispatch_location)
         self.assertEqual(move_line.location_id, location)
-        self.assertEqual(move_line.move_id.location_dest_id, self.dispatch_location)
+        self.assertEqual(
+            move_line.move_id.location_dest_id,
+            self.picking_type.default_location_dest_id,
+        )
         self.assertEqual(move_line.move_id.location_id, location)
 
     def test_set_quantity_scan_packaging_with_allow_move_create_and_no_prefill_qty(
@@ -740,7 +743,8 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(picking.move_line_ids.location_dest_id, self.dispatch_location)
         self.assertEqual(picking.move_line_ids.location_id, self.location)
         self.assertEqual(
-            picking.move_line_ids.move_id.location_dest_id, self.dispatch_location
+            picking.move_line_ids.move_id.location_dest_id,
+            self.picking_type.default_location_dest_id,
         )
         self.assertEqual(
             picking.move_line_ids.move_id.location_id,
@@ -779,7 +783,8 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(picking.move_line_ids.location_dest_id, self.dispatch_location)
         self.assertEqual(picking.move_line_ids.location_id, self.location)
         self.assertEqual(
-            picking.move_line_ids.move_id.location_dest_id, self.dispatch_location
+            picking.move_line_ids.move_id.location_dest_id,
+            self.picking_type.default_location_dest_id,
         )
         self.assertEqual(
             picking.move_line_ids.move_id.location_id,
