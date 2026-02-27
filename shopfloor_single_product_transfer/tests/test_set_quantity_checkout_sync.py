@@ -58,6 +58,9 @@ class TestSetQuantityCheckoutSync(CommonCase):
         picking2 = self._setup_picking()
         move1 = picking1.move_ids
         move2 = picking2.move_ids
+        (move1 | move2).group_id = self.env["procurement.group"].create(
+            {"name": "Test shopfloor sync"}
+        )
         pack_move1 = self._add_pack_move_after_pick_move(move1, self.wh.pack_type_id)
         pack_move2 = self._add_pack_move_after_pick_move(move2, self.wh.pack_type_id)
         (pack_move1 | pack_move2)._assign_picking()
