@@ -6,6 +6,7 @@
     "version": "18.0.1.0.0",
     "summary": """Build delivery packages at the end of the cluster picking""",
     "author": "ACSONE SA/NV,BCIM,Camptocamp,Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux", "TDu", "mmequignon"],
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "category": "Stock Management",
     "depends": [
