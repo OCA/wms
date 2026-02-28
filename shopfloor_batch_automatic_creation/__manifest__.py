@@ -8,8 +8,8 @@
     "development_status": "Alpha",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
-    "author": "Camptocamp, Odoo Community Association (OCA)",
-    "maintainers": ["guewen"],
+    "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
+    "maintainers": ["jbaudoux", "TDu", "mmequignon"],
     "license": "AGPL-3",
     "application": False,
     "depends": [
