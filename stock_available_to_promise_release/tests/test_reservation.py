@@ -94,6 +94,12 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         self.assertEqual(picking4.move_ids.ordered_available_to_promise_uom_qty, 0)
         self.assertEqual(picking5.move_ids.previous_promised_qty, 48)
         self.assertEqual(picking5.move_ids.ordered_available_to_promise_uom_qty, 0)
+        # Check that splitting a move doesn't affect allocation
+        move_vals = picking.move_ids._split(1)
+        move = self.env["stock.move"].create(move_vals)
+        move._action_confirm(merge=False)
+        self.env["stock.move"].invalidate_model(fnames=["previous_promised_qty"])
+        self.assertEqual(picking2.move_ids.previous_promised_qty, 5)
 
     def test_ordered_available_to_promise_value_consider_already_released(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
@@ -284,6 +290,15 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
                 fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
             )
             self.assertEqual(picking4.move_ids.previous_promised_qty, 5)
+            # split picking1 move and check that has no impact
+            move_vals = picking.move_ids._split(1)
+            move = self.env["stock.move"].create(move_vals)
+            move._action_confirm(merge=False)
+            self.env["stock.move"].invalidate_model(
+                fnames=["previous_promised_qty", "ordered_available_to_promise_uom_qty"]
+            )
+            self.assertEqual(picking4.move_ids.previous_promised_qty, 5)
+            move._action_confirm(merge=True)
 
             # set a higher priority for picking 5
             # (restoring previous date_expected values for other pickings before)
@@ -314,6 +329,7 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         with freeze_time("2019-09-03"):
             # last picking won't have available qty again
             self.assertEqual(picking4.move_ids.ordered_available_to_promise_uom_qty, 0)
+
 
     def test_ordered_available_to_promise_value_by_priority(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})

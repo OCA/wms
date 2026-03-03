@@ -54,7 +54,7 @@ class StockMove(models.Model):
         compute="_compute_release_ready",
         search="_search_release_ready",
     )
-    need_release = fields.Boolean(index=True, copy=False)
+    need_release = fields.Boolean(index=True)
     unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
 
     @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
@@ -262,7 +262,7 @@ class StockMove(models.Model):
         if horizon_date:
             sql += (
                 " AND (m.need_release IS true AND m.date <= %(horizon)s "
-                "      OR m.need_release IS false)"
+                f"     OR ({self._previous_promised_qty_sql_moves_no_release()}))"
             )
             params["horizon"] = horizon_date
         return sql, params
