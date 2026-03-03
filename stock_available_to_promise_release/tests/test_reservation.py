@@ -330,7 +330,6 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
             # last picking won't have available qty again
             self.assertEqual(picking4.move_ids.ordered_available_to_promise_uom_qty, 0)
 
-
     def test_ordered_available_to_promise_value_by_priority(self):
         self.wh.delivery_route_id.write({"available_to_promise_defer_pull": True})
         picking, picking2, picking3, picking4, picking5 = self._create_pickings()
