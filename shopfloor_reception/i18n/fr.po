@@ -6,17 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2026-03-04 17:41+0000\n"
+"Last-Translator: Francois Poizat <francois.poizat@gmail.com>\n"
 "Language-Team: none\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
 #: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
 msgid "Reception"
-msgstr ""
+msgstr "Réception"
