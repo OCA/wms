@@ -1,7 +1,7 @@
 {
     "name": "Shopfloor Single Product Transfer",
     "summary": "Move an item from one location to another.",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/stock-logistics-shopfloor",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
