@@ -395,6 +395,11 @@ class ClusterPicking(Component):
         remaining_lines = self._lines_to_pick(picking_batch)
         return fields.first(remaining_lines)
 
+    def _response_package_already_unloaded(self, batch, package):
+        return self._unload_next_package(
+            batch, message=self.msg_store.package_already_unloaded(package)
+        )
+
     def _response_batch_does_not_exist(self):
         return self._response_for_start(message=self.msg_store.record_not_found())
 
@@ -1268,6 +1273,8 @@ class ClusterPicking(Component):
                     wrong = False
             if wrong:
                 return self._response_for_unload_single_wrong_bin(batch, package)
+        if any(line.shopfloor_unloaded for line in package.planned_move_line_ids):
+            return self._response_package_already_unloaded(batch, package)
         return self._response_for_unload_set_destination(batch, package)
 
     def unload_scan_destination(
@@ -1339,11 +1346,11 @@ class ClusterPicking(Component):
             batch, completion_info_popup=completion_info_popup
         )
 
-    def _unload_next_package(self, batch, completion_info_popup=None):
+    def _unload_next_package(self, batch, completion_info_popup=None, message=None):
         next_package = self._next_bin_package_for_unload_single(batch)
         if next_package:
             return self._response_for_unload_single(
-                batch, next_package, popup=completion_info_popup
+                batch, next_package, popup=completion_info_popup, message=message
             )
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 

@@ -600,6 +600,87 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
         )
 
 
+class ClusterPickingUnloadScanPackSingleCase(ClusterPickingUnloadingCommonCase):
+    """ """
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+        cls._set_dest_package_and_done(cls.move_lines, cls.bin1)
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.menu.sudo().unload_single_package = True
+        cls.menu.sudo().unload_single_package_choice = True
+
+    def test_unload_scan_pack_ok_single_multi_twice(self):
+        """
+        Try to unload the same package to the destination twice
+        """
+        self.move_lines[1].picking_id._put_in_pack(self.move_lines[1])
+
+        pack_2 = self.move_lines[1].result_package_id
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        location = self.move_lines[1].location_dest_id
+        line = self._get_line_to_unload(pack_2)
+        data = self._data_for_batch(self.batch, location, line, pack=pack_2)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": pack_2.id,
+                "barcode": self.packing_a_location.barcode,
+            },
+        )
+
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
+
+        # Check we try to pack the next line
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
+        # We scan the package we've just finished to unload
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        message = {
+            "message_type": "error",
+            "body": f"The package '{pack_2.name}' is already unloaded there: "
+            f"{pack_2.planned_move_line_ids.location_dest_id.name}, you cannot do it twice!",
+        }
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+            message=message,
+        )
+
+
 class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase):
     """Tests covering the /unload_scan_destination endpoint
 
