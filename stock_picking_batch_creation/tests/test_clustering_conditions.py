@@ -32,7 +32,6 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertEqual(self.device3, batch.picking_device_id)
         self.assertEqual(self.pick3, batch.picking_ids)
 
-
     def test_device_with_several_bins_volume_0_group_per_partner(self):
         """
         Got a selected picking with volume == 0
@@ -551,7 +550,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         """
         self.picks.action_cancel()
         with self.assertRaises(NoPickingCandidateError):
-            self.make_picking_batch.create_batch()
+            self.make_picking_batch._create_batch(raise_if_not_possible=True)
 
     def test_put_2_pickings_with_volume_in_one_cluster(self):
         """2 products have a volume :

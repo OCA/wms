@@ -8,6 +8,7 @@ import threading
 from collections import defaultdict
 
 from odoo import api, fields, models, tools
+from odoo.exceptions import UserError
 from odoo.osv.expression import AND, OR, expression
 
 from ..exceptions import (
@@ -123,7 +124,16 @@ class MakePickingBatch(models.TransientModel):
 
     def create_batch(self) -> dict:
         self.ensure_one()
-        batch = self._create_batch(raise_if_not_possible=True)
+        try:
+            batch = self._create_batch(raise_if_not_possible=True)
+        except UserError as error:
+            # We catch specific batch picking creation errors to display
+            # them as user errors in the UI. They are declared as
+            # subclass of UserError to be able to catch them
+            # as UserError and display the message in the UI
+            # but also to be able to catch them specifically into
+            # the tests
+            raise UserError(error.name) from error
         action = {
             "type": "ir.actions.act_window",
             "name": batch.name,
@@ -504,6 +514,9 @@ class MakePickingBatch(models.TransientModel):
                 # of the device by convention a picking without volume fill a complete
                 # bin
                 picking_volume = self._device.volume_per_bin
+            if not self._device.volume_per_bin:
+                # We should return current result to avoid division per 0
+                return nbr_bins
             old_volume = self._volume_by_partners[picking.partner_id]
             new_volume = picking_volume + old_volume
             nbr_bins = math.ceil(new_volume / self._device.volume_per_bin) - math.ceil(

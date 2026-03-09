@@ -155,8 +155,8 @@ class ClusterPickingCommonFeatures(TransactionCase):
             "dimensional_uom_id": cls.uom_m.id,
             **kwargs,
         }
-        if vals.get("type", "consu") == "consu" and "is_storable" not in vals:
-            vals["is_storable"] = True
+        if not vals.get("type"):
+            vals["type"] = "product"
         if "uom_id" not in vals:
             vals["uom_id"] = cls.uom_id
         if "volume" not in vals:
