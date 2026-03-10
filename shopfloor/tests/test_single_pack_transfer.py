@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.tests.common import Form
@@ -875,6 +876,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         package_level = self._simulate_started(self.pack_a)
         self.menu.sudo().allow_move_create = True
         self.env.user = self.shopfloor_manager
+        self.env.uid = self.shopfloor_manager.id
         self.assertTrue(package_level.is_done)
 
         # keep references for later checks
