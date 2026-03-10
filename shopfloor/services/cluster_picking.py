@@ -395,6 +395,11 @@ class ClusterPicking(Component):
         remaining_lines = self._lines_to_pick(picking_batch)
         return fields.first(remaining_lines)
 
+    def _response_package_already_unloaded_or_done(self, batch, package):
+        return self._unload_next_package(
+            batch, message=self.msg_store.package_already_unloaded_or_done(package)
+        )
+
     def _response_package_already_unloaded(self, batch, package):
         return self._unload_next_package(
             batch, message=self.msg_store.package_already_unloaded(package)
@@ -1248,6 +1253,17 @@ class ClusterPicking(Component):
             message={"message_type": "error", "body": _("Wrong bin")},
         )
 
+    def _check_package_unloadable(self, batch, package) -> dict:
+        """
+        Check the scanned package is unloadable as it could have already
+        been scanned and put in destination and/or linked
+        picking has already been done.
+        """
+        lines = self._lines_to_unload(batch)
+        if not (lines & package.planned_move_line_ids):
+            return self._response_package_already_unloaded(batch, package)
+        return {}
+
     def unload_scan_pack(self, picking_batch_id, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
 
@@ -1273,8 +1289,8 @@ class ClusterPicking(Component):
                     wrong = False
             if wrong:
                 return self._response_for_unload_single_wrong_bin(batch, package)
-        if any(line.shopfloor_unloaded for line in package.planned_move_line_ids):
-            return self._response_package_already_unloaded(batch, package)
+        if unloadable_check := self._check_package_unloadable(batch, package):
+            return unloadable_check
         return self._response_for_unload_set_destination(batch, package)
 
     def unload_scan_destination(

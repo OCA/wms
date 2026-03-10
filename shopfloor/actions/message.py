@@ -1034,12 +1034,13 @@ class MessageAction(Component):
         }
 
     def package_already_unloaded(self, package: QuantPackage):
+        locations = (
+            package.planned_move_line_ids.location_dest_id or package.location_id
+        )
         body = _(
             "The package '%(package_name)s' is already unloaded there: "
             "%(location)s, you cannot do it twice!",
-            location=",".join(
-                package.planned_move_line_ids.location_dest_id.mapped("name")
-            ),
+            location=",".join(locations.mapped("name")),
             package_name=package.name,
         )
         return {
