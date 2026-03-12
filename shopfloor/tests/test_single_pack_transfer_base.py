@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from .common import CommonCase
 
@@ -24,6 +25,12 @@ class SinglePackTransferCommonBase(CommonCase):
         # disable the completion on the picking type, we'll have specific test(s)
         # to check the behavior of this screen
         cls.picking_type.sudo().display_completion_info = False
+
+    @classmethod
+    def _shopfloor_manager_values(cls):
+        vals = super()._shopfloor_manager_values()
+        vals["groups_id"] = [(6, 0, [cls.env.ref("stock.group_stock_user").id])]
+        return vals
 
     def setUp(self):
         super().setUp()
