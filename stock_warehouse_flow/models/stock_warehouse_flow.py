@@ -76,7 +76,9 @@ class StockWarehouseFlow(models.Model):
         default=[],
         copy=False,
         help="Domain based on Stock Moves, to define if the "
-        "routing flow is applicable or not.",
+        "routing flow is applicable or not.\n"
+        "Use 'wh_total_products' to set flow routes based on "
+        "the quantity assigned to each warehouse.",
     )
     delivery_steps = fields.Selection(
         selection=[

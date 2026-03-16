@@ -88,7 +88,9 @@ msgstr ""
 #: model:ir.model.fields,help:stock_warehouse_flow.field_stock_warehouse_flow__move_domain
 msgid ""
 "Domain based on Stock Moves, to define if the routing flow is applicable or "
-"not."
+"not.\n"
+"Use 'wh_total_products' to set flow routes based on the quantity assigned to "
+"each warehouse."
 msgstr ""
 
 #. module: stock_warehouse_flow
@@ -414,6 +416,20 @@ msgstr ""
 #. module: stock_warehouse_flow
 #: model_terms:ir.ui.view,arch_db:stock_warehouse_flow.stock_warehouse_flow_view_form
 msgid "Warehouse Flow"
+msgstr ""
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,field_description:stock_warehouse_flow.field_stock_move__wh_total_products
+msgid "Wh Total Products"
+msgstr ""
+
+#. module: stock_warehouse_flow
+#: model:ir.model.fields,help:stock_warehouse_flow.field_stock_move__wh_total_products
+msgid ""
+"Total product units for the same sale order and warehouse. Equivalent to "
+"sale.order.total_products but scoped to the warehouse assigned to this "
+"move, useful for flow domain evaluation in multi-warehouse (omnichannel) "
+"scenarios."
 msgstr ""
 
 #. module: stock_warehouse_flow
