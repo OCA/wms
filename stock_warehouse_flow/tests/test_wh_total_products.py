@@ -222,6 +222,44 @@ class TestWhTotalProducts(TransactionCase):
         self.assertEqual(move_shirt.wh_total_products, 1.0)
         self.assertEqual(move_pants.wh_total_products, 3.0)
 
+    def test_incoming_moves_excluded(self):
+        """Incoming (return) moves are excluded from wh_total_products.
+
+        Exchange claims generate both incoming (return) and outgoing (new
+        shipment) moves under the same sale.order. Only outgoing moves
+        should count to avoid inflating the total.
+        """
+        order = self._create_sale_order(
+            [
+                (self.product_a, 1),
+                (self.product_b, 1),
+            ]
+        )
+        lines = order.order_line.sorted("id")
+        # Outgoing moves (new shipment)
+        move_out_a = self._create_move(lines[0], self.wh1)
+        move_out_b = self._create_move(lines[1], self.wh1)
+        # Incoming move (return) — same SO, same warehouse
+        move_in = self.env["stock.move"].create(
+            {
+                "name": "Return %s" % self.product_a.name,
+                "product_id": self.product_a.id,
+                "product_uom_qty": 1,
+                "product_uom": self.product_a.uom_id.id,
+                "sale_line_id": lines[0].id,
+                "location_id": self.loc_customer.id,
+                "location_dest_id": self.wh1.lot_stock_id.id,
+                "warehouse_id": self.wh1.id,
+                "picking_type_id": self.wh1.in_type_id.id,
+            }
+        )
+        # Incoming move should NOT inflate the outgoing total
+        self.assertEqual(move_out_a.wh_total_products, 2.0)
+        self.assertEqual(move_out_b.wh_total_products, 2.0)
+        # Incoming move with sale_line_id sees outgoing siblings total
+        # (irrelevant in practice: flows only evaluate outgoing moves)
+        self.assertEqual(move_in.wh_total_products, 2.0)
+
     def test_single_warehouse_via_so_confirm(self):
         """Integration: SO confirm generates moves with correct field."""
         order = self._create_sale_order(

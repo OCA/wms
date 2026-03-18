@@ -33,11 +33,14 @@ class StockMove(models.Model):
         "product_uom_qty",
     )
     def _compute_wh_total_products(self):
-        """Sum product_uom_qty of sibling moves sharing same SO and warehouse.
+        """Sum product_uom_qty of outgoing sibling moves sharing same SO and warehouse.
 
-        Groups all non-cancelled moves by (sale_order, warehouse) in a
+        Groups all non-cancelled outgoing moves by (sale_order, warehouse) in a
         single query, then assigns each group's total. Moves without
         sale_line_id fall back to their own product_uom_qty.
+
+        Only outgoing moves are counted to avoid inflating the total with
+        incoming (return) moves from exchange claims.
 
         Uses picking_type_id.warehouse_id as fallback when warehouse_id
         is not set (common after flow application in multi-warehouse scenarios).
@@ -52,6 +55,7 @@ class StockMove(models.Model):
             [
                 ("sale_line_id.order_id", "in", order_ids),
                 ("state", "!=", "cancel"),
+                ("picking_type_id.code", "=", "outgoing"),
             ]
         )
         totals = {}
