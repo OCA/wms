@@ -1320,6 +1320,9 @@ class ClusterPicking(Component):
         if not package.exists():
             return self._unload_next_package(batch)
 
+        if unloadable_check := self._check_package_unloadable(batch, package):
+            return unloadable_check
+
         # we work only on the lines of the scanned package
         lines = self._lines_to_unload(batch).filtered(
             lambda x: x.result_package_id == package
