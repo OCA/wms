@@ -5,7 +5,7 @@
     "name": "Stock Picking Batch Creation",
     "summary": """
         Create a batch of pickings to be processed all together""",
-    "version": "16.0.2.1.0",
+    "version": "16.0.2.2.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,BCIM,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
