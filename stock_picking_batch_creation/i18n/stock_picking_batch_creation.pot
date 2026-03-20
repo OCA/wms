@@ -133,6 +133,11 @@ msgid "Diagnostic"
 msgstr ""
 
 #. module: stock_picking_batch_creation
+#: model:ir.model.fields.selection,name:stock_picking_batch_creation.selection__stock_device_type__split_mode__dimension
+msgid "Dimension"
+msgstr ""
+
+#. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__display_name
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__display_name
 msgid "Display Name"
@@ -225,7 +230,7 @@ msgstr ""
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__maximum_number_of_preparation_lines
-msgid "Maximum number of preparation lines for the batch"
+msgid "Maximum number of preparation lines for the batch."
 msgstr ""
 
 #. module: stock_picking_batch_creation
@@ -341,6 +346,16 @@ msgid "SQL FOR UPDATE SKIP LOCKED"
 msgstr ""
 
 #. module: stock_picking_batch_creation
+#: model:ir.model.fields,help:stock_picking_batch_creation.field_make_picking_batch__maximum_number_of_preparation_lines
+msgid "Set to 0 to disable."
+msgstr ""
+
+#. module: stock_picking_batch_creation
+#: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__split_mode
+msgid "Split Mode"
+msgstr ""
+
+#. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__split_picking_exceeding_limits
 msgid "Split pickings exceeding limits"
 msgstr ""
@@ -385,7 +400,7 @@ msgstr ""
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__max_volume
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__min_volume
-msgid "Volume in default system volume unit of measure"
+msgid "Volume in default system volume unit of measure. Set to 0 to disable."
 msgstr ""
 
 #. module: stock_picking_batch_creation
@@ -400,7 +415,7 @@ msgstr ""
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__max_weight
-msgid "Weight in default system weight unit of measure"
+msgid "Weight in default system weight unit of measure. Set to 0 to disable."
 msgstr ""
 
 #. module: stock_picking_batch_creation
