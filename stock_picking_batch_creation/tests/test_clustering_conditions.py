@@ -1,7 +1,14 @@
 # Copyright 2021 ACSONE SA/NV
+# Copyright 2026 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from ..exceptions import NoSuitableDeviceError, PickingCandidateNumberLineExceedError
+from odoo.tests import Form, RecordCapturer
+
+from ..exceptions import (
+    NoPickingCandidateError,
+    NoSuitableDeviceError,
+    PickingCandidateNumberLineExceedError,
+)
 from .common import ClusterPickingCommonFeatures
 
 
@@ -25,7 +32,74 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         self.assertEqual(self.device3, batch.picking_device_id)
         self.assertEqual(self.pick3, batch.picking_ids)
 
-    def test_put_3_pickings_in_one_cluster(self):
+    def test_device_with_several_bins_volume_0_group_per_partner(self):
+        """
+        Got a selected picking with volume == 0
+        Enable grouping per partner
+
+        Ensure we can create batch
+        """
+        product = self._create_product("Without volume", 0.0, 0.0, 0.0, 0.0)
+        self._set_quantity_in_stock(self.stock_location, product)
+        self._create_picking_pick_and_assign(self.picking_type_1.id, 0, product)
+        device = self._create_device("Test", 0.0, 0.0, 200.0, 20, 1)
+        self.make_picking_batch.stock_device_type_ids = device
+        self.make_picking_batch.group_pickings_by_partner = True
+        self.make_picking_batch._create_batch()
+
+    def test_put_3_pickings_in_one_cluster_no_limit(self):
+        """
+        Data: 3 picks of type 1, total of 4 products for a volume of 60m3
+            pick1: 1 line
+            pick2: 1 line
+            pick3: 3 lines
+        Test case:
+            Disable the maximum number of preparation lines
+            Create a device without any limit
+        Expected result:
+            The device without limit is used
+            The batch should contain pick3, pick2 and pick1
+        """
+        self._set_quantity_in_stock(self.stock_location, self.p5)
+        self.p1.write(
+            {
+                "volume": 5.0,
+                "product_length": 5,
+                "product_height": 1,
+                "product_width": 1,
+                "weight": 1,
+            }
+        )
+        self.p2.write(
+            {
+                "volume": 5.0,
+                "product_length": 5,
+                "product_height": 1,
+                "product_width": 1,
+                "weight": 1,
+            }
+        )
+        device = self.env["stock.device.type"].create(
+            {
+                "name": "test no limit device",
+                "min_volume": 0,
+                "max_volume": 0,
+                "max_weight": 0,
+                "nbr_bins": 6,
+                "sequence": 10,
+            }
+        )
+        self.make_picking_batch.write(
+            {
+                "maximum_number_of_preparation_lines": 0,
+                "stock_device_type_ids": [(4, device.id)],
+            }
+        )
+        batch = self.make_picking_batch._create_batch()
+        self.assertEqual(device, batch.picking_device_id)
+        self.assertEqual(self.pick3 | self.pick2 | self.pick1, batch.picking_ids)
+
+    def test_put_3_pickings_in_one_cluster_max_lines(self):
         """
         Data: 3 picks of type 1, total of 4 products for a volume of 60m3
             pick1: 1 line
@@ -447,9 +521,138 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(PickingCandidateNumberLineExceedError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
+
+    def test_device_with_one_bin_create_action(self):
+        """
+        Data: 3 picks of type 1, total of 4 products for a volume of 60m3
+        Test case: We have 3 devices possibles (device1, device2, device3),
+        ordered following sequence: device3, device2, device1.
+        The first picking will be pick3 (higher priority) and its volume is
+        is 30m3. -> device3 is the device to use (min 30m3, max 100m3)
+
+        Device3 has 1 bin -> the batch should only contain pick3
+        """
+        batch_action = self.make_picking_batch.create_batch()
+        batch = self.env["stock.picking.batch"].browse(batch_action.get("res_id"))
+        self.assertEqual(self.device3, batch.picking_device_id)
+        self.assertEqual(self.pick3, batch.picking_ids)
+
+    def test_device_with_one_bin_create_action_no_picking(self):
+        """
+        Cancel all pickings
+
+        No picking candidate error should be raised
+        """
+        self.picks.action_cancel()
+        with self.assertRaises(NoPickingCandidateError):
+            self.make_picking_batch._create_batch(raise_if_not_possible=True)
+
+    def test_put_2_pickings_with_volume_in_one_cluster(self):
+        """2 products have a volume :
+        they should still occupy at least one bin each"""
+        device = self.env["stock.device.type"].create(
+            {
+                "name": "test volume devices",
+                "min_volume": 0,
+                "max_volume": 200,
+                "max_weight": 200,
+                "nbr_bins": 6,
+                "sequence": 50,
+            }
+        )
+        make_picking_batch_volume_zero = self.makePickingBatch.create(
+            {
+                "user_id": self.env.user.id,
+                "picking_type_ids": [(4, self.picking_type_1.id)],
+                "stock_device_type_ids": [(4, device.id)],
+                "maximum_number_of_preparation_lines": 6,
+            }
+        )
+        self.p1.write(
+            {
+                "product_length": 1,
+                "product_height": 1,
+                "product_width": 1,
+                "weight": 1,
+            }
+        )
+        self.p2.write(
+            {
+                "product_length": 1,
+                "product_height": 2,
+                "product_width": 3,
+                "weight": 1,
+            }
+        )
+        self.picks.mapped("move_ids")._compute_volume()
+        self.assertEqual(1.0, self.pick1.volume)
+        self.assertEqual(6.0, self.pick2.volume)
+        self.assertEqual(7.0, self.pick3.volume)
+        batch = make_picking_batch_volume_zero._create_batch()
+        self.assertEqual(device, batch.picking_device_id)
+        self.assertEqual(self.pick3 | self.pick2 | self.pick1, batch.picking_ids)
+
+        # All picks have a volume of 0 : they should each occupy one bin
+        self.assertEqual(batch.batch_nbr_bins, 3)
+
+    def test_changing_device_constraints(self):
+        device = self.env["stock.device.type"].create(
+            {
+                "name": "test volume devices",
+                "min_volume": 0,
+                "max_volume": 200,
+                "max_weight": 200,
+                "nbr_bins": 6,
+                "sequence": 50,
+            }
+        )
+        self.assertEqual(device.user_max_volume, 200.0)
+        self.assertEqual(device.user_min_volume, 0.0)
+        self.assertEqual(device.user_max_weight, 200.0)
+
+        device.write(
+            {
+                "min_volume": 100.0,
+            }
+        )
+        self.assertEqual(device.user_min_volume, 100.0)
+        self.assertAlmostEqual(device.volume_per_bin, 33.33, places=2)
+
+        # Test user interface
+        with Form(device) as device_form:
+            device_form.user_min_volume = 0.0
+        device = device_form.save()
+        self.assertEqual(device.min_volume, 0.0)
+
+        with Form(device) as device_form:
+            device_form.user_min_volume = 10.0
+        device = device_form.save()
+        self.assertEqual(device.min_volume, 10.0)
+
+        with Form(device) as device_form:
+            device_form.user_max_volume = 300.0
+        device = device_form.save()
+        self.assertEqual(device.max_volume, 300.0)
+
+        with Form(device) as device_form:
+            device_form.user_max_volume = 0.0
+        device = device_form.save()
+        self.assertEqual(device.max_volume, 0.0)
+
+        with Form(device) as device_form:
+            device_form.user_max_weight = 0.0
+        device = device_form.save()
+        self.assertEqual(device.max_weight, 0.0)
+
+        with Form(device) as device_form:
+            device_form.user_max_weight = 100.0
+        device = device_form.save()
+        self.assertEqual(device.max_weight, 100.0)
 
     def test_picking_split_with_weight_exceed(self):
         # pick 3 has 2 lines
@@ -484,8 +687,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(NoSuitableDeviceError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
 
     def test_picking_split_with_volume_exceed(self):
@@ -529,8 +734,10 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         with self.assertRaises(NoSuitableDeviceError):
             self.make_picking_batch._create_batch(raise_if_not_possible=True)
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
         self.assertEqual(len(batch.move_line_ids), 1)
 
     def test_picking_split_priority(self):
@@ -580,5 +787,7 @@ class TestClusteringConditions(ClusterPickingCommonFeatures):
         # if the split_picking_exceeding_limits is set to True.
         # then pick3 should be split and processed first
         self.make_picking_batch.split_picking_exceeding_limits = True
-        batch = self.make_picking_batch._create_batch()
-        self.assertEqual(self.pick3, batch.picking_ids)
+        with RecordCapturer(self.env["stock.picking"], []) as rc:
+            batch = self.make_picking_batch._create_batch()
+            new_pickings = rc.records
+        self.assertEqual(new_pickings, batch.picking_ids)
