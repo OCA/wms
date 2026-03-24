@@ -48,15 +48,6 @@ class StockRule(models.Model):
                 actions_to_run.append((procurement, rule))
 
         super()._run_pull(actions_to_run)
-        # use first a list of ids and browse it afterwards for performance
-        move_ids = [
-            move.id
-            for proc, _rule in actions_to_run
-            for move in proc.values.get("move_dest_ids", [])
-        ]
-        if move_ids:
-            moves = self.env["stock.move"].browse(move_ids)
-            moves.filtered(lambda r: r.need_release).write({"need_release": False})
         return True
 
 

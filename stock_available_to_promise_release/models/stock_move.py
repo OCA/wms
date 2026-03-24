@@ -544,6 +544,8 @@ class StockMove(models.Model):
 
         released_moves = released_moves._before_release()
 
+        released_moves.need_release = False
+
         # Move the unreleased moves to a backorder.
         # This behavior can be disabled by setting the flag
         # no_backorder_at_release on the stock.route of the move.
