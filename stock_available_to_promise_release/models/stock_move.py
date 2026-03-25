@@ -828,7 +828,7 @@ class StockMove(models.Model):
                 # in case of canceled origin_moves, the quantity to return must
                 # be limited to the quantity not consumed
                 done_dest_moves = done_moves.move_dest_ids.filtered(
-                    lambda m: m.state == "done"
+                    lambda m: m.state == "done" or m.product_uom_qty == m.quantity_done
                 )
                 returnable_qty = sum(done_moves.mapped("product_qty")) - sum(
                     done_dest_moves.mapped("product_qty")
