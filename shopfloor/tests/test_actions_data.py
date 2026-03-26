@@ -153,7 +153,10 @@ class ActionsDataCase(ActionsDataCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
-            "ship_carrier": None,
+            "ship_carrier": {
+                "id": self.picking.ship_carrier_id.id,
+                "name": self.picking.ship_carrier_id.name,
+            },
             "priority": "0",
         }
         self.assertEqual(data.pop("scheduled_date").split("T")[0], "2020-08-03")
@@ -177,7 +180,10 @@ class ActionsDataCase(ActionsDataCaseBase):
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": carrier.id, "name": carrier.name},
-            "ship_carrier": None,
+            "ship_carrier": {
+                "id": self.picking.ship_carrier_id.id,
+                "name": self.picking.ship_carrier_id.name,
+            },
             "progress": 0.0,
             "priority": "0",
         }

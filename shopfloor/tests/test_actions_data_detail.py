@@ -122,7 +122,10 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "name": picking.name,
             "note": Markup("<p>read me</p>"),
             "origin": "created by test",
-            "ship_carrier": None,
+            "ship_carrier": {
+                "id": picking.ship_carrier_id.id,
+                "name": picking.ship_carrier_id.name,
+            },
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
@@ -159,7 +162,10 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "name": picking.name,
             "note": Markup("<p>read me</p>"),
             "origin": "created by test",
-            "ship_carrier": None,
+            "ship_carrier": {
+                "id": picking.ship_carrier_id.id,
+                "name": picking.ship_carrier_id.name,
+            },
             "weight": 110.0,
             "partner": {"id": self.customer.id, "name": self.customer.name},
             "carrier": {"id": picking.carrier_id.id, "name": picking.carrier_id.name},
