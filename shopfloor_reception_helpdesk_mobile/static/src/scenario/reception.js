@@ -14,7 +14,7 @@ const pos = template.indexOf("</Screen>");
 const new_template =
     template.substring(0, pos) +
     `
- <template v-if="state_is('set_destination')">
+ <template v-if="state_is('set_quantity')">
     <div v-if="state.data.picking.helpdesk_ticket_allowed" class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
@@ -22,7 +22,6 @@ const new_template =
             </v-col>
         </v-row>
     </div>
-
  </template>
 
  <template v-if="state_is('start_helpdesk')">
@@ -72,10 +71,10 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
     props: ["helpdesk_description"],
     "methods._get_states": function () {
         let states = _get_states.bind(this)();
-        const set_destination = states.set_destination;
+        const set_quantity = states.set_quantity;
 
         const self = this;
-        set_destination.on_declare_helpdesk = function () {
+        set_quantity.on_declare_helpdesk = function () {
             self.wait_call(
                 self.odoo.call("start_helpdesk", {
                     picking_id: self.state.data.picking.id,
