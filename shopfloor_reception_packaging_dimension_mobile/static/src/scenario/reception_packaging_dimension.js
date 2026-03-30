@@ -101,8 +101,30 @@ const new_template =
 // Extend the reception scenario with :
 //   - the new patched template
 //   - the js code for the new state
+const baseWatchers = reception_scenario.component.watch || {};
 const ReceptionPackageDimension = process_registry.extend("reception", {
     template: new_template,
+    watch: {
+        ...baseWatchers,
+        "state.key": function (newState) {
+            if (newState === "set_packaging_dimension") {
+                this.prefill_packaging_form_inputs();
+            }
+        },
+    },
+    "methods.prefill_packaging_form_inputs": function () {
+        if (!this.state_is("set_packaging_dimension")) return;
+
+        const pkg = this.state.data.packaging;
+        const input_fields = this.get_packaging_measurements_inputs();
+
+        input_fields.forEach((inputKey) => {
+            const originalKey = inputKey.replace("_input", "");
+            if (pkg[inputKey] === undefined || pkg[inputKey] === null) {
+                this.$set(pkg, inputKey, pkg[originalKey]);
+            }
+        });
+    },
     "methods.get_packaging_measurements_inputs": function () {
         return [
             "packaging_length_input",
@@ -180,6 +202,10 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
     },
     "methods._get_states": function () {
         let states = _get_states.bind(this)();
+
+        // Capture 'this' in a variable to be safe across async boundaries
+        const self = this;
+
         states["set_packaging_dimension"] = {
             display_info: {
                 title: "Set packaging dimension",
@@ -199,14 +225,20 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 }
                 return values;
             },
-            on_skip: () => {
-                const payload = this.state.get_payload_set_packaging_dimension();
+            on_skip: async function () {
+                const payload = self.state.get_payload_set_packaging_dimension();
                 payload["skip"] = true;
-                this.wait_call(this.odoo.call("set_packaging_dimension", payload));
+                await self.wait_call(
+                    self.odoo.call("set_packaging_dimension", payload)
+                );
+                self.prefill_packaging_form_inputs();
             },
-            on_done: () => {
-                const payload = this.state.get_payload_set_packaging_dimension();
-                this.wait_call(this.odoo.call("set_packaging_dimension", payload));
+            on_done: async function () {
+                const payload = self.state.get_payload_set_packaging_dimension();
+                await self.wait_call(
+                    self.odoo.call("set_packaging_dimension", payload)
+                );
+                self.prefill_packaging_form_inputs();
             },
         };
         return states;
