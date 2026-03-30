@@ -135,8 +135,15 @@ export var DatePicker = Vue.component("date-picker-input", {
 
             // ↓ suppose 2000s in case of < 4 digits year
             year = year.padStart(4, "20");
+
             const isoDate = `${year}-${month}-${day}`;
-            if (!isNaN(Date.parse(isoDate))) {
+            const dateTimestamp = Date.parse(isoDate);
+            const isDateValid =
+                !isNaN(dateTimestamp) &&
+                // Ensure parts did not roll over (e.g. Feb 29 -> March 1)
+                new Date(dateTimestamp).toISOString().slice(0, 10) === isoDate;
+
+            if (isDateValid) {
                 this.date = isoDate;
                 this.menu = false;
                 this.dateInput = "";
