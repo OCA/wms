@@ -1,2 +1,3 @@
 vcrpy-unittest
 odoo_test_helper
+odoo-addon-shipment-advice-cash-on-delivery @ git+https://github.com/OCA/stock-logistics-transport.git@refs/pull/214/head#subdirectory=setup/shipment_advice_cash_on_delivery
