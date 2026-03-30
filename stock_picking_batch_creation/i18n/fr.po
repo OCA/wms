@@ -146,6 +146,11 @@ msgid "Diagnostic"
 msgstr "Diagnostic"
 
 #. module: stock_picking_batch_creation
+#: model:ir.model.fields.selection,name:stock_picking_batch_creation.selection__stock_device_type__split_mode__dimension
+msgid "Dimension"
+msgstr ""
+
+#. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__display_name
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__display_name
 msgid "Display Name"
@@ -244,8 +249,8 @@ msgstr "Volume max par bac"
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__maximum_number_of_preparation_lines
-msgid "Maximum number of preparation lines for the batch"
-msgstr "Nombre maximum de lignes de préparation pour la vague"
+msgid "Maximum number of preparation lines for the batch."
+msgstr ""
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__user_max_volume
@@ -362,6 +367,16 @@ msgid "SQL FOR UPDATE SKIP LOCKED"
 msgstr "SQL FOR UPDATE SKIP LOCKED"
 
 #. module: stock_picking_batch_creation
+#: model:ir.model.fields,help:stock_picking_batch_creation.field_make_picking_batch__maximum_number_of_preparation_lines
+msgid "Set to 0 to disable."
+msgstr ""
+
+#. module: stock_picking_batch_creation
+#: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__split_mode
+msgid "Split Mode"
+msgstr ""
+
+#. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_make_picking_batch__split_picking_exceeding_limits
 msgid "Split pickings exceeding limits"
 msgstr ""
@@ -406,8 +421,8 @@ msgstr "Unités de mesure de volume"
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__max_volume
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__min_volume
-msgid "Volume in default system volume unit of measure"
-msgstr "Volume dans l'unité de mesure de volume par défaut du système"
+msgid "Volume in default system volume unit of measure. Set to 0 to disable."
+msgstr ""
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__user_weight_uom_id
@@ -421,8 +436,8 @@ msgstr "Unités de mesure de poids"
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,help:stock_picking_batch_creation.field_stock_device_type__max_weight
-msgid "Weight in default system weight unit of measure"
-msgstr "Poids dans l'unité de mesure de poids par défaut du système"
+msgid "Weight in default system weight unit of measure. Set to 0 to disable."
+msgstr ""
 
 #. module: stock_picking_batch_creation
 #: model:ir.model.fields,field_description:stock_picking_batch_creation.field_stock_device_type__user_weight_uom_name
@@ -440,6 +455,15 @@ msgstr "ex: Transpalette"
 #, python-format
 msgid "no candidate pickings to batch"
 msgstr "aucun transfert candidat à la création de la vague de préparation"
+
+#~ msgid "Maximum number of preparation lines for the batch"
+#~ msgstr "Nombre maximum de lignes de préparation pour la vague"
+
+#~ msgid "Volume in default system volume unit of measure"
+#~ msgstr "Volume dans l'unité de mesure de volume par défaut du système"
+
+#~ msgid "Weight in default system weight unit of measure"
+#~ msgstr "Poids dans l'unité de mesure de poids par défaut du système"
 
 #~ msgid "Indicates the bins occupied by the picking on the device."
 #~ msgstr ""
