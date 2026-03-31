@@ -1,6 +1,8 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # pylint: disable=missing-return
+from datetime import datetime, timedelta
+
 from freezegun import freeze_time
 
 from odoo import fields
@@ -9,7 +11,6 @@ from .common import CommonCase
 
 _TODAY = "2022-12-07"
 _TOMORROW = "2022-12-08"
-_TODAY_ELEVEN = "2022-12-07 23:30:00"
 
 
 class TestSelectDocument(CommonCase):
@@ -82,15 +83,21 @@ class TestSelectDocument(CommonCase):
             data=self._data_for_select_move(picking_today),
         )
 
-    @freeze_time(_TODAY_ELEVEN, tz_offset=0)
+    # Since we use "Europe/Brussels" tz and _TODAY is in winter
+    # the shift is UTC+1
+    @freeze_time(_TODAY, tz_offset=-1)
     def test_scan_picking_origin_multiple_pickings_one_today_tz(self):
         # freezed today is UTC time, set warehouse user to Brussels
-        self.wh.partner_id.sudo().tz = "Europe/Brussels"
+        tz_name = "Europe/Brussels"
+        self.wh.partner_id.sudo().tz = tz_name
 
         # Create a picking with the UTC hour
-        picking_today = self._create_picking(scheduled_date=_TODAY_ELEVEN)
-
-        picking_tomorrow = self._create_picking(scheduled_date=_TOMORROW)
+        picking_today = self._create_picking(
+            scheduled_date=datetime.now() + timedelta(hours=23, minutes=30)
+        )
+        picking_tomorrow = self._create_picking(
+            scheduled_date=datetime.now() + timedelta(days=1),
+        )
         pickings = picking_today | picking_tomorrow
         pickings = pickings.sorted(lambda p: (p.scheduled_date, p.id), reverse=False)
         pickings.write({"origin": "Somewhere together"})
