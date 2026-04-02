@@ -4,6 +4,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 
+from datetime import datetime, time
+
 import pytz
 from decorator import contextmanager
 
@@ -86,31 +88,40 @@ class Reception(Component):
 
     def _scheduled_date_today_domain(self):
         domain = []
-        today_start, today_end = self._get_today_start_end_datetime()
+        today_start, today_end = self._get_today_start_end_datetime_utc()
         domain.append(("scheduled_date", ">=", today_start))
         domain.append(("scheduled_date", "<=", today_end))
         return domain
 
-    def _get_today_start_end_datetime(self, naive=True):
+    def _get_today_start_end_datetime_utc(self):
+        """
+        Returns the start and end of the current day for the warehouse/company
+        timezone, converted to UTC naive datetimes.
+        """
         # TODO: Put warehouse tz retrieval in shopfloor module?
         company = self.env.company
         warehouse = self.picking_types.warehouse_id
-        tz = (
+
+        tz_name = (
             warehouse.partner_id.tz
             if (len(warehouse) == 1 and warehouse.partner_id.tz)
             else company.partner_id.tz or "UTC"
         )
-        today = fields.Datetime.today()
-        today_start = today_start_localized = fields.Datetime.start_of(today, "day")
-        today_end = today_end_localized = fields.Datetime.end_of(today, "day")
-        if not naive:
-            today_start_localized = (
-                pytz.timezone(tz).localize(today_start).astimezone(pytz.utc)
-            )
-            today_end_localized = (
-                pytz.timezone(tz).localize(today_end).astimezone(pytz.utc)
-            )
-        return (today_start_localized, today_end_localized)
+        tz = pytz.timezone(tz_name)
+
+        now_local = pytz.utc.localize(datetime.now()).astimezone(tz)
+
+        local_start = datetime.combine(
+            now_local.date(), time.min, tzinfo=now_local.tzinfo
+        )
+        local_end = datetime.combine(
+            now_local.date(), time.max, tzinfo=now_local.tzinfo
+        )
+
+        utc_start = local_start.astimezone(pytz.utc).replace(tzinfo=None)
+        utc_end = local_end.astimezone(pytz.utc).replace(tzinfo=None)
+
+        return utc_start, utc_end
 
     @property
     def filter_today_scheduled_pickings(self):
@@ -384,7 +395,7 @@ class Reception(Component):
             # could return more than one picking.
             # If there's only one picking due today, we go to the next screen.
             # Otherwise, we ask the user to scan a package instead.
-            today_start, today_end = self._get_today_start_end_datetime()
+            today_start, today_end = self._get_today_start_end_datetime_utc()
             picking_filter_result_due_today = picking_filter_result.filtered(
                 lambda p: today_start <= p.scheduled_date < today_end
             )
