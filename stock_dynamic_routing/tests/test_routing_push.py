@@ -437,7 +437,7 @@ class TestRoutingPush(common.TransactionCase):
         moves = self.env["stock.move"].browse(
             move.id for move in moves_with_routing_details
         )
-        moves._apply_routing_rule_push(moves_with_routing_details)
+        moves._apply_routing_rule(moves_with_routing_details)
         moves._action_assign()
 
         # At this point, we should have this
