@@ -228,7 +228,21 @@ class StockMove(models.Model):
                 # lines with different routing (or lines with a dynamic
                 # routing, lines without). We split the lines according to
                 # these.
-                new_move_vals = move._split(qty)
+                # NOTE: starting from Odoo 18.0, '_split' method doesn't check
+                # anymore the move quantity against the qty to split, and performs
+                # a split in all cases, letting an empty move behind. Avoid this.
+                new_move_vals = []
+                if (
+                    float_compare(
+                        move.product_qty,
+                        qty,
+                        precision_rounding=move.product_id.uom_id.rounding,
+                    )
+                    == 1
+                ):
+                    new_move_vals = move.with_context(bypass_log_message=True)._split(
+                        qty
+                    )
                 if new_move_vals:
                     new_move = self.env["stock.move"].create(new_move_vals)
                     new_move._action_confirm(merge=False)
