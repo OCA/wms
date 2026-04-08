@@ -7,7 +7,7 @@ from odoo import models
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    def _create_split_backorder(self, default=None):
+    def _create_split_order(self, default=None):
         default = default or {}
         default = {**default, "release_channel_id": self.release_channel_id.id}
-        return super()._create_split_backorder(default=default)
+        return super()._create_split_order(default=default)

@@ -2,7 +2,7 @@
 # Copyright 2018 Camptocamp SA - Julien Coux
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import RecordCapturer, TransactionCase
 
 from odoo.addons.base.tests.common import DISABLED_MAIL_CONTEXT
 
@@ -50,15 +50,18 @@ class TestStockSplitPicking(TransactionCase):
         cls.move_2 = _create_stock_move(cls.product_2)
 
     def test_stock_split_picking_with_release_channel(self):
-        wizard = (
-            self.env["stock.split.picking"]
-            .with_context(active_ids=self.picking.ids)
-            .create({"mode": "move"})
+        with RecordCapturer(self.env["stock.picking"], []) as captured:
+            wizard = (
+                self.env["stock.split.picking"]
+                .with_context(active_ids=self.picking.ids)
+                .create({"mode": "move"})
+            )
+            wizard.action_apply()
+
+        new_picking = captured.records
+        self.assertEqual(len(new_picking), 1)
+        self.assertEqual(new_picking[0].release_channel_id, self.default_channel)
+        move_pickings = self.move.mapped("picking_id") | self.move_2.mapped(
+            "picking_id"
         )
-        wizard.action_apply()
-        self.assertNotEqual(self.move_2.picking_id, self.picking)
-        self.assertEqual(self.move.picking_id, self.picking)
-        self.assertEqual(
-            self.move_2.picking_id.release_channel_id, self.default_channel
-        )
-        self.assertEqual(self.move.picking_id.release_channel_id, self.default_channel)
+        self.assertEqual(move_pickings, self.picking | new_picking)
