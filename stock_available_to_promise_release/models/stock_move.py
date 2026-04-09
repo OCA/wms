@@ -860,7 +860,7 @@ class StockMove(models.Model):
                             "You cannot unrelease the move %(move_name)s "
                             "because some origin moves %(done_move_names)s are done"
                         ),
-                        **msg_args
+                        **msg_args,
                     )
                     raise UserError(message)
                 # Multiple pickings can satisfy a move
