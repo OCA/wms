@@ -80,10 +80,10 @@ class TestSetQuantityAction(CommonCase):
         )
         self.assertFalse(self.selected_move_line.result_package_id)
 
-    def test_cancel_action(self):
-        picking = self._create_picking()
+    def test_cancel_action_concurrent(self):
+        picking = self.picking
         move_product_a = picking.move_ids.filtered(
-            lambda l: l.product_id == self.product_a
+            lambda m: m.product_id == self.product_a
         )
         # User 1 and 2 selects the same picking
         service_user_1 = self.service
@@ -169,3 +169,52 @@ class TestSetQuantityAction(CommonCase):
         )
         # This line has been created by shopfloor, therefore, we unlinked it
         self.assertFalse(move_line_user_2.exists())
+
+    def test_cancel_action_no_backorder(self):
+        picking = self.picking
+        move_line = self.selected_move_line
+        move = self.selected_move_line.move_id
+
+        self.service.dispatch(
+            "process_without_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": move_line.id,
+                "quantity": 2,
+            },
+        )
+        self.assertEqual(move.quantity_done, 2)
+        self.assertEqual(len(move.move_line_ids), 2)
+
+        new_move_line = move.move_line_ids - move_line
+        self.assertEqual(new_move_line.reserved_qty, 8)
+
+        # Make some modifications on the new move line
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": new_move_line.id,
+                "quantity": 3,
+            },
+        )
+        new_move_line.lot_id = self._create_lot()
+        self.assertTrue(new_move_line.lot_id)
+        self.assertTrue(new_move_line.qty_done)
+
+        # cancel modifications on new move line
+        self.service.dispatch(
+            "set_quantity__cancel_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": new_move_line.id,
+            },
+        )
+        self.assertTrue(new_move_line.exists())
+        self.assertEqual(new_move_line.reserved_qty, 8)
+        self.assertFalse(new_move_line.lot_id)
+        self.assertEqual(
+            new_move_line.picking_id,
+            move_line.picking_id,
+            "Cancelling the move line should not move it into a backorder",
+        )
