@@ -97,7 +97,7 @@ const Reception = {
             <template v-if="state_is('set_lot')">
                 <date-picker-input
                     v-if="line_being_handled.product.use_expiration_date"
-                    @date_picker_selected="state.on_date_picker_selected"
+                    @dateChange="state.on_date_change"
                 />
                 <item-detail-card
                     :record="line_being_handled"

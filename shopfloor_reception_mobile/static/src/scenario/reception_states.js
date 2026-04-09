@@ -138,7 +138,7 @@ export const reception_states = function () {
                     })
                 );
             },
-            on_date_picker_selected: (expiration_date) => {
+            on_date_change: (expiration_date) => {
                 if (!expiration_date) return;
 
                 // We split and use the constructor to avoid JS auto-converting to UTC
