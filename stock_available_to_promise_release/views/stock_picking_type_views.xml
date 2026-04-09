@@ -13,13 +13,11 @@
                 position="before"
             >
                 <div t-if="record.count_picking_need_release.raw_value > 0" class="row">
-                    <div class="col-9">
+                    <div class="col-12">
                         <a name="get_action_picking_tree_need_release" type="object">
-                            Need Release
-                        </a>
-                    </div>
-                    <div class="col-3">
-                        <field name="count_picking_need_release" />
+                            <field
+                                name="count_picking_need_release"
+                            /> Need Release </a>
                     </div>
                 </div>
             </xpath>
