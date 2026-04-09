@@ -225,7 +225,7 @@ class TestSetDestination(CommonCase):
         # One move remaining in the picking, for product b, still to be processed
         self.assertEqual(picking.move_ids.product_id, self.product_b)
 
-    def test_auto_posting_concurent_work(self):
+    def test_auto_posting_concurrent_work(self):
         """Check 2 users working on the same move.
 
         With the auto post line option On.
