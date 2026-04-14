@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 # pylint: disable=missing-return
+
 from markupsafe import Markup
 
 from .common import PickingBatchMixin
@@ -43,20 +44,49 @@ class ActionsDataCase(ActionsDataCaseBase):
         }
         self.assertDictEqual(data, expected)
 
-    def test_data_location_with_operation_progress(self):
-        location = self.stock_location
-        location.sudo().barcode = None
-        data = self.data.location(location, with_operation_progress=True)
+    def test_data_location_with_operation_progress_schema(self):
+        data = self.data.location(self.stock_location, with_operation_progress=True)
         self.assert_schema(self.schema.location(), data)
+
+    def test_data_location_with_operation_progress(self):
+        location_model = self.env["stock.location"].sudo()
+        location = location_model.create(
+            {
+                "name": "test_location",
+                "location_id": self.stock_location.id,
+            }
+        )
+        product = self.product_a
+        picking = self._create_picking(lines=[(product, 1000)])
+        picking.location_id = location
+        picking.location_dest_id = location.location_id
+        move = picking.move_ids
+        # Move isn't confirmed, no data in operation progress
+        data = self.data.location(location, with_operation_progress=True)
         expected = {
             "id": location.id,
             "name": location.name,
             "barcode": location.name,
             "operation_progress": {
                 "done": 0.0,
-                "to_do": 228.0,
+                "to_do": 0.0,
             },
         }
+        self.assertDictEqual(data, expected)
+        # Move is assigned, but no qty in stock: no qty to process
+        move._action_confirm()
+        data = self.data.location(location, with_operation_progress=True)
+        self.assertDictEqual(data, expected)
+        # Add goods in stock, available qty goes in to_do
+        self._update_qty_in_location(location, product, 500)
+        move._action_assign()
+        data = self.data.location(location, with_operation_progress=True)
+        expected["operation_progress"] = {"done": 0.0, "to_do": 500.0}
+        self.assertDictEqual(data, expected)
+        # pick a few units, picked qties are done, to_do is the rest
+        move.move_line_ids.qty_done = 250
+        data = self.data.location(location, with_operation_progress=True)
+        expected["operation_progress"] = {"done": 250.0, "to_do": 250.0}
         self.assertDictEqual(data, expected)
 
     def test_data_lot(self):
