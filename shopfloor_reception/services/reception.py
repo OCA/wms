@@ -754,8 +754,8 @@ class Reception(Component):
         selected_line.location_dest_id = location
         return self._response_for_select_move(picking)
 
-    def _set_quantity__by_lot(self, picking, selected_line, barcode):
-        if selected_line.lot_id.name == barcode or selected_line.lot_name == barcode:
+    def _set_quantity__by_lot(self, picking, selected_line, lot):
+        if selected_line.lot_id.name == lot.name or selected_line.lot_name == lot.name:
             selected_line.qty_done += 1
             return self._response_for_set_quantity(picking, selected_line)
 

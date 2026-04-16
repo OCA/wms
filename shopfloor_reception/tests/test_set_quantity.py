@@ -53,6 +53,28 @@ class TestSetQuantity(CommonCase):
             },
         )
 
+    def test_set_quantity_scan_lot(self):
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        lot = self._create_lot(
+            product_id=selected_move_line.product_id.id, name="Test Lot"
+        )
+        selected_move_line.write({"shopfloor_user_id": self.env.uid, "lot_id": lot.id})
+        self.service.dispatch(
+            "set_quantity",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                # ↓ UI calls with 0 by default
+                "quantity": 0.0,
+                "barcode": "Test Lot",
+            },
+        )
+
+        self.assertEqual(selected_move_line.qty_done, 1)
+
     def test_set_quantity_scan_wrong_lot(self):
         # create lot "4" for product b
         self.env["stock.lot"].create(
