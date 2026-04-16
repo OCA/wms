@@ -222,6 +222,16 @@ msgid "Execute code"
 msgstr "Esegui codice"
 
 #. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__has_potential_lot_mix_exception
+msgid "Has Potential Lot Mix Exception"
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__has_potential_product_mix_exception
+msgid "Has Potential Product Mix Exception"
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__has_restrictions
 msgid "Has Restrictions"
 msgstr "Ha restrizioni"
@@ -308,11 +318,6 @@ msgstr "Ubicazione terminale"
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_location_sequence__location_id
 msgid "Location"
 msgstr "Ubicazione"
-
-#. module: stock_storage_type
-#: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_is_empty
-msgid "Location Is Empty"
-msgstr "Ubicazione vuota"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__location_will_contain_lot_ids
@@ -561,39 +566,6 @@ msgstr ""
 "è più pesante: {weight_kg}."
 
 #. module: stock_storage_type
-#. odoo-python
-#: code:addons/stock_storage_type/models/stock_quant.py:0
-#, python-format
-msgid ""
-"Storage Category {category} is flagged 'do not mix lots' but there are other "
-"lots in location."
-msgstr ""
-"La categoria stoccaggio {category} è impostata a 'non mescolare i lotti' ma "
-"ci sono altri lotti nell'ubicazione."
-
-#. module: stock_storage_type
-#. odoo-python
-#: code:addons/stock_storage_type/models/stock_quant.py:0
-#, python-format
-msgid ""
-"Storage Category {category} is flagged 'do not mix products' but there are "
-"other products in location."
-msgstr ""
-"La categoria stoccaggio {category} è impostata a 'non mescolare i prodotti' "
-"ma ci sono altri prodotti nell'ubicazione."
-
-#. module: stock_storage_type
-#. odoo-python
-#: code:addons/stock_storage_type/models/stock_quant.py:0
-#, python-format
-msgid ""
-"Storage Category {category} is flagged 'only empty' with other quants in "
-"location."
-msgstr ""
-"La categoria stoccaggio {category} è impostata a 'solo vuote' con altri "
-"quanti nell'ubicazione."
-
-#. module: stock_storage_type
 #: model:ir.ui.menu,name:stock_storage_type.stock_storage_location_sequence_cond_menu
 msgid "Storage Location Sequence Conditions"
 msgstr "Sequenza condizioni ubicazione stoccaggio"
@@ -671,6 +643,22 @@ msgstr ""
 "dalla categoria impostata nell'ubicazione o in uno dei suoi padri."
 
 #. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__has_potential_lot_mix_exception
+msgid ""
+"This will represent a situation where several moves are pointingto the "
+"location for different product lots and the location doesnot allow mixed "
+"lots."
+msgstr ""
+
+#. module: stock_storage_type
+#: model:ir.model.fields,help:stock_storage_type.field_stock_location__has_potential_product_mix_exception
+msgid ""
+"This will represent a situation where several moves are pointingto the "
+"location for different products and the location doesnot allow mixed "
+"products."
+msgstr ""
+
+#. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_category__length_uom_id
 msgid "UoM for height"
 msgstr "UdM per l'altezza"
@@ -703,9 +691,9 @@ msgid ""
 "away is applied."
 msgstr ""
 "Quando i colli con tipo {name} sono depositati, la strategia cerca una "
-"ubicazione disponibile nelle seguenti ubicazioni: <br/><br/>{message} <br/><"
-"br/><b>Nota</b>: questo accade finché queste ubicazioni <u>sono figlie della "
-"ubicazione destinazione del movimento di magazzino</u> o finché queste "
+"ubicazione disponibile nelle seguenti ubicazioni: <br/><br/>{message} <br/"
+"><br/><b>Nota</b>: questo accade finché queste ubicazioni <u>sono figlie "
+"della ubicazione destinazione del movimento di magazzino</u> o finché queste "
 "ubicazioni sono figlie dell'ubicazione di destinazione dopo che è stato "
 "eseguito il deposito (prodotto o categoria)."
 
@@ -716,17 +704,6 @@ msgstr ""
 #, python-format
 msgid "code_snippet should return boolean value into `result` variable."
 msgstr "code_snippet deve restituire un buleano nella variabile `result`."
-
-#. module: stock_storage_type
-#: model:ir.model.fields,help:stock_storage_type.field_stock_location__location_is_empty
-msgid ""
-"technical field: True if the location is empty and there is no pending "
-"incoming products in the location.  Computed only if the location needs to "
-"check for emptiness (has an \"only empty\" policy)."
-msgstr ""
-"Campo tecnico: Vero se l'ubicazione è vuota e non ci sono prodotti in arrivo "
-"in sospeso. Calcolato solo se l'ubicazione deve verificare se vuota (ha una "
-"politica \"solo vuote\")."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__leaf_location_ids
@@ -771,6 +748,42 @@ msgstr "campo tecnico: i stock.moves in attesa nell'ubicazione"
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__out_move_line_ids
 msgid "technical field: the pending outgoing stock.move.lines in the location"
 msgstr "campo tecnico: le stock.move.lines in uscita in atesa nell'ubicazione"
+
+#~ msgid "Location Is Empty"
+#~ msgstr "Ubicazione vuota"
+
+#, python-format
+#~ msgid ""
+#~ "Storage Category {category} is flagged 'do not mix lots' but there are "
+#~ "other lots in location."
+#~ msgstr ""
+#~ "La categoria stoccaggio {category} è impostata a 'non mescolare i lotti' "
+#~ "ma ci sono altri lotti nell'ubicazione."
+
+#, python-format
+#~ msgid ""
+#~ "Storage Category {category} is flagged 'do not mix products' but there "
+#~ "are other products in location."
+#~ msgstr ""
+#~ "La categoria stoccaggio {category} è impostata a 'non mescolare i "
+#~ "prodotti' ma ci sono altri prodotti nell'ubicazione."
+
+#, python-format
+#~ msgid ""
+#~ "Storage Category {category} is flagged 'only empty' with other quants in "
+#~ "location."
+#~ msgstr ""
+#~ "La categoria stoccaggio {category} è impostata a 'solo vuote' con altri "
+#~ "quanti nell'ubicazione."
+
+#~ msgid ""
+#~ "technical field: True if the location is empty and there is no pending "
+#~ "incoming products in the location.  Computed only if the location needs "
+#~ "to check for emptiness (has an \"only empty\" policy)."
+#~ msgstr ""
+#~ "Campo tecnico: Vero se l'ubicazione è vuota e non ci sono prodotti in "
+#~ "arrivo in sospeso. Calcolato solo se l'ubicazione deve verificare se "
+#~ "vuota (ha una politica \"solo vuote\")."
 
 #, python-format
 #~ msgid ""
