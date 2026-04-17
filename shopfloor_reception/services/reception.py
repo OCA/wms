@@ -1203,6 +1203,7 @@ class Reception(Component):
         """
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+
         message = self._check_picking_processible(picking)
         if message:
             return self._response_for_set_lot(picking, selected_line, message=message)
@@ -1215,7 +1216,7 @@ class Reception(Component):
         product = selected_line.product_id
         lot = search.lot_from_scan(lot_name, products=product)
 
-        if selected_line.product_id.use_expiration_date and (
+        if product.use_expiration_date and (
             not expiration_date and not lot.expiration_date
         ):
             return self._response_for_set_lot(
@@ -1226,45 +1227,62 @@ class Reception(Component):
             )
 
         if not lot:
-            if not picking.picking_type_id.use_create_lots:
-                return self._response_for_set_lot(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.lot_creation_disabled(
-                        picking.picking_type_id
-                    ),
-                    lot_name=lot_name,
-                    lot_expiration_date=expiration_date,
-                )
-            lot_vals = self._create_lot_values(product, lot_name)
-            if expiration_date:
-                lot_vals["expiration_date"] = expiration_date.astimezone(UTC).replace(
-                    tzinfo=None
-                )
-            lot = self.env["stock.lot"].create(lot_vals)
+            error_response = self._set_lot_confirm_action__handle_new_lot(
+                picking, selected_line, lot_name, expiration_date
+            )
+            if error_response:
+                return error_response
+            lot = self.env.context["lot"]
         else:
-            if not expiration_date:
-                pass
-            elif not lot.expiration_date:
-                lot.expiration_date = expiration_date.astimezone(UTC).replace(
-                    tzinfo=None
-                )
-            elif lot.expiration_date.astimezone(UTC) != expiration_date.astimezone(UTC):
-                # Prevent user from overwritting an existing expiration date on an existing lot
-                return self._response_for_set_lot(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.lot_already_exists_different_expiration_date(
-                        lot, expiration_date
-                    ),
-                    lot_name=lot_name,
-                    lot_expiration_date=expiration_date,
-                )
+            error_response = self._set_lot_confirm_action__handle_existing_lot(
+                picking, selected_line, lot, expiration_date
+            )
+            if error_response:
+                return error_response
 
         selected_line.lot_id = lot.id
         selected_line._onchange_lot_id()
 
         return self._before_state__set_quantity(picking, selected_line)
+
+    def _set_lot_confirm_action__handle_new_lot(
+        self, picking, line, lot_name, expiration_date
+    ):
+        if not picking.picking_type_id.use_create_lots:
+            return self._response_for_set_lot(
+                picking,
+                line,
+                message=self.msg_store.lot_creation_disabled(picking.picking_type_id),
+                lot_name=lot_name,
+                lot_expiration_date=expiration_date,
+            )
+        lot_vals = self._create_lot_values(line.product_id, lot_name)
+        if expiration_date:
+            lot_vals["expiration_date"] = expiration_date.astimezone(UTC).replace(
+                tzinfo=None
+            )
+        lot = self.env["stock.lot"].create(lot_vals)
+        # Inject lot into context to propagate it through the call stack without extra queries
+        self.env.context = {**self.env.context} | {"lot": lot}
+
+    def _set_lot_confirm_action__handle_existing_lot(
+        self, picking, line, lot, expiration_date
+    ):
+        if not expiration_date:
+            return
+        elif not lot.expiration_date:
+            lot.expiration_date = expiration_date.astimezone(UTC).replace(tzinfo=None)
+        elif lot.expiration_date.astimezone(UTC) != expiration_date.astimezone(UTC):
+            # Prevent user from overwritting an existing expiration date on an existing lot
+            return self._response_for_set_lot(
+                picking,
+                line,
+                message=self.msg_store.lot_already_exists_different_expiration_date(
+                    lot, expiration_date
+                ),
+                lot_name=lot.name,
+                lot_expiration_date=expiration_date,
+            )
 
     def _create_lot_values(self, product, lot_name):
         return {
