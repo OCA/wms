@@ -129,7 +129,8 @@ class TestSelectLine(CommonCase):
         )
 
         self.assertNotEqual(
-            previous_line.id, response["data"]["set_lot"]["selected_move_line"][0]["id"]
+            previous_line.id,
+            response["data"]["set_quantity"]["selected_move_line"][0]["id"],
         )
 
     def test_scan_packaging(self):
@@ -206,8 +207,8 @@ class TestSelectLine(CommonCase):
             },
         )
         self.assertNotEqual(
-            res_u1["data"]["set_lot"]["selected_move_line"][0]["id"],
-            res_u2["data"]["set_lot"]["selected_move_line"][0]["id"],
+            res_u1["data"]["set_quantity"]["selected_move_line"][0]["id"],
+            res_u2["data"]["set_quantity"]["selected_move_line"][0]["id"],
         )
 
     def test_scan_not_tracked_product(self):
@@ -481,5 +482,5 @@ class TestSelectLine(CommonCase):
             response_b["data"]["set_lot"]["selected_move_line"][0]["lot"][
                 "expiration_date"
             ],
-            "2020-02-02T12:00:00+00:00",
+            "2020-02-02T12:00:00",
         )

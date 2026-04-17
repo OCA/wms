@@ -313,9 +313,7 @@ class Reception(Component):
             return self._response_for_set_destination(picking, line, message=message)
 
         if self._move_line_needs_lot(line):
-            return self._response_for_set_lot(
-                picking, line, message=message, lot_name=line.lot_name
-            )
+            return self._set_lot(picking, line, message=message, lot_name=line.lot_name)
 
         # If lot already set, go to set_quantity
         rounding = line.product_uom_id.rounding
@@ -329,7 +327,7 @@ class Reception(Component):
         stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
 
         if self._move_line_needs_lot(line):
-            return self._response_for_set_lot(picking, line, lot_name=line.lot_name)
+            return self._set_lot(picking, line, lot_name=line.lot_name)
 
         return self._before_state__set_quantity(picking, line)
 
@@ -829,19 +827,12 @@ class Reception(Component):
         return self._response(next_state="manual_selection", data=data)
 
     def _response_for_set_lot(self, picking, line, message=None, **kw):
-        # Bypass "set_lot" screen and send lot info to endpoint directly if
-        # lot info have been found when parsing
-        response = self._set_lot_from_parse(picking, line)
-        if response:
-            return response
-
-        # In case the lot_name has been filled on the move line (but not the lot_id)
-        # Send lot values to frontend to allow pre-fill the screen
-        if kw.get("lot_name") and not kw.get("lot_expiration_date"):
-            search = self._actions_for("search")
-            search_result = search.find(kw.get("lot_name"), types=["lot"])
-            if lot := search_result.record:
-                kw["lot"] = lot
+        # Try pre-fill expiration_date for UI
+        if kw.get("lot_name") and not kw.get("lot_expiration_date") and not message:
+            lot = self._actions_for("search").lot_from_scan(
+                kw.get("lot_name"), line.product_id
+            )
+            kw["lot_expiration_date"] = lot.expiration_date or line.expiration_date
 
         return self._response(
             next_state="set_lot",
@@ -852,17 +843,15 @@ class Reception(Component):
             message=message,
         )
 
+    def _set_lot(self, picking, line, message=None, **kw):
+        # Bypass "set_lot" screen and send lot info to endpoint directly if
+        # lot info have been found when parsing
+        if response := self._set_lot_from_parse(picking, line):
+            return response
+        return self._response_for_set_lot(picking, line, message, **kw)
+
     def _set_lot_from_parse(self, picking, line):
-        """
-        The lot has not been found in move lines before this call.
-
-        Following the picking type configuration, set it:
-
-            - on lot_id if record is found
-            - on lot_name if record is not found
-            - set expiration date if found in parse result
-        """
-        if line.shopfloor_should_create_lot and self.search_result.parse_result:
+        if self.search_result.parse_result:
             expiration_date = None
             lot_name = None
             found = False
@@ -885,6 +874,16 @@ class Reception(Component):
                 return self.set_lot_confirm_action(
                     picking.id, line.id, lot_name, expiration_date
                 )
+
+        # We could have found a lot, but with result type "unknow"
+        # Put this afterwards to favor multi-attribute barcode parsing
+        # logic first
+        if self.search_result.record and isinstance(
+            self.search_result.record, self.env["stock.lot"].__class__
+        ):
+            return self.set_lot_confirm_action(
+                picking.id, line.id, lot_name=self.search_result.record.name
+            )
 
     def _align_display_product_uom_qty(self, line, response):
         # This method aligns product uom qties on move lines.
@@ -1212,9 +1211,10 @@ class Reception(Component):
                 picking, selected_line, message=self.msg_store.record_not_found()
             )
 
-        search = self._actions_for("search")
         product = selected_line.product_id
-        lot = search.lot_from_scan(lot_name, products=product)
+        lot = self.search_result.record or self._actions_for("search").lot_from_scan(
+            lot_name, product
+        )
 
         if product.use_expiration_date and (
             not expiration_date and not lot.expiration_date
