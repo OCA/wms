@@ -117,3 +117,26 @@ class TestScanLotName(CommonCase):
                 lot, lot.expiration_date + timedelta(days=2)
             ),
         )
+
+    def test_scan_lot_name_auto_set_lot_on_move_line(self):
+        """
+        If lot exists and lot_name is set on the move line,
+        auto-fill the lot_id and skip "sel_lot" state.
+        """
+        picking = self._create_picking()
+        lot = self._create_lot()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.lot_name = lot.name
+
+        res = self.service.dispatch(
+            "scan_line",
+            params={
+                "picking_id": picking.id,
+                "barcode": lot.name,
+            },
+        )
+
+        self.assertEqual(res["next_state"], "set_quantity")
+        self.assertEqual(selected_move_line.lot_id, lot)
