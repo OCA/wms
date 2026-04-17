@@ -202,24 +202,6 @@ class Reception(Component):
             next_state="confirm_new_package", data=data, message=message
         )
 
-    def _select_document_from_move_lines(self, move_lines, msg_func):
-        pickings = move_lines.move_id.picking_id
-        if len(pickings) == 1:
-            for line in move_lines:
-                if self._move_line_needs_lot(line):
-                    return self._response_for_set_lot(
-                        pickings, line, lot_name=line.lot_name
-                    )
-            return self._response_for_set_quantity(pickings, move_lines)
-        elif len(pickings) > 1:
-            return self._response_for_select_document(
-                pickings=pickings,
-                message=self.msg_store.multiple_picks_found_select_manually(),
-            )
-        # If no available picking with the right state has been found,
-        # return an error
-        return self._response_for_select_document(message=msg_func())
-
     def _scan_document__create_return(self, picking, return_type, barcode):
         stock = self._actions_for("stock")
         return_picking = stock.create_return_picking(picking, return_type, barcode)
