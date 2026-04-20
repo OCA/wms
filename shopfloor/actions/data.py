@@ -271,7 +271,7 @@ class DataAction(Component):
                 "location_id:location_src",
                 lambda rec, fname: self.location(
                     fields.first(rec.move_line_ids).location_id
-                    or fields.first(rec.move_lines).location_id
+                    or fields.first(rec.move_ids).location_id
                     or rec.picking_id.location_id
                 ),
             ),
