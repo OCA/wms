@@ -1,77 +1,14 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo.tests import tagged
-from odoo.tests.common import TransactionCase
+from .model_common import ModelCommon
 
 # pylint: disable=missing-return
 
 
-@tagged("post_install", "-at_install")
-class TestStockSplit(TransactionCase):
+class TestStockSplit(ModelCommon):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
-        cls.warehouse = cls.env.ref("stock.warehouse0")
-        cls.warehouse.delivery_steps = "pick_pack_ship"
-        cls.customer_location = cls.env.ref("stock.stock_location_customers")
-        cls.pack_location = cls.warehouse.wh_pack_stock_loc_id
-        cls.ship_location = cls.warehouse.wh_output_stock_loc_id
-        cls.stock_location = cls.env.ref("stock.stock_location_stock")
-        # Create products
-        cls.product_a = (
-            cls.env["product.product"]
-            .sudo()
-            .create(
-                {
-                    "name": "Product A",
-                    "type": "product",
-                    "default_code": "A",
-                    "barcode": "A",
-                    "weight": 2,
-                }
-            )
-        )
-        cls.product_a_packaging = (
-            cls.env["product.packaging"]
-            .sudo()
-            .create(
-                {
-                    "name": "Box",
-                    "product_id": cls.product_a.id,
-                    "barcode": "ProductABox",
-                }
-            )
-        )
-        cls.product_b = (
-            cls.env["product.product"]
-            .sudo()
-            .create(
-                {
-                    "name": "Product B",
-                    "type": "product",
-                    "default_code": "B",
-                    "barcode": "B",
-                    "weight": 2,
-                }
-            )
-        )
-        cls.product_b_packaging = (
-            cls.env["product.packaging"]
-            .sudo()
-            .create(
-                {
-                    "name": "Box",
-                    "product_id": cls.product_b.id,
-                    "barcode": "ProductBBox",
-                }
-            )
-        )
-        # Put product_a quantities in different packages to get several move lines
-        cls.package_1 = cls.env["stock.quant.package"].create({"name": "PACKAGE_1"})
-        cls.package_2 = cls.env["stock.quant.package"].create({"name": "PACKAGE_2"})
-        cls.package_3 = cls.env["stock.quant.package"].create({"name": "PACKAGE_3"})
-        cls.package_4 = cls.env["stock.quant.package"].create({"name": "PACKAGE_4"})
+    def setUpClassData(cls):
+        super().setUpClassData()
         cls._update_qty_in_location(
             cls.stock_location, cls.product_a, 6, package=cls.package_1
         )
@@ -84,6 +21,7 @@ class TestStockSplit(TransactionCase):
         # Put product_b quantities in stock
         cls._update_qty_in_location(cls.stock_location, cls.product_b, 10)
         # Create the pick/pack/ship transfer
+        cls.warehouse.sudo().delivery_steps = "pick_pack_ship"
         cls.ship_move_a = cls.env["stock.move"].create(
             {
                 "name": cls.product_a.display_name,
