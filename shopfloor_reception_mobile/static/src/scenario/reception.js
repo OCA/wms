@@ -21,14 +21,6 @@ const Reception = {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
-            <template v-if="state_is('select_move')">
-                <item-detail-card
-                    :record="state.data.picking"
-                    :options="operation_options()"
-                    :card_color="utils.colors.color_for('screen_step_done')"
-                    :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
-                />
-            </template>
             <template v-if="state_is('select_document')">
                 <manual-select
                     class="with-progress-bar"
@@ -36,14 +28,12 @@ const Reception = {
                     :options="manual_select_options_for_select_document(true)"
                     :key="make_state_component_key(['reception', 'manual-select-document'])"
                 />
-                <div v-if="state_is('select_document')">
-                    <div class="button-list button-vertical-list full">
-                        <v-row align="center">
-                            <v-col class="text-center" cols="12">
-                                <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
-                            </v-col>
-                        </v-row>
-                    </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
+                        </v-col>
+                    </v-row>
                 </div>
             </template>
             <template v-if="state_is('manual_selection') && visible_pickings">
@@ -66,6 +56,12 @@ const Reception = {
                 </div>
             </template>
             <template v-if="state_is('select_move')">
+                <item-detail-card
+                    :record="state.data.picking"
+                    :options="operation_options()"
+                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
+                />
                 <manual-select
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :records="ordered_moves"
