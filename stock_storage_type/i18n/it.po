@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-10-07 10:43+0000\n"
+"PO-Revision-Date: 2026-04-20 15:45+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: stock_storage_type
 #. odoo-python
@@ -224,12 +224,12 @@ msgstr "Esegui codice"
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__has_potential_lot_mix_exception
 msgid "Has Potential Lot Mix Exception"
-msgstr ""
+msgstr "Ha potenziale eccezione lotto misto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_location__has_potential_product_mix_exception
 msgid "Has Potential Product Mix Exception"
-msgstr ""
+msgstr "Ha potenziale eccezione prodotto misto"
 
 #. module: stock_storage_type
 #: model:ir.model.fields,field_description:stock_storage_type.field_stock_storage_category__has_restrictions
@@ -649,6 +649,9 @@ msgid ""
 "location for different product lots and the location doesnot allow mixed "
 "lots."
 msgstr ""
+"Questo rappresenterà una situazione dove diversi movimenti puntano "
+"all'ubicazione per diversi lotti prodotto e l'ubicazione non consente lotti "
+"misti."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_location__has_potential_product_mix_exception
@@ -657,6 +660,9 @@ msgid ""
 "location for different products and the location doesnot allow mixed "
 "products."
 msgstr ""
+"Questo rappresenterà una situazione dove diversi movimenti puntano "
+"all'ubicazione per diversi prodotti e l'ubicazione non consente prodotti "
+"misti."
 
 #. module: stock_storage_type
 #: model:ir.model.fields,help:stock_storage_type.field_stock_storage_category__length_uom_id
