@@ -125,6 +125,7 @@ class TestSetDestination(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+                "confirmation": None,
             },
             message={"message_type": "error", "body": "You cannot place it here"},
         )

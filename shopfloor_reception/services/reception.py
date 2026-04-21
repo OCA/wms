@@ -908,12 +908,15 @@ class Reception(Component):
         )
         return self._align_display_product_uom_qty(line, response)
 
-    def _response_for_set_destination(self, picking, line, message=None):
+    def _response_for_set_destination(
+        self, picking, line, message=None, confirmation=None
+    ):
         return self._response(
             next_state="set_destination",
             data={
                 "selected_move_line": self._data_for_move_lines(line),
                 "picking": self.data.picking(picking),
+                "confirmation": confirmation,
             },
             message=message,
         )
@@ -1494,6 +1497,7 @@ class Reception(Component):
                 message=self.msg_store.place_in_location_ask_confirmation(
                     location.name
                 ),
+                confirmation=location_name,
             )
         selected_line.location_dest_id = location
 
@@ -1851,6 +1855,7 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "schema": {"type": "dict", "schema": self.schemas.move_line()},
             },
             "picking": {"type": "dict", "schema": self.schemas.picking()},
+            "confirmation": {"type": "string", "nullable": True},
         }
 
     @property
