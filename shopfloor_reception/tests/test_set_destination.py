@@ -9,76 +9,98 @@ class TestSetDestination(CommonCase):
     def setUpClassBaseData(cls):
         super().setUpClassBaseData()
         cls.packing_location.sudo().active = True
-        cls.location_dest = cls.env.ref("stock.stock_location_stock")
-
-    @classmethod
-    def _change_line_dest(cls, line):
-        # Modify the location dest on the move, so we have different children
-        # for move's dest_location and pick type's dest_location
-        line.location_dest_id = cls.location_dest
+        cls.sub_input_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test Reception Shelf",
+                    "location_id": cls.input_location.id,
+                }
+            )
+        )
+        cls.sub_input_location_2 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test Reception Shelf 2",
+                    "location_id": cls.input_location.id,
+                }
+            )
+        )
+        cls.sub_stock_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Test Reception Shelf",
+                    "location_id": cls.stock_location.id,
+                }
+            )
+        )
 
     def test_scan_location_child_of_dest_location(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        self._change_line_dest(selected_move_line)
+        self.assertTrue(
+            self.sub_input_location.is_sublocation_of(picking.location_dest_id)
+        )
+        self.assertNotEqual(
+            self.sub_input_location, selected_move_line.location_dest_id
+        )
+
         response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.shelf2.name,
+                "location_name": self.sub_input_location.name,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.shelf2)
+        self.assertEqual(selected_move_line.location_dest_id, self.sub_input_location)
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )
 
-    def test_scan_location_child_of_pick_type_dest_location(self):
+    def test_scan_location_valid_but_unexpected(self):
         picking = self._create_picking()
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        self._change_line_dest(selected_move_line)
+
+        selected_move_line.location_dest_id = self.sub_input_location
+        # `sub_input_location_2` is valid but not the expected location
         response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.dispatch_location.name,
+                "location_name": self.sub_input_location_2.name,
             },
+        )
+        self.assertMessage(
+            response,
+            self.msg_store.place_in_location_ask_confirmation(
+                self.sub_input_location_2.name
+            ),
+        )
+        self.assertNotEqual(
+            selected_move_line.location_dest_id, self.sub_input_location_2
         )
 
-        # location is a child of the picking type's location. destination location
-        # hasn't been set
-        self.assertNotEqual(selected_move_line.location_dest_id, self.dispatch_location)
-        # But a confirmation has been asked
-        data = self.data.picking(picking)
-        self.assert_response(
-            response,
-            next_state="set_destination",
-            data={
-                "picking": data,
-                "selected_move_line": self.data.move_lines(selected_move_line),
-            },
-            message={
-                "message_type": "warning",
-                "body": f"Place it in {self.dispatch_location.name}?",
-            },
-        )
-        # Send the same message with confirmation=True to confirm
         response = self.service.dispatch(
             "set_destination",
             params={
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
-                "location_name": self.dispatch_location.name,
-                "confirmation": True,
+                "location_name": self.sub_input_location_2.name,
+                "confirmation": self.sub_input_location_2.name,
             },
         )
-        self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
+        self.assertEqual(selected_move_line.location_dest_id, self.sub_input_location_2)
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
         )
