@@ -239,8 +239,7 @@ export const reception_states = function () {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
                         location_name: location.text,
-                        // FIXME if it is always set to true, it is not really used ?
-                        confirmation: true,
+                        confirmation: this.state.data.confirmation || "",
                     })
                 );
             },
