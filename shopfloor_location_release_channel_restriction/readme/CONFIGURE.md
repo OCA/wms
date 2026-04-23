@@ -1,0 +1,1 @@
+- See `stock_location_release_channel_restriction` module.
