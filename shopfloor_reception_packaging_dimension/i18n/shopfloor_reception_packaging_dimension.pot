@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 18.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,6 +12,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_barcode
+msgid "Collect Barcode"
+msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
 #: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
@@ -66,11 +71,12 @@ msgid "Shopfloor"
 msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_barcode
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
 msgid ""
-"When marked, shopfloor will require to set this dimension during reception "
-"if undefined on the packaging"
+"When marked, shopfloor will require to set dimensions during reception if "
+"undefined on the packaging"
 msgstr ""
