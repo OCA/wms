@@ -338,7 +338,7 @@ let data = function () {
             const data = this.state.data;
             this.wait_call(
                 this.odoo.call("scan_package_action", {
-                    picking_id: data.id,
+                    picking_id: data.picking.id,
                     selected_line_ids: this.selected_line_ids(),
                     barcode: scanned.text,
                 })
