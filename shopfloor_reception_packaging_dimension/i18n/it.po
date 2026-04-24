@@ -1,0 +1,92 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception_packaging_dimension
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-09-01 09:42+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+msgid "Collect height"
+msgstr "Raccogli altezza"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+msgid "Collect length"
+msgstr "Raccogli lunghezza"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+msgid "Collect weight"
+msgstr "Raccogli peso"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid "Collect width"
+msgstr "Raccogli larghezza"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
+msgid ""
+"If for the product being processed, its related packaging dimension are not "
+"set, ask to fill them up."
+msgstr ""
+"Se per il prodotto che deve essere lavorato, non è impostata la dimensione "
+"dell'imballo, chiede di compilarla."
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model,name:shopfloor_reception_packaging_dimension.model_product_packaging_level
+msgid "Level management for product.packaging"
+msgstr "Gestione livello per product.packaging"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model,name:shopfloor_reception_packaging_dimension.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr "Menu visualizzato nell'applicazione di scansione"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension_is_possible
+msgid "Set Packaging Dimension Is Possible"
+msgstr "È possibile impostare la dimensione dell'imballo"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
+msgid "Set packaging dimension"
+msgstr "Imposta dimensione imballo"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model_terms:ir.ui.view,arch_db:shopfloor_reception_packaging_dimension.view_product_packaging_level_form
+msgid "Shopfloor"
+msgstr "Reparto"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid ""
+"When marked, shopfloor will require to set this dimension during reception "
+"if undefined on the packaging"
+msgstr ""
+"Una volta contrassegnata, il reparto dovrà impostare questa dimensione "
+"durante la ricezione se non definita sulla confezione"
+
+#~ msgid "Display Name"
+#~ msgstr "Nome visualizzato"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Ultima modifica il"

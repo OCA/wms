@@ -1,0 +1,76 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception_packaging_dimension
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+msgid "Collect height"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+msgid "Collect length"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+msgid "Collect weight"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid "Collect width"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
+msgid ""
+"If for the product being processed, its related packaging dimension are not "
+"set, ask to fill them up."
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model,name:shopfloor_reception_packaging_dimension.model_product_packaging_level
+msgid "Level management for product.packaging"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model,name:shopfloor_reception_packaging_dimension.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension_is_possible
+msgid "Set Packaging Dimension Is Possible"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension
+msgid "Set packaging dimension"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model_terms:ir.ui.view,arch_db:shopfloor_reception_packaging_dimension.view_product_packaging_level_form
+msgid "Shopfloor"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
+msgid ""
+"When marked, shopfloor will require to set this dimension during reception "
+"if undefined on the packaging"
+msgstr ""
