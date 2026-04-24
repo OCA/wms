@@ -215,7 +215,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 events: {
                     go_back: "on_back",
                 },
-                get_payload_set_packaging_dimension: () => {
+                _get_payload_set_packaging_dimension: () => {
                     let values = {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.state.data.selected_move_line.id,
@@ -227,20 +227,27 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     }
                     return values;
                 },
-                on_skip: async function () {
-                    const payload = self.state.get_payload_set_packaging_dimension();
-                    payload["skip"] = true;
+                _handle_dimension_submission: async function (is_skip = false) {
+                    const payload = self.state._get_payload_set_packaging_dimension();
+                    if (is_skip) {
+                        payload["skip"] = true;
+                    }
+
                     await self.wait_call(
                         self.odoo.call("set_packaging_dimension", payload)
                     );
+
+                    // Prepare next screen
                     self.prefill_packaging_form_inputs();
+                    self.$nextTick(() => {
+                        window.scrollTo(0, 0);
+                    });
+                },
+                on_skip: async function () {
+                    await self.state._handle_dimension_submission(true);
                 },
                 on_done: async function () {
-                    const payload = self.state.get_payload_set_packaging_dimension();
-                    await self.wait_call(
-                        self.odoo.call("set_packaging_dimension", payload)
-                    );
-                    self.prefill_packaging_form_inputs();
+                    await self.state._handle_dimension_submission(false);
                 },
             };
             return states;
