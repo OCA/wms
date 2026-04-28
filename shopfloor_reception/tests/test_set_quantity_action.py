@@ -218,3 +218,28 @@ class TestSetQuantityAction(CommonCase):
             move_line.picking_id,
             "Cancelling the move line should not move it into a backorder",
         )
+
+    def test_set_quantity_actions_prevent_null_quantity(self):
+        for action in [
+            "process_with_new_pack",
+            "process_without_pack",
+            "process_with_existing_pack",
+        ]:
+            response = self.service.dispatch(
+                action,
+                params={
+                    "picking_id": self.picking.id,
+                    "selected_line_id": self.selected_move_line.id,
+                    "quantity": 0.0,
+                },
+            )
+            self.assert_response(
+                response,
+                next_state="set_quantity",
+                data={
+                    "confirmation_required": None,
+                    "picking": self.data.picking(self.picking),
+                    "selected_move_line": self.data.move_lines(self.selected_move_line),
+                },
+                message=self.msg_store.invalid_quantity(0.0),
+            )

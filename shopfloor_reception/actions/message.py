@@ -39,3 +39,12 @@ class MessageAction(Component):
                 picking_type=picking_type.display_name,
             ),
         }
+
+    def invalid_quantity(self, qty):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Invalid quantity: '%(qty)s'.",
+                qty=qty,
+            ),
+        }
