@@ -832,7 +832,7 @@ class Reception(Component):
             lot = self._actions_for("search").lot_from_scan(
                 kw.get("lot_name"), line.product_id
             )
-            kw["lot_expiration_date"] = lot.expiration_date or line.expiration_date
+            kw["lot_expiration_date"] = lot.expiration_date
 
         return self._response(
             next_state="set_lot",
