@@ -12,6 +12,9 @@ from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
 from .common import CommonCase
 
 UTC = timezone.utc
+GTIN_AI = "01"
+LOT_AI = "10"
+EXPIRATION_DATE_AI = "17"
 
 
 class TestScanLotName(CommonCase):
@@ -34,13 +37,18 @@ class TestScanLotName(CommonCase):
         )
         selected_move_line.shopfloor_user_id = self.env.uid
 
+        gs1_barcode = (
+            f"{GTIN_AI}01234567890128{EXPIRATION_DATE_AI}220702{LOT_AI}{lot.name}"
+        )
+
         with mock.patch.object(SearchAction, "find") as mock_find:
             mock_find.return_value = SearchResult(
                 record=None,
                 type="None",
                 parse_result=[
-                    BarcodeResult(type="unknown", value=lot.name),
+                    BarcodeResult(type="unknown", value=gs1_barcode),
                     BarcodeResult(type="expiration_date", value=expiration_date),
+                    BarcodeResult(type="lot", value=lot.name),
                 ],
             )
             res = self.service.dispatch(
@@ -78,16 +86,21 @@ class TestScanLotName(CommonCase):
         )
         selected_move_line.shopfloor_user_id = self.env.uid
 
+        gs1_barcode = (
+            f"{GTIN_AI}01234567890128{EXPIRATION_DATE_AI}220704{LOT_AI}{lot.name}"
+        )
+
         with mock.patch.object(SearchAction, "find") as mock_find:
             mock_find.return_value = SearchResult(
                 record=lot,
                 type="lot",
                 parse_result=[
-                    BarcodeResult(type="unknown", value=lot.name),
+                    BarcodeResult(type="unknown", value=gs1_barcode),
                     BarcodeResult(
                         type="expiration_date",
-                        value=lot.expiration_date + timedelta(days=2),
+                        value=expiration_date + timedelta(days=2),
                     ),
+                    BarcodeResult(type="lot", value=lot.name),
                 ],
             )
             res = self.service.dispatch(

@@ -22,9 +22,9 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "A lot already exists with a different expiration date.\n\n"
-                "Lot '%(lot_name)s' expiration date: %(current)s "
-                "!= provided expiration date: %(provided)s",
+                "This lot already exists with a different expiration date.\n\n"
+                "Lot: '%(lot_name)s'\nStored expiration date: %(current)s"
+                "\nProvided expiration date: %(provided)s",
                 lot_name=lot.name,
                 current=formatted_lot_expiration_date,
                 provided=formatted_provided_expiration_date,

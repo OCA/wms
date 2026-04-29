@@ -38,6 +38,11 @@ class DataAction(Component):
         lot_data = {}
         if lot := kw.get("lot"):
             lot_data = self._jsonify(lot, self._lot_parser_reception)
+            # add expiration_date from scan if not defined on existing lot
+            if not lot_data.get("expiration_date") and (
+                lot_expiration_date := kw.get("lot_expiration_date")
+            ):
+                lot_data["expiration_date"] = lot_expiration_date.isoformat()
         else:
             if lot_name := kw.get("lot_name"):
                 lot_data["name"] = lot_name

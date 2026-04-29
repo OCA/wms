@@ -1162,16 +1162,24 @@ class Reception(Component):
             handler_kw={"lot": {"products": selected_line.product_id}},
         )
 
-        if search_result.type == "lot":
-            existing_lot = search_result.record
-
         # Look for more info in the barcode
         for result in search_result.parse_result:
-            if result.type == "expiration_date":
+            if result.type == "lot":
+                lot_name = result.value
+            elif result.type == "expiration_date":
                 lot_expiration_date = result.value
 
+        if search_result.type == "lot":
+            existing_lot = search_result.record
+        if not existing_lot:
+            existing_lot = search.lot_from_scan(lot_name, selected_line.product_id)
+
         message = None
-        if lot_expiration_date and existing_lot.expiration_date != lot_expiration_date:
+        if (
+            lot_expiration_date
+            and existing_lot
+            and existing_lot.expiration_date != lot_expiration_date
+        ):
             message = self.msg_store.lot_already_exists_different_expiration_date(
                 existing_lot, lot_expiration_date
             )
