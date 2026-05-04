@@ -131,10 +131,10 @@ export const reception_states = function () {
             },
             on_scan: (barcode) => {
                 this.wait_call(
-                    this.odoo.call("scan_lot_name", {
+                    this.odoo.call("scan_lot", {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
-                        lot_name: barcode.text,
+                        barcode: barcode.text,
                     })
                 );
             },
