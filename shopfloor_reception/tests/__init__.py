@@ -13,4 +13,4 @@ from . import test_return_scan_line
 from . import test_return_set_quantity
 from . import test_return_reception_done
 from . import test_recover
-from . import test_scan_lot_name
+from . import test_scan_lot
