@@ -129,7 +129,8 @@ class TestSelectLine(CommonCase):
         )
 
         self.assertNotEqual(
-            previous_line.id, response["data"]["set_lot"]["selected_move_line"][0]["id"]
+            previous_line.id,
+            response["data"]["set_quantity"]["selected_move_line"][0]["id"],
         )
 
     def test_scan_packaging(self):
@@ -206,8 +207,8 @@ class TestSelectLine(CommonCase):
             },
         )
         self.assertNotEqual(
-            res_u1["data"]["set_lot"]["selected_move_line"][0]["id"],
-            res_u2["data"]["set_lot"]["selected_move_line"][0]["id"],
+            res_u1["data"]["set_quantity"]["selected_move_line"][0]["id"],
+            res_u2["data"]["set_quantity"]["selected_move_line"][0]["id"],
         )
 
     def test_scan_not_tracked_product(self):
@@ -433,4 +434,53 @@ class TestSelectLine(CommonCase):
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
+        )
+
+    def test_select_move_next_state_ignores_lot_name(self):
+        picking = self._create_picking()
+
+        self.product_a.tracking = "lot"
+        self.product_b.tracking = "lot"
+
+        move_a = picking.move_ids.filtered(lambda m: m.product_id == self.product_a)
+        move_line_a = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        move_line_a.lot_id = self._create_lot()
+
+        move_b = picking.move_ids.filtered(lambda m: m.product_id == self.product_b)
+        move_line_b = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_b
+        )
+        move_line_b.lot_name = "Pre-Configured Lot Name"
+        self._create_lot(
+            product_id=self.product_b.id,
+            name="Pre-Configured Lot Name",
+            expiration_date="2020-02-02 12:00:00",
+        )
+
+        # There is already a lot -> we skip "set_lot"
+        response_a = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": move_a.id},
+        )
+        self.assertEqual(response_a.get("next_state"), "set_quantity")
+
+        # There is a lot name but no lot record -> enter "set_lot"
+        response_b = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": move_b.id},
+        )
+        self.assertEqual(response_b.get("next_state"), "set_lot")
+
+        # The UI should receive the lot metadata so as to be able to prefill
+        self.assertEqual(
+            response_b["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
+            "Pre-Configured Lot Name",
+        )
+        self.assertEqual(
+            response_b["data"]["set_lot"]["selected_move_line"][0]["lot"][
+                "expiration_date"
+            ],
+            "2020-02-02T12:00:00",
         )
