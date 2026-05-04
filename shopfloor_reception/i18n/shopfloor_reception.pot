@@ -54,3 +54,23 @@ msgstr ""
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
 msgid "Reception"
 msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid ""
+"The operation type '%(picking_type)s' does not allow to create new lots."
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid ""
+"This lot already exists with a different expiration date.\n"
+"\n"
+"Lot: '%(lot_name)s'\n"
+"Stored expiration date: %(current)s\n"
+"Provided expiration date: %(provided)s"
+msgstr ""
