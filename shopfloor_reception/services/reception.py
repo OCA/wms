@@ -728,6 +728,20 @@ class Reception(Component):
             return self._response_for_select_move(picking)
         return self._response_for_set_destination(picking, selected_line)
 
+    def _set_quantity__by_new_package(
+        self, picking, selected_line, barcode: str, confirmation: str
+    ):
+        if confirmation != barcode:
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.create_new_pack_ask_confirmation(barcode),
+                asking_confirmation=barcode,
+            )
+        package = self.env["stock.quant.package"].create({"name": barcode})
+        selected_line.result_package_id = package
+        return self._response_for_set_destination(picking, selected_line)
+
     def _set_quantity__by_location(self, picking, selected_line, location):
         move_dest_location_ok, pick_type_dest_location_ok = self._check_location_ok(
             location, selected_line, picking
@@ -1322,18 +1336,12 @@ class Reception(Component):
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(picking, selected_line, search_result.record)
+
         # Nothing found, ask user if we should create a new pack for the scanned
         # barcode
-        if confirmation != barcode:
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.create_new_pack_ask_confirmation(barcode),
-                asking_confirmation=barcode,
-            )
-        package = self.env["stock.quant.package"].create({"name": barcode})
-        selected_line.result_package_id = package
-        return self._response_for_set_destination(picking, selected_line)
+        return self._set_quantity__by_new_package(
+            picking, selected_line, barcode, confirmation
+        )
 
     def _set_quantity__assign_quantity(self, picking, selected_line, quantity):
         # If this is a return line, we cannot assign more qty_done than what
