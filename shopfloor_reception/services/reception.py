@@ -1392,8 +1392,6 @@ class Reception(Component):
         return self._response_for_select_move(picking)
 
     def _set_quantity__process__set_qty_and_split(self, picking, line, quantity):
-        move = line.move_id
-        sum(move.move_line_ids.mapped("qty_done"))
         savepoint = self._actions_for("savepoint").new()
         line.qty_done = quantity
         compare = self._set_quantity__check_quantity_done(line)
@@ -1413,33 +1411,33 @@ class Reception(Component):
             }
             line._split_qty_to_be_done(quantity, **default_values)
 
+    def _process(self, picking, line, quantity):
+        if message := self._check_picking_processible(picking):
+            return self._response_for_set_quantity(picking, line, message=message)
+
+        if float_is_zero(quantity, precision_rounding=line.product_id.uom_id.rounding):
+            return self._response_for_set_quantity(
+                picking,
+                line,
+                message=self.msg_store.invalid_quantity(quantity),
+            )
+
+        response = self._set_quantity__process__set_qty_and_split(
+            picking, line, quantity
+        )
+        return response
+
     def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_processible(picking)
-        if message:
-            return self._response_for_set_quantity(
-                picking, selected_line, message=message
-            )
-        response = self._set_quantity__process__set_qty_and_split(
-            picking, selected_line, quantity
-        )
-        if response:
+        if response := self._process(picking, selected_line, quantity):
             return response
         return self._response_for_select_dest_package(picking, selected_line)
 
     def process_with_new_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_processible(picking)
-        if message:
-            return self._response_for_set_quantity(
-                picking, selected_line, message=message
-            )
-        response = self._set_quantity__process__set_qty_and_split(
-            picking, selected_line, quantity
-        )
-        if response:
+        if response := self._process(picking, selected_line, quantity):
             return response
         picking._put_in_pack(selected_line)
         return self._response_for_set_destination(picking, selected_line)
@@ -1447,15 +1445,7 @@ class Reception(Component):
     def process_without_pack(self, picking_id, selected_line_id, quantity):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
-        message = self._check_picking_processible(picking)
-        if message:
-            return self._response_for_set_quantity(
-                picking, selected_line, message=message
-            )
-        response = self._set_quantity__process__set_qty_and_split(
-            picking, selected_line, quantity
-        )
-        if response:
+        if response := self._process(picking, selected_line, quantity):
             return response
         return self._response_for_set_destination(picking, selected_line)
 
