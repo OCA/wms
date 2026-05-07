@@ -29,7 +29,7 @@ class ModelCommon(TransactionCase):
             .create(
                 {
                     "name": "Product A",
-                    "is_storable": True,
+                    "type": "product",
                     "default_code": "A",
                     "barcode": "A",
                     "weight": 2,
@@ -53,7 +53,7 @@ class ModelCommon(TransactionCase):
             .create(
                 {
                     "name": "Product B",
-                    "is_storable": True,
+                    "type": "product",
                     "default_code": "B",
                     "barcode": "B",
                     "weight": 2,
