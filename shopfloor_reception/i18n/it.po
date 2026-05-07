@@ -45,6 +45,13 @@ msgid "Filter Today Scheduled Pickings Is Possible"
 msgstr "Filtro Possibili prelievi schedulati oggi"
 
 #. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid "Invalid quantity: '%(qty)s'."
+msgstr ""
+
+#. module: shopfloor_reception
 #: model:ir.model,name:shopfloor_reception.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
 msgstr "Menu visualizzato nell'applicazione di scansione"
