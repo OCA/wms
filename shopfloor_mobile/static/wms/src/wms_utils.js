@@ -296,6 +296,8 @@ export class WMSUtils {
                 render_props: function (record) {
                     return self.move_line_qty_picker_props(record, {
                         qtyInit: record.quantity,
+                        // ↓ we do not want to display "/ qtyTodo" in normal case
+                        qtyTodo: undefined,
                     });
                 },
             },
