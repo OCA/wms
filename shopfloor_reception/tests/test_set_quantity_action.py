@@ -56,6 +56,7 @@ class TestSetQuantityAction(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(self.selected_move_line),
+                "confirmation": None,
             },
         )
         self.assertTrue(self.selected_move_line.result_package_id)
@@ -76,6 +77,7 @@ class TestSetQuantityAction(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(self.selected_move_line),
+                "confirmation": None,
             },
         )
         self.assertFalse(self.selected_move_line.result_package_id)
