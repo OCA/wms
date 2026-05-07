@@ -11,7 +11,7 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from ..exceptions import ConcurentWorkOnTransfer
+from ..exceptions import CannotProcessMoreThanPlanned, ConcurentWorkOnTransfer
 from ..utils import to_float
 
 
@@ -1033,15 +1033,6 @@ class ZonePicking(Component):
             return (package_changed, response)
         # the quantity done is set to the passed quantity
         # but if we move a partial qty, we need to split the move line
-        compare = self._move_line_compare_qty(move_line, quantity)
-        qty_greater = compare == 1
-        if qty_greater:
-            response = self._response_for_set_line_destination(
-                move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
-                qty_done=quantity,
-            )
-            return (package_changed, response)
         stock = self._actions_for("stock")
         stock._lock_lines(move_line)
         try:
@@ -1055,6 +1046,13 @@ class ZonePicking(Component):
                     "message_type": "error",
                     "body": str(error),
                 },
+                qty_done=quantity,
+            )
+            return (package_changed, response)
+        except CannotProcessMoreThanPlanned:
+            response = self._response_for_set_line_destination(
+                move_line,
+                message=self.msg_store.unable_to_pick_more(move_line.quantity),
                 qty_done=quantity,
             )
             return (package_changed, response)
