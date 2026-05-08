@@ -133,17 +133,17 @@ const Reception = {
                     />
                 </v-card>
                 <div class="button-list button-vertical-list full">
-                    <v-row align="center">
+                    <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_add_to_existing_pack">Existing pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_create_new_pack">New pack</btn-action>
                         </v-col>
                     </v-row>
-                    <v-row align="center">
+                    <v-row v-if="show_without_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_process_without_pack">Process without pack</btn-action>
                         </v-col>
@@ -212,6 +212,16 @@ const Reception = {
         </Screen>
     `,
     computed: {
+        show_with_pack_actions: function () {
+            const put_in_pack_restriction = this.state.data.put_in_pack_restriction;
+            if (!put_in_pack_restriction) return true;
+            return put_in_pack_restriction === "with_package";
+        },
+        show_without_pack_actions: function () {
+            const put_in_pack_restriction = this.state.data.put_in_pack_restriction;
+            if (!put_in_pack_restriction) return true;
+            return put_in_pack_restriction === "no_package";
+        },
         visible_pickings: function () {
             return !_.isEmpty(this.filtered_pickings)
                 ? this.filtered_pickings

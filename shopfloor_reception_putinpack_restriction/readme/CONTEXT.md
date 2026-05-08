@@ -1,0 +1,1 @@
+It is specifically designed for warehouses that want to control if goods are put in a pack or cannot be put in a pack, here at the end of the reception. This prevents warehouse operators from freely choosing by hiding forbidden buttons.

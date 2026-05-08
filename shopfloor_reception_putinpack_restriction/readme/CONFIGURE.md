@@ -1,0 +1,1 @@
+You can configure on the picking type if you want to use packages or not.
