@@ -6,24 +6,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2026-05-11 16:35+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: shopfloor_reception_putinpack_restriction
 #. odoo-python
 #: code:addons/shopfloor_reception_putinpack_restriction/actions/message.py:0
 #, python-format
 msgid "The operation '%(picking_type)s' does not allow the use of package."
-msgstr ""
+msgstr "L'operazione '%(picking_type)s' non consente l'utilizzo dei colli."
 
 #. module: shopfloor_reception_putinpack_restriction
 #. odoo-python
 #: code:addons/shopfloor_reception_putinpack_restriction/actions/message.py:0
 #, python-format
 msgid "The operation '%(picking_type)s' requires a package."
-msgstr ""
+msgstr "L'operazione '%(picking_type)s' richiede un collo."
