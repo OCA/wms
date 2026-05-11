@@ -1,0 +1,29 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception_putinpack_restriction
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: shopfloor_reception_putinpack_restriction
+#. odoo-python
+#: code:addons/shopfloor_reception_putinpack_restriction/actions/message.py:0
+#, python-format
+msgid "The operation '%(picking_type)s' does not allow the use of package."
+msgstr ""
+
+#. module: shopfloor_reception_putinpack_restriction
+#. odoo-python
+#: code:addons/shopfloor_reception_putinpack_restriction/actions/message.py:0
+#, python-format
+msgid "The operation '%(picking_type)s' requires a package."
+msgstr ""
