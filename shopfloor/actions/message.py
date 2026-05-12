@@ -651,13 +651,15 @@ class MessageAction(Component):
             ),
         }
 
-    def location_content_unable_to_transfer(self, location_dest):
-        return {
-            "message_type": "error",
-            "body": _(
-                "The content of {} cannot be transferred with this scenario."
-            ).format(location_dest.name),
-        }
+    def location_content_unable_to_transfer(self, move, location, location_dest):
+        message = _(
+            "The content of %(location)s cannot be transferred to "
+            "%(location_dest)s with this scenario for product %(product_name)s.",
+            location=location.name,
+            location_dest=location_dest.name,
+            product_name=move.product_id.display_name,
+        )
+        return {"message_type": "error", "body": message}
 
     def product_in_multiple_sublocation(self, product):
         return {

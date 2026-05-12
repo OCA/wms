@@ -129,15 +129,23 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.test_loc.barcode}
         )
+        current_moves = self.env["stock.move"].search(
+            [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]
+        )
+        self.assertEqual(existing_moves, current_moves)
+
+        test_move = self.env["stock.move"].new(
+            {
+                "product_id": self.product_a.id,
+                "location_dest_id": self.picking_type.default_location_dest_id.id,
+                "location_id": self.test_loc.id,
+            }
+        )
         self.assert_response(
             response,
             next_state="scan_location",
             data=self.ANY,
             message=self.service.msg_store.location_content_unable_to_transfer(
-                self.test_loc
+                test_move, self.test_loc, self.test_loc
             ),
         )
-        current_moves = self.env["stock.move"].search(
-            [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]
-        )
-        self.assertEqual(existing_moves, current_moves)
