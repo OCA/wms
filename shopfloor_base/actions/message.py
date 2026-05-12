@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+
 from odoo import _
 
 from odoo.addons.component.core import Component
@@ -18,6 +19,17 @@ class MessageAction(Component):
     _name = "shopfloor.message.action"
     _inherit = "shopfloor.process.action"
     _usage = "message"
+
+    _message_queue = []
+
+    @property
+    def message_queue(self):
+        return self._message_queue
+
+    def add_message(self, value):
+        if not isinstance(value, str):
+            raise TypeError("You should set a string to message queue!")
+        self._message_queue.append(value)
 
     def generic_record_not_found(self):
         return {
