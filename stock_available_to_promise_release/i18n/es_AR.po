@@ -347,6 +347,11 @@ msgid "Release based on Available to Promise"
 msgstr "Liberación basada en Disponibilidad a Prometer"
 
 #. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_return_picking
+msgid "Return Picking"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__allow_unrelease_return_done_move
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__allow_unrelease_return_done_move
 msgid "Reverse done transfer on cancellation"
@@ -366,7 +371,7 @@ msgstr "Asignaciones de Inventario Liberadas"
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_unrelease
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "Stock Allocations Un Release"
+msgid "Stock Allocations Unrelease"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -389,9 +394,7 @@ msgstr "Regla de Inventario"
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
-msgid ""
-"The backorder <a href=# data-oe-model=stock.picking data-oe-"
-"id=%(id)s>%(name)s</a> has been created."
+msgid "The backorder %s has been created."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -417,7 +420,7 @@ msgstr "Los registros seleccionados han sido liberados."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "The selected records will be un released."
+msgid "The selected records will be unreleased."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -453,22 +456,22 @@ msgstr "Asignaciones de Transferencia"
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "Un Release"
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
-msgid "Un Release Move Allocations"
-msgstr ""
-
-#. module: stock_available_to_promise_release
-#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
-msgid "Un Release Transfers Allocations"
+msgid "Unrelease"
 msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_allowed
 msgid "Unrelease Allowed"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
+msgid "Unrelease Move Allocations"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
+msgid "Unrelease Transfers Allocations"
 msgstr ""
 
 #. module: stock_available_to_promise_release

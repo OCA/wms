@@ -354,6 +354,11 @@ msgid "Release based on Available to Promise"
 msgstr "Lanzamiento basado en disponibilidad para prometer"
 
 #. module: stock_available_to_promise_release
+#: model:ir.model,name:stock_available_to_promise_release.model_stock_return_picking
+msgid "Return Picking"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__allow_unrelease_return_done_move
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_rule__allow_unrelease_return_done_move
 msgid "Reverse done transfer on cancellation"
@@ -373,8 +378,8 @@ msgstr "Publicaciones de asignaciones de acciones"
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_unrelease
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "Stock Allocations Un Release"
-msgstr "Asignaciones de acciones sin publicación"
+msgid "Stock Allocations Unrelease"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_move
@@ -396,12 +401,8 @@ msgstr "Regla de existencias"
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
-msgid ""
-"The backorder <a href=# data-oe-model=stock.picking data-oe-"
-"id=%(id)s>%(name)s</a> has been created."
+msgid "The backorder %s has been created."
 msgstr ""
-"Se ha creado el pedido pendiente <a href=# data-oe-model=stock.picking data-"
-"oe-id=%(id)s>%(name)s</a>."
 
 #. module: stock_available_to_promise_release
 #. odoo-python
@@ -428,8 +429,8 @@ msgstr "Los registros seleccionados serán liberados."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "The selected records will be un released."
-msgstr "Los discos seleccionados no serán publicados."
+msgid "The selected records will be unreleased."
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
@@ -465,23 +466,23 @@ msgstr "Asignaciones Transferencias"
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
-msgid "Un Release"
-msgstr "No liberar"
-
-#. module: stock_available_to_promise_release
-#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
-msgid "Un Release Move Allocations"
-msgstr "Asignaciones de movimientos de no liberación"
-
-#. module: stock_available_to_promise_release
-#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
-msgid "Un Release Transfers Allocations"
-msgstr "no liberar asignaciones de transferencias"
+msgid "Unrelease"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_allowed
 msgid "Unrelease Allowed"
 msgstr "No liberación permitida"
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
+msgid "Unrelease Move Allocations"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
+msgid "Unrelease Transfers Allocations"
+msgstr ""
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
@@ -573,6 +574,29 @@ msgstr "días"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.res_config_settings_view_form_stock
 msgid "minutes"
 msgstr "minutos"
+
+#~ msgid "Stock Allocations Un Release"
+#~ msgstr "Asignaciones de acciones sin publicación"
+
+#, python-format
+#~ msgid ""
+#~ "The backorder <a href=# data-oe-model=stock.picking data-oe-"
+#~ "id=%(id)s>%(name)s</a> has been created."
+#~ msgstr ""
+#~ "Se ha creado el pedido pendiente <a href=# data-oe-model=stock.picking "
+#~ "data-oe-id=%(id)s>%(name)s</a>."
+
+#~ msgid "The selected records will be un released."
+#~ msgstr "Los discos seleccionados no serán publicados."
+
+#~ msgid "Un Release"
+#~ msgstr "No liberar"
+
+#~ msgid "Un Release Move Allocations"
+#~ msgstr "Asignaciones de movimientos de no liberación"
+
+#~ msgid "Un Release Transfers Allocations"
+#~ msgstr "no liberar asignaciones de transferencias"
 
 #~ msgid "Shipment date"
 #~ msgstr "Fecha de envío"
