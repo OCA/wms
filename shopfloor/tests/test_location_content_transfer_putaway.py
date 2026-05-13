@@ -134,18 +134,14 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         )
         self.assertEqual(existing_moves, current_moves)
 
-        test_move = self.env["stock.move"].new(
-            {
-                "product_id": self.product_a.id,
-                "location_dest_id": self.picking_type.default_location_dest_id.id,
-                "location_id": self.test_loc.id,
-            }
-        )
+        message = {
+            "message_type": "error",
+            "body": "The content of test cannot be transferred to test with "
+            "this scenario for product [A] Product A.",
+        }
         self.assert_response(
             response,
             next_state="scan_location",
             data=self.ANY,
-            message=self.service.msg_store.location_content_unable_to_transfer(
-                test_move, self.test_loc, self.test_loc
-            ),
+            message=message,
         )

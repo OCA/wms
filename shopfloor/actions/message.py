@@ -659,7 +659,10 @@ class MessageAction(Component):
             location_dest=location_dest.name,
             product_name=move.product_id.display_name,
         )
-        return {"message_type": "error", "body": message}
+        return {
+            "message_type": "error",
+            "body": message,
+        }
 
     def product_in_multiple_sublocation(self, product):
         return {
