@@ -1,4 +1,5 @@
 # Copyright 2024 ACSONE SA/NV
+# Copyright 2025 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 from datetime import datetime
@@ -64,7 +65,12 @@ class TestMergeMoves(PromiseReleaseCommonCase):
             ]
         )
 
-    def test_unrelease_at_move_merge(self):
+    def test_unrelease_at_move_merge_pos(self):
+        """Test merging released and need release moves
+
+        The released move is unreleased for merging and the merged move is then
+        released for the new total quantity
+        """
         self.assertFalse(self.shipping1.need_release)
         self.assertEqual(1, len(self.shipping1.move_ids))
         original_qty = self.shipping1.move_ids.product_uom_qty
@@ -73,11 +79,21 @@ class TestMergeMoves(PromiseReleaseCommonCase):
         self.assertEqual(1, len(self.shipping1.move_ids))
         self.assertEqual(original_qty + 2, self.shipping1.move_ids.product_uom_qty)
         self.assertFalse(self.shipping1.need_release)
-        # since the shipment is no more released, the picking should be canceled
+        # the initial picking has been canceled
         self.assertEqual("cancel", self.picking1.state)
+        # the new picking is for the new total quantity
+        new_picking = self.shipping1.move_ids.move_orig_ids.filtered(
+            lambda m: m.state != "cancel"
+        )
+        self.assertEqual(original_qty + 2, new_picking.product_uom_qty)
 
-    def test_unrelease_at_move_merge_2(self):
-        # create a negative quant to cancel teh qty to deliver
+    def test_unrelease_at_move_merge_neg(self):
+        """Test merging released and need release moves
+
+        The released move is unreleased for merging and the merged move is
+        canceled as the total quantity is 0
+        """
+        # create a negative quant to cancel the qty to deliver
         self.assertFalse(self.shipping1.need_release)
         self.assertEqual(1, len(self.shipping1.move_ids))
         original_qty = self.shipping1.move_ids.product_uom_qty
@@ -88,6 +104,11 @@ class TestMergeMoves(PromiseReleaseCommonCase):
         # no more qty to deliver, the shipment and picking should be canceled
         self.assertEqual("cancel", self.shipping1.state)
         self.assertEqual("cancel", self.picking1.state)
+        # there is no new picking
+        new_picking = self.shipping1.move_ids.move_orig_ids.filtered(
+            lambda m: m.state != "cancel"
+        )
+        self.assertEqual(0, len(new_picking))
 
     def test_unrelease_at_move_merge_merged(self):
         # Create a new shipping for the same product and date
@@ -125,17 +146,28 @@ class TestMergeMoves(PromiseReleaseCommonCase):
 
         # the pick should still contain a move with the processed qty
         # and the qty to do should be the one from shipping2
-        move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
+        pick_move = self.picking1.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
         self.assertEqual(2, move.move_line_ids.qty_done)
         self.assertEqual(5, move.product_uom_qty)
 
         # if we release the ship 1 again, a new move should be created
-        # and merged with the existing one
+        # and merged with the existing one. The 2 released ship moves will also
+        # be merged.
+        ship_moves = self.shipping1.move_ids
+        self.assertEqual(2, len(ship_moves))
         self.shipping1.release_available_to_promise()
-        move = self.picking1.move_ids.filtered(lambda m: m.state == "assigned")
-        self.assertEqual(1, len(move))
-        self.assertEqual(2 + original_qty_1 + original_qty_2, move.product_uom_qty)
-        self.assertEqual(2, move.move_line_ids.qty_done)
+        # the released ship moves are still in the same shipping1
+        ship_moves = ship_moves.exists()
+        self.assertEqual(1, len(ship_moves))
+        self.assertEqual(ship_moves.picking_id, self.shipping1)
+        pick_move = self.picking1.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
+        self.assertEqual(1, len(pick_move))
+        self.assertEqual(2 + original_qty_1 + original_qty_2, pick_move.product_uom_qty)
+        self.assertEqual(2, pick_move.move_line_ids.qty_done)
 
     def test_default_merge(self):
         # check that the merge is still working when the available_to_promise_defer_pull

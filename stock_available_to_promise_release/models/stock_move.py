@@ -54,7 +54,7 @@ class StockMove(models.Model):
         compute="_compute_release_ready",
         search="_search_release_ready",
     )
-    need_release = fields.Boolean(index=True, copy=False)
+    need_release = fields.Boolean(index=True)
     unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
 
     @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
@@ -221,14 +221,7 @@ class StockMove(models.Model):
                 OR (
                     m.priority = move.priority
                     AND m.date_priority = move.date_priority
-                    AND m.picking_type_id = move.picking_type_id
                     AND m.id < move.id
-                )
-                OR (
-                    m.priority = move.priority
-                    AND m.date_priority = move.date_priority
-                    AND m.picking_type_id != move.picking_type_id
-                    AND m.id > move.id
                 )
             )
         """.format(
@@ -269,7 +262,7 @@ class StockMove(models.Model):
         if horizon_date:
             sql += (
                 " AND (m.need_release IS true AND m.date <= %(horizon)s "
-                "      OR m.need_release IS false)"
+                f"     OR ({self._previous_promised_qty_sql_moves_no_release()}))"
             )
             params["horizon"] = horizon_date
         return sql, params
@@ -488,8 +481,10 @@ class StockMove(models.Model):
         )
 
     def _action_cancel(self):
-        # Unrelease moves that must be, before canceling them.
-        self.unrelease()
+        if not self.env.context.get("from_merge_no_need_release"):
+            # Unrelease moves that must be, before canceling them.
+            # We skip this when merging moves that are all released.
+            self.unrelease()
         super()._action_cancel()
         self.write({"need_release": False})
         return True
@@ -508,15 +503,6 @@ class StockMove(models.Model):
 
     def release_available_to_promise(self):
         return self._run_stock_rule()
-
-    def _prepare_move_split_vals(self, qty):
-        vals = super()._prepare_move_split_vals(qty)
-        # The method set procure_method as 'make_to_stock' by default on split,
-        # but we want to keep 'make_to_order' for chained moves when we split
-        # a partially available move in _run_stock_rule().
-        if self.env.context.get("release_available_to_promise"):
-            vals.update({"procure_method": self.procure_method, "need_release": True})
-        return vals
 
     def _get_release_decimal_precision(self):
         return self.env["decimal.precision"].precision_get("Product Unit of Measure")
@@ -556,6 +542,10 @@ class StockMove(models.Model):
                 move._release_split(remaining_qty)
             released_moves |= move
 
+        released_moves = released_moves._before_release()
+
+        released_moves.need_release = False
+
         # Move the unreleased moves to a backorder.
         # This behavior can be disabled by setting the flag
         # no_backorder_at_release on the stock.route of the move.
@@ -563,6 +553,7 @@ class StockMove(models.Model):
         unreleased_moves = released_pickings.move_ids - released_moves
         unreleased_moves_to_bo = unreleased_moves.filtered(
             lambda m: m.state not in ("done", "cancel")
+            and m.need_release
             and not m.rule_id.no_backorder_at_release
         )
         if unreleased_moves_to_bo:
@@ -570,7 +561,6 @@ class StockMove(models.Model):
 
         # Pull the released moves
         for move in released_moves:
-            move._before_release()
             values = move._prepare_procurement_values()
             procurement_requests.append(
                 self.env["procurement.group"].Procurement(
@@ -586,17 +576,29 @@ class StockMove(models.Model):
             )
         self.env["procurement.group"].run_defer(procurement_requests)
 
-        assigned_moves = released_moves._after_release_assign_moves()
-        assigned_moves._after_release_update_chain()
+        released_moves._after_release_update_chain()
 
         # We could have discrepancies regarding released moves state, recompute it
         released_moves._recompute_state()
 
-        return assigned_moves
+        # some moves may have been already released but not merged because of
+        # an ongoing quantity on the pick step. Now that both are released, try
+        # to merge them
+        prereleased_moves = unreleased_moves.filtered(
+            lambda m: m.state not in ("done", "cancel") and not m.need_release
+        )
+        if prereleased_moves:
+            prereleased_moves._merge_moves()
+
+        return released_moves
 
     def _before_release(self):
-        """Hook that aims to be overridden."""
+        """Hook that aims to be overridden.
+
+        Return the moves that must be further released
+        """
         self._release_set_expected_date()
+        return self
 
     def _release_get_expected_date(self):
         """Return the new scheduled date of a single delivery move"""
@@ -611,15 +613,19 @@ class StockMove(models.Model):
 
         This will be propagated to the chain of moves"""
         for move in self:
-            if not new_expected_date:
-                new_expected_date = move._release_get_expected_date()
-            if not new_expected_date:
-                continue
-            move.date = new_expected_date
+            expected_date = new_expected_date or move._release_get_expected_date()
+            if expected_date:
+                move.date = expected_date
 
     def _after_release_update_chain(self):
+        move_ids = []
+        for origin_moves in self._get_chained_moves_iterator("move_orig_ids"):
+            move_ids += origin_moves.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            ).ids
+        moves = self.browse(move_ids)
+
         picking_ids = set()
-        moves = self
         while moves:
             picking_ids.update(moves.picking_id.ids)
             moves = moves.move_orig_ids
@@ -634,16 +640,6 @@ class StockMove(models.Model):
         if priorities:
             pickings.write({"priority": max(priorities)})
 
-    def _after_release_assign_moves(self):
-        move_ids = []
-        for origin_moves in self._get_chained_moves_iterator("move_orig_ids"):
-            move_ids += origin_moves.filtered(
-                lambda m: m.state not in ("cancel", "done")
-            ).ids
-        moves = self.browse(move_ids)
-        moves._action_assign()
-        return moves
-
     def _release_split(self, remaining_qty):
         """Split move and put remaining_qty to a backorder move."""
         new_move_vals = self.with_context(release_available_to_promise=True)._split(
@@ -653,17 +649,33 @@ class StockMove(models.Model):
         new_move._action_confirm(merge=False)
         return new_move
 
-    def _unreleased_to_backorder(self):
-        """Move the unreleased moves to a new backorder picking"""
+    def _unreleased_to_backorder(self, split_order=False):
+        """Move the unreleased moves to a new backorder picking
+
+        Set split_order=True when it's the released moves that are moved to a
+        split order.
+        """
         origin_pickings = {m.id: m.picking_id for m in self}
         self.with_context(release_available_to_promise=True)._assign_picking()
         backorder_links = {}
         for move in self:
             origin = origin_pickings[move.id]
             if origin:
-                backorder_links[move.picking_id] = origin
+                if not split_order:
+                    backorder_links[move.picking_id] = origin
+                else:
+                    backorder_links[origin] = move.picking_id
         for backorder, origin in backorder_links.items():
-            backorder._release_link_backorder(origin)
+            if (
+                backorder.state in ("draft", "cancel")
+                and len(backorder.backorder_ids) == 1
+            ):
+                # When the backorder order is canceled and the moves are
+                # reassigned to a new order, post a link to the real
+                # backorder. Used by the module
+                # stock_available_to_promise_release_alternative_carrier
+                backorder = backorder.backorder_ids
+            backorder._release_link_backorder(origin, split_order=split_order)
 
     def _assign_picking_post_process(self, new=False):
         res = super()._assign_picking_post_process(new)
@@ -848,7 +860,7 @@ class StockMove(models.Model):
                             "You cannot unrelease the move %(move_name)s "
                             "because some origin moves %(done_move_names)s are done"
                         ),
-                        **msg_args
+                        **msg_args,
                     )
                     raise UserError(message)
                 # Multiple pickings can satisfy a move
@@ -908,11 +920,9 @@ class StockMove(models.Model):
     def _search_picking_for_assignation_domain(self):
         domain = super()._search_picking_for_assignation_domain()
         if self.env.context.get("release_available_to_promise"):
-            force_new_picking = not self.rule_id.no_backorder_at_release
-            if force_new_picking:
-                # We want a newer picking, search with '>' to prevent to select
-                # any old available picking
-                domain = expression.AND([domain, [("id", ">", self.picking_id.id)]])
+            # We want a newer picking, search with '>' to prevent to select
+            # any old available picking
+            domain = expression.AND([domain, [("id", ">", self.picking_id.id)]])
         if self.picking_type_id.prevent_new_move_after_release:
             domain = expression.AND([domain, [("last_release_date", "=", False)]])
         return domain
@@ -924,7 +934,10 @@ class StockMove(models.Model):
 
     def write(self, vals):
         released_moves = self.browse()
-        if self.env.context.get("in_merge_mode") and "product_uom_qty" in vals:
+        if (
+            self.env.context.get("from_merge_need_release")
+            and "product_uom_qty" in vals
+        ):
             # when a move is merged, we need to unrelease it if the quantity
             # is changed and the move is unreleasable
             released_moves = self.filtered(lambda m: m._is_unreleaseable())
@@ -942,17 +955,28 @@ class StockMove(models.Model):
 
     def _is_mergeable(self):
         self.ensure_one()
-        return self.state not in ("done", "cancel") and (
-            not self._is_unreleaseable() or self.unrelease_allowed
+        return self.state not in ("draft", "done", "cancel") and (
+            self.need_release or self.unrelease_allowed
         )
 
+    def _prepare_merge_moves_distinct_fields(self):
+        fields = super()._prepare_merge_moves_distinct_fields()
+        if self.env.context.get("from_merge_no_need_release"):
+            # when we merge moves that do not need release, ensure candidates
+            # have the same value for need release (i.e. False)
+            fields.append("need_release")
+        return fields
+
     def _update_candidate_moves_list(self, candidate_moves):
-        # filter out the moves that are not unreleasable
-        res = super()._update_candidate_moves_list(candidate_moves)
         # candidate_moves is a list of recordset of moves
         # it contains one recordset per move to merge
         # each recordset contains the moves that we want to merge (an item of self)
         # and the candidate moves to merge into
+        res = super()._update_candidate_moves_list(candidate_moves)
+        if not self.env.context.get("from_merge_need_release"):
+            return res
+        # when merging a move that needs release, filter out the moves that are
+        # not unreleasable
         new_candidate_moves = [
             candidates.filtered(
                 lambda m, moves_to_merge=self: m in moves_to_merge or m._is_mergeable()
@@ -964,13 +988,36 @@ class StockMove(models.Model):
         return res
 
     def _merge_moves(self, merge_into=False):
-        # From here any write on the moves are done in the context of a merge
-        # and we need to unrelease them if the quantity is changed
-        self_ctx = self.with_context(in_merge_mode=True)
-        if merge_into:
-            merge_into = merge_into.filtered(lambda m: m._is_mergeable())
-        return (
-            super(StockMove, self_ctx)
-            ._merge_moves(merge_into=merge_into)
-            .with_context(in_merge_mode=False)
-        )
+        res = self.browse()
+        no_need_release = self.filtered(lambda m: not m.need_release)
+        if no_need_release:
+            # For moves that do not need release, search moves that also do not
+            # need release
+            from_merge_no_need_release = self.env.context.get(
+                "from_merge_no_need_release", False
+            )
+            res |= (
+                super(
+                    StockMove,
+                    no_need_release.with_context(from_merge_no_need_release=True),
+                )
+                ._merge_moves(merge_into=merge_into)
+                .with_context(from_merge_no_need_release=from_merge_no_need_release)
+            )
+        need_release = self - no_need_release
+        if need_release:
+            # For moves that do need release, search moves that also need
+            # release or are unreleasable
+            from_merge_need_release = self.env.context.get(
+                "from_merge_need_release", False
+            )
+            if merge_into:
+                merge_into = merge_into.filtered(lambda m: m._is_mergeable())
+            res |= (
+                super(
+                    StockMove, need_release.with_context(from_merge_need_release=True)
+                )
+                ._merge_moves(merge_into=merge_into)
+                .with_context(from_merge_need_release=from_merge_need_release)
+            )
+        return res

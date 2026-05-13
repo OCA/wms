@@ -46,7 +46,7 @@
                 <button
                     name="unrelease"
                     attrs="{'invisible': [('unrelease_allowed', '=', False)]}"
-                    string="Un Release"
+                    string="Unrelease"
                     type="object"
                     icon="fa-cube"
                     groups="stock.group_stock_user"

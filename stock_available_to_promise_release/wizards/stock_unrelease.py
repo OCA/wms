@@ -6,7 +6,7 @@ from odoo import models
 
 class StockUnRelease(models.TransientModel):
     _name = "stock.unrelease"
-    _description = "Stock Allocations Un Release"
+    _description = "Stock Allocations Unrelease"
 
     def unrelease(self):
         model = self.env.context.get("active_model")
