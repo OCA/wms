@@ -5,6 +5,13 @@ from odoo import _
 
 from odoo.addons.component.core import Component
 
+MESSAGE_TYPES = {
+    "info": 0,
+    "success": 1,
+    "warning": 2,
+    "error": 3,
+}
+
 
 class MessageAction(Component):
     """Provide message templates
@@ -20,16 +27,22 @@ class MessageAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "message"
 
+    # A list of ShopfloorMessage
     _message_queue = []
 
     @property
     def message_queue(self):
         return self._message_queue
 
-    def add_message(self, value):
+    def add_message(self, value, message_type="info"):
         if not isinstance(value, str):
             raise TypeError("You should set a string to message queue!")
-        self._message_queue.append(value)
+        if message_type not in MESSAGE_TYPES.keys():
+            raise TypeError("You should use a correct Shopfloor message type!")
+        self._message_queue.append(ShopfloorMessage(value, message_type))
+
+    def clear_queue(self):
+        self._message_queue = []
 
     def generic_record_not_found(self):
         return {
@@ -58,3 +71,13 @@ class MessageAction(Component):
     # then all depending modules can simply create records they need
     # instea of overriding and polluting the component.
     # Additional goodie: users can edit messages via UI.
+
+
+class ShopfloorMessage:
+
+    body = str()
+    message_type = str()
+
+    def __init__(self, body, message_type, **kwargs):
+        self.body = body
+        self.message_type = message_type
