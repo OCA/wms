@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-04-29 16:26+0000\n"
+"PO-Revision-Date: 2026-05-14 15:45+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__release_ready_count
@@ -361,7 +361,7 @@ msgstr "Rilascio in base alla disponibilità alle promesse"
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_return_picking
 msgid "Return Picking"
-msgstr ""
+msgstr "Prelievo di reso"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_route__allow_unrelease_return_done_move
@@ -384,7 +384,7 @@ msgstr "Rilasci assegnazioni quantità"
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_unrelease
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "Stock Allocations Unrelease"
-msgstr ""
+msgstr "Rilascio allocazioni giacenze"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_move
@@ -407,7 +407,7 @@ msgstr "Regola di giacenza"
 #: code:addons/stock_available_to_promise_release/models/stock_picking.py:0
 #, python-format
 msgid "The backorder %s has been created."
-msgstr ""
+msgstr "L'ordine residuo %s è stato creato."
 
 #. module: stock_available_to_promise_release
 #. odoo-python
@@ -435,7 +435,7 @@ msgstr "Le righe selezionate verranno rilasciate."
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "The selected records will be unreleased."
-msgstr ""
+msgstr "Il record selezionato verrà rilasciato."
 
 #. module: stock_available_to_promise_release
 #: model_terms:ir.actions.act_window,help:stock_available_to_promise_release.stock_move_release_action
@@ -471,7 +471,7 @@ msgstr "Assegnazioni trasferimento"
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_picking_release_form
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "Unrelease"
-msgstr ""
+msgstr "Rilascio"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_allowed
@@ -481,12 +481,12 @@ msgstr "Consenti trattenute"
 #. module: stock_available_to_promise_release
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
 msgid "Unrelease Move Allocations"
-msgstr ""
+msgstr "Rilascio allocazioni movimento"
 
 #. module: stock_available_to_promise_release
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_picking_unrelease_form
 msgid "Unrelease Transfers Allocations"
-msgstr ""
+msgstr "Rilascio allocazioni trasferimenti"
 
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking_type__unrelease_on_backorder
