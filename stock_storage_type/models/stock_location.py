@@ -171,7 +171,6 @@ class StockLocation(models.Model):
         for location in self:
             if (
                 location.fill_state not in ("empty", "being_emptied")
-                and location._should_compute_will_contain_lot_ids()
                 and len(location.location_will_contain_lot_ids) > 1
             ):
                 locations_with_exception |= location
@@ -187,7 +186,6 @@ class StockLocation(models.Model):
         for location in self:
             if (
                 location.fill_state not in ("empty", "being_emptied")
-                and location._should_compute_will_contain_product_ids()
                 and len(location.location_will_contain_product_ids) > 1
             ):
                 locations_with_exception |= location
@@ -312,53 +310,64 @@ class StockLocation(models.Model):
         "do_not_mix_products",
     )
     def _compute_location_will_contain_product_ids(self):
+        rec_computed = self.browse()
+        rec_not_computed = self.browse()
         for rec in self:
-            if not rec._should_compute_will_contain_product_ids():
-                no_product = self.env["product.product"].browse()
-                rec.location_will_contain_product_ids = no_product
+            if rec._should_compute_will_contain_product_ids():
+                rec_computed |= rec
             else:
-                non_fully_reserved_quants = rec.quant_ids.filtered(
-                    lambda q: float_compare(
-                        q.quantity, 0, precision_rounding=q.product_uom_id.rounding
+                rec_not_computed |= rec
+
+        no_product = self.env["product.product"].browse()
+        rec_not_computed.location_will_contain_product_ids = no_product
+
+        # To avoid to fetch all move lines and quants for all records,
+        # we prefetch them for the records that should be computed
+        # This way we avoid to fetch quant_ids for locaitions like 'Customers'
+        # for example
+        for rec in rec_computed.with_prefetch(rec_computed.ids):
+            non_fully_reserved_quants = rec.quant_ids.filtered(
+                lambda q: float_compare(
+                    q.quantity, 0, precision_rounding=q.product_uom_id.rounding
+                )
+                > 0
+                and float_compare(
+                    q.reserved_quantity,
+                    q.quantity,
+                    precision_rounding=q.product_uom_id.rounding,
+                )
+                < 0
+            )
+            # Products that are obviously in the location
+            products = (
+                non_fully_reserved_quants.product_id
+                | rec.mapped("in_move_line_ids.product_id")
+                | rec.mapped("in_move_ids.product_id")
+            )
+            # For fully reserved quants, ensure the product is not being emptied
+            remaining_quants = rec.quant_ids.filtered(
+                lambda q, products=products: q.product_id not in products
+            )
+            if remaining_quants:
+                for product, quants_by_product in groupby(
+                    remaining_quants, lambda q: q.product_id
+                ):
+                    quantity = sum(map(lambda q: q.quantity, quants_by_product))
+                    picked_quantity = sum(
+                        ml.qty_done
+                        for ml in rec.out_move_line_ids
+                        if ml.product_id == product
                     )
-                    > 0
-                    and float_compare(
-                        q.reserved_quantity,
-                        q.quantity,
-                        precision_rounding=q.product_uom_id.rounding,
-                    )
-                    < 0
-                )
-                # Products that are obviously in the location
-                products = (
-                    non_fully_reserved_quants.product_id
-                    | rec.mapped("in_move_line_ids.product_id")
-                    | rec.mapped("in_move_ids.product_id")
-                )
-                # For fully reserved quants, ensure the product is not being emptied
-                remaining_quants = rec.quant_ids.filtered(
-                    lambda q, products=products: q.product_id not in products
-                )
-                if remaining_quants:
-                    for product, quants_by_product in groupby(
-                        remaining_quants, lambda q: q.product_id
-                    ):
-                        quantity = sum(map(lambda q: q.quantity, quants_by_product))
-                        picked_quantity = sum(
-                            ml.qty_done
-                            for ml in rec.out_move_line_ids
-                            if ml.product_id == product
+                    if (
+                        float_compare(
+                            quantity,
+                            picked_quantity,
+                            precision_rounding=product.uom_id.rounding,
                         )
-                        if (
-                            float_compare(
-                                quantity,
-                                picked_quantity,
-                                precision_rounding=product.uom_id.rounding,
-                            )
-                            > 0
-                        ):
-                            products |= product
-                rec.location_will_contain_product_ids = products
+                        > 0
+                    ):
+                        products |= product
+            rec.location_will_contain_product_ids = products
 
     @api.depends(
         "quant_ids.quantity",
