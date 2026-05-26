@@ -12,6 +12,7 @@ class TestSetProductDimension(CommonCase):
         res = super().setUpClassBaseData()
         # Activate the option to use the module
         cls.menu.sudo().set_product_barcode = True
+        cls.picking_type.sudo().use_create_lots = True
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10), (cls.product_c, 10)]
         )
@@ -129,6 +130,7 @@ class TestSetProductDimension(CommonCase):
             params={
                 "picking_id": self.picking.id,
                 "selected_line_id": selected_move_line.id,
+                "lot_name": "Test Lot",
             },
         )
         self.data.picking(self.picking)
