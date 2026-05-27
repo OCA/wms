@@ -19,6 +19,11 @@ msgstr ""
 
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
+msgid "<strong>Expected delivery</strong>"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "As of"
 msgstr "Le"
 
@@ -59,9 +64,6 @@ msgid "Delayed Qty"
 msgstr "Qté différée"
 
 #. module: sale_stock_available_to_promise_release
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_procurement_group__date_expected
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_move__sale_date_expected
-#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_stock_picking__sale_date_expected
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
 msgid "Delivery Date"
 msgstr "Date de livraison"
@@ -84,6 +86,11 @@ msgstr "Disponible en Totalité"
 #. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_search
 msgid "Further Shipment"
+msgstr ""
+
+#. module: sale_stock_available_to_promise_release
+#: model:ir.model.fields,field_description:sale_stock_available_to_promise_release.field_sale_order__is_ok_expected_delivery_date
+msgid "Is Ok Expected Delivery Date"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
@@ -117,11 +124,6 @@ msgstr "À la demande"
 #: model:ir.model.fields.selection,name:sale_stock_available_to_promise_release.selection__sale_order_line__availability_status__partial
 msgid "Partially Available"
 msgstr "Partiellement Disponible"
-
-#. module: sale_stock_available_to_promise_release
-#: model:ir.model,name:sale_stock_available_to_promise_release.model_procurement_group
-msgid "Procurement Group"
-msgstr "Groupe d'approvisionnement"
 
 #. module: sale_stock_available_to_promise_release
 #: model:ir.model,name:sale_stock_available_to_promise_release.model_product_product
@@ -167,11 +169,6 @@ msgid "Today Shipment"
 msgstr ""
 
 #. module: sale_stock_available_to_promise_release
-#: model:ir.model,name:sale_stock_available_to_promise_release.model_stock_picking
-msgid "Transfer"
-msgstr "Transfert"
-
-#. module: sale_stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.view_move_release_tree
 msgid "Weight"
 msgstr ""
@@ -180,6 +177,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_stock_available_to_promise_release.report_saleorder_document
 msgid "Yes"
 msgstr "Oui"
+
+#~ msgid "Procurement Group"
+#~ msgstr "Groupe d'approvisionnement"
+
+#~ msgid "Transfer"
+#~ msgstr "Transfert"
 
 #~ msgid "Product"
 #~ msgstr "Article"
