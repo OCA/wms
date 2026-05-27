@@ -17,9 +17,6 @@
             <field name="date" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <field name="date" position="after">
-                <field name="sale_date_expected" />
-            </field>
         </field>
     </record>
     <record id="view_move_release_form" model="ir.ui.view">
@@ -33,9 +30,9 @@
             <field name="date" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <field name="date" position="after">
-                <field name="sale_date_expected" />
-            </field>
+            <xpath expr="//div[hasclass('o_td_label')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
     <record id="view_move_release_search" model="ir.ui.view">
@@ -50,26 +47,26 @@
                 <filter
                     string="Late Shipment"
                     name="late"
-                    domain="[('sale_date_expected', '&lt;=', (context_today() + relativedelta(days=-1)).strftime('%Y-%m-%d'))]"
+                    domain="[('date_deadline', '&lt;=', (context_today() + relativedelta(days=-1)).strftime('%Y-%m-%d'))]"
                 />
                 <filter
                     string="Today Shipment"
                     name="today"
-                    domain="['&amp;', ('sale_date_expected', '&gt;', (context_today() + relativedelta(days=-1)).strftime('%Y-%m-%d')),
-                    ('sale_date_expected', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                    domain="['&amp;', ('date_deadline', '&gt;', (context_today() + relativedelta(days=-1)).strftime('%Y-%m-%d')),
+                    ('date_deadline', '&lt;', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                 />
                 <filter
                     string="Further Shipment"
                     name="further"
-                    domain="[('sale_date_expected', '&gt;=', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
+                    domain="[('date_deadline', '&gt;=', (context_today() + relativedelta(days=1)).strftime('%Y-%m-%d'))]"
                 />
             </filter>
             <filter name="groupby_date" position="after">
                 <filter
                     string="Delivery Date"
-                    name="groupby_sale_date_expected"
+                    name="groupby_date_deadline"
                     domain="[]"
-                    context="{'group_by': 'sale_date_expected'}"
+                    context="{'group_by': 'date_deadline'}"
                 />
             </filter>
         </field>

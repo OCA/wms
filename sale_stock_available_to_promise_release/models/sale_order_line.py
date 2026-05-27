@@ -81,7 +81,7 @@ class SaleOrderLine(models.Model):
             availability_status = "partial"
             delayed_qty = self.product_uom_qty - available_qty
         # On order product
-        elif self.is_mto:
+        elif self._on_order_route():
             availability_status = "on_order"
         # No stock
         elif float_is_zero(available_qty, precision_rounding=rounding):
@@ -97,3 +97,7 @@ class SaleOrderLine(models.Model):
             "available_qty": available_qty,
             "delayed_qty": delayed_qty,
         }
+
+    def _on_order_route(self):
+        self.ensure_one()
+        return self.is_mto
