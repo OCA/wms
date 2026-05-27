@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright 2025 ACSONE SA/NV
+<!-- Copyright 2026 ACSONE SA/NV
      License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
 <odoo>
-    <record id="shopfloor_menu_form_view" model="ir.ui.view">
+
+    <record model="ir.ui.view" id="shopfloor_menu_form_view">
         <field name="model">shopfloor.menu</field>
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
-            <group name="options" position="inside">
-                <group
-                    name="filter_today_scheduled_pickings"
-                    attrs="{'invisible': [('filter_today_scheduled_pickings_is_possible', '=', False)]}"
-                >
-                    <field
-                        name="filter_today_scheduled_pickings_is_possible"
-                        invisible="1"
-                    />
-                    <field name="filter_today_scheduled_pickings" />
+            <xpath expr="//group[@name='options']" position="inside">
+                <group name="over_reception">
+                    <field name="allow_over_reception" />
                 </group>
-            </group>
+            </xpath>
         </field>
     </record>
-
 </odoo>

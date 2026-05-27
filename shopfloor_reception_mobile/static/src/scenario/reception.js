@@ -80,6 +80,20 @@ const Reception = {
                     </v-row>
                 </div>
             </template>
+            <template v-if="state_is('confirm_over_reception')">
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action action="todo" @click="state.on_confirm">Confirm</btn-action>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
+            </template>
             <template v-if="state_is('confirm_done')">
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">

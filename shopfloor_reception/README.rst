@@ -71,6 +71,7 @@ Contributors
 * Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 * Michael Tietz (MT Software) <mtietz@mt-software.de>
 * Souheil Bejaoui <souheil.bejaoui@acsone.eu>
+* Nicolas Delbovier (Acsone) <nicolas.delbovier@acsone.eu>
 
 Maintainers
 ~~~~~~~~~~~

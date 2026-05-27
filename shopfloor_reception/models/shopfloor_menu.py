@@ -18,6 +18,10 @@ class ShopfloorMenu(models.Model):
         default=False,
         help=FILTER_TODAY_SCHEDULED_PICKINGS_HELP,
     )
+    allow_over_reception = fields.Boolean(
+        help="Allows operators to receive more goods than originally "
+        "planned on the incoming pickings (displays a confirmation prompt)."
+    )
 
     @api.depends("scenario_id")
     def _compute_filter_today_scheduled_pickings_is_possible(self):
