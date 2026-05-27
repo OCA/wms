@@ -22,6 +22,18 @@ msgid ""
 msgstr ""
 
 #. module: shopfloor_reception
+#: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__allow_over_reception
+msgid "Allow Over Reception"
+msgstr ""
+
+#. module: shopfloor_reception
+#: model:ir.model.fields,help:shopfloor_reception.field_shopfloor_menu__allow_over_reception
+msgid ""
+"Allows operators to receive more goods than originally planned on the "
+"incoming pickings (displays a confirmation prompt)."
+msgstr ""
+
+#. module: shopfloor_reception
 #. odoo-python
 #: code:addons/shopfloor_reception/models/shopfloor_menu.py:0
 #, python-format
