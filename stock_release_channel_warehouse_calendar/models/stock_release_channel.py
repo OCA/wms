@@ -34,7 +34,7 @@ class StockReleaseChannel(models.Model):
         wh_tz = pytz.timezone(self.warehouse_id.partner_id.tz or "UTC")
         batch_delta = timedelta(days=61)
         while True:
-            delivery_date = delivery_date.astimezone(pytz.utc)
+            delivery_date = pytz.utc.localize(delivery_date)
             work_intervals = calendar._work_intervals_batch(
                 delivery_date, delivery_date + batch_delta, tz=wh_tz
             )[False]
@@ -45,4 +45,4 @@ class StockReleaseChannel(models.Model):
                     delivery_date = yield delivery_date.astimezone(pytz.utc).replace(
                         tzinfo=None
                     )
-                    delivery_date = delivery_date.astimezone(pytz.utc)
+                    delivery_date = pytz.utc.localize(delivery_date)
