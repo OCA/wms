@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-11 16:35+0000\n"
+"PO-Revision-Date: 2026-05-29 12:46+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -30,7 +30,7 @@ msgstr ""
 #. module: shopfloor_reception
 #: model:ir.model.fields,field_description:shopfloor_reception.field_shopfloor_menu__allow_over_reception
 msgid "Allow Over Reception"
-msgstr ""
+msgstr "Consenti sovra ricezione"
 
 #. module: shopfloor_reception
 #: model:ir.model.fields,help:shopfloor_reception.field_shopfloor_menu__allow_over_reception
@@ -38,6 +38,9 @@ msgid ""
 "Allows operators to receive more goods than originally planned on the "
 "incoming pickings (displays a confirmation prompt)."
 msgstr ""
+"Consente agli operatori di ricevere una quantità di merce superiore a quella "
+"originariamente prevista al momento del prelievo (visualizza una richiesta "
+"di conferma)."
 
 #. module: shopfloor_reception
 #. odoo-python
