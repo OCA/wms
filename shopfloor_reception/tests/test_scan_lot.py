@@ -126,9 +126,7 @@ class TestScanLotName(CommonCase):
         )
         self.assertEqual(
             res["message"],
-            self.msg_store.lot_already_exists_different_expiration_date(
-                lot, lot.expiration_date + timedelta(days=2)
-            ),
+            self.msg_store.lot_already_exists_different_expiration_date(lot),
         )
 
     def test_scan_lot_name_auto_set_lot_on_move_line(self):

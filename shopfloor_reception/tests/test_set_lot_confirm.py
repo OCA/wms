@@ -164,9 +164,7 @@ class TestSetLotConfirm(CommonCase):
                 "picking": self.data.picking(picking),
                 "selected_move_line": move_line_response_data,
             },
-            message=self.msg_store.lot_already_exists_different_expiration_date(
-                lot, new_expiration_date
-            ),
+            message=self.msg_store.lot_already_exists_different_expiration_date(lot),
         )
 
     @freeze_time("2020-01-01 11:00:00")
