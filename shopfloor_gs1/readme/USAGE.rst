@@ -1,0 +1,1 @@
+- You can use the `Scan` action in Shopfloor with a GS1 barcode. The 
