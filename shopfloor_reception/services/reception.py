@@ -1237,7 +1237,7 @@ class Reception(Component):
             and existing_lot.expiration_date != lot_expiration_date
         ):
             message = self.msg_store.lot_already_exists_different_expiration_date(
-                existing_lot, lot_expiration_date
+                existing_lot
             )
 
         res = self._response_for_set_lot(
@@ -1342,7 +1342,7 @@ class Reception(Component):
                 picking,
                 line,
                 message=self.msg_store.lot_already_exists_different_expiration_date(
-                    lot, expiration_date
+                    lot
                 ),
                 lot_name=lot.name,
                 lot_expiration_date=expiration_date,
