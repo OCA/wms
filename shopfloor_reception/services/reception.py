@@ -1074,17 +1074,22 @@ class Reception(Component):
                         single correspondance. Not tracked product
         """
         handlers_by_type = self._scan_document__get_handlers_by_type()
+
+        if not handlers_by_type:
+            return self._scan_document__fallback()
+
         search = self._actions_for("search")
         find_kw = self._scan_document__get_find_kw()
-        for handler_type, handler in handlers_by_type.items():
-            record = search._find_record_by_type(
-                barcode, handler_type, handler_kw=find_kw
-            )
-            if not record:
-                continue
-            res = handler(record, barcode)
-            if res:
-                return res
+
+        result = search.find(barcode, types=handlers_by_type.keys(), handler_kw=find_kw)
+
+        if result and result.type != "none" and (recordset := result.record):
+            handler = handlers_by_type.get(result.type)
+            if handler:
+                res = handler(recordset, barcode)
+                if res:
+                    return res
+
         return self._scan_document__fallback()
 
     def list_stock_pickings(self):
