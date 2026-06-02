@@ -103,6 +103,15 @@ class ShopfloorMenu(models.Model):
             "triggering a backorder creation with the remaining lines."
         ),
     )
+    allow_quantity_exceeding_demand = fields.Boolean(
+        help="If True, prevents shopfloor error in case you process more qty than "
+        "planned."
+    )
+
+    allow_quantity_exceeding_demand_is_possible = fields.Boolean(
+        compute="_compute_allow_quantity_exceeding_demand_is_possible"
+    )
+
     # TODO: refactor handling of these options.
     # Possible solution:
     # * field should stay on the scenario and get stored in options
@@ -157,8 +166,7 @@ class ShopfloorMenu(models.Model):
         string="Show Get Work on start",
         default=False,
         help=(
-            "When enabled the user will have the option to ask "
-            "for a task to work on."
+            "When enabled the user will have the option to ask for a task to work on."
         ),
     )
     allow_get_work_is_possible = fields.Boolean(
@@ -428,7 +436,7 @@ class ShopfloorMenu(models.Model):
             ):
                 raise exceptions.ValidationError(
                     _(
-                        "Processing reserved quantities is" " not allowed for menu {}."
+                        "Processing reserved quantities is not allowed for menu {}."
                     ).format(menu.name)
                 )
 
@@ -536,6 +544,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.require_destination_package_is_possible = menu.scenario_id.has_option(
                 "require_destination_package"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_allow_quantity_exceeding_demand_is_possible(self):
+        for menu in self:
+            menu.allow_quantity_exceeding_demand_is_possible = (
+                menu.scenario_id.has_option("allow_quantity_exceeding_demand")
             )
 
     @api.constrains(
