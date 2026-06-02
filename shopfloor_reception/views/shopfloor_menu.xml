@@ -8,8 +8,15 @@
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
             <xpath expr="//group[@name='options']" position="inside">
-                <group name="over_reception">
-                    <field name="allow_over_reception" />
+                <group
+                    name="filter_today_scheduled_pickings"
+                    attrs="{'invisible': [('filter_today_scheduled_pickings_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="filter_today_scheduled_pickings_is_possible"
+                        invisible="1"
+                    />
+                    <field name="filter_today_scheduled_pickings" />
                 </group>
             </xpath>
         </field>
