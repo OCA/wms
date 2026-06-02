@@ -36,11 +36,14 @@ class GS1Barcode:
     @classmethod
     def _get_value(cls, ai_value: GS1ElementString):
         """
-        We must return the date value if set
-        We must return the formatted GTIN if set
-        as the library will transform the GTIN 14 into
-        a GTIN 13 one. That one is the barcode
-        set in Odoo.
+        Determine the final value for the given parsed element.
+
+        Returns
+        * date value if set
+        * formatted GTIN if set
+
+        The library will transform the GTIN 14 into
+        a GTIN 13, which is the one used by Odoo.
         """
         value = ai_value.date or ai_value.value
         if ai_value.gtin and ai_value.gtin.payload:
