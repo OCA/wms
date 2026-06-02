@@ -1480,7 +1480,7 @@ class Reception(Component):
     ):
         compare = self._set_quantity__check_quantity_done(line, quantity)
         if compare == 1:
-            if not self.work.menu.allow_over_reception:
+            if not self.work.menu.allow_quantity_exceeding_demand:
                 return self._response_for_set_quantity(
                     picking, line, message=self.msg_store.unable_to_pick_qty()
                 )
