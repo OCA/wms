@@ -18,7 +18,7 @@
             # >= 2.3.0 required to use 'GS1Message.parse_hri' method
             # and next version 3.0.0 has been refactored bringing
             # incompatibility issues (to check later).
-            "biip"
+            "biip==2.3.0"
         ]
     },
 }
