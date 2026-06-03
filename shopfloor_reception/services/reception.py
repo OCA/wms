@@ -878,8 +878,7 @@ class Reception(Component):
             for result in self.search_result.parse_result:
                 if result.type == "lot":
                     if self.search_result.type == "lot" and self.search_result.record:
-                        lot_id = self.search_result.record
-                        lot_name = lot_id.name
+                        lot_name = self.search_result.record.name
                         found = True
                     else:
                         lot_name = result.value
