@@ -1,5 +1,7 @@
 # Copyright 2025 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+from datetime import date
+
 import mock
 
 from odoo import fields
@@ -34,7 +36,7 @@ class TestStructuredBarcode(CommonCase):
                 BarcodeResult(type="lot", value=lot.name, raw=lot.name),
                 BarcodeResult(
                     type="expiration_date",
-                    value="2025-04-15",
+                    value=date(2025, 4, 15),
                     raw="250415",
                 ),
             ]
