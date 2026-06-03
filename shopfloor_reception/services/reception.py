@@ -1036,18 +1036,30 @@ class Reception(Component):
         return self._response_for_select_document()
 
     def _scan_document__get_handlers_by_type(self):
-        return {
-            "picking": self._scan_document__by_picking,
-            # only add the handler if scan_location_or_pack_first is disabled
-            "product": (
-                self._scan_document__by_product
-                if not self.work.menu.scan_location_or_pack_first
-                else None
-            ),
-            "packaging": self._scan_document__by_packaging,
-            "lot": self._scan_document__by_lot,
-            "origin_move": self._scan_document__by_origin_move,
-        }
+        # CRITICAL ORDERING:
+        # 1. "origin_move" BEFORE "picking".
+        # -> If a partial delivery occurred, a completed move and an active
+        # backorder picking will share the same Source Document name (e.g., SO001).
+        # Because `search.find()` loops through this dictionary in order, placing
+        # "origin_move" first ensures we trigger a return for the completed delivery
+        # instead of accidentally opening the pending backorder picking.
+        #
+        # 2. "product" BEFORE "lot"
+        # -> as it restricts the lots of the found products.
+        handlers_by_type = {}
+
+        if self.work.menu.allow_return:
+            handlers_by_type["origin_move"] = self._scan_document__by_origin_move
+
+        handlers_by_type["picking"] = self._scan_document__by_picking
+
+        if not self.work.menu.scan_location_or_pack_first:
+            handlers_by_type["product"] = self._scan_document__by_product
+
+        handlers_by_type["packaging"] = self._scan_document__by_packaging
+        handlers_by_type["lot"] = self._scan_document__by_lot
+
+        return handlers_by_type
 
     def _scan_document__get_find_kw(self):
         return {
