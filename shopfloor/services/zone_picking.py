@@ -321,7 +321,7 @@ class ZonePicking(Component):
 
     def _picking_type_zone_lines(self, zone_location, picking_type):
         return self.search_move_line.search_move_lines(
-            zone_location, picking_type=picking_type
+            locations=zone_location, picking_types=picking_type
         )
 
     def _data_for_move_line(
@@ -437,12 +437,12 @@ class ZonePicking(Component):
     ):
         """Find lines that potentially need work in given locations."""
         return self.search_move_line.search_move_lines(
-            locations or self.zone_location,
-            picking_type=picking_type or self.picking_type,
+            locations=locations or self.zone_location,
+            picking_types=picking_type or self.picking_type,
             order=self.lines_order,
-            package=package,
-            product=product,
-            lot=lot,
+            packages=package,
+            products=product,
+            lots=lot,
             match_user=match_user,
             enforce_empty_package=enforce_empty_package,
         )
