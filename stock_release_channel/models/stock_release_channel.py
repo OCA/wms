@@ -902,17 +902,17 @@ class StockReleaseChannel(models.Model):
         return False
 
     def _localize(self, dt, tz=None):
-        """Localize a datetime
+        """Localize a naive datetime
 
         Use the given tz or use the tz of the warehouse
         """
         wh_tz = pytz.timezone(tz or self.warehouse_id.partner_id.tz or "UTC")
-        dt_tz = dt.astimezone(pytz.utc).astimezone(wh_tz)
+        dt_tz = pytz.utc.localize(dt).astimezone(wh_tz)
         return dt_tz
 
     @api.model
     def _naive(self, dt_tz, reset_time=False):
-        """Convert a datetime as naive datetime
+        """Convert a localized datetime to a naive datetime
 
         Allow to reset time
         """
