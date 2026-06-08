@@ -4,7 +4,7 @@
 {
     "name": "Shopfloor Reception Packaging Dimension Mobile",
     "summary": "Frontend for the packaging dimension on reception scenario",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
