@@ -56,6 +56,13 @@ msgid "Menu displayed in the scanner application"
 msgstr ""
 
 #. module: shopfloor_reception_packaging_dimension
+#. odoo-python
+#: code:addons/shopfloor_reception_packaging_dimension/actions/message.py:0
+#, python-format
+msgid "Packaging '{}' updated."
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
 #: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension_is_possible
 msgid "Set Packaging Dimension Is Possible"
 msgstr ""
