@@ -419,7 +419,8 @@ msgstr "Conferma modifica ubicazione da %(location_from)s a %(location_to)s?"
 #, python-format
 msgid ""
 "Content line transferred from %(location_name)s to %(location_dest_name)s"
-msgstr "Riga contenuto trasferita da %(location_name)s a %(location_dest_name)s"
+msgstr ""
+"Riga contenuto trasferita da %(location_name)s a %(location_dest_name)s"
 
 #. module: shopfloor
 #. odoo-python
@@ -1215,13 +1216,6 @@ msgstr "Imballo non trovato nel trasferimento attuale."
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging {} dimension updated."
-msgstr "Dimensione imballo {} aggiornata."
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
@@ -1789,8 +1783,9 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
 "id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
 msgstr ""
-"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock."
-"picking\" data-oe-id=\"%(new_picking_id)d\">%(new_picking_name)s</a>."
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-"
+"model=\"stock.picking\" data-oe-"
+"id=\"%(new_picking_id)d\">%(new_picking_name)s</a>."
 
 #. module: shopfloor
 #. odoo-python
@@ -2366,6 +2361,10 @@ msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
 
 #, python-format
+#~ msgid "Packaging {} dimension updated."
+#~ msgstr "Dimensione imballo {} aggiornata."
+
+#, python-format
 #~ msgid "Content transfer to {} completed"
 #~ msgstr "Tasferimento contenuto a {} completato"
 
@@ -2505,8 +2504,8 @@ msgstr "{} non è un collo destinazione valido."
 #~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
 #~ "id=\"%d\">%s</a> has been created."
 #~ msgstr ""
-#~ "È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock."
-#~ "picking\" data-oe-id=\"%d\">%s</a> ."
+#~ "È stato creato l'ordine residuo <a href=\"#\" data-oe-"
+#~ "model=\"stock.picking\" data-oe-id=\"%d\">%s</a> ."
 
 #, python-format
 #~ msgid "You cannot work on a package (%s) outside of locations: %s"

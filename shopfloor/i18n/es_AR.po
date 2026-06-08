@@ -1171,13 +1171,6 @@ msgstr "Paquete no encontrado en la transferencia actual."
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Packaging {} dimension updated."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/actions/message.py:0
-#, python-format
 msgid ""
 "Pick + Pack mode ON: the picking {0.name} has no carrier set. The system "
 "couldn't pack goods automatically."
@@ -2380,8 +2373,8 @@ msgstr "{} no es un paquete de destino válido."
 #~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
 #~ "id=\"%d\">%s</a> has been created."
 #~ msgstr ""
-#~ "Se ha creado el pedido pendiente <a href=\"#\" data-oe-model=\"stock."
-#~ "picking\" data-oe-id=\"%d\">%s</a>."
+#~ "Se ha creado el pedido pendiente <a href=\"#\" data-oe-"
+#~ "model=\"stock.picking\" data-oe-id=\"%d\">%s</a>."
 
 #, python-format
 #~ msgid "You cannot work on a package (%s) outside of locations: %s"
