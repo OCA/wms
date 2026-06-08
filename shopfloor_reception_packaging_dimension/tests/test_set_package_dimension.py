@@ -53,7 +53,7 @@ class TestSetPackDimension(CommonCase):
         data = {
             "picking": self.data.picking(picking),
             "selected_move_line": self.data.move_line(line),
-            "packaging": self.data_detail.packaging_detail(packaging),
+            "packaging": self.data.packaging_dimensions(packaging),
         }
         self.assert_response(
             response,
@@ -206,7 +206,7 @@ class TestSetPackDimension(CommonCase):
                 "selected_line_id": line.id,
                 "packaging_id": self.product_c_packaging.id,
                 "height": 55,
-                "length": 233,
+                "packaging_length": 233,
             },
         )
         self.assertEqual(self.product_c_packaging.height, 55)
@@ -216,9 +216,7 @@ class TestSetPackDimension(CommonCase):
             self.picking,
             line,
             self.product_c_packaging_2,
-            message=self.msg_store.packaging_dimension_updated(
-                self.product_c_packaging
-            ),
+            message=self.msg_store.packaging_updated(self.product_c_packaging),
         )
         response = self.service.dispatch(
             "set_packaging_dimension",
@@ -240,7 +238,35 @@ class TestSetPackDimension(CommonCase):
                 "selected_move_line": self.data.move_lines(line),
                 "confirmation_required": None,
             },
-            message=self.msg_store.packaging_dimension_updated(
-                self.product_c_packaging_2
-            ),
+            message=self.msg_store.packaging_updated(self.product_c_packaging_2),
+        )
+
+    def test_skip_packaging_dimension_skips_to_next(self):
+        line = self.picking.move_line_ids.filtered(
+            lambda li: li.product_id == self.product_c
+        )
+        original_height = self.product_c_packaging.height
+
+        response = self.service.dispatch(
+            "set_packaging_dimension",
+            params={
+                "picking_id": self.picking.id,
+                "selected_line_id": line.id,
+                "packaging_id": self.product_c_packaging.id,
+                "height": 999.0,  # This value should be ignored
+                "skip": True,
+            },
+        )
+
+        self.assertEqual(
+            self.product_c_packaging.height,
+            original_height,
+            "Packaging height should not change when skipped",
+        )
+        self._assert_response_set_dimension(
+            response,
+            self.picking,
+            line,
+            self.product_c_packaging_2,
+            message=None,  # No 'Updated' message should be returned when skipping
         )

@@ -1,0 +1,17 @@
+import logging
+
+from odoo import _
+
+from odoo.addons.component.core import Component
+
+_logger = logging.getLogger(__name__)
+
+
+class MessageAction(Component):
+    _inherit = "shopfloor.message.action"
+
+    def packaging_updated(self, packaging):
+        return {
+            "message_type": "success",
+            "body": _("Packaging '{}' updated.").format(packaging.name),
+        }

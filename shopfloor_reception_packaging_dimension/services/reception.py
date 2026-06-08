@@ -17,13 +17,16 @@ class Reception(Component):
 
     def _before_state__set_quantity(self, picking, line, message=None):
         """Show the packaging dimension screen before the set quantity screen."""
-        if self.work.menu.set_packaging_dimension and not self.packaging_update_done:
-            packaging = self._get_next_packaging_to_set_dimension(line.product_id)
-            if packaging:
-                return self._response_for_set_packaging_dimension(
-                    picking, line, packaging, message=message
-                )
-        return super()._before_state__set_quantity(picking, line, message=message)
+        if not self.work.menu.set_packaging_dimension or self.packaging_update_done:
+            return super()._before_state__set_quantity(picking, line, message=message)
+
+        packaging = self._get_next_packaging_to_set_dimension(line.product_id)
+        if not packaging:
+            return super()._before_state__set_quantity(picking, line, message=message)
+
+        return self._response_for_set_packaging_dimension(
+            picking, line, packaging, message=message
+        )
 
     def _get_domain_packaging_needs_dimension(self):
         return expression.OR(
@@ -86,14 +89,14 @@ class Reception(Component):
         )
 
     def _set_packaging_dimension_data_for_packaging(self, packaging):
-        return self.data_detail.packaging_detail(packaging)
+        return self.data.packaging_dimensions(packaging)
 
     def set_packaging_dimension(
-        self, picking_id, selected_line_id, packaging_id, cancel=False, **kwargs
+        self, picking_id, selected_line_id, packaging_id, skip=False, **kwargs
     ):
         """Set the dimension on a product packaging.
 
-        If the user cancel the dimension update we still propose the next
+        If the user skip the dimension update we still propose the next
         possible packaging.
 
         Transitions:
@@ -103,38 +106,48 @@ class Reception(Component):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         packaging = self.env["product.packaging"].sudo().browse(packaging_id)
-        message = None
-        next_packaging = None
+
         if not packaging:
-            message = self.msg_store.record_not_found()
-        elif not cancel and self._check_dimension_to_update(kwargs):
-            self._update_packaging_dimension(packaging, kwargs)
-            message = self.msg_store.packaging_dimension_updated(packaging)
-        if packaging:
-            next_packaging = self._get_next_packaging_to_set_dimension(
-                selected_line.product_id, packaging
+            return self._before_state__set_quantity(
+                picking, selected_line, message=self.msg_store.record_not_found()
             )
+
+        message = None
+
+        if not skip and self._check_dimension_to_update(kwargs):
+            self._update_packaging_dimension(packaging, kwargs)
+            message = self.msg_store.packaging_updated(packaging)
+
+        next_packaging = self._get_next_packaging_to_set_dimension(
+            selected_line.product_id, packaging
+        )
         if next_packaging:
             return self._response_for_set_packaging_dimension(
                 picking, selected_line, next_packaging, message=message
             )
+
         self.packaging_update_done = True
         return self._before_state__set_quantity(picking, selected_line, message=message)
 
     def _check_dimension_to_update(self, dimensions):
-        """Return True if any dimension on the packaging needs to be updated"""
-        return any([value is not None for key, value in dimensions.items()])
-
-    def _get_dimension_fields_conversion_map(self):
-        return {"length": "packaging_length"}
+        """Check if the Shopfloor payload contains data for a packaging update."""
+        return any(value is not None for value in dimensions.values())
 
     def _update_packaging_dimension(self, packaging, dimensions_to_update):
         """Update dimension on the packaging."""
-        fields_conv_map = self._get_dimension_fields_conversion_map()
-        for dimension, value in dimensions_to_update.items():
-            if value is not None:
-                dimension = fields_conv_map.get(dimension, dimension)
-                packaging[dimension] = value
+        values_to_update = {}
+        packaging_values = packaging.read(dimensions_to_update.keys())[0]
+
+        for key, value in dimensions_to_update.items():
+            if value is None:
+                continue
+            # Skip updating fields with unchanged values to prevent unnecessary
+            # triggers of compute methods or other side effects
+            if packaging_values[key] != value:
+                values_to_update[key] = value
+
+        if values_to_update:
+            packaging.write(values_to_update)
 
 
 class ShopfloorReceptionValidator(Component):
@@ -155,7 +168,7 @@ class ShopfloorReceptionValidator(Component):
                 "type": "float",
                 "nullable": True,
             },
-            "length": {
+            "packaging_length": {
                 "coerce": to_float,
                 "required": False,
                 "type": "float",
@@ -186,7 +199,7 @@ class ShopfloorReceptionValidator(Component):
                 "nullable": True,
             },
             "barcode": {"type": "string", "required": False, "nullable": True},
-            "cancel": {"type": "boolean"},
+            "skip": {"type": "boolean"},
         }
 
 
@@ -213,13 +226,13 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {"type": "dict", "schema": self.schemas.move_line()},
-            "packaging": self._schema_packaging(),
+            "packaging": self._schema_packaging_dimensions(),
         }
 
-    def _schema_packaging(self):
+    def _schema_packaging_dimensions(self):
         return {
             "type": "dict",
-            "schema": self.schemas_detail.packaging_detail(),
+            "schema": self.schemas.packaging_dimensions(),
         }
 
     def _set_packaging_dimension_next_states(self):
