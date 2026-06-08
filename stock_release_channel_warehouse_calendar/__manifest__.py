@@ -3,7 +3,7 @@
 {
     "name": "Stock Release Channels Warehouse Calendar",
     "summary": "Glue module between release channel and warehouse calendar",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.1",
     "license": "AGPL-3",
     "author": "BCIM, Camptocamp, Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux"],
