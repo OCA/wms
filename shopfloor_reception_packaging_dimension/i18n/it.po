@@ -17,6 +17,11 @@ msgstr ""
 "X-Generator: Weblate 5.10.4\n"
 
 #. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_barcode
+msgid "Collect Barcode"
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
 #: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
 msgid "Collect height"
 msgstr "Raccogli altezza"
@@ -56,6 +61,13 @@ msgid "Menu displayed in the scanner application"
 msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor_reception_packaging_dimension
+#. odoo-python
+#: code:addons/shopfloor_reception_packaging_dimension/actions/message.py:0
+#, python-format
+msgid "Packaging '{}' updated."
+msgstr ""
+
+#. module: shopfloor_reception_packaging_dimension
 #: model:ir.model.fields,field_description:shopfloor_reception_packaging_dimension.field_shopfloor_menu__set_packaging_dimension_is_possible
 msgid "Set Packaging Dimension Is Possible"
 msgstr "È possibile impostare la dimensione dell'imballo"
@@ -71,16 +83,22 @@ msgid "Shopfloor"
 msgstr "Reparto"
 
 #. module: shopfloor_reception_packaging_dimension
+#: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_barcode
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_height
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_length
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_weight
 #: model:ir.model.fields,help:shopfloor_reception_packaging_dimension.field_product_packaging_level__shopfloor_collect_width
 msgid ""
-"When marked, shopfloor will require to set this dimension during reception "
-"if undefined on the packaging"
+"When marked, shopfloor will require to set dimensions during reception if "
+"undefined on the packaging"
 msgstr ""
-"Una volta contrassegnata, il reparto dovrà impostare questa dimensione "
-"durante la ricezione se non definita sulla confezione"
+
+#~ msgid ""
+#~ "When marked, shopfloor will require to set this dimension during "
+#~ "reception if undefined on the packaging"
+#~ msgstr ""
+#~ "Una volta contrassegnata, il reparto dovrà impostare questa dimensione "
+#~ "durante la ricezione se non definita sulla confezione"
 
 #~ msgid "Display Name"
 #~ msgstr "Nome visualizzato"
