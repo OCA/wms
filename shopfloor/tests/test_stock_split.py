@@ -9,6 +9,7 @@ class TestStockSplit(ModelCommon):
     @classmethod
     def setUpClassData(cls):
         super().setUpClassData()
+        cls.warehouse.write({"delivery_steps": "pick_pack_ship"})
         cls._update_qty_in_location(
             cls.stock_location, cls.product_a, 6, package=cls.package_1
         )
