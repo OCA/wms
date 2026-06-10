@@ -7,6 +7,6 @@ from odoo import fields, models
 class StockRule(models.Model):
     _inherit = "stock.rule"
 
-    autoblock_release_on_backorder = fields.Boolean(
+    autoblock_release_on_backorder = fields.Selection(
         related="route_id.autoblock_release_on_backorder", store=True
     )

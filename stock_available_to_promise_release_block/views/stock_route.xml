@@ -11,12 +11,12 @@
             ref="stock_available_to_promise_release.stock_route_form_view"
         />
         <field name="arch" type="xml">
-            <field name="no_backorder_at_release" position="after">
+            <xpath expr="//field[@name='no_backorder_at_release']" position="after">
                 <field
                     name="autoblock_release_on_backorder"
                     attrs="{'invisible': [('available_to_promise_defer_pull', '=', False)]}"
                 />
-            </field>
+            </xpath>
         </field>
     </record>
 

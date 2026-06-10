@@ -31,8 +31,38 @@ class StockMove(models.Model):
         return False
 
     def _blocked_on_backorder(self):
-        """Hook that aims to be overridden."""
-        return True
+        self.ensure_one()
+        mode = self.rule_id.autoblock_release_on_backorder
+
+        if mode == "always":
+            return True
+
+        if mode == "never":
+            return False
+
+        if mode == "single_customer_outgoing_move":
+            if self.picking_code != "outgoing":
+                return False
+
+            partner = self.partner_id
+            if not partner:
+                return False
+
+            # Block if no other out moves for this client
+            other_move_exists = bool(
+                self.search_count(
+                    [
+                        ("id", "!=", self.id),
+                        ("partner_id", "=", partner.id),
+                        ("state", "in", ["confirmed", "waiting", "assigned"]),
+                        ("picking_code", "=", "outgoing"),
+                    ],
+                    limit=1,
+                )
+            )
+            return not other_move_exists
+
+        return False
 
     def action_block_release(self):
         """Block the release."""

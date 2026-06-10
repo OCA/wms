@@ -54,8 +54,7 @@ class StockPicking(models.Model):
         backorders = super()._create_backorder()
         # Auto-block backorders
         for move in backorders.move_ids:
-            if move.rule_id.autoblock_release_on_backorder:
-                move.release_blocked = move._blocked_on_backorder()
+            move.release_blocked = move._blocked_on_backorder()
         return backorders
 
     def action_block_release(self):

@@ -101,7 +101,7 @@ class TestBlockRelease(BlockReleaseCommon):
         self.assertFalse(picking.block_release_allowed)
 
     def test_autoblock_release_on_backorder(self):
-        self.wh.delivery_route_id.autoblock_release_on_backorder = True
+        self.wh.delivery_route_id.autoblock_release_on_backorder = "always"
         picking = self._out_picking(
             self._create_picking_chain(
                 self.wh,
@@ -118,3 +118,60 @@ class TestBlockRelease(BlockReleaseCommon):
         # Backorder is not release ready and is automatically blocked
         self.assertFalse(backorder.release_ready)
         self.assertTrue(backorder.release_blocked)
+
+    def test_autoblock_release_on_backorder_single_customer_move_block(self):
+        """Backorder is blocked when it becomes the only outgoing move."""
+        self.wh.delivery_route_id.autoblock_release_on_backorder = (
+            "single_customer_outgoing_move"
+        )
+
+        picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 3), (self.product2, 5)],
+            )
+        )
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 3.0)
+
+        move = picking.move_ids.filtered(lambda m: m.product_id == self.product1)
+        move.quantity_done = move.product_uom_qty
+        picking.move_ids._action_done()
+
+        backorder = picking.backorder_ids
+
+        self.assertTrue(backorder.release_blocked)
+        self.assertFalse(backorder.release_ready)
+
+    def test_autoblock_release_on_backorder_single_customer_move_not_blocked(self):
+        """Backorder is not blocked when another outgoing move exists."""
+        self.wh.delivery_route_id.autoblock_release_on_backorder = (
+            "single_customer_outgoing_move"
+        )
+
+        picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product1, 3), (self.product2, 5)],
+            )
+        )
+
+        # Create another outgoing picking for the same customer
+        other_picking = self._out_picking(
+            self._create_picking_chain(
+                self.wh,
+                [(self.product3, 1)],
+            )
+        )
+
+        self.assertTrue(other_picking)
+
+        self._update_qty_in_location(self.loc_bin1, self.product1, 3.0)
+
+        move = picking.move_ids.filtered(lambda m: m.product_id == self.product1)
+        move.quantity_done = move.product_uom_qty
+        picking.move_ids._action_done()
+
+        backorder = picking.backorder_ids
+
+        self.assertFalse(backorder.release_blocked)
