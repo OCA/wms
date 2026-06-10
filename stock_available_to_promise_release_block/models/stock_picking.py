@@ -19,7 +19,6 @@ class StockPicking(models.Model):
         tracking=True,
     )
     release_blocked_label = fields.Char(
-        string="Release Blocked",
         compute="_compute_release_blocked_label",
     )
 

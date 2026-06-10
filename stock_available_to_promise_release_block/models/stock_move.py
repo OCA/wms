@@ -10,7 +10,6 @@ class StockMove(models.Model):
 
     release_blocked = fields.Boolean(readonly=True)
     release_blocked_label = fields.Char(
-        string="Release Blocked",
         compute="_compute_release_blocked_label",
     )
 
