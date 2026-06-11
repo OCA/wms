@@ -3,7 +3,7 @@
     "summary": "Move an item from one location to another.",
     "version": "18.0.1.2.0",
     "category": "Inventory",
-    "website": "https://github.com/OCA/stock-logistics-shopfloor",
+    "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "maintainers": ["mmequignon", "jbaudoux", "TDu"],
     "license": "AGPL-3",
