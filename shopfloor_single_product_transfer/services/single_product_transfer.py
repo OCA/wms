@@ -529,7 +529,7 @@ class ShopfloorSingleProductTransfer(Component):
     ):
         stock = self._actions_for("stock")
         if not stock.move_line_check_qty_picked(move_line):
-            message = self.msg_store.unable_to_pick_more(move_line.quantity)
+            message = self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty)
             return self._response_for_set_quantity(move_line, message=message)
 
     def _set_quantity__check_no_prefill_qty(
@@ -538,7 +538,7 @@ class ShopfloorSingleProductTransfer(Component):
         if not self.work.menu.no_prefill_qty:
             # If no_prefill_qty is False, then qty_picked should have been prefilled
             # with product_uom_qty in the select_product screen
-            message = self.msg_store.unable_to_pick_more(move_line.product_uom_qty)
+            message = self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty)
             return self._response_for_set_quantity(move_line, message=message)
 
     def _set_quantity__increment_qty_picked(
@@ -645,7 +645,7 @@ class ShopfloorSingleProductTransfer(Component):
             )
             checkout_sync._sync_checkout(lines, location)
         stock = self._actions_for("stock")
-        stock.set_destination_on_lines(lines, location, lock_lines=False)
+        stock.set_destination_on_lines(lines, location)
         if unload:
             lines.result_package_id = False
 
@@ -696,7 +696,7 @@ class ShopfloorSingleProductTransfer(Component):
             ("picking_id.user_id", "in", (False, self.env.uid)),
             ("picking_id.picking_type_id", "in", self.picking_types.ids),
             ("state", "in", ("assigned", "partially_available")),
-            ("qty_picked", ">", 0),
+            ("qty_done", ">", 0),
         ]
 
     def _find_user_move_line(self):
@@ -879,7 +879,7 @@ class ShopfloorSingleProductTransfer(Component):
         if move_line.state == "done":
             message = self.msg_store.move_already_done()
             return self._response_for_set_quantity(move_line, message=message)
-        move_line.qty_picked = quantity
+        move_line.qty_done = quantity
         handlers_by_type = {
             # Increment qty done if a product / lot / packaging is scanned
             "product": self._set_quantity__by_product,

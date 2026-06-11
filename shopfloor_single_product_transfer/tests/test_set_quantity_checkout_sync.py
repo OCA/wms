@@ -75,7 +75,7 @@ class TestSetQuantityCheckoutSync(CommonCase):
             "set_quantity",
             params={
                 "selected_line_id": move_line.id,
-                "quantity": move_line.quantity,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.dispatch_location.name,
             },
         )

@@ -76,8 +76,8 @@ class TestScanProduct(CommonCase):
         new_picking = self.get_new_picking()
         self.assertTrue(new_picking)
         self.assertEqual(move_line.picking_id, new_picking)
-        self.assertEqual(move_line.qty_picked, 1)
-        self.assertEqual(move_line.quantity, 10.0)
+        self.assertEqual(move_line.qty_done, 1)
+        self.assertEqual(move_line.reserved_uom_qty, 10.0)
 
     def test_scan_product_no_move_line(self):
         # No move with product in location, create move line is disabled.
@@ -160,7 +160,7 @@ class TestScanProduct(CommonCase):
         move_line = self.get_new_move_line()
         self.assertTrue(move_line)
         self.assertTrue(move_line.picking_id.user_id)
-        self.assertEqual(move_line.quantity, 10.0)
+        self.assertEqual(move_line.reserved_uom_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
@@ -236,7 +236,7 @@ class TestScanProduct(CommonCase):
         move_line = self.get_new_move_line()
         self.assertTrue(move_line)
         self.assertTrue(move_line.picking_id.user_id)
-        self.assertEqual(move_line.quantity, 10.0)
+        self.assertEqual(move_line.reserved_uom_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
@@ -373,7 +373,7 @@ class TestScanProduct(CommonCase):
         move_line = self.get_new_move_line()
         self.assertTrue(move_line)
         self.assertTrue(move_line.picking_id.user_id)
-        self.assertEqual(move_line.quantity, 10.0)
+        self.assertEqual(move_line.reserved_uom_qty, 10.0)
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
@@ -461,9 +461,8 @@ class TestScanProduct(CommonCase):
             params={"location_id": location.id, "barcode": product.barcode},
         )
         move_line = self.get_new_move_line()
-        self.assertTrue(move_line.picked)
-        self.assertEqual(move_line.quantity, max_qty_done)
-        self.assertEqual(move_line.qty_picked, max_qty_done)
+        self.assertEqual(move_line.reserved_uom_qty, max_qty_done)
+        self.assertEqual(move_line.qty_done, max_qty_done)
 
     def test_create_move_line_by_product_no_prefill_qty_enabled(self):
         location = self.location_src
@@ -477,8 +476,8 @@ class TestScanProduct(CommonCase):
             params={"location_id": location.id, "barcode": product.barcode},
         )
         move_line = self.get_new_move_line()
-        self.assertEqual(move_line.qty_picked, 1)
-        self.assertEqual(move_line.quantity, max_qty_done)
+        self.assertEqual(move_line.qty_done, 1)
+        self.assertEqual(move_line.reserved_uom_qty, max_qty_done)
 
     def test_create_move_line_by_lot_no_prefill_qty_disabled(self):
         location = self.location_src
@@ -492,8 +491,8 @@ class TestScanProduct(CommonCase):
             "scan_product", params={"location_id": location.id, "barcode": lot.name}
         )
         move_line = self.get_new_move_line()
-        self.assertEqual(move_line.qty_picked, max_qty_done)
-        self.assertEqual(move_line.quantity, max_qty_done)
+        self.assertEqual(move_line.qty_done, max_qty_done)
+        self.assertEqual(move_line.reserved_uom_qty, max_qty_done)
 
     def test_create_move_line_by_lot_no_prefill_qty_enabled(self):
         location = self.location_src
@@ -509,8 +508,8 @@ class TestScanProduct(CommonCase):
             params={"location_id": location.id, "barcode": lot.name},
         )
         move_line = self.get_new_move_line()
-        self.assertEqual(move_line.qty_picked, 1)
-        self.assertEqual(move_line.quantity, max_qty_done)
+        self.assertEqual(move_line.qty_done, 1)
+        self.assertEqual(move_line.reserved_uom_qty, max_qty_done)
 
     def test_action_cancel(self):
         response = self.service.dispatch("scan_product__action_cancel")

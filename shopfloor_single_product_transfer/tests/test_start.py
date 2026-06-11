@@ -17,7 +17,7 @@ class TestStart(CommonCase):
 
         picking.user_id = self.env.user
         move_line = picking.move_line_ids
-        move_line._pick_qty(move_line.quantity)
+        move_line.qty_done = move_line.reserved_uom_qty
         response = self.service.dispatch("start")
         data = {
             "move_line": self._data_for_move_line(move_line),
