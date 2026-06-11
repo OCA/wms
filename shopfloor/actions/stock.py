@@ -278,13 +278,13 @@ class StockAction(Component):
 
     def move_line_increment_qty_picked(self, move_line, packaging=False):
         qty = packaging and packaging.qty or 1
-        move_line.qty_picked += qty
+        move_line.qty_done += qty
 
     def move_line_check_qty_picked(self, move_line):
         rounding = move_line.product_id.uom_id.rounding
-        qty_picked = move_line.qty_picked
-        qty_todo = move_line.quantity
+        qty_done = move_line.qty_done
+        qty_todo = move_line.reserved_uom_qty
         # If qty picked is >= qty todo, then there's nothing more to pick
-        if float_compare(qty_picked, qty_todo, precision_rounding=rounding) > 0:
+        if float_compare(qty_done, qty_todo, precision_rounding=rounding) > 0:
             return False
         return True
