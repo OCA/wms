@@ -867,16 +867,29 @@ class ShopfloorSingleProductTransfer(Component):
         package = self.env["stock.quant.package"].browse(package_id)
         if not location.exists() and not package.exists():
             return self._response_for_select_location_or_package()
+        products = (
+            self.env["stock.quant"]
+            .search([("location_id", "=", location.id or package.location_id.id)])
+            .product_id
+        )
         handlers_by_type = {
             "product": self._scan_product__scan_product,
             "packaging": self._scan_product__scan_packaging,
             "lot": self._scan_product__scan_lot,
         }
         search = self._actions_for("search")
-        search_result = search.find(barcode, types=handlers_by_type.keys())
+        search_result = search.find(
+            barcode,
+            types=handlers_by_type.keys(),
+            handler_kw={"lot": {"products": products}},
+        )
         handler = handlers_by_type.get(search_result.type)
         if handler:
-            return handler(search_result.record, location=location, package=package)
+            return handler(
+                search_result.record,
+                location=location,
+                package=package,
+            )
         message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(
             location=location, package=package, message=message

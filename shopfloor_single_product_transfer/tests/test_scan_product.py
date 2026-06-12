@@ -255,7 +255,7 @@ class TestScanProduct(CommonCase):
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         expected_message = {
             "message_type": "error",
-            "body": "No operation found for this menu and profile.",
+            "body": "Barcode not found",
         }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
@@ -263,6 +263,14 @@ class TestScanProduct(CommonCase):
         )
 
     def test_scan_lot_with_move_line(self):
+        # create a duplicate lot to ensure that the search
+        # on lot name is restricted to the products of the location
+        self._set_product_tracking_by_lot(self.product_b)
+        duplicate_lot = self._create_lot_for_product(self.product_b, "LOT_BARCODE")
+        self._add_stock_to_product(
+            self.product_b, self.location_dest, 10, lot=duplicate_lot
+        )
+
         location = self.location_src
         product = self.product_a
         self._set_product_tracking_by_lot(product)
