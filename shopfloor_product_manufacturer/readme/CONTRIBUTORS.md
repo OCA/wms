@@ -1,0 +1,2 @@
+- Simone Orsi \<<simahawk@gmail.com>\>
+- Jacques-Etienne Baudoux \<<je@bcim.be>\>
