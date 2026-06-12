@@ -3,7 +3,7 @@
 
 {
     "name": "Shopfloor Cluster Picking Repack",
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.1.1",
     "summary": """Build delivery packages at the end of the cluster picking""",
     "author": "ACSONE SA/NV,BCIM,Camptocamp,Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux", "TDu", "mmequignon"],
