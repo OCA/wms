@@ -29,9 +29,6 @@
         "stock_quant_package_dimension",
         "stock_quant_package_product_packaging",
         "stock_picking_progress",
-        # TODO: used for manuf info on prod detail.
-        # This must be an optional dep
-        "product_manufacturer",
         # TODO: used for prod lot expire detail info.
         # This must be an optional dep
         "product_expiry",
