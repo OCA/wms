@@ -319,11 +319,9 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         move_line = self.move_b.move_line_ids
         product = move_line.product_id.with_context(location=move_line.location_id.id)
         Partner = self.env["res.partner"].sudo()
-        manuf = Partner.create({"name": "Manuf 1"})
         product.sudo().write(
             {
                 "image_128": fake_colored_image(size=(128, 128)),
-                "manufacturer_id": manuf.id,
             }
         )
         vendor_a = Partner.create({"name": "Supplier A"})

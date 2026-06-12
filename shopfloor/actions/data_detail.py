@@ -173,12 +173,6 @@ class DataDetailAction(Component):
                 "stock_quant_ids:locations",
                 lambda record, fname: self._locations_for_product(record),
             ),
-            (
-                "product_tmpl_id:manufacturer",
-                lambda rec, fname: self._jsonify(
-                    rec.product_tmpl_id.manufacturer_id, ["id", "name"]
-                ),
-            ),
         ]
 
     def _get_product_locations(self, record):
