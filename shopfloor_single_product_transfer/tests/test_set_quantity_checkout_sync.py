@@ -80,14 +80,12 @@ class TestSetQuantityCheckoutSync(CommonCase):
             },
         )
         expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
-        data = {"location": self._data_for_location(self.location)}
         completion_info = self.service._actions_for("completion.info")
         expected_popup = completion_info.popup(move_line)
         self.assert_response(
             response,
-            next_state="select_product",
+            next_state="select_location_or_package",
             message=expected_message,
-            data=data,
             popup=expected_popup,
         )
         self.assertEqual(move1.move_line_ids.location_dest_id, self.dispatch_location)
