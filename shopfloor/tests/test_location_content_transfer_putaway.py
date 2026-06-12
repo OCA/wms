@@ -10,40 +10,9 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
     """Tests with putaway when using option to ignore unavailable putaway locations"""
 
     @classmethod
-    def setUpClassVars(cls, *args, **kwargs):
-        super().setUpClassVars(*args, **kwargs)
-        cls.pallets_storage_type = cls.env.ref(
-            "stock_storage_type.package_storage_type_pallets"
-        )
-        cls.main_pallets_location = cls.env.ref(
-            "stock_storage_type.stock_location_pallets"
-        )
-        cls.reserve_pallets_locations = cls.env.ref(
-            "stock_storage_type.stock_location_pallets_reserve"
-        )
-        cls.all_pallets_locations = (
-            cls.main_pallets_location.leaf_location_ids
-            | cls.reserve_pallets_locations.leaf_location_ids
-        )
-
-    @classmethod
     def setUpClassBaseData(cls, *args, **kwargs):
         super().setUpClassBaseData(*args, **kwargs)
-        cls.package = cls.env["stock.quant.package"].create(
-            {
-                # this will parameterize the putaway to use pallet locations,
-                # and if not, it will stay on the picking type's default dest.
-                "package_type_id": cls.pallets_storage_type.id,
-            }
-        )
-        cls.package2 = cls.env["stock.quant.package"].create(
-            {
-                # this will parameterize the putaway to use pallet locations,
-                # and if not, it will stay on the picking type's default dest.
-                "package_type_id": cls.pallets_storage_type.id,
-            }
-        )
-        # create a location to be sure it's empty
+        # create a test source location to be sure it's empty
         cls.test_loc = (
             cls.env["stock.location"]
             .sudo()
@@ -55,18 +24,81 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
                 }
             )
         )
+        cls.package_type = (
+            cls.env["stock.package.type"]
+            .sudo()
+            .create({"name": "TestLocationContentTransferPutaway"})
+        )
+        cls.package_type2 = (
+            cls.env["stock.package.type"]
+            .sudo()
+            .create({"name": "TestLocationContentTransferPutaway2"})
+        )
+        cls.package = cls.env["stock.quant.package"].create(
+            {"package_type_id": cls.package_type.id}
+        )
+        cls.package2 = cls.env["stock.quant.package"].create(
+            {"package_type_id": cls.package_type2.id}
+        )
         cls._update_qty_in_location(
             cls.test_loc, cls.product_a, 10, package=cls.package
         )
         cls._update_qty_in_location(
             cls.test_loc, cls.product_a, 10, package=cls.package2
         )
+        # create a destination child location
+        cls.main_pallets_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Pallet Location",
+                    "location_id": cls.picking_type.default_location_dest_id.id,
+                }
+            )
+        )
+        cls.reserve_pallets_location = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Reserve Pallet Location",
+                    "location_id": cls.picking_type.default_location_dest_id.id,
+                }
+            )
+        )
         cls.menu.sudo().allow_move_create = True
-        cls.menu.sudo().ignore_no_putaway_available = True
+        cls.menu.sudo().ignore_no_putaway_available = (
+            True  # read as ignore transfer when no putaway available
+        )
         cls.menu.sudo().allow_unreserve_other_moves = True
 
     def test_normal_putaway(self):
         """Ensure putaway is applied on moves"""
+        self.pallet_putaway_rule = (
+            self.env["stock.putaway.rule"]
+            .sudo()
+            .create(
+                {
+                    "product_id": self.product_a.id,
+                    "package_type_ids": [(6, 0, self.package_type.ids)],
+                    "location_in_id": self.stock_location.id,
+                    "location_out_id": self.main_pallets_location.id,
+                }
+            )
+        )
+        self.pallet_putaway_rule = (
+            self.env["stock.putaway.rule"]
+            .sudo()
+            .create(
+                {
+                    "product_id": self.product_a.id,
+                    "package_type_ids": [(6, 0, self.package_type2.ids)],
+                    "location_in_id": self.stock_location.id,
+                    "location_out_id": self.reserve_pallets_location.id,
+                }
+            )
+        )
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.test_loc.barcode}
         )
@@ -77,7 +109,7 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         )
         package_level_id = response["data"]["start_single"]["package_level"]["id"]
         package_level = self.env["stock.package_level"].browse(package_level_id)
-        self.assertIn(package_level.location_dest_id, self.all_pallets_locations)
+        self.assertIn(package_level.location_dest_id, self.main_pallets_location)
 
     def test_ignore_no_putaway_available(self):
         """Ignore no putaway available is activated on the menu
@@ -85,12 +117,6 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
         In this case, when no putaway is possible, the changes
         are rollbacked and an error is returned.
         """
-        for location in self.all_pallets_locations:
-            package = self.env["stock.quant.package"].create(
-                {"package_type_id": self.pallets_storage_type.id}
-            )
-            self._update_qty_in_location(location, self.product_a, 10, package=package)
-
         response = self.service.dispatch(
             "scan_location", params={"barcode": self.test_loc.barcode}
         )

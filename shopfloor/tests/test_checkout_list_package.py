@@ -58,11 +58,9 @@ class CheckoutListDestPackageCase(
         self._fill_stock_for_moves(picking.move_ids[2], in_package=True)
         self._fill_stock_for_moves(picking.move_ids[3], in_package=True)
         picking.action_assign()
-        delivery_packaging = self.env.ref(
-            "stock_storage_type.product_product_9_packaging_single_bag"
-        )
+        package_type = self.env.ref("stock.package_type_01")
         delivery_package = self.env["stock.quant.package"].create(
-            {"package_type_id": delivery_packaging.id}
+            {"package_type_id": package_type.id}
         )
         picking.move_ids[1].move_line_ids.result_package_id = delivery_package
         response = self.service.dispatch(
@@ -123,11 +121,9 @@ class CheckoutScanSetDestPackageCase(CheckoutCommonCase, SelectDestPackageMixin)
 
         cls.selected_lines = pack1_moves.move_line_ids
         cls.pack1 = pack1_moves.move_line_ids.package_id
-        cls.delivery_packaging = cls.env.ref(
-            "stock_storage_type.product_product_9_packaging_single_bag"
-        )
+        cls.package_type = cls.env.ref("stock.package_type_01")
         cls.delivery_package = cls.env["stock.quant.package"].create(
-            {"package_type_id": cls.delivery_packaging.id}
+            {"package_type_id": cls.package_type.id}
         )
         cls.move_line1, cls.move_line2, cls.move_line3 = cls.selected_lines
         # The 'scan_dest_package' and 'set_dest_package' methods can not be
