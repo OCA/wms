@@ -17,7 +17,7 @@ class TestOverReception(CommonCase):
         )
         cls.reception_picking = picking
         cls.reception_line = picking.move_line_ids[0]
-        cls.menu.sudo().allow_over_reception = True
+        cls.menu.sudo().allow_quantity_exceeding_demand = True
 
     def test_over_reception_confirmation_flow(self):
         """

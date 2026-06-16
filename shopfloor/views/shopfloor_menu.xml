@@ -13,6 +13,16 @@
             </field>
             <group name="options" position="inside">
                 <group
+                    name="quantity_exceeding_demand"
+                    attrs="{'invisible': [('allow_quantity_exceeding_demand_is_possible', '=', False)]}"
+                >
+                    <field
+                        name="allow_quantity_exceeding_demand_is_possible"
+                        invisible="1"
+                    />
+                    <field name="allow_quantity_exceeding_demand" />
+                </group>
+                <group
                     name="move_create"
                     attrs="{'invisible': [('move_create_is_possible', '=', False)]}"
                 >
