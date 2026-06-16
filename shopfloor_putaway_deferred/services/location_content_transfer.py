@@ -9,5 +9,6 @@ class LocationContentTransfer(Component):
 
     def _select_move_lines_first_location(self, move_lines):
         result = super()._select_move_lines_first_location(move_lines=move_lines)
-        result._recompute_putaways()
+        to_recompute = result.filtered(lambda ml: ml.putaway_deferred)
+        to_recompute._recompute_putaways()
         return result

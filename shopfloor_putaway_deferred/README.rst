@@ -1,6 +1,10 @@
-===========================
-Shopfloor Putaway Recompute
-===========================
+.. image:: https://odoo-community.org/readme-banner-image
+   :target: https://odoo-community.org/get-involved?utm_source=readme
+   :alt: Odoo Community Association
+
+==========================
+Shopfloor Putaway Deferred
+==========================
 
 .. 
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -13,14 +17,14 @@ Shopfloor Putaway Recompute
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
-    :target: https://github.com/OCA/wms/tree/16.0/shopfloor_putaway_recompute
+    :target: https://github.com/OCA/wms/tree/16.0/shopfloor_putaway_deferred
     :alt: OCA/wms
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/wms-16-0/wms-16-0-shopfloor_putaway_recompute
+    :target: https://translation.odoo-community.org/projects/wms-16-0/wms-16-0-shopfloor_putaway_deferred
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
     :target: https://runboat.odoo-community.org/builds?repo=OCA/wms&target_branch=16.0
@@ -28,8 +32,11 @@ Shopfloor Putaway Recompute
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-This module allows to recompute putaways at 'Get Work' event for the
-Location Content Transfer.
+This module ensures that deferred putaway strategies are applied at the
+'Get Work' event for Shopfloor scenarios.
+
+It depends on ``stock_picking_putaway_deferred`` to defer putaway
+calculation until the operator is ready to start working.
 
 **Table of contents**
 
@@ -39,21 +46,26 @@ Location Content Transfer.
 Use Cases / Context
 ===================
 
-When the operator starts an operation, if the configuration has changed
-(putaways), the destination location could be the wrong one.
+When the operator starts an operation, if putaway strategies have not
+yet been applied (deferred mode), the destination location could be
+wrong.
 
-So, when launching the 'Get Work', we need to recompute the putaways for
-the selected move lines.
+So, when launching 'Get Work', we need to apply the deferred putaways
+for the selected move lines. The ``stock_picking_putaway_deferred``
+module provides the mechanism to defer putaway calculation until this
+moment.
 
 Configuration
 =============
 
-See configuration in stock_putaway_recompute module.
+See configuration in ``stock_picking_putaway_deferred`` module.
 
 Known issues / Roadmap
 ======================
 
--  Extends it to support more scenarios.
+- Currently supported scenarios: ``location_content_transfer``,
+  ``zone_picking``.
+- Further scenarios (e.g. ``checkout``) could be added if needed.
 
 Bug Tracker
 ===========
@@ -61,7 +73,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/wms/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_putaway_recompute%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/wms/issues/new?body=module:%20shopfloor_putaway_deferred%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -76,7 +88,8 @@ Authors
 Contributors
 ------------
 
--  Denis Roussel denis.roussel@acsone.eu
+- Denis Roussel denis.roussel@acsone.eu
+- Laurent Mignon laurent.mignon@acsone.eu
 
 Maintainers
 -----------
@@ -99,6 +112,6 @@ Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
 
 |maintainer-rousseldenis| 
 
-This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/16.0/shopfloor_putaway_recompute>`_ project on GitHub.
+This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/16.0/shopfloor_putaway_deferred>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.

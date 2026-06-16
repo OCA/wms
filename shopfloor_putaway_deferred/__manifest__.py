@@ -2,13 +2,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
-    "name": "Shopfloor Putaway Recompute",
+    "name": "Shopfloor Putaway Deferred",
     "summary": """
-        This module allows to recompute putaways on 'Get Work'""",
+        This module ensures that deferred putaway are computed on 'Get Work'.""",
     "version": "16.0.1.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "maintainers": ["rousseldenis"],
-    "depends": ["shopfloor", "stock_picking_putaway_recompute"],
+    "depends": ["shopfloor", "stock_picking_putaway_deferred"],
 }
