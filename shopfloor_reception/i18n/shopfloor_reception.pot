@@ -74,6 +74,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor_reception/actions/message.py:0
 #, python-format
+msgid "The scanned lot does not match the selected product"
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
 msgid ""
 "This lot already exists with expiration date '%(lot_expiration_date)s'. You "
 "cannot change its date."
