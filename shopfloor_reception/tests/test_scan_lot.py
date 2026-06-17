@@ -151,3 +151,50 @@ class TestScanLotName(CommonCase):
 
         self.assertEqual(res["next_state"], "set_quantity")
         self.assertEqual(selected_move_line.lot_id, lot)
+
+    def test_scan_lot_wrong_product(self):
+        """
+        Test that the system detects that the scanned lot is for another product
+        than currently selected one.
+        """
+        picking = self._create_picking()
+        lot = self._create_lot()
+        expiration_date = fields.Datetime.from_string("2022-07-02")
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+
+        other_product_barcode = "01223334444555"
+
+        gs1_barcode = f"{GTIN_AI}{other_product_barcode}"
+        gs1_barcode += f"{EXPIRATION_DATE_AI}220702{LOT_AI}{lot.name}"
+
+        with mock.patch.object(SearchAction, "find") as mock_find:
+            mock_find.return_value = SearchResult(
+                record=None,
+                type="None",
+                parse_result=[
+                    BarcodeResult(type="unknown", value=gs1_barcode),
+                    BarcodeResult(type="expiration_date", value=expiration_date),
+                    BarcodeResult(type="lot", value=lot.name),
+                    BarcodeResult(type="product", value=other_product_barcode),
+                ],
+            )
+            res = self.service.dispatch(
+                "scan_lot",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "barcode": lot.name,
+                },
+            )
+        self.assert_response(
+            res,
+            "set_lot",
+            self.msg_store.lot_product_mismatch(),
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_line": self._data_for_move_lines(selected_move_line),
+            },
+        )
