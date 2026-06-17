@@ -5,7 +5,7 @@
     "summary": "Mobile frontend for single product transfer scenario",
     "version": "16.0.1.0.0",
     "development_status": "Beta",
-    "depends": ["shopfloor_mobile_base", "shopfloor_single_product_transfer"],
+    "depends": ["shopfloor_mobile", "shopfloor_single_product_transfer"],
     "author": "Camptocamp, BCIM, Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux", "TDu", "mmequignon"],
     "website": "https://github.com/OCA/wms",

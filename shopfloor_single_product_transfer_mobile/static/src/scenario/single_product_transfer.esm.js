@@ -18,6 +18,7 @@ const SingleProductTransfer = {
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
+
             <template v-if="state_is('select_product')">
                 <item-detail-card
                     v-if="get_select_product_package_or_location_data()"
@@ -34,6 +35,13 @@ const SingleProductTransfer = {
                     </template>
                 </item-detail-card>
             </template>
+
+            <get-work
+                v-if="state_is('get_work')"
+                v-on:get_work="state.on_get_work"
+                v-on:manual_selection="state.on_manual_selection"
+            />
+
             <template v-if="state_is('set_quantity')">
                 <item-detail-card
                     :key="make_state_component_key(['location_src', state.data.move_line.location_src.id])"
@@ -198,6 +206,16 @@ const SingleProductTransfer = {
                 init: {
                     enter: () => {
                         this.wait_call(this.odoo.call("start"));
+                    },
+                },
+                get_work: {
+                    /* eslint-disable no-unused-vars */
+                    on_get_work: (evt) => {
+                        this.wait_call(this.odoo.call("find_work"));
+                    },
+                    /* eslint-disable no-unused-vars */
+                    on_manual_selection: (evt) => {
+                        this.state_to("select_location_or_package");
                     },
                 },
                 select_location_or_package: {
