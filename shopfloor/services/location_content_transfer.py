@@ -758,6 +758,15 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination(
                 location, move_line, confirmation_required=barcode
             )
+        if (
+            quantity > move_line.qty_done
+            and not self.work.menu.allow_quantity_exceeding_demand
+        ):
+            return self._response_for_scan_destination(
+                location,
+                move_line,
+                message=self.msg_store.unable_to_pick_more(move_line.qty_done),
+            )
 
         self._lock_lines(move_line)
 
