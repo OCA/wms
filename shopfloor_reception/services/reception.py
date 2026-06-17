@@ -1289,8 +1289,11 @@ class Reception(Component):
             )
 
         product = selected_line.product_id
-        lot = self.search_result.record or self._actions_for("search").lot_from_scan(
-            lot_name, product
+        search_result_record = self.search_result.record
+        lot = (
+            search_result_record
+            if search_result_record and search_result_record._name == "stock.lot"
+            else self._actions_for("search").lot_from_scan(lot_name, product)
         )
 
         if product.use_expiration_date and (
