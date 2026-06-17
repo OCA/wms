@@ -1213,7 +1213,7 @@ class Reception(Component):
         search = self._actions_for("search")
         search_result = search.find(
             barcode=barcode,
-            types=["lot", "expiration_date"],
+            types=["lot", "expiration_date", "product"],
             handler_kw={"lot": {"products": selected_line.product_id}},
         )
 
@@ -1224,6 +1224,15 @@ class Reception(Component):
                 lot_name = result.value
             elif result.type == "expiration_date":
                 lot_expiration_date = result.value
+            elif (
+                result.type == "product"
+                and result.raw != selected_line.product_id.barcode
+            ):
+                return self._response_for_set_lot(
+                    picking,
+                    selected_line,
+                    message=self.msg_store.lot_product_mismatch(),
+                )
 
         if search_result.type == "lot":
             existing_lot = search_result.record
