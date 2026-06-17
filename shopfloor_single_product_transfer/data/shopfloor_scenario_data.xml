@@ -8,6 +8,9 @@
         <field name="options_edit">
 {
     "allow_create_moves": true,
+    "allow_get_work": true,
+    "allow_move_line_search_sort_order": true,
+    "allow_move_line_search_additional_domain": true,
     "allow_unreserve_other_moves": true,
     "allow_ignore_no_putaway_available": true,
     "allow_alternative_destination": true,

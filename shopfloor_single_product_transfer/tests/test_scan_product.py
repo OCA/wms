@@ -526,6 +526,11 @@ class TestScanProduct(CommonCase):
         response = self.service.dispatch("scan_product__action_cancel")
         self.assert_response(response, next_state="select_location_or_package", data={})
 
+    def test_action_cancel_with_get_work(self):
+        self.menu.sudo().allow_get_work = True
+        response = self.service.dispatch("scan_product__action_cancel")
+        self.assert_response(response, next_state="get_work", data={})
+
     def test_scan_product_packaging(self):
         location = self.location_src
         packaging = self.product_a_packaging

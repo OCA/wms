@@ -69,7 +69,19 @@ class ShopfloorSingleProductTransfer(Component):
     _usage = "single_product_transfer"
     _description = __doc__
 
+    _advisory_lock_find_work = "single_product_transfer_find_work"
+
     # Responses
+    def _response_for_start(self, message=None, popup=None):
+        """Transition to the 'start' or 'get_work' state
+
+        The switch to 'get_work' is done if the option is enabled on the scenario
+        """
+        if self.work.menu.allow_get_work:
+            return self._response(
+                next_state="get_work", data={}, message=message, popup=popup
+            )
+        return self._response_for_select_location_or_package(message=message)
 
     def _response_for_select_location_or_package(self, message=None, popup=None):
         return self._response(
@@ -679,6 +691,10 @@ class ShopfloorSingleProductTransfer(Component):
         message = self.msg_store.transfer_done_success(move_line.picking_id)
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
+        if self.work.menu.allow_get_work:
+            return self._response_for_start(
+                message=message, popup=completion_info_popup
+            )
         if (
             not self.is_allow_move_create()
             and not self._has_pending_operations_at_same_location(move_line)
@@ -814,14 +830,51 @@ class ShopfloorSingleProductTransfer(Component):
             return response
         return self._response_for_select_product(location=location)
 
-    # Endpoints
+    def _recover_previous_session(self):
+        """When a user starts a transfer, then leaves the session and comes back later,
+        we want to be able to restore the previous session so they can continue where
+        they left off.
+        This method looks for any move line in progress for the user and returns the
+        corresponding response to restore the session.
 
-    def start(self):
+        :return: A response to restore the previous session, or False if no session to
+        recover
+        """
+
+        response = False
         move_line = self._find_user_move_line()
         if move_line:
             message = self.msg_store.recovered_previous_session()
-            return self._response_for_set_quantity(move_line, message=message)
-        return self._response_for_select_location_or_package()
+            response = self._response_for_set_quantity(move_line, message=message)
+        return response
+
+    # Endpoints
+
+    def start(self):
+        response = self._recover_previous_session()
+        return response or self._response_for_start()
+
+    def find_work(self):
+        """Find the new location to work from, for a user.
+
+        First recover any started pickings.
+        The find the first move line from the oldest transfer that can be worked on.
+        Mark all move lines on that location as picked.
+        And ask the user to confirm.
+
+        Transitions:
+        * start: no work found
+        * scan_location: with the location to work form for confirmation
+        """
+        response = self._recover_previous_session()
+        if response:
+            return response
+        self._actions_for("lock").advisory(self._advisory_lock_find_work)
+        move_lines = self.search_move_line.search_move_lines(match_user=True)
+        if not move_lines:
+            return self._response_for_start(message=self.msg_store.no_work_found())
+        location = fields.first(move_lines).location_id
+        return self._response_for_select_product(location=location)
 
     def scan_location_or_package(self, barcode):
         """Scan a source location or a source package.
@@ -908,7 +961,7 @@ class ShopfloorSingleProductTransfer(Component):
         )
 
     def scan_product__action_cancel(self):
-        return self._response_for_select_location_or_package()
+        return self._response_for_start()
 
     def set_quantity(self, selected_line_id, barcode, quantity, confirmation=None):
         """Sets quantity done if a product is scanned,
@@ -954,7 +1007,7 @@ class ShopfloorSingleProductTransfer(Component):
         else:
             stock = self._actions_for("stock")
             stock.unmark_move_line_as_picked(move_line)
-        return self._response_for_select_location_or_package()
+        return self._response_for_start()
 
     def set_location(self, selected_line_id, package_id, barcode):
         """Sets the destination location
@@ -981,6 +1034,9 @@ class ShopfloorSingleProductTransferValidator(Component):
     _usage = "single_product_transfer.validator"
 
     def start(self):
+        return {}
+
+    def get_work(self):
         return {}
 
     def scan_location_or_package(self):
@@ -1030,6 +1086,7 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
             "select_product": self._schema_select_product,
             "set_quantity": self._schema_set_quantity,
             "set_location": self._schema_set_location,
+            "get_work": {},
         }
 
     def start(self):
@@ -1057,8 +1114,11 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
     def set_location(self):
         return self._response_schema(next_states=self._set_location_next_states())
 
+    def find_work(self):
+        return self._response_schema(next_states=self._find_work_next_states())
+
     def _start_next_states(self):
-        return {"select_location_or_package", "set_quantity"}
+        return {"select_location_or_package", "set_quantity", "get_work"}
 
     def _scan_location_next_states(self):
         return {"select_location_or_package", "select_product"}
@@ -1067,16 +1127,19 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return {"select_product", "set_quantity"}
 
     def _scan_product__action_cancel_next_states(self):
-        return {"select_location_or_package"}
+        return {"select_location_or_package", "get_work"}
 
     def _set_quantity_next_states(self):
         return {"set_quantity", "select_product", "set_location"}
 
     def _set_quantity__action_cancel_next_states(self):
-        return {"select_location_or_package"}
+        return {"select_location_or_package", "get_work"}
 
     def _set_location_next_states(self):
         return {"set_quantity", "select_product", "set_location"}
+
+    def _find_work_next_states(self):
+        return {"start_line", "get_work"}
 
     @property
     def _schema_select_location_or_package(self):
