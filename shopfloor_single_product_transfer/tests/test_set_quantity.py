@@ -571,7 +571,7 @@ class TestSetQuantity(CommonCase):
         )
         params = {
             "selected_line_id": move_line.id,
-            "quantity": move_line.qty_picked,
+            "quantity": move_line.qty_done,
             "barcode": self.dispatch_location.barcode,
         }
         response = self.service.dispatch("set_quantity", params=params)
@@ -594,7 +594,7 @@ class TestSetQuantity(CommonCase):
         )
         params = {
             "selected_line_id": move_line.id,
-            "quantity": move_line.qty_picked,
+            "quantity": move_line.qty_done,
             "barcode": self.dispatch_location.barcode,
         }
         response = self.service.dispatch("set_quantity", params=params)
