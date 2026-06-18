@@ -878,8 +878,7 @@ class Reception(Component):
             for result in self.search_result.parse_result:
                 if result.type == "lot":
                     if self.search_result.type == "lot" and self.search_result.record:
-                        lot_id = self.search_result.record
-                        lot_name = lot_id.name
+                        lot_name = self.search_result.record.name
                         found = True
                     else:
                         lot_name = result.value
@@ -888,7 +887,8 @@ class Reception(Component):
                     result.type == "expiration_date"
                     and line.product_id.use_expiration_date
                 ):
-                    expiration_date = datetime.fromisoformat(result.value)
+                    date = result.value
+                    expiration_date = datetime(date.year, date.month, date.day)
 
             if found:
                 return self.set_lot_confirm_action(
