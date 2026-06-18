@@ -83,6 +83,18 @@ class ShopfloorSingleProductTransfer(Component):
             )
         return self._response_for_select_location_or_package(message=message)
 
+    def _response_for_start_line(self, move_line, message=None):
+        """Transition to the 'start_line' state
+
+        This is used to confirm the processing of a move line
+        by the user. The user will be requested to select the
+        product or the package to process the move line.
+        """
+        data = {
+            "move_line": self.data.move_line(move_line),
+        }
+        return self._response(next_state="start_line", data=data, message=message)
+
     def _response_for_select_location_or_package(self, message=None, popup=None):
         return self._response(
             next_state="select_location_or_package", message=message, popup=popup
@@ -848,6 +860,38 @@ class ShopfloorSingleProductTransfer(Component):
             response = self._response_for_set_quantity(move_line, message=message)
         return response
 
+    def _scan_line__by_package(self, package, move_line):
+        if move_line.package_id == package:
+            return self._response_for_set_quantity(move_line)
+
+    def _scan_line__by_product(self, product, move_line):
+        if product == move_line.product_id:
+            if product.tracking in ("lot", "serial"):
+                return self._response_for_start_line(
+                    move_line,
+                    message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
+                )
+            else:
+                return self._response_for_set_quantity(move_line)
+
+    def _scan_line__by_packaging(self, packaging, move_line):
+        return self._scan_line__by_product(packaging.product_id, move_line)
+
+    def _scan_line__by_lot(self, lot, move_line):
+        if lot == move_line.lot_id:
+            return self._response_for_set_quantity(move_line)
+
+    def _scan_line__fallback(self, record, move_line):
+        # Nothing matches what is expected from the move line.
+        if record:
+            return self._response_for_start_line(
+                move_line,
+                message=self.msg_store.wrong_record(record),
+            )
+        return self._response_for_start_line(
+            move_line, message=self.msg_store.barcode_not_found()
+        )
+
     # Endpoints
 
     def start(self):
@@ -859,12 +903,13 @@ class ShopfloorSingleProductTransfer(Component):
 
         First recover any started pickings.
         The find the first move line from the oldest transfer that can be worked on.
-        Mark all move lines on that location as picked.
+        Mark the first move lines as picked.
         And ask the user to confirm.
 
         Transitions:
         * start: no work found
-        * scan_location: with the location to work form for confirmation
+        * select_line: a move line has been found and marked as picked,
+            ask the user to confirm
         """
         response = self._recover_previous_session()
         if response:
@@ -873,8 +918,34 @@ class ShopfloorSingleProductTransfer(Component):
         move_lines = self.search_move_line.search_move_lines(match_user=True)
         if not move_lines:
             return self._response_for_start(message=self.msg_store.no_work_found())
-        location = fields.first(move_lines).location_id
-        return self._response_for_select_product(location=location)
+        move_line = fields.first(move_lines)
+        stock = self._actions_for("stock")
+        stock.mark_move_line_as_picked(move_line, quantity=0)
+        return self._response_for_start_line(move_line)
+
+    def confirm_start_line(self, selected_line_id, barcode):
+        """Validate the selected line by scanning the location, product, lot
+        or package."""
+        move_line = self.env["stock.move.line"].browse(selected_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+
+        search = self._actions_for("search")
+        handlers = {
+            "package": self._scan_line__by_package,
+            "product": self._scan_line__by_product,
+            "packaging": self._scan_line__by_packaging,
+            "lot": self._scan_line__by_lot,
+            "none": self._scan_line__fallback,
+        }
+        search_result = search.find(
+            barcode,
+            types=handlers.keys(),
+            handler_kw=dict(lot=dict(products=move_line.product_id)),
+        )
+        handler = handlers.get(search_result.type, self._scan_line__fallback)
+        response = handler(search_result.record, move_line)
+        return response or self._scan_line__fallback(search_result.record, move_line)
 
     def scan_location_or_package(self, barcode):
         """Scan a source location or a source package.
@@ -1072,6 +1143,12 @@ class ShopfloorSingleProductTransferValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
+    def confirm_start_line(self):
+        return {
+            "selected_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": True, "type": "string"},
+        }
+
 
 class ShopfloorSingleProductTransferValidatorResponse(Component):
     _inherit = "base.shopfloor.validator.response"
@@ -1086,6 +1163,7 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
             "select_product": self._schema_select_product,
             "set_quantity": self._schema_set_quantity,
             "set_location": self._schema_set_location,
+            "start_line": self._schema_start_line,
             "get_work": {},
         }
 
@@ -1110,6 +1188,9 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return self._response_schema(
             next_states=self._set_quantity__action_cancel_next_states()
         )
+
+    def confirm_start_line(self):
+        return self._response_schema(next_states=self._confirm_start_line_next_states())
 
     def set_location(self):
         return self._response_schema(next_states=self._set_location_next_states())
@@ -1140,6 +1221,9 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
 
     def _find_work_next_states(self):
         return {"start_line", "get_work"}
+
+    def _confirm_start_line_next_states(self):
+        return {"start_line", "set_quantity", "get_work"}
 
     @property
     def _schema_select_location_or_package(self):
@@ -1172,4 +1256,10 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return {
             "move_line": {"type": "dict", "schema": self.schemas.move_line()},
             "package": {"type": "dict", "schema": self.schemas.package()},
+        }
+
+    @property
+    def _schema_start_line(self):
+        return {
+            "move_line": {"type": "dict", "schema": self.schemas.move_line()},
         }
