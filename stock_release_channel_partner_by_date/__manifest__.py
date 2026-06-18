@@ -13,6 +13,7 @@
     "website": "https://github.com/OCA/wms",
     "depends": [
         "stock_release_channel",
+        "stock_release_channel_shipment_lead_time",
     ],
     "data": [
         "views/res_partner.xml",

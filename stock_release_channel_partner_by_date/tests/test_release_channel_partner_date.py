@@ -35,6 +35,26 @@ class TestReleaseChannelPartnerDate(ReleaseChannelPartnerDateCommon):
         self.delivery_date_channel.action_sleep()
         self.assertFalse(channel_date.active)
 
+    def test_release_channel_sleep_archive_specific_date_future(self):
+        self.delivery_date_channel.process_end_date = fields.Date.today()
+        self.delivery_date_channel.action_wake_up()
+        channel_date_today = self._create_channel_partner_date(
+            self.delivery_date_channel,
+            self.partner,
+            fields.Date.today(),
+        )
+        channel_date_future = self._create_channel_partner_date(
+            self.delivery_date_channel,
+            self.partner,
+            fields.Date.add(fields.Date.today(), days=1),
+        )
+        self.assertTrue(channel_date_today.active)
+        self.assertTrue(channel_date_future.active)
+        self.delivery_date_channel.action_sleep()
+        # Keep today's specific date active to allow multiple wake/sleep cycles in the same day.
+        self.assertTrue(channel_date_today.active)
+        self.assertTrue(channel_date_future.active)
+
     def test_release_channel_on_specific_date_not_available(self):
         """Test that when no release channel is available to satisfy
         a specific partner date,no fallback release channel is
