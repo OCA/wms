@@ -15,6 +15,11 @@
                 t-value="get_version('shopfloor_single_product_transfer_mobile')"
             />
 
+            <script
+                id="script_scenario_single_product_transfer_translations"
+                t-attf-src="/shopfloor_single_product_transfer_mobile/static/src/translation_registry.esm.js?v=#{mod_version}"
+                type="module"
+            />
             <!-- Scenario -->
             <script
                 id="script_scenario_single_product_transfer"

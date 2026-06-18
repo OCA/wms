@@ -14,7 +14,7 @@ const SingleProductTransfer = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state_in(['select_location_or_package', 'select_product', 'set_quantity', 'set_location'])"
+                v-if="state_in(['start_line', 'select_location_or_package', 'select_product', 'set_quantity', 'set_location'])"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
             />
@@ -42,29 +42,31 @@ const SingleProductTransfer = {
                 v-on:manual_selection="state.on_manual_selection"
             />
 
-            <template v-if="state_is('set_quantity')">
+            <template v-if="state_in(['start_line', 'set_quantity'])">
                 <item-detail-card
                     :key="make_state_component_key(['location_src', state.data.move_line.location_src.id])"
                     :record="state.data.move_line.location_src"
-                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :card_color="utils.colors.color_for(state_is('start_line') ? 'screen_step_todo' : 'screen_step_done')"
                 />
                 <item-detail-card
                     :key="make_state_component_key(['product', state.data.move_line.product.id])"
                     :options="product_detail_options_for_set_quantity()"
                     :record="state.data.move_line"
-                    :card_color="utils.colors.color_for('screen_step_done')"
+                    :card_color="utils.colors.color_for(state_is('start_line') ? 'screen_step_todo' : 'screen_step_done')"
                 />
-                <item-detail-card
-                    :key="make_state_component_key(['location_dest', state.data.move_line.location_dest.id])"
-                    :record="state.data.move_line.location_dest"
-                    :card_color="utils.colors.color_for('screen_step_todo')"
-                />
-                <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
-                    <packaging-qty-picker
-                        :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
-                        v-bind="utils.wms.move_line_qty_picker_props(state.data.move_line)"
+                <template v-if="state_is('set_quantity')">
+                    <item-detail-card
+                        :key="make_state_component_key(['location_dest', state.data.move_line.location_dest.id])"
+                        :record="state.data.move_line.location_dest"
+                        :card_color="utils.colors.color_for('screen_step_todo')"
                     />
-                </v-card>
+                    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                        <packaging-qty-picker
+                            :key="make_state_component_key(['packaging-qty-picker', state.data.move_line.id])"
+                            v-bind="utils.wms.move_line_qty_picker_props(state.data.move_line)"
+                        />
+                    </v-card>
+                </template>
             </template>
             <template v-if="state_is('set_location')">
                 <item-detail-card
@@ -216,6 +218,22 @@ const SingleProductTransfer = {
                     /* eslint-disable no-unused-vars */
                     on_manual_selection: (evt) => {
                         this.state_to("select_location_or_package");
+                    },
+                },
+                start_line: {
+                    display_info: {
+                        title: this.$t("single_product_transfer.start_line.title"),
+                        scan_placeholder: this.$t(
+                            "single_product_transfer.start_line.scan_placeholder"
+                        ),
+                    },
+                    on_scan: (scanned) => {
+                        this.wait_call(
+                            this.odoo.call("confirm_start_line", {
+                                selected_line_id: this.state.data.move_line.id,
+                                barcode: scanned.text,
+                            })
+                        );
                     },
                 },
                 select_location_or_package: {
