@@ -1,6 +1,8 @@
 {
   "single_product_transfer.start_line.title": "Commencez par scanner quelque chose",
   "single_product_transfer.start_line.scan_placeholder": "Scanner l'emplacement / le paquet / le produit / le lot",
+  "single_product_transfer.start_line.scan_placeholder_location_pack": "Scanner un emplacement ou un paquet",
+  "single_product_transfer.start_line.scan_placeholder_product_lot_pack": "Scanner un produit, un lot ou un paquet",
   "single_product_transfer.select_location_or_package.title": "Scanner un emplacement ou un paquet",
   "single_product_transfer.select_location_or_package.scan_placeholder": "Scanner l'emplacement / le paquet",
   "single_product_transfer.select_product.title": "Sélectionner un produit",

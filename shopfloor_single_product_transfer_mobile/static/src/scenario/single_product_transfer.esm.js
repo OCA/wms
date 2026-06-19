@@ -46,7 +46,7 @@ const SingleProductTransfer = {
                 <item-detail-card
                     :key="make_state_component_key(['location_src', state.data.move_line.location_src.id])"
                     :record="state.data.move_line.location_src"
-                    :card_color="utils.colors.color_for(state_is('start_line') ? 'screen_step_todo' : 'screen_step_done')"
+                    :card_color="utils.colors.color_for(state_is('start_line') && (state.data.selected_location_id || state.data.selected_package_id) ? 'screen_step_done' : state_is('start_line') ? 'screen_step_todo' : 'screen_step_done')"
                 />
                 <item-detail-card
                     :key="make_state_component_key(['product', state.data.move_line.product.id])"
@@ -223,17 +223,44 @@ const SingleProductTransfer = {
                 start_line: {
                     display_info: {
                         title: this.$t("single_product_transfer.start_line.title"),
-                        scan_placeholder: this.$t(
-                            "single_product_transfer.start_line.scan_placeholder"
-                        ),
+                        scan_placeholder: () => {
+                            const selected_location_id =
+                                this.state.data.selected_location_id;
+                            const selected_package_id =
+                                this.state.data.selected_package_id;
+                            if (
+                                this.state.data.scan_location_or_pack_first &&
+                                !selected_location_id &&
+                                !selected_package_id
+                            ) {
+                                return this.$t(
+                                    "single_product_transfer.start_line.scan_placeholder_location_pack"
+                                );
+                            }
+                            if (selected_package_id || selected_location_id) {
+                                return this.$t(
+                                    "single_product_transfer.start_line.scan_placeholder_product_lot_pack"
+                                );
+                            }
+                            return this.$t(
+                                "single_product_transfer.start_line.scan_placeholder"
+                            );
+                        },
                     },
                     on_scan: (scanned) => {
-                        this.wait_call(
-                            this.odoo.call("confirm_start_line", {
-                                selected_line_id: this.state.data.move_line.id,
-                                barcode: scanned.text,
-                            })
-                        );
+                        const data = {
+                            selected_line_id: this.state.data.move_line.id,
+                            barcode: scanned.text,
+                        };
+                        if (this.state.data.selected_location_id) {
+                            data.selected_location_id =
+                                this.state.data.selected_location_id;
+                        }
+                        if (this.state.data.selected_package_id) {
+                            data.selected_package_id =
+                                this.state.data.selected_package_id;
+                        }
+                        this.wait_call(this.odoo.call("confirm_start_line", data));
                     },
                 },
                 select_location_or_package: {
