@@ -814,6 +814,33 @@ class TestSetQuantity(CommonCase):
             self.picking_type.default_location_src_id,
         )
 
+    def test_set_quantity_scan_location_with_get_work(self):
+        self.menu.sudo().allow_get_work = True
+        picking = self._setup_picking()
+        location = self.location
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": location.id, "barcode": self.product.barcode},
+        )
+        move_line = picking.move_line_ids
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 6,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        completion_info = self.service._actions_for("completion.info")
+        expected_popup = completion_info.popup(move_line)
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        self.assert_response(
+            response,
+            next_state="get_work",
+            message=expected_message,
+            popup=expected_popup,
+        )
+
     def test_set_quantity_scan_location_allow_move_create(self):
         self.menu.sudo().allow_move_create = True
         picking = self._setup_picking()
