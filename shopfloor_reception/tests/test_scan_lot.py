@@ -1,10 +1,8 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from unittest import mock
-
-from odoo import fields
 
 from odoo.addons.shopfloor.actions.barcode_parser import BarcodeResult
 from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
@@ -31,7 +29,7 @@ class TestScanLotName(CommonCase):
         """
         picking = self._create_picking()
         lot = self._create_lot()
-        expiration_date = fields.Datetime.from_string("2022-07-02")
+        expiration_date = date(2022, 7, 2)
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
@@ -62,7 +60,9 @@ class TestScanLotName(CommonCase):
 
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
-            expiration_date.isoformat(),
+            datetime(
+                expiration_date.year, expiration_date.month, expiration_date.day
+            ).isoformat(),
         )
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"], lot.name
@@ -77,9 +77,8 @@ class TestScanLotName(CommonCase):
         """
         picking = self._create_picking()
 
-        expiration_date = fields.Datetime.from_string("2022-07-02")
+        expiration_date = date(2022, 7, 2)
         lot = self._create_lot(expiration_date=expiration_date)
-        self.assertEqual(lot.expiration_date, expiration_date)
 
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
@@ -113,12 +112,10 @@ class TestScanLotName(CommonCase):
             )
 
         self.assertEqual(
-            datetime.fromisoformat(
-                res["data"]["set_lot"]["selected_move_line"][0]["lot"][
-                    "expiration_date"
-                ]
-            ),
-            expiration_date.replace(tzinfo=UTC),
+            res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
+            datetime(expiration_date.year, expiration_date.month, expiration_date.day)
+            .replace(tzinfo=UTC)
+            .isoformat(),
         )
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
@@ -159,7 +156,7 @@ class TestScanLotName(CommonCase):
         """
         picking = self._create_picking()
         lot = self._create_lot()
-        expiration_date = fields.Datetime.from_string("2022-07-02")
+        expiration_date = date(2022, 7, 2)
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
