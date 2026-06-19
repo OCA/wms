@@ -32,5 +32,10 @@ def _update_scenario_options(scenario):
             "Option allow_alternative_destination_package added to scenario %s",
             scenario.name,
         )
+    if "scan_location_or_pack_first" not in options:
+        options["scan_location_or_pack_first"] = True
+        _logger.info(
+            "Option scan_location_or_pack_first added to scenario %s", scenario.name
+        )
     options_edit = json.dumps(options or {}, indent=4, sort_keys=True)
     scenario.write({"options_edit": options_edit})
