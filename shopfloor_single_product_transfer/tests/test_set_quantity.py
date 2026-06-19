@@ -357,6 +357,36 @@ class TestSetQuantity(CommonCase):
             response, next_state="set_quantity", message=expected_message, data=data
         )
 
+    def test_set_quantity_scan_lot_not_unique(self):
+        """Even if the lot is not unique, we should be able to process the line by
+        scanning the lot, if the scanned lot is the one on the move line."""
+        self._set_product_tracking_by_lot(self.product_b)
+        duplicate_lot = self._create_lot_for_product(self.product_b, "LOT_BARCODE")
+        self._add_stock_to_product(self.product_b, self.location, 10, lot=duplicate_lot)
+        # First, select a picking
+        self._set_product_tracking_by_lot(self.product)
+        lot = self._create_lot_for_product(self.product, duplicate_lot.name)
+        self._add_stock_to_product(self.product, self.location, 5, lot=lot)
+        picking = self._setup_picking(lot=lot)
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": lot.name},
+        )
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 1,
+                "barcode": lot.name,
+            },
+        )
+        data = {
+            "move_line": self._data_for_move_line(move_line),
+            "asking_confirmation": None,
+        }
+        self.assert_response(response, next_state="set_quantity", data=data)
+
     def test_set_quantity_scan_packaging(self):
         """Scan a packaging to process an existing line."""
         # First, select a picking

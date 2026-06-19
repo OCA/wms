@@ -1215,7 +1215,11 @@ class ShopfloorSingleProductTransfer(Component):
             "package": self._set_quantity__by_package,
         }
         search = self._actions_for("search")
-        search_result = search.find(barcode, types=handlers_by_type.keys())
+        search_result = search.find(
+            barcode,
+            types=handlers_by_type.keys(),
+            handler_kw={"lot": {"products": move_line.product_id}},
+        )
         handler = handlers_by_type.get(search_result.type)
         if handler:
             confirmed = confirmation == barcode
