@@ -723,6 +723,10 @@ class ShopfloorSingleProductTransfer(Component):
             return self._response_for_select_location_or_package(
                 message=message, popup=completion_info_popup
             )
+        if self.work.menu.allow_get_work:
+            return self._response_for_start(
+                message=message, popup=completion_info_popup
+            )
         return self._response_for_select_product(
             location=move_line.location_id,
             package=move_line.package_id,
@@ -1370,7 +1374,7 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return {"select_location_or_package", "get_work"}
 
     def _set_quantity_next_states(self):
-        return {"set_quantity", "select_product", "set_location"}
+        return {"set_quantity", "select_product", "set_location", "get_work"}
 
     def _set_quantity__action_cancel_next_states(self):
         return {"select_location_or_package", "get_work"}
