@@ -238,8 +238,12 @@ const SingleProductTransfer = {
                 },
                 select_location_or_package: {
                     display_info: {
-                        title: "Scan a location or a package",
-                        scan_placeholder: "Scan location / package",
+                        title: this.$t(
+                            "single_product_transfer.select_location_or_package.title"
+                        ),
+                        scan_placeholder: this.$t(
+                            "single_product_transfer.select_location_or_package.scan_placeholder"
+                        ),
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
@@ -251,8 +255,10 @@ const SingleProductTransfer = {
                 },
                 select_product: {
                     display_info: {
-                        title: "Select a product",
-                        scan_placeholder: "Scan product / lot",
+                        title: this.$t("single_product_transfer.select_product.title"),
+                        scan_placeholder: this.$t(
+                            "single_product_transfer.select_product.scan_placeholder"
+                        ),
                     },
                     on_scan: (scanned) => {
                         const params = this.get_select_product_scan_params(scanned);
@@ -264,9 +270,10 @@ const SingleProductTransfer = {
                 },
                 set_quantity: {
                     display_info: {
-                        title: "Set quantity",
-                        scan_placeholder:
-                            "Scan product / packaging / lot / location / package",
+                        title: this.$t("single_product_transfer.set_quantity.title"),
+                        scan_placeholder: this.$t(
+                            "single_product_transfer.set_quantity.scan_placeholder"
+                        ),
                     },
                     events: {
                         qty_edit: "on_qty_update",

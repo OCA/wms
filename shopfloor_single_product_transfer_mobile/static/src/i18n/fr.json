@@ -1,4 +1,12 @@
 {
   "single_product_transfer.start_line.title": "Commencez par scanner quelque chose",
-  "single_product_transfer.start_line.scan_placeholder": "Scanner l'emplacement / le paquet / le produit / le lot"
+  "single_product_transfer.start_line.scan_placeholder": "Scanner l'emplacement / le paquet / le produit / le lot",
+  "single_product_transfer.select_location_or_package.title": "Scanner un emplacement ou un paquet",
+  "single_product_transfer.select_location_or_package.scan_placeholder": "Scanner l'emplacement / le paquet",
+  "single_product_transfer.select_product.title": "Sélectionner un produit",
+  "single_product_transfer.select_product.scan_placeholder": "Scanner le produit / le lot",
+  "single_product_transfer.set_quantity.title": "Définir la quantité",
+  "single_product_transfer.set_quantity.scan_placeholder": "Scanner le produit / l'emballage / le lot / l'emplacement / le paquet",
+  "single_product_transfer.set_location.title": "Définir l'emplacement",
+  "single_product_transfer.set_location.scan_placeholder": "Scanner l'emplacement"
 }
