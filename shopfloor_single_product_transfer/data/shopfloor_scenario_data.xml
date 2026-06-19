@@ -11,6 +11,7 @@
     "allow_get_work": true,
     "allow_move_line_search_sort_order": true,
     "allow_move_line_search_additional_domain": true,
+    "scan_location_or_pack_first": true,
     "allow_unreserve_other_moves": true,
     "allow_ignore_no_putaway_available": true,
     "allow_alternative_destination": true,

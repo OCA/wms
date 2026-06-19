@@ -37,13 +37,50 @@ class TestFindWork(CommonCase):
         cls.picking_1 = cls._create_picking(lines=[(cls.product_a, 10)])
         cls.picking_2 = cls._create_picking(lines=[(cls.product_b, 10)])
 
+    def _data_for_start_line(
+        self, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        return {
+            "move_line": self._data_for_move_line(move_line),
+            "selected_location_id": selected_location_id,
+            "selected_package_id": selected_package_id,
+            "scan_location_or_pack_first": self.menu.scan_location_or_pack_first,
+        }
+
+    def _setup_lot_move_line(self, location=None):
+        location = location or self.location_src
+        self._set_product_tracking_by_lot(self.product_a)
+        lot = self._create_lot_for_product(self.product_a, "LOT001")
+        self._add_stock_to_product(self.product_a, location, 5, lot=lot)
+        picking = self._create_picking(lines=[(self.product_a, 5)])
+        move_line = fields.first(picking.move_line_ids)
+        return move_line, lot
+
+    def _assert_start_line_lot_required(
+        self, response, move_line, selected_location_id=None
+    ):
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._data_for_start_line(
+                move_line, selected_location_id=selected_location_id
+            ),
+            message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
+        )
+
+    def _assert_set_quantity(self, response, move_line):
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "move_line": self._data_for_move_line(move_line),
+                "asking_confirmation": None,
+            },
+        )
+
     def test_find_work(self):
         response = self.service.dispatch("find_work")
-        data = {
-            "move_line": self._data_for_move_line(
-                fields.first(self.picking_1.move_line_ids)
-            )
-        }
+        data = self._data_for_start_line(fields.first(self.picking_1.move_line_ids))
         self.assert_response(
             response,
             next_state="start_line",
@@ -60,11 +97,7 @@ class TestFindWork(CommonCase):
         # cancel the first picking
         self.picking_1.action_cancel()
         response = self.service.dispatch("find_work")
-        data = {
-            "move_line": self._data_for_move_line(
-                fields.first(self.picking_2.move_line_ids)
-            )
-        }
+        data = self._data_for_start_line(fields.first(self.picking_2.move_line_ids))
         self.assert_response(
             response,
             next_state="start_line",
@@ -88,7 +121,7 @@ class TestFindWork(CommonCase):
             "confirm_start_line",
             params={"selected_line_id": move_line.id, "barcode": "NOPE"},
         )
-        data = {"move_line": self._data_for_move_line(move_line)}
+        data = self._data_for_start_line(move_line)
         self.assert_response(
             response,
             next_state="start_line",
@@ -105,11 +138,7 @@ class TestFindWork(CommonCase):
                 "barcode": self.product_a.barcode,
             },
         )
-        data = {
-            "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": None,
-        }
-        self.assert_response(response, next_state="set_quantity", data=data)
+        self._assert_set_quantity(response, move_line)
 
     def test_confirm_start_line_scan_wrong_product(self):
         move_line = fields.first(self.picking_1.move_line_ids)
@@ -120,7 +149,7 @@ class TestFindWork(CommonCase):
                 "barcode": self.product_b.barcode,
             },
         )
-        data = {"move_line": self._data_for_move_line(move_line)}
+        data = self._data_for_start_line(move_line)
         self.assert_response(
             response,
             next_state="start_line",
@@ -141,13 +170,7 @@ class TestFindWork(CommonCase):
                 "barcode": self.product_a.barcode,
             },
         )
-        data = {"move_line": self._data_for_move_line(move_line)}
-        self.assert_response(
-            response,
-            next_state="start_line",
-            data=data,
-            message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
-        )
+        self._assert_start_line_lot_required(response, move_line)
 
     def test_confirm_start_line_scan_packaging(self):
         move_line = fields.first(self.picking_1.move_line_ids)
@@ -158,11 +181,7 @@ class TestFindWork(CommonCase):
                 "barcode": self.product_a_packaging.barcode,
             },
         )
-        data = {
-            "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": None,
-        }
-        self.assert_response(response, next_state="set_quantity", data=data)
+        self._assert_set_quantity(response, move_line)
 
     def test_confirm_start_line_scan_lot(self):
         self._set_product_tracking_by_lot(self.product_a)
@@ -174,11 +193,7 @@ class TestFindWork(CommonCase):
             "confirm_start_line",
             params={"selected_line_id": move_line.id, "barcode": lot.name},
         )
-        data = {
-            "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": None,
-        }
-        self.assert_response(response, next_state="set_quantity", data=data)
+        self._assert_set_quantity(response, move_line)
 
     def test_confirm_start_line_scan_wrong_lot(self):
         self._set_product_tracking_by_lot(self.product_a)
@@ -191,7 +206,7 @@ class TestFindWork(CommonCase):
             "confirm_start_line",
             params={"selected_line_id": move_line.id, "barcode": wrong_lot.name},
         )
-        data = {"move_line": self._data_for_move_line(move_line)}
+        data = self._data_for_start_line(move_line)
         self.assert_response(
             response,
             next_state="start_line",
@@ -211,11 +226,7 @@ class TestFindWork(CommonCase):
             "confirm_start_line",
             params={"selected_line_id": move_line.id, "barcode": package.name},
         )
-        data = {
-            "move_line": self._data_for_move_line(move_line),
-            "asking_confirmation": None,
-        }
-        self.assert_response(response, next_state="set_quantity", data=data)
+        self._assert_set_quantity(response, move_line)
 
     def test_confirm_start_line_scan_wrong_package(self):
         package = self._create_empty_package("PKG001")
@@ -229,10 +240,300 @@ class TestFindWork(CommonCase):
             "confirm_start_line",
             params={"selected_line_id": move_line.id, "barcode": wrong_package.name},
         )
-        data = {"move_line": self._data_for_move_line(move_line)}
+        data = self._data_for_start_line(move_line)
         self.assert_response(
             response,
             next_state="start_line",
             data=data,
             message=self.msg_store.wrong_record(wrong_package),
         )
+
+    def _enable_scan_location_or_pack_first(self):
+        self.menu.sudo().scan_location_or_pack_first = True
+
+    def _setup_packaged_move_line(self):
+        package = self._create_empty_package("PKG001")
+        self._add_stock_to_product(
+            self.product_a, self.child_location, 5, package=package
+        )
+        picking = self._create_picking(lines=[(self.product_a, 5)])
+        move_line = fields.first(picking.move_line_ids)
+        return move_line, package
+
+    def test_confirm_start_line_slpf_scan_product_requires_location(self):
+        self._enable_scan_location_or_pack_first()
+        move_line = fields.first(self.picking_1.move_line_ids)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        data = self._data_for_start_line(move_line)
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=data,
+            message=self.msg_store.scan_the_location_first(),
+        )
+
+    def test_confirm_start_line_scan_slpf_scan_location(self):
+        self._enable_scan_location_or_pack_first()
+        self._add_stock_to_product(self.product_a, self.child_location, 5)
+        picking = self._create_picking(lines=[(self.product_a, 5)])
+        move_line = fields.first(picking.move_line_ids)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        data = {
+            "move_line": self._data_for_move_line(move_line),
+            "asking_confirmation": None,
+        }
+        self.assert_response(response, next_state="set_quantity", data=data)
+
+    def test_confirm_start_line_scan_slpf_lot_tracked_scan_location(self):
+        # With scan_location_or_pack_first, scanning the location on a
+        # lot-tracked line is sufficient to confirm: goes to set_quantity
+        # directly, bypassing the lot scan step.
+        self._enable_scan_location_or_pack_first()
+        self._set_product_tracking_by_lot(self.product_a)
+        lot = self._create_lot_for_product(self.product_a, "LOT001")
+        self._add_stock_to_product(self.product_a, self.child_location, 5, lot=lot)
+        picking = self._create_picking(lines=[(self.product_a, 5)])
+        move_line = fields.first(picking.move_line_ids)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=self.child_location.id
+        )
+
+    def test_confirm_start_line_scan_slpf_scan_product_with_location(
+        self,
+    ):
+        self._enable_scan_location_or_pack_first()
+        move_line = fields.first(self.picking_1.move_line_ids)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+                "selected_location_id": move_line.location_id.id,
+            },
+        )
+        self._assert_set_quantity(response, move_line)
+
+    def test_confirm_start_line_slpf_package_scan_product_requires_package(self):
+        self._enable_scan_location_or_pack_first()
+        move_line, _package = self._setup_packaged_move_line()
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        data = self._data_for_start_line(move_line)
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=data,
+            message=self.msg_store.line_has_package_scan_package(),
+        )
+
+    def test_confirm_start_line_slpf_package_scan_location_requires_package(self):
+        self._enable_scan_location_or_pack_first()
+        move_line, _package = self._setup_packaged_move_line()
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        data = self._data_for_start_line(
+            move_line, selected_location_id=self.child_location.id
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=data,
+            message=self.msg_store.line_has_package_scan_package(),
+        )
+
+    def test_confirm_start_line_scan_slpf_package_scan_package(
+        self,
+    ):
+        self._enable_scan_location_or_pack_first()
+        move_line, package = self._setup_packaged_move_line()
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={"selected_line_id": move_line.id, "barcode": package.name},
+        )
+        self._assert_set_quantity(response, move_line)
+
+    # -------------------------------------------------------------------------
+    # Lot tracking: all paths that require a lot must stay on start_line,
+    # and scanning the lot must reach set_quantity.
+    # -------------------------------------------------------------------------
+
+    # -- Without scan_location_or_pack_first --
+
+    def test_confirm_start_line_lot_tracked_scan_location_requires_lot(self):
+        move_line, _lot = self._setup_lot_move_line(self.child_location)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=self.child_location.id
+        )
+
+    def test_confirm_start_line_lot_tracked_scan_packaging_requires_lot(self):
+        move_line, _lot = self._setup_lot_move_line()
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a_packaging.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(response, move_line)
+
+    def test_confirm_start_line_lot_tracked_scan_product_then_lot(self):
+        move_line, lot = self._setup_lot_move_line()
+        # Step 1: product scan -> lot required
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(response, move_line)
+        # Step 2: lot scan -> set_quantity
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={"selected_line_id": move_line.id, "barcode": lot.name},
+        )
+        self._assert_set_quantity(response, move_line)
+
+    def test_confirm_start_line_lot_tracked_scan_location_then_lot(self):
+        move_line, lot = self._setup_lot_move_line(self.child_location)
+        # Step 1: location scan -> lot required
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=self.child_location.id
+        )
+        # Step 2: lot scan -> set_quantity (no slpf, no location check needed)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={"selected_line_id": move_line.id, "barcode": lot.name},
+        )
+        self._assert_set_quantity(response, move_line)
+
+    # -- With scan_location_or_pack_first --
+
+    def test_confirm_start_line_slpf_lot_tracked_scan_lot_no_location(self):
+        self._enable_scan_location_or_pack_first()
+        move_line, lot = self._setup_lot_move_line()
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={"selected_line_id": move_line.id, "barcode": lot.name},
+        )
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._data_for_start_line(move_line),
+            message=self.msg_store.scan_the_location_first(),
+        )
+
+    def test_confirm_start_line_slpf_lot_tracked_product_with_location_requires_lot(
+        self,
+    ):
+        self._enable_scan_location_or_pack_first()
+        move_line, _lot = self._setup_lot_move_line()
+        location_id = move_line.location_id.id
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+                "selected_location_id": location_id,
+            },
+        )
+        # slpf check passes (location provided); lot still required
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=location_id
+        )
+
+    def test_confirm_start_line_slpf_lot_tracked_product_with_location_then_lot(self):
+        self._enable_scan_location_or_pack_first()
+        move_line, lot = self._setup_lot_move_line()
+        location_id = move_line.location_id.id
+        # Step 1: product + location -> lot required (location preserved in response)
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.product_a.barcode,
+                "selected_location_id": location_id,
+            },
+        )
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=location_id
+        )
+        # Step 2: lot + location -> set_quantity
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": lot.name,
+                "selected_location_id": location_id,
+            },
+        )
+        self._assert_set_quantity(response, move_line)
+
+    def test_confirm_start_line_slpf_lot_tracked_scan_location_then_lot(self):
+        self._enable_scan_location_or_pack_first()
+        move_line, lot = self._setup_lot_move_line(self.child_location)
+        # Step 1: location scan -> lot required
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": self.child_location.barcode,
+            },
+        )
+        self._assert_start_line_lot_required(
+            response, move_line, selected_location_id=self.child_location.id
+        )
+        # Step 2: lot + location (frontend passes the confirmed location)
+        # -> set_quantity
+        response = self.service.dispatch(
+            "confirm_start_line",
+            params={
+                "selected_line_id": move_line.id,
+                "barcode": lot.name,
+                "selected_location_id": self.child_location.id,
+            },
+        )
+        self._assert_set_quantity(response, move_line)
