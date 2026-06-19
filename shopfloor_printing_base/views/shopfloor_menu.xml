@@ -7,12 +7,16 @@
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
 
-          <xpath expr="//group[@name='options']" position="inside">
-              <group name="print_label">
-                  <field name="display_print_label_button" />
-                  <field name="label_print_report_id" />
-              </group>
-          </xpath>
+            <xpath expr="//group[@name='options']" position="after">
+                <group name="print_label" string="Label Printing">
+                    <group>
+                        <field name="display_print_label_button" />
+                    </group>
+                    <group>
+                        <field name="label_print_report_id" />
+                    </group>
+                </group>
+            </xpath>
 
         </field>
     </record>
