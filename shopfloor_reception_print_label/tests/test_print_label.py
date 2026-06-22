@@ -175,3 +175,35 @@ class TestSetDestinationPrinting(CommonCase):
                 "confirmation": None,
             },
         )
+
+    def test_set_quantity_auto_print_labels(self):
+        self.reception.work.menu.sudo().write(
+            {
+                "auto_print_labels_on_location_scan": True,
+                "label_print_report_id": self.env.ref(
+                    "shopfloor_reception_print_label.report_test_document"
+                ).id,
+            }
+        )
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        selected_move_line.shopfloor_user_id = self.env.uid
+
+        with mock.patch.object(
+            IrActionsReport, "print_document_client_action"
+        ) as mock_print:
+            mock_print.return_value = True
+            self.service.dispatch(
+                "set_quantity",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "barcode": self.dispatch_location.barcode,
+                    "quantity": 1,
+                },
+            )
+            mock_print.assert_called_once_with(
+                selected_move_line.ids, **{"quantity": 1}
+            )

@@ -13,4 +13,5 @@
         "shopfloor_reception",
         "shopfloor_printing_base",
     ],
+    "data": ["views/shopfloor_menu.xml"],
 }
