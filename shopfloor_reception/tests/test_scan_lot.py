@@ -4,7 +4,7 @@
 from datetime import date, datetime, timezone
 from unittest import mock
 
-from odoo.addons.shopfloor.actions.barcode_parser import BarcodeResult
+from odoo.addons.shopfloor.actions.barcode_parser import BarcodeParser, BarcodeResult
 from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
 
 from .common import CommonCase
@@ -195,5 +195,48 @@ class TestScanLotName(CommonCase):
                 "selected_move_line": self._data_for_move_lines(
                     self.selected_move_line
                 ),
+            },
+        )
+
+    def test_set_lot_from_select_move(self):
+        picking = self._create_picking()
+        lot = self._create_lot()
+        lot.expiration_date = None
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        # selected_move_line.lot_id = lot
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            # Note: the order here is important, the first to match a record
+            # in DB will determine the `type` (and `record`) of the `SearchResult`
+            mock_parse.return_value = [
+                # -> Put "product" in first to test if no error in case the
+                # SearchResult type is not "lot" but "product"
+                BarcodeResult(
+                    type="product",
+                    value=selected_move_line.product_id.barcode,
+                    raw=selected_move_line.product_id.barcode,
+                ),
+                BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+                BarcodeResult(
+                    type="expiration_date",
+                    value=date(2025, 4, 15),
+                    raw="250415",
+                ),
+            ]
+            response = self.service.dispatch(
+                "scan_line",
+                params={
+                    "picking_id": picking.id,
+                    "barcode": lot.name,
+                },
+            )
+        self.assert_response(
+            response,
+            next_state="set_quantity",
+            data={
+                "picking": self.data.picking(picking),
+                "selected_move_line": self._data_for_move_lines(selected_move_line),
+                "confirmation_required": None,
             },
         )
