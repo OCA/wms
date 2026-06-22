@@ -24,7 +24,11 @@ class Reception(Component):
         report = printing.report_to_print
 
         if not report:
-            return printing.msg_store.print_no_report()
+            return self._response_for_set_destination(
+                picking,
+                selected_line,
+                message=printing.msg_store.print_no_report(),
+            )
 
         # Dynamically resolve record_ids based on the target report model
         if report.model == "stock.move.line":
