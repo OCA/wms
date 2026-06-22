@@ -1,9 +1,12 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import logging
 import warnings
 from typing import Literal
 
-from odoo import fields, models
+from odoo import api, fields, models, tools
+
+_logger = logging.getLogger(__name__)
 
 
 class StockMove(models.Model):
@@ -12,6 +15,15 @@ class StockMove(models.Model):
     is_full_location_reservation = fields.Boolean(
         "Full location reservation move", default=False
     )
+
+    def init(self):
+        tools.create_index(
+            self._cr,
+            "stock_move_full_loc_reservation_gc_idx",
+            self._table,
+            ["id"],
+            where="is_full_location_reservation AND state = 'cancel'",
+        )
 
     def _filter_full_location_reservation_moves(self):
         return self.filtered(lambda m: m.is_full_location_reservation)
@@ -33,7 +45,38 @@ class StockMove(models.Model):
         self = self.with_context(skip_undo_full_location_reservation=True)
         self._do_unreserve()
         self._action_cancel()
-        self.unlink()
+        self._post_commit_unlink()
+
+    def _post_commit_unlink(self):
+        # We need to defer the unlink of the moves until the end of the
+        # transaction to avoid issues where methods having a reference
+        # to the original move would try to access it after it has been unlinked
+        ids_to_unlink = self.ids
+        env = self.env
+
+        def _deferred_unlink():
+            try:
+                env["stock.move"].browse(ids_to_unlink).exists().unlink()
+            except Exception:
+                _logger.exception(
+                    "Failed to unlink full location reservation moves %s",
+                    ids_to_unlink,
+                )
+
+        self.env.cr.postcommit.add(_deferred_unlink)
+
+    @api.autovacuum
+    def _gc_full_location_reservation_moves(self):
+        """This method is meant to be called by a cron and will delete full location
+        reservation moves that are still in canceled state.
+
+        This should normally not be necessary as the moves should be unlinked right
+        after being canceled into the post commit hook of the transaction,
+        but this is a safety measure in case something goes wrong with the unlinking.
+        """
+        self.search(
+            [("is_full_location_reservation", "=", True), ("state", "=", "cancel")]
+        ).unlink()
 
     def _prepare_full_location_reservation_package_level_vals(self, package):
         return {
