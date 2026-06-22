@@ -60,6 +60,21 @@ class Reception(Component):
             picking, selected_line, message=message
         )
 
+    def _set_quantity__by_location(self, picking, selected_line, location):
+        res = super()._set_quantity__by_location(picking, selected_line, location)
+        if self.work.menu.auto_print_labels_on_location_scan and selected_line.qty_done:
+            print_response = self.print_labels(
+                picking.id, selected_line.id, selected_line.qty_done
+            )
+            print_message = print_response.get("message")
+            if print_message and print_message.get("message_type") == "success":
+                res["message"] = print_response["message"]
+            else:
+                return self._response_for_set_quantity(
+                    picking, selected_line, print_message
+                )
+        return res
+
 
 class ShopfloorReceptionValidator(Component):
     _inherit = "shopfloor.reception.validator"
