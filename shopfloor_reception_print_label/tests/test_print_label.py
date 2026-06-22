@@ -71,7 +71,7 @@ class TestSetDestinationPrinting(CommonCase):
             )
             mock_print.assert_not_called()
 
-            self.assertEqual(response, self.msg_store.print_no_report())
+            self.assertMessage(response, self.msg_store.print_no_report())
 
     def test_print_labels_supported_models(self):
         report = self.env.ref("shopfloor_reception_print_label.report_test_document")
