@@ -1028,6 +1028,29 @@ class ShopfloorSingleProductTransfer(Component):
             )
         return None
 
+    def _try_select_move_line(self, move_line):
+        """Check if the move line can be worked on by the user.
+
+        This is a method hookable to apply specific rules on which move lines can be
+        selected/skipped when looking for the next move line to work on.
+
+        By default, it checks if the move line has no putaway available when the option
+        'ignore_no_putaway_available' is enabled, and if so, it will skip the move line.
+        """
+        if self.work.menu.ignore_no_putaway_available and self._actions_for(
+            "stock"
+        ).no_putaway_available(self.picking_types, move_line):
+            return None
+        return move_line
+
+    def _get_next_move_line_to_work(self):
+        """Get the next move line to work on for the user."""
+        move_lines = self.search_move_line.search_move_lines(match_user=True)
+        for line in move_lines:
+            if line := self._try_select_move_line(line):
+                return line
+        return None
+
     # Endpoints
 
     def start(self):
@@ -1044,6 +1067,7 @@ class ShopfloorSingleProductTransfer(Component):
 
         Transitions:
         * start: no work found
+        * start: a move line has been found but no putaway location is available
         * select_line: a move line has been found and marked as picked,
             ask the user to confirm
         """
@@ -1051,11 +1075,16 @@ class ShopfloorSingleProductTransfer(Component):
         if response:
             return response
         self._actions_for("lock").advisory(self._advisory_lock_find_work)
-        move_lines = self.search_move_line.search_move_lines(match_user=True)
-        if not move_lines:
+        move_line = self._get_next_move_line_to_work()
+        if not move_line:
             return self._response_for_start(message=self.msg_store.no_work_found())
-        move_line = fields.first(move_lines)
         stock = self._actions_for("stock")
+        if (
+            not self.work.menu.ignore_no_putaway_available
+            and stock.no_putaway_available(self.picking_types, move_line)
+        ):
+            message = self.msg_store.no_putaway_destination_available()
+            return self._response_for_start(message=message)
         stock.mark_move_line_as_picked(move_line, quantity=0)
         return self._response_for_start_line(move_line)
 

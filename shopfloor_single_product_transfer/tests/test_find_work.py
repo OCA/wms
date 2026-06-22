@@ -36,6 +36,11 @@ class TestFindWork(CommonCase):
         cls._add_stock_to_product(cls.product_b, cls.location_src_b, 10)
         cls.picking_1 = cls._create_picking(lines=[(cls.product_a, 10)])
         cls.picking_2 = cls._create_picking(lines=[(cls.product_b, 10)])
+        # Simulate putaway rules having run so that no_putaway_available returns
+        # False for the class-level pickings. Without this, find_work would
+        # return no_putaway_destination_available for every test.
+        cls.picking_1.move_line_ids.sudo().location_dest_id = cls.dispatch_location.id
+        cls.picking_2.move_line_ids.sudo().location_dest_id = cls.dispatch_location.id
 
     def _data_for_start_line(
         self, move_line, selected_location_id=None, selected_package_id=None
@@ -537,3 +542,52 @@ class TestFindWork(CommonCase):
             },
         )
         self._assert_set_quantity(response, move_line)
+
+    # -------------------------------------------------------------------------
+    # ignore_no_putaway_available flag behaviour in find_work
+    # -------------------------------------------------------------------------
+
+    def test_find_work_no_putaway_destination(self):
+        # With ignore_no_putaway_available=False (default), find_work returns
+        # an error and stays at get_work when the candidate line has no
+        # putaway destination (location_dest_id == picking type default).
+        self.picking_1.action_cancel()
+        self.picking_2.action_cancel()
+        self._add_stock_to_product(self.product_a, self.location_src_a, 3)
+        self._create_picking(lines=[(self.product_a, 3)])
+        response = self.service.dispatch("find_work")
+        self.assert_response(
+            response,
+            next_state="get_work",
+            message=self.msg_store.no_putaway_destination_available(),
+        )
+
+    def test_find_work_ignore_no_putaway_skips_to_next(self):
+        # With ignore_no_putaway_available=True, lines without a specific
+        # putaway destination are skipped; the next eligible line is returned.
+        self._enable_ignore_no_putaway_available()
+        default_dest = self.picking_1.picking_type_id.default_location_dest_id
+        self.picking_1.move_line_ids.sudo().location_dest_id = default_dest.id
+        # picking_2 still has dispatch_location as destination (set in setUpClass)
+        response = self.service.dispatch("find_work")
+        move_line = fields.first(self.picking_2.move_line_ids)
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=self._data_for_start_line(move_line),
+        )
+
+    def test_find_work_ignore_no_putaway_no_work_found(self):
+        # With ignore_no_putaway_available=True, if every candidate line has no
+        # putaway destination, find_work returns no_work_found.
+        self._enable_ignore_no_putaway_available()
+        self.picking_1.action_cancel()
+        self.picking_2.action_cancel()
+        self._add_stock_to_product(self.product_a, self.location_src_a, 3)
+        self._create_picking(lines=[(self.product_a, 3)])
+        response = self.service.dispatch("find_work")
+        self.assert_response(
+            response,
+            next_state="get_work",
+            message=self.msg_store.no_work_found(),
+        )
