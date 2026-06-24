@@ -23,7 +23,7 @@ class ZonePicking(Component):
         self, move_line, package, quantity, confirmation, location, barcode
     ):
         if self._handle_full_location_package_reservation(package):
-            move_line._full_location_reservation(package_only=True)
+            move_line._full_location_reservation(reservation_mode="package")
             # Ensure all move lines have the same destination package.
             # If moves lines are in different pickings, the destination package
             # is not set in standard
