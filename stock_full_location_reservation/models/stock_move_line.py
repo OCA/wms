@@ -42,23 +42,48 @@ class StockMoveLine(models.Model):
                 ] += qty_available
         return res
 
-    def _full_location_reservation(self, package_only=None):
-        reservable_qties = self._get_full_location_reservable_qties(package_only)
+    def _full_location_reservation(self, strict=False, package_only=None):
         moves_to_assign_ids = []
-        for line in self.exists():  # Move line should have been deleted
-            # Copy location and package as move line could be deleted if merge occurs
-            location = line.location_id
-            package = line.package_id
-            qties = reservable_qties.get(location, {}).get(package, {})
-            if not qties:
-                continue
-            for product, qty in qties.items():
-                moves_to_assign_ids.append(
-                    line.move_id._full_location_reservation_create_move(
-                        product, qty, location, package
-                    ).id
+        if not strict:
+            reservable_qties = self._get_full_location_reservable_qties(
+                package_only=package_only
+            )
+            for line in self.exists():
+                location = line.location_id
+                package = line.package_id
+                qties = reservable_qties.get(location, {}).get(package, {})
+                if not qties:
+                    continue
+                for product, qty in qties.items():
+                    moves_to_assign_ids.append(
+                        line.move_id._full_location_reservation_create_move(
+                            product, qty, location, package
+                        ).id
+                    )
+                reservable_qties[location].pop(package)
+
+        else:
+            # Use Odoo core mechanism
+            Quant = self.env["stock.quant"]
+
+            for line in self.exists():  # Move line should have been deleted
+                quants = Quant._gather(
+                    line.product_id,
+                    line.location_id,
+                    lot_id=line.lot_id,
+                    package_id=line.package_id,
+                    owner_id=line.owner_id,
+                    strict=strict,
                 )
-            reservable_qties[location].pop(package)
+                if not quants:
+                    continue
+
+                total_quantity = 0.0
+                for quant in quants:
+                    total_quantity += quant.available_quantity
+                # We let the core mechanism occur that will reserve
+                # the needed quants
+                line.reserved_uom_qty += total_quantity
         moves_to_assign = self.env["stock.move"].browse(moves_to_assign_ids)
         if moves_to_assign:
             moves_to_assign._action_confirm()

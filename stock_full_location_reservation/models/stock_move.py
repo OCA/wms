@@ -89,5 +89,7 @@ class StockMove(models.Model):
             )
         return new_move
 
-    def _full_location_reservation(self, package_only=None):
-        return self.move_line_ids._full_location_reservation(package_only)
+    def _full_location_reservation(self, strict=False, package_only=None):
+        return self.move_line_ids._full_location_reservation(
+            strict=strict, package_only=package_only
+        )

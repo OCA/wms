@@ -16,6 +16,12 @@ class TestStockFullLocationReservationCommon(TestStockCommon):
         cls.location_rack_child = cls.location.create(
             {"name": "Rack child", "location_id": cls.location_rack.id}
         )
+        cls.location_rack_child_2 = cls.location.create(
+            {"name": "Rack child 2", "location_id": cls.location_rack.id}
+        )
+        cls.location_rack_child_3 = cls.location.create(
+            {"name": "Rack child 3", "location_id": cls.location_rack.id}
+        )
         cls.customer_location = cls.env.ref("stock.stock_location_customers")
 
     def _create_quant(self, product, location, qty, package=None):
