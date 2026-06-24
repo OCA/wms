@@ -1,6 +1,7 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 import warnings
+from typing import Literal
 
 from odoo import fields, models
 
@@ -91,7 +92,11 @@ class StockMove(models.Model):
             )
         return new_move
 
-    def _full_location_reservation(self, reservation_mode=None, **kwargs):
+    def _full_location_reservation(
+        self,
+        reservation_mode: Literal["strict", "package", "product"] | None = None,
+        **kwargs
+    ):
         if "package_only" in kwargs:
             warnings.warn(
                 "The 'package_only' parameter is deprecated. "

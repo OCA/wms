@@ -175,6 +175,77 @@ class TestFullLocationReservation(TestStockFullLocationReservationCommon):
         self.assertEqual(picking.move_line_ids.package_id, package)
         self.assertEqual(sum(picking.move_line_ids.mapped("reserved_qty")), 11)
 
+    def test_product_mode(self):
+        """
+        Location has productA and productB.
+        After product mode on a productA move: only productA gets a new
+        full-reservation move — productB is left untouched.
+        """
+        self._create_quants(
+            [
+                (self.productA, self.location_rack_child, 10.0),
+                (self.productB, self.location_rack_child, 10.0),
+            ]
+        )
+        picking = self._create_picking(
+            self.location_rack,
+            self.customer_location,
+            self.picking_type,
+            [[self.productA, 1]],
+        )
+        picking.action_confirm()
+        picking.action_assign()
+
+        self._check_move_line_len(picking, 1)
+        picking.move_ids._full_location_reservation(reservation_mode="product")
+        # Original move + 1 new full-reservation move for remaining productA
+        self._check_move_line_len(picking, 2)
+        self._check_move_line_len(picking, 1, self._filter_func)
+        full_reservation_moves = picking.move_ids.filtered(self._filter_func)
+        self.assertEqual(full_reservation_moves.product_id, self.productA)
+        # Total reserved = all 10 units of productA; productB untouched
+        self.assertEqual(
+            sum(picking.move_line_ids.mapped("reserved_uom_qty")),
+            10.0,
+        )
+
+    def test_product_mode_multiple_packages(self):
+        """
+        Location has productA in two package combinations (packaged and
+        unpackaged) plus productB. Move for productA (no package).
+        After product mode: new moves are created for each package combination
+        of productA — productB remains untouched.
+        """
+        package = self.env["stock.quant.package"].create({"name": "test package"})
+        self._create_quants(
+            [
+                (self.productA, self.location_rack_child, 5.0),
+                (self.productA, self.location_rack_child, 7.0, package),
+                (self.productB, self.location_rack_child, 10.0),
+            ]
+        )
+        picking = self._create_picking(
+            self.location_rack,
+            self.customer_location,
+            self.picking_type,
+            [[self.productA, 1]],
+        )
+        picking.action_confirm()
+        picking.action_assign()
+
+        self._check_move_line_len(picking, 1)
+        picking.move_ids._full_location_reservation(reservation_mode="product")
+        # Original move + 2 new full-reservation moves (one per package combo)
+        self._check_move_line_len(picking, 3)
+        self._check_move_line_len(picking, 2, self._filter_func)
+        full_reservation_moves = picking.move_ids.filtered(self._filter_func)
+        self.assertEqual(full_reservation_moves.product_id, self.productA)
+        # Total reserved: 1 (original) + 4 (remaining no-pkg) + 7 (packaged) = 12
+        self.assertEqual(
+            sum(picking.move_line_ids.mapped("reserved_uom_qty")),
+            12.0,
+        )
+
     def test_full_location_reservation_merge(self):
         """
         Activate the merge for new quantity move.
