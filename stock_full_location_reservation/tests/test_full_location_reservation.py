@@ -103,7 +103,7 @@ class TestFullLocationReservation(TestStockFullLocationReservationCommon):
             ).qty_available,
         )
 
-        picking.move_line_ids[0]._full_location_reservation(strict=True)
+        picking.move_line_ids[0]._full_location_reservation(reservation_mode="strict")
 
         self.assertEqual(3, len(picking.move_line_ids))
 
@@ -170,7 +170,7 @@ class TestFullLocationReservation(TestStockFullLocationReservationCommon):
 
         self.assertEqual(picking.move_line_ids.package_id, package)
         self._check_move_line_len(picking, 2)
-        picking.move_ids._full_location_reservation(package_only=True)
+        picking.move_ids._full_location_reservation(reservation_mode="package")
         self._check_move_line_len(picking, 3)
         self.assertEqual(picking.move_line_ids.package_id, package)
         self.assertEqual(sum(picking.move_line_ids.mapped("reserved_qty")), 11)

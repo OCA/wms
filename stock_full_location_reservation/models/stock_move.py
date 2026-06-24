@@ -1,5 +1,7 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import warnings
+
 from odoo import fields, models
 
 
@@ -89,7 +91,16 @@ class StockMove(models.Model):
             )
         return new_move
 
-    def _full_location_reservation(self, strict=False, package_only=None):
+    def _full_location_reservation(self, reservation_mode=None, **kwargs):
+        if "package_only" in kwargs:
+            warnings.warn(
+                "The 'package_only' parameter is deprecated. "
+                "Use reservation_mode='package' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if kwargs.pop("package_only"):
+                reservation_mode = "package"
         return self.move_line_ids._full_location_reservation(
-            strict=strict, package_only=package_only
+            reservation_mode=reservation_mode
         )

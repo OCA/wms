@@ -1,6 +1,8 @@
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import warnings
 from collections import defaultdict
+from typing import Literal
 
 from odoo import models
 from odoo.osv import expression
@@ -42,7 +44,20 @@ class StockMoveLine(models.Model):
                 ] += qty_available
         return res
 
-    def _full_location_reservation(self, strict=False, package_only=None):
+    def _full_location_reservation(
+        self, reservation_mode: Literal["strict", "package"] | None = None, **kwargs
+    ):
+        if "package_only" in kwargs:
+            warnings.warn(
+                "The 'package_only' parameter is deprecated. "
+                "Use reservation_mode='package' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if kwargs.pop("package_only"):
+                reservation_mode = "package"
+        strict = reservation_mode == "strict"
+        package_only = reservation_mode == "package"
         moves_to_assign_ids = []
         if not strict:
             reservable_qties = self._get_full_location_reservable_qties(
@@ -61,11 +76,9 @@ class StockMoveLine(models.Model):
                         ).id
                     )
                 reservable_qties[location].pop(package)
-
         else:
             # Use Odoo core mechanism
             Quant = self.env["stock.quant"]
-
             for line in self.exists():  # Move line should have been deleted
                 quants = Quant._gather(
                     line.product_id,
@@ -73,11 +86,10 @@ class StockMoveLine(models.Model):
                     lot_id=line.lot_id,
                     package_id=line.package_id,
                     owner_id=line.owner_id,
-                    strict=strict,
+                    strict=True,
                 )
                 if not quants:
                     continue
-
                 total_quantity = 0.0
                 for quant in quants:
                     total_quantity += quant.available_quantity
