@@ -2,7 +2,7 @@
 {
     "name": "Stock full location reservation",
     "summary": "Extend reservation to full content of location",
-    "author": "MT Software, BCIM, Odoo Community Association (OCA)",
+    "author": "MT Software, BCIM, ACSONE SA/NV, Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "category": "Warehouse Management",
     "version": "16.0.1.0.0",
