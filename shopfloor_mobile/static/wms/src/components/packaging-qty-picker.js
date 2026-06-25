@@ -297,15 +297,16 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
     props: {
         nonZeroOnly: Boolean,
         pkgNameKey: {default: "code"},
+        qtyTodo: Number,
     },
     methods: {
-        display_pkg: function (pkg) {
-            return this.nonZeroOnly ? this.qty_by_pkg[pkg.id] > 0 : true;
+        display_pkg: function (pkg, qty_by_pkg) {
+            return this.nonZeroOnly ? qty_by_pkg[pkg.id] > 0 : true;
         },
-    },
-    computed: {
-        visible_packaging: function () {
-            let packagings = _.filter(this.sorted_packaging, this.display_pkg);
+        get_visible_packaging: function (qty_by_pkg) {
+            let packagings = _.filter(this.sorted_packaging, (pkg) => {
+                return this.display_pkg(pkg, qty_by_pkg);
+            });
             // Do not display if only uom packaging
             if (
                 packagings.length == 1 &&
@@ -314,16 +315,54 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
                 return [];
             return packagings;
         },
+        /**
+         * Returns the quantity by packaging string for a given quantity
+         * Example: "(1 PAL + 3 TU)"
+         */
+        _product_qty_by_packaging_string: function (qty) {
+            const qty_by_pkg = this._product_qty_by_packaging(
+                this.sorted_packaging,
+                qty
+            );
+
+            const visible_pkgs = this.get_visible_packaging(qty_by_pkg);
+
+            // Do not display if only uom packaging
+            if (
+                visible_pkgs.length === 1 &&
+                visible_pkgs[0].id.toString().startsWith("uom-")
+            ) {
+                return "";
+            }
+
+            const parts = visible_pkgs.map((pkg) => {
+                const count = qty_by_pkg[pkg.id];
+                const name = pkg[this.pkgNameKey] || this.unit_uom.name;
+                return `${count} ${name}`;
+            });
+
+            return parts.length ? "(" + parts.join(" + ") + ")" : "";
+        },
+    },
+    computed: {
+        qtyInitDisplay: function () {
+            const qty_by_pkg_str = this._product_qty_by_packaging_string(this.qtyInit);
+            return `${this.qty} ${this.unit_uom.name}${
+                qty_by_pkg_str ? " " + qty_by_pkg_str : ""
+            }`;
+        },
+        qtyTodoDisplay: function () {
+            const qty_by_pkg_str = this._product_qty_by_packaging_string(this.qtyTodo);
+            return `${this.qtyTodo} ${this.unit_uom.name}${
+                qty_by_pkg_str ? " " + qty_by_pkg_str : ""
+            }`;
+        },
     },
     template: `
     <div :class="[$options._componentTag, mode ? 'mode-' + mode: '', 'd-inline']">
-        <span class="min-unit">{{ qty }} {{ unit_uom.name }}</span>
-        <span class="packaging" v-for="(pkg, index) in visible_packaging" :key="make_component_key([pkg.id])">
-            <span v-if="index == 0">(</span>
-            <span class="pkg-qty" v-text="qty_by_pkg[pkg.id]" />
-            <span class="pkg-name" v-text="pkg[pkgNameKey] || unit_uom.name" /><span class="sep" v-if="index != Object.keys(visible_packaging).length - 1"> + </span>
-            <span v-if="index == visible_packaging.length - 1">)</span>
-        </span>
+        <span class="pkg-qty">{{ qtyInitDisplay }}</span>
+        <span v-if="qtyTodo" class="">/</span>
+        <span v-if="qtyTodo" class="pkg-qty">{{ qtyTodoDisplay }}</span>
     </div>
 `,
 });
