@@ -898,9 +898,7 @@ class Reception(Component):
         # We could have found a lot, but with result type "unknow"
         # Put this afterwards to favor multi-attribute barcode parsing
         # logic first
-        if self.search_result.record and isinstance(
-            self.search_result.record, self.env["stock.lot"].__class__
-        ):
+        if self.search_result.record and self.search_result.record._name == "stock.lot":
             return self.set_lot_confirm_action(
                 picking.id, line.id, lot_name=self.search_result.record.name
             )
