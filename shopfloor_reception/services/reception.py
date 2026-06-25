@@ -887,8 +887,9 @@ class Reception(Component):
                     result.type == "expiration_date"
                     and line.product_id.use_expiration_date
                 ):
-                    date = result.value
-                    expiration_date = datetime(date.year, date.month, date.day)
+                    expiration_date = datetime.combine(
+                        result.value, datetime.min.time()
+                    )
 
             if found:
                 return self.set_lot_confirm_action(
