@@ -14,7 +14,7 @@ const pos = template.indexOf("</Screen>");
 const new_template =
     template.substring(0, pos) +
     `
- <template v-if="state_is('set_quantity')">
+ <template v-if="state_is('set_quantity') || state_is('select_move') || state_is('set_lot')">
     <div v-if="state.data.picking.helpdesk_ticket_allowed" class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
@@ -71,17 +71,24 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
     props: ["helpdesk_description"],
     "methods._get_states": function () {
         let states = _get_states.bind(this)();
-        const set_quantity = states.set_quantity;
 
         const self = this;
-        set_quantity.on_declare_helpdesk = function () {
+
+        const handle_declare_helpdesk = function (state) {
             self.wait_call(
                 self.odoo.call("start_helpdesk", {
                     picking_id: self.state.data.picking.id,
-                    selected_line_id: self.state.data.selected_move_line[0].id,
+                    selected_line_id: (self.state.data.selected_move_line || [])[0]?.id,
+                    state: state,
                 })
             );
         };
+
+        states.set_quantity.on_declare_helpdesk = () =>
+            handle_declare_helpdesk("set_quantity");
+        states.select_move.on_declare_helpdesk = () =>
+            handle_declare_helpdesk("select_move");
+        states.set_lot.on_declare_helpdesk = () => handle_declare_helpdesk("set_lot");
 
         states["start_helpdesk"] = {
             on_create_helpdesk: () => {
@@ -89,10 +96,11 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
                 self.wait_call(
                     self.odoo.call("create_helpdesk", {
                         picking_id: self.state.data.picking.id,
-                        selected_line_id: self.state.data.selected_move_line[0].id,
+                        selected_line_id: self.state.data.selected_move_line[0]?.id,
                         helpdesk_wizard_id: self.state.data.helpdesk_wizard.id,
                         description: self.state.data.helpdesk_wizard.description,
                         motive_id: motive ? motive.id : false,
+                        origin_state: self.state.data.origin_state,
                     })
                 );
             },
