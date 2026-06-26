@@ -401,6 +401,7 @@ const Reception = {
                         },
                     },
                 ],
+                title_action_field: {action_val_path: "product.barcode"},
             };
         },
         picking_detail_options_for_select_move: function () {
