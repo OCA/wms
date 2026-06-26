@@ -1,0 +1,3 @@
+- Create a Helpdesk team for your stock (Helpdesk / Configuration / Teams)
+- Create Motives for this stock helpdesk team (Helpdesk / Configuration / Motives)
+- On your reception picking type form view, check "Allow Helpdesk Ticket" and set the team you just created inside "Default Helpdesk Team" field
