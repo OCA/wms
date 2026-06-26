@@ -182,7 +182,39 @@ class TestScanLotName(CommonCase):
         self.assert_response(
             res,
             "set_lot",
-            self.msg_store.lot_product_mismatch(),
+            self.msg_store.lot_product_mismatch(
+                self.selected_move_line, lot_other_product.product_id
+            ),
+            data={
+                "picking": self.data.picking(self.picking),
+                "selected_move_line": self._data_for_move_lines(
+                    self.selected_move_line
+                ),
+            },
+        )
+
+    def test_scan_lot_product_not_found(self):
+        lot = self._create_lot(
+            product_id=self.product_b.id, expiration_date=datetime(2022, 7, 2)
+        )
+        unkown_barcode = lot.product_id.barcode
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            mock_parse.return_value = self._get_gs1_parsing_results(lot)
+            # ↓ Delete the barcode on the product to simulate that we do not have it
+            lot.product_id.sudo().barcode = False
+            res = self.service.dispatch(
+                "scan_lot",
+                params={
+                    "picking_id": self.picking.id,
+                    "selected_line_id": self.selected_move_line.id,
+                    "barcode": mock_parse.return_value["unknown"].raw,
+                },
+            )
+
+        self.assert_response(
+            res,
+            "set_lot",
+            self.msg_store.lot_product_not_found(unkown_barcode),
             data={
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": self._data_for_move_lines(
