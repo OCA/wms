@@ -12,7 +12,7 @@ from odoo.addons.stock.models.stock_picking import Picking
 class Reception(Component):
     _inherit = "shopfloor.reception"
 
-    def start_helpdesk(self, picking_id: int, selected_line_id: int):
+    def start_helpdesk(self, picking_id: int, state: str, selected_line_id: int = None):
         """
         Endpoint to start to fill in Helpdesk details
         """
@@ -27,16 +27,27 @@ class Reception(Component):
                 "picking": self.data.picking(picking),
                 "helpdesk_wizard": self.data.helpdesk_wizard(wizard),
                 "available_motives": self._get_available_motives(picking),
+                "origin_state": state,
             },
         )
+
+    def _create_helpdesk_response(self, picking, line, origin_state, message):
+        if origin_state == "set_quantity":
+            return self._response_for_set_destination(
+                picking,
+                line,
+                message=message,
+            )
+        return self._response_for_select_move(picking, message)
 
     def create_helpdesk(
         self,
         picking_id: int,
-        selected_line_id: int,
         helpdesk_wizard_id: int,
         description: str,
         motive_id: int,
+        origin_state: str,
+        selected_line_id: int = None,
     ):
         """
         Endpoint to create the helpdesk ticket
@@ -58,23 +69,14 @@ class Reception(Component):
         message = {}
         if ticket:
             message = self.msg_store.helpdesk_ticket_created(ticket)
-        return self._response(
-            next_state="set_destination",
-            data={
-                "selected_move_line": self._data_for_move_lines(line),
-                "picking": self.data.picking(picking),
-            },
-            message=message,
-        )
+        return self._create_helpdesk_response(picking, line, origin_state, message)
 
     def _prepare_ticket_wizard_values(self, picking: Picking, line: StockMoveLine):
-        return {}
+        return {"stock_picking_id": picking.id, "stock_move_id": line.move_id.id}
 
     def _create_helpdesk_wizard(self, picking: Picking, line: StockMoveLine):
-        wizard = (
-            self.env["stock.helpdesk.ticket.create"]
-            .with_context(active_model="stock.move", active_id=line.move_id.id)
-            .create(self._prepare_ticket_wizard_values(picking, line))
+        wizard = self.env["stock.helpdesk.ticket.create"].create(
+            self._prepare_ticket_wizard_values(picking, line)
         )
         return wizard
 
@@ -85,9 +87,8 @@ class Reception(Component):
         wizard: StockHelpdeskTicketCreate,
         **kwargs,
     ):
-        tickets_before = line.move_id.helpdesk_ticket_ids
-        wizard.action_create_helpdesk_ticket()
-        ticket = line.move_id.helpdesk_ticket_ids - tickets_before
+        action = wizard.action_create_helpdesk_ticket()
+        ticket = self.env["helpdesk.ticket"].search(action["domain"])
         return ticket
 
     def _get_available_motives(self, picking: Picking) -> list[dict]:
@@ -103,20 +104,24 @@ class ShopfloorReceptionValidator(Component):
     def start_helpdesk(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "state": {"type": "string", "required": True},
             "selected_line_id": {
                 "coerce": to_int,
                 "type": "integer",
-                "required": True,
+                "required": False,
+                "nullable": True,
             },
         }
 
     def create_helpdesk(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "origin_state": {"type": "string", "required": True},
             "selected_line_id": {
                 "coerce": to_int,
                 "type": "integer",
-                "required": True,
+                "required": False,
+                "nullable": True,
             },
             "helpdesk_wizard_id": {
                 "coerce": to_int,
@@ -157,6 +162,7 @@ class ShopfloorReceptionValidatorResponse(Component):
                 "type": "list",
                 "schema": {"type": "dict", "schema": self.schemas.helpdesk_motive()},
             },
+            "origin_state": {"type": "string"},
         }
 
     @property
