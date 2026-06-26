@@ -116,11 +116,11 @@ class TestReceptionHelpdesk(CommonCase):
         self.assertEqual(helpdesk_ticket.motive_id, self.motive)
         self.assert_response(
             response,
-            next_state="set_destination",
+            next_state="set_quantity",
             data={
                 "picking": self._data_for_picking(picking, with_progress=False),
                 "selected_move_line": self.data.move_lines(line),
-                "confirmation": None,
+                "confirmation_required": None,
             },
             message=self.msg_store.helpdesk_ticket_created(helpdesk_ticket),
         )

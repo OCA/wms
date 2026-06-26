@@ -33,7 +33,7 @@ class Reception(Component):
 
     def _create_helpdesk_response(self, picking, line, origin_state, message):
         if origin_state == "set_quantity":
-            return self._response_for_set_destination(
+            return self._response_for_set_quantity(
                 picking,
                 line,
                 message=message,
@@ -176,7 +176,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     def _create_helpdesk_next_states(self):
-        return {"set_destination", "select_move"}
+        return {"set_destination", "select_move", "set_quantity"}
 
     def _start_helpdesk_next_states(self):
         return {"start_helpdesk"}
