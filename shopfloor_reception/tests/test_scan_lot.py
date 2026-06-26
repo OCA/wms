@@ -92,8 +92,8 @@ class TestScanLotName(CommonCase):
 
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
-            datetime(
-                expiration_date.year, expiration_date.month, expiration_date.day
+            datetime.combine(
+                expiration_date, datetime.min.time(), tzinfo=timezone.utc
             ).isoformat(),
         )
         self.assertEqual(
@@ -133,8 +133,8 @@ class TestScanLotName(CommonCase):
 
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
-            datetime(
-                expiration_date.year, expiration_date.month, expiration_date.day
+            datetime.combine(
+                expiration_date, datetime.min.time(), tzinfo=timezone.utc
             ).isoformat(),
         )
         self.assertEqual(
@@ -199,12 +199,16 @@ class TestScanLotName(CommonCase):
         )
 
     def test_set_lot_from_select_move(self):
+        # Test that time zones are handled correctly
+        self.wh.partner_id.sudo().tz = "Europe/Brussels"
+
         picking = self._create_picking()
         lot = self._create_lot()
         lot.expiration_date = None
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        selected_move_line.product_id.sudo().use_expiration_date = True
         # selected_move_line.lot_id = lot
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
             # Note: the order here is important, the first to match a record
@@ -240,3 +244,8 @@ class TestScanLotName(CommonCase):
                 "confirmation_required": None,
             },
         )
+
+        # Verify the expiration datetime on the lot is correct in UTC
+        # 2025-04-15 00:00:00 Brussels time is 2025-04-14 22:00:00 UTC
+        expected_utc = datetime(2025, 4, 14, 22, 0, 0)
+        self.assertEqual(selected_move_line.lot_id.expiration_date, expected_utc)
