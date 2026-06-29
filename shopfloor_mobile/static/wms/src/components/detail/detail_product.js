@@ -6,6 +6,29 @@
 
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
+Vue.component("detail-product-image", {
+    props: ["record"],
+    template: `
+        <div v-if="record.image" class="detail-product-image-wrapper my-3 d-flex justify-center">
+            <v-img
+                :src="record.image"
+                max-width="256"
+                contain
+                class="rounded elevation-1"
+            >
+                <template #placeholder>
+                    <div class="d-flex align-center justify-center fill-height">
+                        <v-progress-circular
+                            color="grey-lighten-4"
+                            indeterminate
+                        />
+                    </div>
+                </template>
+            </v-img>
+        </div>
+    `,
+});
+
 // TODO: refactor according to new data from backend and maybe merge w/ `detail-lot`
 Vue.component("detail-product", {
     mixins: [ItemDetailMixin],
@@ -18,7 +41,11 @@ Vue.component("detail-product", {
         },
         full_detail_fields() {
             return [
-                // Image TODO
+                {
+                    path: "image",
+                    display_no_value: false,
+                    render_component: "detail-product-image",
+                },
                 {path: "lot.name", label: "Lot"},
                 {path: "expiration_date", label: "Expiry date"},
                 {path: "default_code", label: "Internal ref"},
