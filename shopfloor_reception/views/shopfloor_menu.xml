@@ -19,6 +19,10 @@
                     <field name="filter_today_scheduled_pickings" />
                 </group>
             </xpath>
+
+            <xpath expr="//field[@name='picking_type_ids']/tree" position="inside">
+                <field name="use_create_lots" optional="show" />
+            </xpath>
         </field>
     </record>
 </odoo>
