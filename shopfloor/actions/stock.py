@@ -159,7 +159,6 @@ class StockAction(Component):
                 "shopfloor_user_id": False,
                 "qty_done": 0,
                 "result_package_id": False,
-                "lot_id": False,
             }
         )
         pickings = move_lines.picking_id

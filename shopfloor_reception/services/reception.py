@@ -1475,6 +1475,7 @@ class Reception(Component):
         if selected_line.exists():
             if selected_line.reserved_uom_qty:
                 stock = self._actions_for("stock")
+                selected_line.lot_id = False
                 stock.unmark_move_line_as_picked(selected_line, split=False)
             else:
                 selected_line.unlink()
