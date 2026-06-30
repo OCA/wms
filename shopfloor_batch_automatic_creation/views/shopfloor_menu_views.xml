@@ -5,6 +5,10 @@
         <field name="model">shopfloor.menu</field>
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_type_ids']/tree" position="inside">
+                <field name="auto_batch" optional="show" />
+            </xpath>
+
             <group name="options" position="after">
 
                 <group
