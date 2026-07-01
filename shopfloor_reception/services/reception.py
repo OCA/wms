@@ -312,24 +312,19 @@ class Reception(Component):
             # Destination package is set, go to set_destination
             return self._response_for_set_destination(picking, line, message=message)
 
-        if self._move_line_needs_lot(line):
-            return self._set_lot(picking, line, message=message, lot_name=line.lot_name)
-
-        # If lot already set, go to set_quantity
-        rounding = line.product_uom_id.rounding
-        if float_is_zero(line.qty_done, precision_rounding=rounding):
-            # If no qty_done, set default qty_done
-            line.qty_done = default_qty
-        return self._before_state__set_quantity(picking, line, message=message)
+        return self._set_lot(
+            picking,
+            line,
+            message=message,
+            lot_name=line.lot_name,
+            default_qty=default_qty,
+        )
 
     def _scan_line__assign_user(self, picking, line, qty_done):
         stock = self._actions_for("stock")
         stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
 
-        if self._move_line_needs_lot(line):
-            return self._set_lot(picking, line, lot_name=line.lot_name)
-
-        return self._before_state__set_quantity(picking, line)
+        return self._set_lot(picking, line, lot_name=line.lot_name)
 
     def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
         return_line = fields.first(
@@ -831,6 +826,17 @@ class Reception(Component):
         )
 
     def _set_lot(self, picking, line, message=None, **kw):
+        if not self._move_line_needs_lot(line):
+            # If no qty_done, set default qty_done
+            default_qty = kw.get("default_qty")
+            rounding = line.product_uom_id.rounding
+            if default_qty and float_is_zero(
+                line.qty_done, precision_rounding=rounding
+            ):
+                line.qty_done = default_qty
+
+            return self._before_state__set_quantity(picking, line, message)
+
         # Bypass "set_lot" screen and send lot info to endpoint directly if
         # lot info have been found when parsing
         if response := self._set_lot_from_parse(picking, line):
@@ -1242,7 +1248,7 @@ class Reception(Component):
         selected_line.lot_id = lot.id
         selected_line._onchange_lot_id()
 
-        return self._before_state__set_quantity(picking, selected_line)
+        return self._before_state__set_quantity(picking, selected_line, message)
 
     def _set_lot_confirm_action__handle_new_lot(
         self, picking, line, lot_name, expiration_date
