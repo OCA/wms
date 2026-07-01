@@ -15,3 +15,9 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("Packaging '{}' updated.").format(packaging.name),
         }
+
+    def new_packaging_created(self, packaging):
+        return {
+            "message_type": "success",
+            "body": _("Packaging '{}' created.").format(packaging.name),
+        }

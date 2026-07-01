@@ -16,9 +16,10 @@ _logger = logging.getLogger(__file__)
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     _logger.info("Add set packaging dimension option on reception scenario")
+    _logger.info("Add create new packaging option on reception scenario")
     scenario = env.ref("shopfloor_reception.scenario_reception")
     options = scenario.options
-    options.update({"set_packaging_dimension": True})
+    options.update({"set_packaging_dimension": True, "create_new_packaging": True})
     scenario.options_edit = json.dumps(options)
     # The service imported is extending an existing component
     # As it is a simple python import the odoo inheritance is not working
@@ -31,10 +32,13 @@ def post_init_hook(cr, registry):
 def uninstall_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     _logger.info("Remove set packaging dimension option on reception scenario")
+    _logger.info("Remove create new packaging dimension option on reception scenario")
     scenario = env.ref("shopfloor_reception.scenario_reception")
     options = scenario.options
     if "set_packaging_dimension" in options.keys():
         options.pop("set_packaging_dimension")
+    if "create_new_packaging" in options.keys():
+        options.pop("create_new_packaging")
     scenario.options_edit = json.dumps(options)
     Service._usage = "reception"
     purge_endpoints(env, Service._usage, endpoint="set_packaging_dimension")

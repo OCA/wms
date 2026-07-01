@@ -6,11 +6,16 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='options']" position="inside">
                 <field name="set_packaging_dimension_is_possible" invisible="1" />
-                <group
-                    name="set_packaging_dimension"
-                    attrs="{'invisible': [('set_packaging_dimension_is_possible', '=', False)]}"
-                >
-                    <field name="set_packaging_dimension" />
+                <field name="create_new_packaging_is_possible" invisible="1" />
+                <group name="packagings">
+                    <field
+                        name="set_packaging_dimension"
+                        attrs="{'invisible': [('set_packaging_dimension_is_possible', '=', False)]}"
+                    />
+                    <field
+                        name="create_new_packaging"
+                        attrs="{'invisible': [('create_new_packaging_is_possible', '=', False)]}"
+                    />
                 </group>
             </xpath>
         </field>

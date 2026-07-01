@@ -16,9 +16,23 @@ class ShopfloorMenu(models.Model):
         "dimension are not set, ask to fill them up.",
     )
 
+    create_new_packaging_is_possible = fields.Boolean(
+        compute="_compute_create_new_packaging_is_possible"
+    )
+    create_new_packaging = fields.Boolean(
+        help="Add a button to create a new packaging " "in 'set_quantity' screen."
+    )
+
     @api.depends("scenario_id")
     def _compute_set_packaging_dimension_is_possible(self):
         for menu in self:
             menu.set_packaging_dimension_is_possible = menu.scenario_id.has_option(
                 "set_packaging_dimension"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_create_new_packaging_is_possible(self):
+        for menu in self:
+            menu.create_new_packaging_is_possible = menu.scenario_id.has_option(
+                "create_new_packaging"
             )
