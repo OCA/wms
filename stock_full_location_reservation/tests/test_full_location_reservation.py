@@ -164,8 +164,8 @@ class TestFullLocationReservation(TestStockFullLocationReservationCommon):
         )
         self.assertEqual(picking.move_line_ids[0].reserved_uom_qty, 60.0)
 
-        # The original demand stays at 30.0
-        self.assertEqual(picking.move_ids.product_uom_qty, 30.0)
+        # The original is now 80
+        self.assertEqual(picking.move_ids.product_uom_qty, 80.0)
         self.assertEqual(picking.move_ids.reserved_availability, 80.0)
 
     def test_multiple_pickings(self):

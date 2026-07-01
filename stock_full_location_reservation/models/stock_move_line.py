@@ -63,7 +63,13 @@ class StockMoveLine(models.Model):
         Increments reserved_uom_qty on existing move lines - no new moves created.
         """
         Quant = self.env["stock.quant"]
+        reserved_qty_by_move = defaultdict(lambda: 0.0)
+        new_reserved_qty_by_move = defaultdict(lambda: 0.0)
         for line in self.exists():  # Move line should have been deleted
+            # gather reserved_qty by move
+
+            for line in self:
+                reserved_qty_by_move[line.move_id] += line.reserved_uom_qty
             quants = Quant._gather(
                 line.product_id,
                 line.location_id,
@@ -76,6 +82,22 @@ class StockMoveLine(models.Model):
                 continue
             # We let the core mechanism occur that will reserve the needed quants
             line.reserved_uom_qty += sum(q.available_quantity for q in quants)
+            # get new reserved_qty by move
+            for line in self:
+                new_reserved_qty_by_move[line.move_id] += line.reserved_uom_qty
+        # increase product_uom_qty on moves that have increased reserved_uom_qty
+        for move in reserved_qty_by_move.keys():
+            if (
+                float_compare(
+                    new_reserved_qty_by_move[move],
+                    reserved_qty_by_move[move],
+                    precision_rounding=move.product_uom.rounding,
+                )
+                > 0
+            ):
+                move.with_context(do_not_unreserve=True).product_uom_qty += (
+                    new_reserved_qty_by_move[move] - reserved_qty_by_move[move]
+                )
 
     def _full_location_reservation_product(self):
         """Reserve all available qty of each line's product across every package
