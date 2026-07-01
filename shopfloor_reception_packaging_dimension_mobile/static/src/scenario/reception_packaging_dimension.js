@@ -11,14 +11,40 @@ const reception_scenario = process_registry.get("reception");
 const template = reception_scenario.component.template;
 // And inject the new state template (for this module) into it
 const pos = template.indexOf("</Screen>");
-const new_template =
+let new_template =
     template.substring(0, pos) +
     `
 <div v-if="state_is('set_packaging_dimension')">
     <form-edit-product-packaging :packaging="state.data.packaging" :allowEditName="false" @done="this.state.on_done" @skip="this.state.on_skip"/>
 </div>
+
+<div v-if="state_is('create_new_packaging')">
+    <form-edit-product-packaging :packaging="state.data.packaging" :allowEditName="true" @done="this.state.on_done" @skip="this.state.on_skip"/>
+</div>
 ` +
     template.substring(pos);
+
+// Add button to create new packaging in 'set_quantity' screen
+
+const regex = /<v-row\b[^>]*v-if="show_without_pack_actions"[^>]*>[\s\S]*?<\/v-row>/;
+const match = regex.exec(template);
+
+if (match) {
+    const insertIndex = match.index + match[0].length;
+
+    new_template =
+        new_template.substring(0, insertIndex) +
+        `
+        <v-row>
+            <v-col class="text-center" cols="12">
+                <btn-action color="warning" @click="state.create_new_packaging">
+                    Create New Packaging
+                </btn-action>
+            </v-col>
+        </v-row>
+            ` +
+        new_template.substring(insertIndex);
+}
 
 // Extend the reception scenario with :
 //   - the new patched template
@@ -70,6 +96,42 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 },
                 on_done: async function (event) {
                     await self.state._handle_dimension_submission(false, event);
+                },
+            };
+            states["set_quantity"] = {
+                ...states["set_quantity"],
+                create_new_packaging: function () {
+                    self.wait_call(
+                        self.odoo.call("create_new_packaging", {
+                            picking_id: self.state.data.picking.id,
+                            selected_line_id: self.state.data.selected_move_line[0].id,
+                        })
+                    );
+                },
+            };
+            states["create_new_packaging"] = {
+                display_info: {
+                    title: "Create new packaging",
+                },
+                on_skip: async function () {
+                    let payload = {
+                        picking_id: self.state.data.picking.id,
+                        selected_line_id: self.state.data.selected_move_line.id,
+                        packaging_id: self.state.data.packaging.id,
+                        skip: true,
+                    };
+
+                    self.wait_call(self.odoo.call("set_packaging_dimension", payload));
+                },
+                on_done: async function (event) {
+                    let payload = {
+                        picking_id: self.state.data.picking.id,
+                        selected_line_id: self.state.data.selected_move_line.id,
+                        packaging_id: self.state.data.packaging.id,
+                        ...event,
+                    };
+
+                    self.wait_call(self.odoo.call("set_packaging_dimension", payload));
                 },
             };
             return states;
