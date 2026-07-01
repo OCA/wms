@@ -113,3 +113,17 @@ class TestScanDocumentReturn(CommonCaseReturn):
             next_state="select_move",
             data={"picking": self._data_for_picking_with_moves(return_picking)},
         )
+
+    def test_scan_picking_respects_move_line_search_additional_domain(self):
+        pick = self._create_picking()
+
+        self.menu.sudo().move_line_search_additional_domain = (
+            f'[("picking_id.id", "!=", {pick.id})]'
+        )
+        response = self.service.dispatch("scan_document", params={"barcode": pick.name})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": []},
+            message=self.msg_store.barcode_not_found(),
+        )

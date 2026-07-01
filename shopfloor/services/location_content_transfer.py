@@ -331,7 +331,7 @@ class LocationContentTransfer(Component):
         move_lines = self.search_move_line.search_move_lines(
             locations=location,
             match_user=True,
-            picking_type=self.env[
+            picking_types=self.env[
                 "stock.picking.type"
             ],  # disable filtering on picking types
         )

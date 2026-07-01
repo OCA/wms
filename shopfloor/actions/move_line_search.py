@@ -61,10 +61,11 @@ class MoveLineSearch(Component):
     def _search_move_lines_domain(
         self,
         locations=None,
-        picking_type=None,
-        package=None,
-        product=None,
-        lot=None,
+        pickings=None,
+        picking_types=None,
+        packages=None,
+        products=None,
+        lots=None,
         match_user=False,
         picking_ready=True,
         # When True, adds the package in the domain even if the package is False
@@ -84,18 +85,26 @@ class MoveLineSearch(Component):
             ("qty_done", "=", 0),
             ("state", "in", ("assigned", "partially_available")),
         ]
-        picking_types = picking_type if picking_type is not None else self.picking_types
+        if pickings:
+            domain += [("picking_id", "in", pickings.ids)]
+        picking_types = (
+            picking_types if picking_types is not None else self.picking_types
+        )
         if picking_types:
             domain += [("picking_id.picking_type_id", "in", picking_types.ids)]
         locations = locations or picking_types.default_location_src_id
         if locations:
             domain += [("location_id", "child_of", locations.ids)]
-        if package or package is not None and enforce_empty_package:
-            domain += [("package_id", "=", package.id if package else False)]
-        if product:
-            domain += [("product_id", "=", product.id)]
-        if lot:
-            domain += [("lot_id", "=", lot.id)]
+        if packages or packages is not None and enforce_empty_package:
+            domain += (
+                [("package_id", "in", packages.ids)]
+                if packages
+                else [("package_id", "=", False)]
+            )
+        if products:
+            domain += [("product_id", "in", products.ids)]
+        if lots:
+            domain += [("lot_id", "in", lots.ids)]
         if match_user:
             # we only want to see the lines assigned to the current user
             domain += [
@@ -112,10 +121,11 @@ class MoveLineSearch(Component):
     def search_move_lines(
         self,
         locations=None,
-        picking_type=None,
-        package=None,
-        product=None,
-        lot=None,
+        pickings=None,
+        picking_types=None,
+        packages=None,
+        products=None,
+        lots=None,
         order=None,
         match_user=False,
         sort_keys_func=None,
@@ -126,10 +136,11 @@ class MoveLineSearch(Component):
         move_lines = self.env["stock.move.line"].search(
             self._search_move_lines_domain(
                 locations,
-                picking_type,
-                package,
-                product,
-                lot,
+                pickings,
+                picking_types,
+                packages,
+                products,
+                lots,
                 match_user=match_user,
                 picking_ready=picking_ready,
                 enforce_empty_package=enforce_empty_package,

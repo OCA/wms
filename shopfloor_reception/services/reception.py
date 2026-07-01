@@ -80,19 +80,6 @@ class Reception(Component):
             move_line.product_id.tracking in ("lot", "serial") and not move_line.lot_id
         )
 
-    def _move_line_by_product(self, product):
-        return self.env["stock.move.line"].search(
-            self._domain_move_line_by_product(product)
-        )
-
-    def _move_line_by_packaging(self, packaging):
-        return self.env["stock.move.line"].search(
-            self._domain_move_line_by_packaging(packaging)
-        )
-
-    def _move_line_by_lot(self, lot):
-        return self.env["stock.move.line"].search(self._domain_move_line_by_lot(lot))
-
     def _scheduled_date_today_domain(self):
         domain = []
         today_start, today_end = self._get_today_start_end_datetime_utc()
@@ -135,32 +122,6 @@ class Reception(Component):
         return self.work.menu.filter_today_scheduled_pickings
 
     # DOMAIN METHODS
-
-    def _domain_move_line_by_packaging(self, packaging):
-        return [
-            ("move_id.picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("move_id.picking_id.state", "=", "assigned"),
-            ("move_id.picking_id.user_id", "in", [False, self.env.uid]),
-            ("package_id.product_packaging_id", "=", packaging.id),
-        ]
-
-    def _domain_move_line_by_product(self, product):
-        return [
-            ("move_id.picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("move_id.picking_id.state", "=", "assigned"),
-            ("move_id.picking_id.user_id", "in", [False, self.env.uid]),
-            ("product_id", "=", product.id),
-        ]
-
-    def _domain_move_line_by_lot(self, lot):
-        return [
-            ("move_id.picking_id.picking_type_id", "in", self.picking_types.ids),
-            ("move_id.picking_id.state", "=", "assigned"),
-            ("move_id.picking_id.user_id", "=", False),
-            "|",
-            ("lot_id.name", "=", lot),
-            ("lot_name", "=", lot),
-        ]
 
     def _domain_stock_picking(self, today_only=False):
         domain = [
@@ -215,8 +176,8 @@ class Reception(Component):
             - set_lot: a single picking has been found for this packaging
             - select_document: A single or no pickings has been found for this packaging
         """
-        move_lines = self._move_line_by_product(product).filtered(
-            lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
+        move_lines = self.search_move_line.search_move_lines(
+            products=product, picking_types=self.picking_types, match_user=True
         )
         pickings = move_lines.move_id.picking_id
         if pickings:
@@ -240,10 +201,11 @@ class Reception(Component):
             - set_lot: a single picking has been found for this packaging
             - select_document: A single or no pickings has been found for this packaging
         """
-        move_lines = self._move_line_by_packaging(packaging).filtered(
-            lambda l: l.picking_id.picking_type_id.id in self.picking_types.ids
+        move_lines = self.env["stock.move.line"].search(
+            self.search_move_line._search_move_lines_domain()
+            + [("package_id.product_packaging_id", "=", packaging.id)]
         )
-        pickings = move_lines.move_id.picking_id
+        pickings = move_lines.picking_id
         if pickings:
             return self._response_for_select_document(
                 pickings=pickings,
@@ -261,7 +223,9 @@ class Reception(Component):
             - set_lot: a single picking has been found for this packaging
             - select_document: A single or no pickings has been found for this packaging
         """
-        move_lines = self._move_line_by_lot(lot)
+        move_lines = self.search_move_line.search_move_lines(
+            lots=lot, picking_types=self.picking_types, match_user=True
+        )
         if not move_lines:
             return
         pickings = move_lines.move_id.picking_id
@@ -364,7 +328,13 @@ class Reception(Component):
         return "scheduled_date ASC, id ASC"
 
     def _scan_document__by_picking(self, pickings, barcode):
-        picking_filter_result = pickings
+        picking_filter_result = self.search_move_line.search_move_lines(
+            pickings=pickings,
+            picking_types=self.env[
+                "stock.picking.type"
+            ],  # disable filtering on picking types
+        ).picking_id
+
         reception_pickings = picking_filter_result.filtered(
             lambda p: p.picking_type_id.id in self.picking_types.ids
         )
