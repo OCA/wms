@@ -19,6 +19,12 @@
                 type="module"
             />
 
+            <script
+                id="form_edit_product_packaging"
+                t-attf-src="/shopfloor_reception_packaging_dimension_mobile/static/src/components/form_edit_product_packaging.js?v=#{mod_version}"
+                type="module"
+            />
+
         </script>
     </template>
 
