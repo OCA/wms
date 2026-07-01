@@ -57,11 +57,6 @@ msgid "Menu displayed in the scanner application"
 msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor_reception
-#: model:ir.model,name:shopfloor_reception.model_stock_move_line
-msgid "Product Moves (Stock Move Line)"
-msgstr "Movimenti prodotto (riga movimento di magazzino)"
-
-#. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
 #: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
@@ -94,6 +89,9 @@ msgid ""
 msgstr ""
 "Questo lotto esiste già con data scadenza '%(lot_expiration_date)s'. Non si "
 "può modificare questa data."
+
+#~ msgid "Product Moves (Stock Move Line)"
+#~ msgstr "Movimenti prodotto (riga movimento di magazzino)"
 
 #~ msgid "Allow Over Reception"
 #~ msgstr "Consenti sovra ricezione"
