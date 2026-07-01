@@ -281,7 +281,7 @@ const Reception = {
             return [
                 {path: "origin", label: "Source Document"},
                 {path: "partner.name", label: "Partner"},
-                {path: "carrier"},
+                {path: "carrier.name", label: "Carrier"},
                 {
                     path: "scheduled_date",
                     renderer: (rec, field) => {
