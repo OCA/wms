@@ -115,6 +115,7 @@ const Reception = {
                     :card_color="is_set_lot_possible() ? utils.colors.color_for('screen_step_done') : utils.colors.color_for('screen_step_todo')"
                     :key="make_state_component_key(['reception-product-item-detail-set-lot', state.data.picking.id])"
                 />
+                <v-img v-if="line_being_handled.product.image" :src="line_being_handled.product.image" max-width="256" class="mx-auto"/>
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
