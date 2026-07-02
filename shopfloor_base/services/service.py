@@ -34,7 +34,9 @@ class BaseShopfloorService(AbstractComponent):
         # User private attributes to not mess up w/ public endpoints
         return getattr(self.work, "profile", self.env["shopfloor.profile"])
 
-        self._msg_store = self._actions_for("message")
+    def __init__(self, work_context):
+        super().__init__(work_context=work_context)
+        self._msg_store = False
 
     def _get_api_spec(self, **params):
         return ShopfloorRestServiceAPISpec(self, **params)
@@ -161,7 +163,7 @@ class BaseShopfloorService(AbstractComponent):
 
         if message := self._get_message(message):
             response["message"] = message
-            self.msg_store.clear_queue()
+        self.msg_store.clear_queue()
 
         if popup:
             response["popup"] = popup
@@ -244,7 +246,14 @@ class BaseShopfloorService(AbstractComponent):
 
     @property
     def msg_store(self):
-        return self._msg_store if self._msg_store else self._actions_for("message")
+        if self._msg_store:
+            return self._msg_store
+        self._msg_store = self._actions_for("message")
+        return self._msg_store
+
+    @msg_store.setter
+    def _set_msg_store(self, store):
+        self._msg_store = store
 
     # TODO: maybe to be proposed to base_rest
     # TODO: add tests
