@@ -13,8 +13,12 @@ class TestSetLotConfirm(CommonCase):
         cls.product_a.tracking = "lot"
 
     def test_set_existing_lot(self):
+        self.wh.partner_id.sudo().tz = "Europe/Brussels"
+        # 2025-04-15 00:00:00 Brussels time is 2025-04-14 22:00:00 UTC
+        expiration_date_utc = "2025-04-14 22:00:00"
+
         picking = self._create_picking()
-        lot = self._create_lot()
+        lot = self._create_lot(expiration_date=expiration_date_utc)
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
@@ -25,10 +29,12 @@ class TestSetLotConfirm(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "lot_name": lot.name,
+                # Test locale aware timezones are handled correctly
+                "expiration_date": "2025-04-14T22:00:00+00:00",
             },
         )
         self.assertEqual(selected_move_line.lot_id, lot)
-        self.assertFalse(selected_move_line.expiration_date)
+        self.assertTrue(selected_move_line.expiration_date)
         self.assert_response(
             response,
             next_state="set_quantity",
