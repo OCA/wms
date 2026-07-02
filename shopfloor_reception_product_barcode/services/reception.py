@@ -147,7 +147,6 @@ class ShopfloorReceptionValidatorResponse(Component):
         res.update(
             {
                 "set_product_barcode": self._schema_set_product_barcode,
-                "set_product_barcode_scan": self._schema_set_product_barcode_scan,
             }
         )
         return res
@@ -170,7 +169,3 @@ class ShopfloorReceptionValidatorResponse(Component):
             "product": {"type": "dict", "schema": self.schemas_detail.product_detail()},
             "product_barcode": {"type": "string", "required": False, "nullable": True},
         }
-
-    @property
-    def _schema_set_product_barcode_scan(self) -> dict:
-        return self._schema_set_product_barcode
