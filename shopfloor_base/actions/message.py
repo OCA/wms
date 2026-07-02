@@ -27,22 +27,23 @@ class MessageAction(Component):
     _inherit = "shopfloor.process.action"
     _usage = "message"
 
-    # A list of ShopfloorMessage
-    _message_queue = []
-
     @property
     def message_queue(self):
+        if not hasattr(self, "_message_queue"):
+            self._message_queue = []
         return self._message_queue
 
-    def add_message(self, value, message_type="info"):
-        if not isinstance(value, str):
+    def add_message(self, body, message_type="info"):
+        if not isinstance(body, str):
             raise TypeError("You should set a string to message queue!")
         if message_type not in MESSAGE_TYPES.keys():
             raise TypeError("You should use a correct Shopfloor message type!")
-        self._message_queue.append(ShopfloorMessage(value, message_type))
+        if not hasattr(self, "_message_queue"):
+            self._message_queue = []
+        self._message_queue.append(ShopfloorMessage(body, message_type))
 
     def clear_queue(self):
-        self._message_queue = []
+        self._message_queue = list()
 
     def generic_record_not_found(self):
         return {
