@@ -13,9 +13,9 @@ class Reception(Component):
 
     product_barcode_update_done = False
 
-    def _before_state__set_quantity(self, picking, line, message=None):
+    def _set_lot(self, picking, line, message=None, **kw):
         """
-        Check if product needs its barcode before
+        Check if product needs its barcode before 'set_lot'
         """
         if self.work.menu.set_product_barcode and not self.product_barcode_update_done:
             product = self._get_product_to_set_barcode(line.product_id)
@@ -23,7 +23,7 @@ class Reception(Component):
                 return self._response_for_set_product_barcode(
                     picking, line, message=message
                 )
-        return super()._before_state__set_quantity(picking, line, message=message)
+        return super()._set_lot(picking, line, message=message, **kw)
 
     def _get_domain_product_needs_barcode(self):
         """
@@ -94,9 +94,7 @@ class Reception(Component):
             self._update_product_barcode(product, barcode)
             message = self.msg_store.product_barcode_updated(product)
         self.product_barcode_update_done = True
-        return super()._before_state__set_quantity(
-            picking, selected_line, message=message
-        )
+        return super()._set_lot(picking, selected_line, message=message)
 
     def _update_product_barcode(self, product, barcode) -> None:
         """Update barcode on the product."""
@@ -153,11 +151,6 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def _scan_line_next_states(self) -> dict:
         res = super()._scan_line_next_states()
-        res.update({"set_product_barcode"})
-        return res
-
-    def _set_lot_confirm_action_next_states(self) -> dict:
-        res = super()._set_lot_confirm_action_next_states()
         res.update({"set_product_barcode"})
         return res
 

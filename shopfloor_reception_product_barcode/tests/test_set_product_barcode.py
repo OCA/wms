@@ -119,28 +119,6 @@ class TestSetProductDimension(CommonCase):
             response, self.picking, selected_move_line
         )
 
-    def test_scan_lot_ask_for_barcode(self):
-        self.product_a.tracking = "none"
-        self.product_a.barcode = ""
-        selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        response = self.service.dispatch(
-            "set_lot_confirm_action",
-            params={
-                "picking_id": self.picking.id,
-                "selected_line_id": selected_move_line.id,
-                "lot_name": "Test Lot",
-            },
-        )
-        self.data.picking(self.picking)
-        selected_move_line = self.picking.move_line_ids.filtered(
-            lambda l: l.product_id == self.product_a
-        )
-        self._assert_response_set_barcode(
-            response, self.picking, selected_move_line, ""
-        )
-
     def test_set_product_barcode(self):
         self.product_a.barcode = ""
         selected_move_line = self.picking.move_line_ids.filtered(
