@@ -560,7 +560,7 @@ class LocationContentTransfer(Component):
             else:
                 return self._response_for_scan_destination(location, package_level)
 
-        lot = search.lot_from_scan(barcode, products=package_move_lines.product_id)
+        lot = search.for_products(package_move_lines.product_id).lot_from_scan(barcode)
         if lot and lot in package_move_lines.mapped("lot_id"):
             if lot in other_move_lines.mapped("lot_id"):
                 return self._response_for_start_single(
@@ -610,10 +610,9 @@ class LocationContentTransfer(Component):
             "lot": self._scan_line__by_lot,
             "none": self._scan_line__fallback,
         }
-        search_result = search.find(
+        search_result = search.for_products(move_line.product_id).find(
             barcode,
             types=handlers.keys(),
-            handler_kw=dict(lot=dict(products=move_line.product_id)),
         )
         handler = handlers.get(search_result.type, self._scan_line__fallback)
         # handler might've been called but returned no response.

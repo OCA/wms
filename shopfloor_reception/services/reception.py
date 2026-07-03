@@ -434,8 +434,8 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
-        origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+        origin_moves = search.with_domain(origin_move_domain).origin_move_from_scan(
+            picking.origin
         )
         origin_moves_for_product = origin_moves.filtered(
             lambda m: m.product_id == product
@@ -488,8 +488,8 @@ class Reception(Component):
         origin_move_domain = [
             ("picking_id.picking_type_code", "=", "outgoing"),
         ]
-        origin_moves = search.origin_move_from_scan(
-            picking.origin, extra_domain=origin_move_domain
+        origin_moves = search.with_domain(origin_move_domain).origin_move_from_scan(
+            picking.origin
         )
         origin_moves_for_packaging = origin_moves.filtered(
             lambda m: packaging in m.product_id.packaging_ids
@@ -833,8 +833,10 @@ class Reception(Component):
     def _response_for_set_lot(self, picking, line, message=None, **kw):
         # Try pre-fill expiration_date for UI
         if kw.get("lot_name") and not kw.get("lot_expiration_date") and not message:
-            lot = self._actions_for("search").lot_from_scan(
-                kw.get("lot_name"), line.product_id
+            lot = (
+                self._actions_for("search")
+                .for_products(line.product_id)
+                .lot_from_scan(kw.get("lot_name"))
             )
             kw["lot_expiration_date"] = lot.expiration_date
 
@@ -1041,12 +1043,6 @@ class Reception(Component):
             "origin_move": self._scan_document__by_origin_move,
         }
 
-    def _scan_document__get_find_kw(self):
-        return {
-            "picking": {"use_origin": True},
-            "delivered_picking": {"use_origin": True},
-        }
-
     def scan_document(self, barcode):
         """Scan a picking, a product or a packaging.
 
@@ -1066,12 +1062,9 @@ class Reception(Component):
                         single correspondance. Not tracked product
         """
         handlers_by_type = self._scan_document__get_handlers_by_type()
-        search = self._actions_for("search")
-        find_kw = self._scan_document__get_find_kw()
+        search = self._actions_for("search").with_origin()
         for handler_type, handler in handlers_by_type.items():
-            record = search._find_record_by_type(
-                barcode, handler_type, handler_kw=find_kw
-            )
+            record = search._find_record_by_type(barcode, handler_type)
             if not record:
                 continue
             res = handler(record, barcode)
@@ -1202,11 +1195,10 @@ class Reception(Component):
         existing_lot = self.env["stock.lot"]
         lot_expiration_date = None
 
-        search = self._actions_for("search")
+        search = self._actions_for("search").for_products(selected_line.product_id)
         search_result = search.find(
             barcode=barcode,
-            types=["lot", "expiration_date", "product"],
-            handler_kw={"lot": {"products": selected_line.product_id}},
+            types=["lot", "expiration_date"],
         )
 
         # Look for more info in the barcode
@@ -1229,7 +1221,9 @@ class Reception(Component):
         if search_result.type == "lot":
             existing_lot = search_result.record
         if not existing_lot:
-            existing_lot = search.lot_from_scan(lot_name, selected_line.product_id)
+            existing_lot = search.for_products(selected_line.product_id).lot_from_scan(
+                lot_name
+            )
 
         message = None
         if (
@@ -1285,7 +1279,9 @@ class Reception(Component):
         lot = (
             search_result_record
             if search_result_record and search_result_record._name == "stock.lot"
-            else self._actions_for("search").lot_from_scan(lot_name, product)
+            else self._actions_for("search")
+            .for_products(product)
+            .lot_from_scan(lot_name)
         )
 
         if product.use_expiration_date and (
@@ -1379,11 +1375,10 @@ class Reception(Component):
         self, picking, selected_line, barcode, confirmation=None
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
-        search = self._actions_for("search")
+        search = self._actions_for("search").for_products(selected_line.product_id)
         search_result = search.find(
             barcode,
             handlers_by_type.keys(),
-            handler_kw=dict(lot=dict(products=selected_line.product_id)),
         )
         handler = handlers_by_type.get(search_result.type)
         if handler:

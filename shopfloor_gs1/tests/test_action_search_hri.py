@@ -57,9 +57,8 @@ class TestFindHri(TestSearchBaseCase):
                 }
             )
         )
-        res = self.search.find(
+        res = self.search.for_products(self.product_a).find(
             GS1_GTIN_BARCODE_1_HRI,
             types=("lot",),
-            handler_kw=dict(lot=dict(products=self.product_a)),
         )
         self.assertEqual(res.record, rec)

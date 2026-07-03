@@ -498,13 +498,9 @@ class Checkout(Component):
 
     def _scan_line_find(self, picking, barcode, search_types):
         search = self._actions_for("search")
-        return search.find(
+        return search.for_products(picking.move_ids.product_id).find(
             barcode,
             types=search_types,
-            handler_kw=dict(
-                lot=dict(products=picking.move_ids.product_id),
-                serial=dict(products=picking.move_ids.product_id),
-            ),
         )
 
     def _select_lines_from_none(self, picking, selection_lines, record, **kw):
@@ -1087,13 +1083,9 @@ class Checkout(Component):
             "serial",
             "delivery_packaging",
         )
-        return search.find(
+        return search.for_products(picking.move_ids.product_id).find(
             barcode,
             types=search_types,
-            handler_kw=dict(
-                lot=dict(products=picking.move_ids.product_id),
-                serial=dict(products=picking.move_ids.product_id),
-            ),
         )
 
     def _find_line_to_increment(self, product_lines):

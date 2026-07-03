@@ -50,6 +50,29 @@ class SearchAction(Component):
         parser.search_action = self
         return parser
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._products = None
+        self._limit = 1
+        self._use_origin = False
+        self._extra_domain = None
+
+    def for_products(self, products):
+        self._products = products
+        return self
+
+    def with_limit(self, limit):
+        self._limit = limit
+        return self
+
+    def with_origin(self, use_origin=True):
+        self._use_origin = use_origin
+        return self
+
+    def with_domain(self, extra_domain):
+        self._extra_domain = extra_domain
+        return self
+
     @property
     def _barcode_type_handler(self):
         return {
@@ -75,33 +98,30 @@ class SearchAction(Component):
         """
         return SearchResult(**kwargs)
 
-    def find(self, barcode, types=None, handler_kw=None):
+    def find(self, barcode, types=None):
         """Find Odoo record matching given `barcode`.
 
         Plain barcodes
         """
         barcode = barcode or ""
-        return self.generic_find(barcode, types=types, handler_kw=handler_kw)
+        return self.generic_find(barcode, types=types)
 
-    def _find_record_by_type(self, barcode, btype, handler_kw=None):
-        handler_kw = handler_kw or {}
+    def _find_record_by_type(self, barcode, btype):
         handler = self._barcode_type_handler.get(btype)
         if not handler:
             return
-        return handler(barcode, **handler_kw.get(btype, {}))
+        return handler(barcode)
 
-    def generic_find(self, barcode, types=None, handler_kw=None):
-        _types = types or self._barcode_type_handler.keys()
+    def generic_find(self, barcode, types=None):
         # TODO: decide the best default order in case we don't pass `types`
+        _types = types or self._barcode_type_handler.keys()
         parse_results = self.parser.parse(barcode, types)
         # OPTIMIZATION: Push 'unknown' types to the end so that we return earlier
         # in case the type is known after parsing
         for parse_result in sorted(parse_results, key=lambda r: r.type == "unknown"):
             btypes = _types if parse_result.type == "unknown" else [parse_result.type]
             for btype in btypes:
-                record = self._find_record_by_type(
-                    parse_result.value, btype, handler_kw
-                )
+                record = self._find_record_by_type(parse_result.value, btype)
                 if record:
                     return self._make_search_result(
                         record=record,
@@ -111,15 +131,17 @@ class SearchAction(Component):
                     )
         return self._make_search_result(type="none", parse_result=parse_results)
 
-    def location_from_scan(self, barcode, limit=1):
+    def location_from_scan(self, barcode):
         model = self.env["stock.location"]
         if not barcode:
             return model.browse()
         # First search location by barcode
-        res = model.search([("barcode", "=", barcode)], limit=limit)
+        res = model.search([("barcode", "=", barcode)], limit=self._limit)
         # And only if we have not found through barcode search on the location name
-        if len(res) < limit:
-            res |= model.search([("name", "=", barcode)], limit=(limit - len(res)))
+        if len(res) < self._limit:
+            res |= model.search(
+                [("name", "=", barcode)], limit=(self._limit - len(res))
+            )
         return res
 
     def package_from_scan(self, barcode):
@@ -128,7 +150,7 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode, use_origin=False):
+    def picking_from_scan(self, barcode):
         model = self.env["stock.picking"]
         if not barcode:
             return model.browse()
@@ -140,7 +162,7 @@ class SearchAction(Component):
         # the name search takes priority.
         if picking:
             return picking
-        if use_origin:
+        if self._use_origin:
             source_document_domain = [
                 # We could have the same origin for multiple transfers
                 # but we're interested only in the "assigned" ones.
@@ -155,15 +177,11 @@ class SearchAction(Component):
         if not barcode:
             return model.browse()
         return model.search(
-            [
-                "|",
-                ("barcode", "=", barcode),
-                ("default_code", "=", barcode),
-            ],
+            ["|", ("barcode", "=", barcode), ("default_code", "=", barcode)],
             limit=1,
         )
 
-    def lot_from_scan(self, barcode, products=None, limit=1):
+    def lot_from_scan(self, barcode):
         model = self.env["stock.lot"]
         if not barcode:
             return model.browse()
@@ -171,9 +189,9 @@ class SearchAction(Component):
             ("company_id", "=", self.env.company.id),
             ("name", "=", barcode),
         ]
-        if products:
-            domain.append(("product_id", "in", products.ids))
-        return model.search(domain, limit=limit)
+        if self._products:
+            domain.append(("product_id", "in", self._products.ids))
+        return model.search(domain, limit=self._limit)
 
     def packaging_from_scan(self, barcode):
         model = self.env["product.packaging"]
@@ -197,7 +215,7 @@ class SearchAction(Component):
             return model.browse()
         return model.search([("barcode", "=", barcode)], limit=1)
 
-    def origin_move_from_scan(self, barcode, extra_domain=None):
+    def origin_move_from_scan(self, barcode):
         model = self.env["stock.move"]
         outgoing_move_domain = [
             # We could have the same origin for multiple transfers
@@ -205,8 +223,8 @@ class SearchAction(Component):
             ("origin", "=", barcode),
             ("state", "=", "done"),
         ]
-        if extra_domain:
-            outgoing_move_domain = AND([outgoing_move_domain, extra_domain])
+        if self._extra_domain:
+            outgoing_move_domain = AND([outgoing_move_domain, self._extra_domain])
         return model.search(outgoing_move_domain)
 
     def dummy_from_scan(self, barcode):

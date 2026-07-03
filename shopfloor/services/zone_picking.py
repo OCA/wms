@@ -779,7 +779,7 @@ class ZonePicking(Component):
         search = self._actions_for("search")
         products = self.env["product.product"].browse(product_id)
         # Could get several lots from different products, check each of them
-        lots = search.lot_from_scan(barcode, products=products, limit=None)
+        lots = search.for_products(products).with_limit(None).lot_from_scan(barcode)
         if not lots:
             return response, message
         move_lines_with_package_ids = []
@@ -1452,7 +1452,7 @@ class ZonePicking(Component):
         response = None
         change_package_lot = self._actions_for("change.package.lot")
         # handle lot
-        lot = search.lot_from_scan(barcode, products=move_line.product_id)
+        lot = search.for_products(move_line.product_id).lot_from_scan(barcode)
         if lot:
             response = change_package_lot.change_lot(
                 move_line, lot, response_ok_func, response_error_func
