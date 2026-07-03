@@ -305,8 +305,8 @@ const Reception = {
         manual_select_options_for_select_document: function (today_only = false) {
             return {
                 group_title_default: today_only
-                    ? "Pickings to process today"
-                    : "Pickings to process",
+                    ? "Receptions to process today"
+                    : "Receptions to process",
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_extra_component: "picking-list-item-progress-bar",
                 showActions: false,
