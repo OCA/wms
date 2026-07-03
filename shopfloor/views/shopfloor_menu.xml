@@ -143,6 +143,13 @@
                     <field name="pick_by_product" />
               </group>
               <group
+                    name="skip_unload_all_scan"
+                    attrs="{'invisible': [('skip_unload_all_scan_is_possible', '=', False)]}"
+                >
+                    <field name="skip_unload_all_scan_is_possible" invisible="1" />
+                    <field name="skip_unload_all_scan" />
+              </group>
+              <group
                     name="auto_post_line"
                     attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
                 >

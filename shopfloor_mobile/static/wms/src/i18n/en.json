@@ -21,6 +21,7 @@
   "cluster_picking.unload_all.title": "Unload all bins",
   "cluster_picking.unload_all.destination": "Destination:",
   "cluster_picking.unload_all.split": "Split [TODO]",
+  "cluster_picking.unload_all.validate": "Validate",
   "cluster_picking.unload_set_destination.title": "Set destination",
   "cluster_picking.unload_single.title": "Unload single bin",
   "cluster_picking.scan_destination.full_bin": "Full bin",

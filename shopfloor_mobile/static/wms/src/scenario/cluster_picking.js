@@ -17,7 +17,7 @@ const ClusterPicking = {
                 <state-display-info :info="state.display_info" v-if="state.display_info"/>
             </template>
             <searchbar
-                v-if="state.on_scan"
+                v-if="state.on_scan && !(state_is('unload_all') && state.data.skip_unload_all_scan)"
                 v-on:found="on_scan"
                 :input_placeholder="search_input_placeholder"
                 :autofocus="!screen_info.user_popup"
@@ -151,13 +151,13 @@ const ClusterPicking = {
 
             <div class="unload-all" v-if="state_is('unload_all')">
                 <item-detail-card
-                    v-if="current_carrier()"
+                    v-if="!state.data.skip_unload_all_scan && current_carrier()"
                     :card_color="utils.colors.color_for('success')"
                     :key="make_state_component_key(['batch-picking', state.data.id])"
                     :record="current_carrier()"
                     :options="{main: true, key_title: 'name', title_icon: 'mdi-truck-outline'}"
                     />
-                <v-card class="main">
+                <v-card class="main" v-if="!state.data.skip_unload_all_scan">
                     <v-card-title>
                         <div class="main-info">
                             <div class="destination">
@@ -167,7 +167,16 @@ const ClusterPicking = {
                         </div>
                     </v-card-title>
                 </v-card>
-                <div class="button-list button-vertical-list full">
+                <div class="button-list button-vertical-list full" v-if="state.data.skip_unload_all_scan">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <v-btn color="primary" @click="state.on_validate">
+                                {{ $t("cluster_picking.unload_all.validate") }}
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </div>
+                <div class="button-list button-vertical-list full" v-if="!state.data.skip_unload_all_scan">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <v-btn color="primary" @click="$emit('action', 'action_split')">{{ $t("cluster_picking.unload_all.split") }}</v-btn>
@@ -488,6 +497,13 @@ const ClusterPicking = {
                                 picking_batch_id: this.current_batch().id,
                                 barcode: scanned.text,
                                 confirmation: confirmation,
+                            })
+                        );
+                    },
+                    on_validate: () => {
+                        this.wait_call(
+                            this.odoo.call("validate_destination_all", {
+                                picking_batch_id: this.current_batch().id,
                             })
                         );
                     },

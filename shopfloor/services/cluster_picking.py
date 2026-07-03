@@ -1047,7 +1047,12 @@ class ClusterPicking(Component):
         # only for the first one
         first_line = fields.first(lines)
         data = self.data.picking_batch(batch)
-        data.update({"location_dest": self.data.location(first_line.location_dest_id)})
+        data.update(
+            {
+                "location_dest": self.data.location(first_line.location_dest_id),
+                "skip_unload_all_scan": self.work.menu.skip_unload_all_scan,
+            }
+        )
         if confirmation:
             data.update({"confirmation": confirmation})
         return data
@@ -1350,6 +1355,38 @@ class ClusterPicking(Component):
         completion_info_popup = completion_info.popup(lines)
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
+    def validate_destination_all(self, picking_batch_id):
+        """Validate the destination for all the lines of the batch with a dest. package
+
+        This method must be used only if all the move lines which have a destination
+        package and qty done have the same destination location.
+        The expected destination location is used without any barcode scan.
+
+        Transitions:
+        * start_line: the batch still have move lines without destination package
+        * unload_all: if destinations were not the same (race condition)
+        * unload_single: if destinations were not the same (race condition)
+        * start: batch is totally done. In this case, this method *has*
+          to handle the closing of the batch to create backorders.
+        """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+
+        if not self._are_all_dest_location_same(batch):
+            return self.prepare_unload(batch.id)
+
+        lines = self._lines_to_unload(batch)
+        if not lines:
+            return self._unload_end(batch)
+
+        first_line = fields.first(lines)
+        location = first_line.location_dest_id
+        self._unload_write_destination_on_lines(lines, location)
+        completion_info = self._actions_for("completion.info")
+        completion_info_popup = completion_info.popup(lines)
+        return self._unload_end(batch, completion_info_popup=completion_info_popup)
+
     def _unload_write_destination_on_lines(self, lines, location):
         stock = self._actions_for("stock")
         stock.set_destination_and_unload_lines(
@@ -1632,6 +1669,11 @@ class ShopfloorClusterPickingValidator(Component):
             "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
+    def validate_destination_all(self):
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
     def unload_split(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
@@ -1812,6 +1854,20 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             }
         )
 
+    def validate_destination_all(self):
+        return self._response_schema(
+            next_states={
+                # if the batch still contain lines
+                "start_line",
+                # this endpoint was called but after checking, lines
+                # have different destination locations
+                "unload_all",
+                "unload_single",
+                # batch finished
+                "start",
+            }
+        )
+
     def unload_split(self):
         return self._response_schema(next_states={"unload_single"})
 
@@ -1863,6 +1919,11 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         schema = self.schemas.picking_batch()
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
         schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
+        schema["skip_unload_all_scan"] = {
+            "type": "boolean",
+            "nullable": False,
+            "required": False,
+        }
         return schema
 
     @property

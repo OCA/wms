@@ -93,6 +93,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             line, [{"qty_done": qty_done, "result_package_id": self.bin2.id}]
         )
         data = self._data_for_batch(self.batch, self.packing_location)
+        data["skip_unload_all_scan"] = False
         self.assert_response(
             response,
             # they reach the same destination so next state unload_all

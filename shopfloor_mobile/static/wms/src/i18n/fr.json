@@ -19,6 +19,7 @@
   "cluster_picking.unload_all.title": "Décharger tous les compartiments",
   "cluster_picking.unload_all.destination": "Destination:",
   "cluster_picking.unload_all.split": "Séparer [TODO]",
+  "cluster_picking.unload_all.validate": "Valider",
   "cluster_picking.unload_set_destination.title": "Définir un emplacement de destination",
   "cluster_picking.unload_single.title": "Décharger un compartiment",
   "cluster_picking.scan_destination.full_bin": "Compartiment plein",

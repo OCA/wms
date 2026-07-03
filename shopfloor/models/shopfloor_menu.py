@@ -242,6 +242,19 @@ class ShopfloorMenu(models.Model):
     pick_by_product_is_possible = fields.Boolean(
         compute="_compute_pick_by_product_is_possible"
     )
+    skip_unload_all_scan = fields.Boolean(
+        string="Skip unload all scan",
+        default=False,
+        help=(
+            "Add a 'Validate' button on the 'Unload all' screen that confirms "
+            "the expected destination for all lines at once without scanning. "
+            "When enabled, the scan input, destination name, and Split button "
+            "are hidden — only Validate and Back are shown."
+        ),
+    )
+    skip_unload_all_scan_is_possible = fields.Boolean(
+        compute="_compute_skip_unload_all_scan_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -477,4 +490,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.pick_by_product_is_possible = menu.scenario_id.has_option(
                 "pick_by_product"
+            )
+
+    @api.depends("scenario_id")
+    def _compute_skip_unload_all_scan_is_possible(self):
+        for menu in self:
+            menu.skip_unload_all_scan_is_possible = menu.scenario_id.has_option(
+                "skip_unload_all_scan"
             )
