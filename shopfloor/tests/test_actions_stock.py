@@ -14,12 +14,13 @@ class TestActionsStock(CommonCase):
         super().setUpClass()
         with cls.work_on_actions(cls) as work:
             cls.stock = work.component(usage="stock")
+        cls.product_a.tracking = "lot"
         cls.picking = cls._create_picking(
             lines=[(cls.product_a, 10), (cls.product_b, 10)], confirm=True
         )
         cls.move0 = cls.picking.move_ids[0]
         cls.move1 = cls.picking.move_ids[1]
-        cls._fill_stock_for_moves(cls.move0)
+        cls._fill_stock_for_moves(cls.move0, in_lot=True)
         cls._fill_stock_for_moves(cls.move1)
         cls.picking.action_assign()
 
