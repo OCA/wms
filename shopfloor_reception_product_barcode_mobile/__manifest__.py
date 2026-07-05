@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor Reception Product Barcode Mobile",
     "summary": "Frontend for the product barcode on reception scenario",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
