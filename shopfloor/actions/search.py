@@ -102,28 +102,20 @@ class SearchAction(Component):
         result = parse_results.get(btype) or parse_results.get("unknown")
         return result.value if result else None
 
-    def find(self, barcode, types=None):
-        """Find Odoo record matching given `barcode`.
-
-        Plain barcodes
-        """
+    def find(self, barcode: str, types: list[str] = None):
+        """Find Odoo record matching given `barcode`."""
         barcode = barcode or ""
-        return self.generic_find(barcode, types=types)
-
-    def _find_record_by_type(self, parse_results, btype):
-        handler = self._barcode_type_handler.get(btype)
-        if not handler:
-            return
-        return handler(parse_results, btype=btype)
-
-    def generic_find(self, barcode, types=None):
         # TODO: decide the best default order in case we don't pass `types`
         types = types or self._barcode_type_handler.keys()
 
         parse_results = self.parser.parse(barcode)
 
         for btype in types:
-            record = self._find_record_by_type(parse_results, btype)
+            handler = self._barcode_type_handler.get(btype)
+            if not handler:
+                continue
+
+            record = handler(parse_results, btype=btype)
             if record:
                 return self._make_search_result(
                     record=record,
@@ -138,39 +130,39 @@ class SearchAction(Component):
     # -------------------------------------------------------------------------
 
     def location_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["location", "location_dest"])
+        res = self.find(barcode, types=["location", "location_dest"])
         return res.record if res else self.env["stock.location"].browse()
 
     def package_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["package"])
+        res = self.find(barcode, types=["package"])
         return res.record if res else self.env["stock.quant.package"].browse()
 
     def picking_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["picking"])
+        res = self.find(barcode, types=["picking"])
         return res.record if res else self.env["stock.picking"].browse()
 
     def product_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["product"])
+        res = self.find(barcode, types=["product"])
         return res.record if res else self.env["product.product"].browse()
 
     def lot_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["lot", "serial"])
+        res = self.find(barcode, types=["lot", "serial"])
         return res.record if res else self.env["stock.lot"].browse()
 
     def packaging_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["packaging"])
+        res = self.find(barcode, types=["packaging"])
         return res.record if res else self.env["product.packaging"].browse()
 
     def delivery_packaging_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["delivery_packaging"])
+        res = self.find(barcode, types=["delivery_packaging"])
         return res.record if res else self.env["stock.package.type"].browse()
 
     def origin_move_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["origin_move"])
+        res = self.find(barcode, types=["origin_move"])
         return res.record if res else self.env["stock.move"].browse()
 
     def expiration_date_from_scan(self, barcode):
-        res = self.generic_find(barcode, types=["expiration_date"])
+        res = self.find(barcode, types=["expiration_date"])
         return res.record if res else None
 
     # -------------------------------------------------------------------------
