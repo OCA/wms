@@ -62,8 +62,9 @@ class Reception(Component):
         This will parse the scanned barcode and return the result
         """
         search = self._actions_for("search")
-        result = search.parser.parse(barcode, ["product"])
-        result_value = result[0].value if result else ""
+        parse_results = search.parser.parse(barcode)
+        result = parse_results.get("product") or parse_results.get("unknown")
+        result_value = result.value if result else ""
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
         return self._response(

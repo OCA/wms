@@ -115,7 +115,9 @@ class SearchAction(Component):
     def generic_find(self, barcode, types=None):
         # TODO: decide the best default order in case we don't pass `types`
         _types = types or self._barcode_type_handler.keys()
-        parse_results = self.parser.parse(barcode, types)
+
+        parse_results = self.parser.parse(barcode)
+
         # OPTIMIZATION: Push 'unknown' types to the end so that we return earlier
         # in case the type is known after parsing
         for parse_result in sorted(parse_results, key=lambda r: r.type == "unknown"):
