@@ -120,7 +120,9 @@ class SearchAction(Component):
 
         # OPTIMIZATION: Push 'unknown' types to the end so that we return earlier
         # in case the type is known after parsing
-        for parse_result in sorted(parse_results, key=lambda r: r.type == "unknown"):
+        for parse_result in sorted(
+            parse_results.values(), key=lambda r: r.type == "unknown"
+        ):
             btypes = _types if parse_result.type == "unknown" else [parse_result.type]
             for btype in btypes:
                 record = self._find_record_by_type(parse_result.value, btype)

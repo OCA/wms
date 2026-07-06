@@ -868,28 +868,25 @@ class Reception(Component):
         return self._response_for_set_lot(picking, line, message, **kw)
 
     def _set_lot_from_parse(self, picking, line):
-        if self.search_result.parse_result:
-            expiration_date = None
-            lot_name = None
-            found = False
-            for result in self.search_result.parse_result:
-                if result.type == "lot":
-                    if self.search_result.type == "lot" and self.search_result.record:
-                        lot_name = self.search_result.record.name
-                        found = True
-                    else:
-                        lot_name = result.value
-                        found = True
-                if (
-                    result.type == "expiration_date"
-                    and line.product_id.use_expiration_date
-                ):
-                    expiration_date = self._locale_date_to_datetime_utc(result.value)
+        parse_result = self.search_result.parse_result
+        if not parse_result:
+            return
 
-            if found:
-                return self.set_lot_confirm_action(
-                    picking.id, line.id, lot_name, expiration_date
-                )
+        lot_result = parse_result.get("lot")
+        if lot_result:
+            if self.search_result.type == "lot" and self.search_result.record:
+                lot_name = self.search_result.record.name
+            else:
+                lot_name = lot_result.value
+
+            expiration_date = None
+            exp_result = parse_result.get("expiration_date")
+            if exp_result and line.product_id.use_expiration_date:
+                expiration_date = self._locale_date_to_datetime_utc(exp_result.value)
+
+            return self.set_lot_confirm_action(
+                picking.id, line.id, lot_name, expiration_date
+            )
 
         # We could have found a lot, but with result type "unknow"
         # Put this afterwards to favor multi-attribute barcode parsing
@@ -1203,20 +1200,20 @@ class Reception(Component):
 
         # Look for more info in the barcode
         lot_name = barcode
-        for result in search_result.parse_result:
-            if result.type == "lot":
-                lot_name = result.value
-            elif result.type == "expiration_date":
-                lot_expiration_date = self._locale_date_to_datetime_utc(result.value)
-            elif (
-                result.type == "product"
-                and result.raw != selected_line.product_id.barcode
-            ):
-                return self._response_for_set_lot(
-                    picking,
-                    selected_line,
-                    message=self.msg_store.lot_product_mismatch(),
-                )
+        if (
+            prod_result := search_result.parse_result.get("product")
+        ) and prod_result.value != selected_line.product_id.barcode:
+            return self._response_for_set_lot(
+                picking,
+                selected_line,
+                message=self.msg_store.lot_product_mismatch(),
+            )
+
+        if lot_result := search_result.parse_result.get("lot"):
+            lot_name = lot_result.value
+
+        if exp_result := search_result.parse_result.get("expiration_date"):
+            lot_expiration_date = self._locale_date_to_datetime_utc(exp_result.value)
 
         if search_result.type == "lot":
             existing_lot = search_result.record

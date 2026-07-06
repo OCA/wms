@@ -53,18 +53,20 @@ class TestScanLotName(CommonCase):
         return SearchResult(
             record=record,
             type=_type,
-            parse_result=[
-                BarcodeResult(type="unknown", value=full_barcode, raw=full_barcode),
-                BarcodeResult(
+            parse_result={
+                "unknown": BarcodeResult(
+                    type="unknown", value=full_barcode, raw=full_barcode
+                ),
+                "expiration_date": BarcodeResult(
                     type="expiration_date",
                     value=expiration_date,
                     raw=expiration_date.strftime("%y%m%d"),
                 ),
-                BarcodeResult(type="lot", value=lot_name, raw=lot_name),
-                BarcodeResult(
+                "lot": BarcodeResult(type="lot", value=lot_name, raw=lot_name),
+                "product": BarcodeResult(
                     type="product", value=product_barcode, raw=product_barcode
                 ),
-            ],
+            },
         )
 
     def test_scan_lot_extract_expiration_date_new_lot(self):
@@ -213,21 +215,21 @@ class TestScanLotName(CommonCase):
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
             # Note: the order here is important, the first to match a record
             # in DB will determine the `type` (and `record`) of the `SearchResult`
-            mock_parse.return_value = [
+            mock_parse.return_value = {
                 # -> Put "product" in first to test if no error in case the
                 # SearchResult type is not "lot" but "product"
-                BarcodeResult(
+                "product": BarcodeResult(
                     type="product",
                     value=selected_move_line.product_id.barcode,
                     raw=selected_move_line.product_id.barcode,
                 ),
-                BarcodeResult(type="lot", value=lot.name, raw=lot.name),
-                BarcodeResult(
+                "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+                "expiration_date": BarcodeResult(
                     type="expiration_date",
                     value=date(2025, 4, 15),
                     raw="250415",
                 ),
-            ]
+            }
             response = self.service.dispatch(
                 "scan_line",
                 params={

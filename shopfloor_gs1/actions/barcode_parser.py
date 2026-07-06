@@ -45,11 +45,9 @@ class BarcodeParser(Component):
             for barcode_type in self.search_action._barcode_type_handler.keys():
                 for parsed_item in parsed:
                     if parsed_item.ai in MAPPING_TYPE_TO_AI.get(barcode_type, tuple()):
-                        result.append(
-                            BarcodeResult(
-                                type=barcode_type,
-                                value=parsed_item.value,
-                                raw=parsed_item.raw_value,
-                            )
+                        result[barcode_type] = BarcodeResult(
+                            type=barcode_type,
+                            value=parsed_item.value,
+                            raw=parsed_item.raw_value,
                         )
         return result
