@@ -76,18 +76,18 @@ class SearchAction(Component):
     @property
     def _barcode_type_handler(self):
         return {
-            "product": self.product_from_scan,
-            "package": self.package_from_scan,
-            "picking": self.picking_from_scan,
-            "location": self.location_from_scan,
-            "location_dest": self.location_from_scan,
-            "lot": self.lot_from_scan,
-            "serial": self.lot_from_scan,
-            "packaging": self.packaging_from_scan,
-            "delivery_packaging": self.delivery_packaging_from_scan,
-            "origin_move": self.origin_move_from_scan,
+            "product": self._find_product,
+            "package": self._find_package,
+            "picking": self._find_picking,
+            "location": self._find_location,
+            "location_dest": self._find_location,
+            "lot": self._find_lot,
+            "serial": self._find_lot,
+            "packaging": self._find_packaging,
+            "delivery_packaging": self._find_delivery_packaging,
+            "origin_move": self._find_origin_move,
             # Extra data can be contained in barcodes
-            "expiration_date": self.expiration_date_from_scan,
+            "expiration_date": self._find_expiration_date,
         }
 
     def _make_search_result(self, **kwargs):
@@ -98,6 +98,10 @@ class SearchAction(Component):
         """
         return SearchResult(**kwargs)
 
+    def _get_parse_results_value(self, parse_results: dict, btype: str):
+        result = parse_results.get(btype) or parse_results.get("unknown")
+        return result.value if result else None
+
     def find(self, barcode, types=None):
         """Find Odoo record matching given `barcode`.
 
@@ -106,37 +110,76 @@ class SearchAction(Component):
         barcode = barcode or ""
         return self.generic_find(barcode, types=types)
 
-    def _find_record_by_type(self, barcode, btype):
+    def _find_record_by_type(self, parse_results, btype):
         handler = self._barcode_type_handler.get(btype)
         if not handler:
             return
-        return handler(barcode)
+        return handler(parse_results, btype=btype)
 
     def generic_find(self, barcode, types=None):
         # TODO: decide the best default order in case we don't pass `types`
-        _types = types or self._barcode_type_handler.keys()
+        types = types or self._barcode_type_handler.keys()
 
         parse_results = self.parser.parse(barcode)
 
-        # OPTIMIZATION: Push 'unknown' types to the end so that we return earlier
-        # in case the type is known after parsing
-        for parse_result in sorted(
-            parse_results.values(), key=lambda r: r.type == "unknown"
-        ):
-            btypes = _types if parse_result.type == "unknown" else [parse_result.type]
-            for btype in btypes:
-                record = self._find_record_by_type(parse_result.value, btype)
-                if record:
-                    return self._make_search_result(
-                        record=record,
-                        code=barcode,
-                        type=btype,
-                        parse_result=parse_results,
-                    )
+        for btype in types:
+            record = self._find_record_by_type(parse_results, btype)
+            if record:
+                return self._make_search_result(
+                    record=record,
+                    code=barcode,
+                    type=btype,
+                    parse_result=parse_results,
+                )
         return self._make_search_result(type="none", parse_result=parse_results)
 
+    # -------------------------------------------------------------------------
+    # Public Entry Points (Safe for direct downstream calls)
+    # -------------------------------------------------------------------------
+
     def location_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["location", "location_dest"])
+        return res.record if res else self.env["stock.location"].browse()
+
+    def package_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["package"])
+        return res.record if res else self.env["stock.quant.package"].browse()
+
+    def picking_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["picking"])
+        return res.record if res else self.env["stock.picking"].browse()
+
+    def product_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["product"])
+        return res.record if res else self.env["product.product"].browse()
+
+    def lot_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["lot", "serial"])
+        return res.record if res else self.env["stock.lot"].browse()
+
+    def packaging_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["packaging"])
+        return res.record if res else self.env["product.packaging"].browse()
+
+    def delivery_packaging_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["delivery_packaging"])
+        return res.record if res else self.env["stock.package.type"].browse()
+
+    def origin_move_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["origin_move"])
+        return res.record if res else self.env["stock.move"].browse()
+
+    def expiration_date_from_scan(self, barcode):
+        res = self.generic_find(barcode, types=["expiration_date"])
+        return res.record if res else None
+
+    # -------------------------------------------------------------------------
+    # Internal Concrete DB Search Methods
+    # -------------------------------------------------------------------------
+
+    def _find_location(self, parse_results, btype="location"):
         model = self.env["stock.location"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         # First search location by barcode
@@ -148,14 +191,16 @@ class SearchAction(Component):
             )
         return res
 
-    def package_from_scan(self, barcode):
+    def _find_package(self, parse_results, btype="package"):
         model = self.env["stock.quant.package"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode):
+    def _find_picking(self, parse_results, btype="picking"):
         model = self.env["stock.picking"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         picking = model.search([("name", "=", barcode)], limit=1)
@@ -176,8 +221,9 @@ class SearchAction(Component):
             return model.search(source_document_domain)
         return model.browse()
 
-    def product_from_scan(self, barcode):
+    def _find_product(self, parse_results, btype="product"):
         model = self.env["product.product"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         return model.search(
@@ -185,8 +231,9 @@ class SearchAction(Component):
             limit=1,
         )
 
-    def lot_from_scan(self, barcode):
+    def _find_lot(self, parse_results, btype="lot"):
         model = self.env["stock.lot"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         domain = [
@@ -197,8 +244,9 @@ class SearchAction(Component):
             domain.append(("product_id", "in", self._products.ids))
         return model.search(domain, limit=self._limit)
 
-    def packaging_from_scan(self, barcode):
+    def _find_packaging(self, parse_results, btype="packaging"):
         model = self.env["product.packaging"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         return model.search(
@@ -213,14 +261,16 @@ class SearchAction(Component):
             [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
         )
 
-    def delivery_packaging_from_scan(self, barcode):
+    def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
         model = self.env["stock.package.type"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         return model.search([("barcode", "=", barcode)], limit=1)
 
-    def origin_move_from_scan(self, barcode):
+    def _find_origin_move(self, parse_results, btype="origin_move"):
         model = self.env["stock.move"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         outgoing_move_domain = [
             # We could have the same origin for multiple transfers
             # but we're interested only in the "done" ones.
@@ -234,6 +284,6 @@ class SearchAction(Component):
     def dummy_from_scan(self, barcode):
         return None
 
-    def expiration_date_from_scan(self, barcode):
+    def _find_expiration_date(self, parse_results, btype="expiration_date"):
         # TODO
         return None

@@ -1061,7 +1061,7 @@ class Reception(Component):
         handlers_by_type = self._scan_document__get_handlers_by_type()
         search = self._actions_for("search").with_origin()
         for handler_type, handler in handlers_by_type.items():
-            record = search._find_record_by_type(barcode, handler_type)
+            record = search.find(barcode, [handler_type]).record
             if not record:
                 continue
             res = handler(record, barcode)
