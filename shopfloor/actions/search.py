@@ -253,14 +253,6 @@ class SearchAction(Component):
             [("barcode", "=", barcode), ("product_id", "!=", False)], limit=1
         )
 
-    def generic_packaging_from_scan(self, barcode):
-        model = self.env["product.packaging"]
-        if not barcode:
-            return model.browse()
-        return model.search(
-            [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
-        )
-
     def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
         model = self.env["stock.package.type"]
         barcode = self._get_parse_results_value(parse_results, btype)
@@ -280,9 +272,6 @@ class SearchAction(Component):
         if self._extra_domain:
             outgoing_move_domain = AND([outgoing_move_domain, self._extra_domain])
         return model.search(outgoing_move_domain)
-
-    def dummy_from_scan(self, barcode):
-        return None
 
     def _find_expiration_date(self, parse_results, btype="expiration_date"):
         # TODO

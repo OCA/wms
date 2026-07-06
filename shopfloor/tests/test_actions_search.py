@@ -95,17 +95,6 @@ class TestSearchCase(TestSearchBaseCase):
         self.assertEqual(handler(lots[0].name), lots[1])
         self.assertEqual(handler(lots[1].name), lots[1])
 
-    def test_search_generic_packaging(self):
-        rec = (
-            self.env["product.packaging"]
-            .sudo()
-            .create({"name": "TEST PKG", "barcode": "1234"})
-        )
-        handler = self.search.generic_packaging_from_scan
-        self.assertEqual(handler(rec.barcode), rec)
-        self.assertEqual(handler(False), rec.browse())
-        self.assertEqual(handler("NONE"), rec.browse())
-
 
 class TestFindCase(TestSearchBaseCase):
     def test_find_api(self):
