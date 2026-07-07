@@ -149,6 +149,16 @@ class Reception(Component):
         if values_to_update:
             packaging.write(values_to_update)
 
+    def _response_for_set_quantity(
+        self, picking, line, message=None, asking_confirmation=None
+    ):
+        res = super()._response_for_set_quantity(
+            picking, line, message, asking_confirmation
+        )
+        if self.work.menu.create_new_packaging:
+            res["data"]["set_quantity"]["create_new_packaging"] = True
+        return res
+
     def _response_for_create_new_packaging(
         self, picking, line, packaging, message=None
     ):
@@ -300,3 +310,18 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     def create_new_packaging(self):
         return self._response_schema(next_states={"create_new_packaging"})
+
+    @property
+    def _schema_set_quantity(self):
+        res = super()._schema_set_quantity
+
+        res.update(
+            {
+                "create_new_packaging": {
+                    "type": "boolean",
+                    "nullable": True,
+                    "required": False,
+                },
+            }
+        )
+        return res
