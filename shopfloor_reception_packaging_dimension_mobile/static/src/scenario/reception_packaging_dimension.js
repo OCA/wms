@@ -35,7 +35,7 @@ if (match) {
     new_template =
         new_template.substring(0, insertIndex) +
         `
-        <v-row>
+        <v-row v-if="show_create_new_packaging_button">
             <v-col class="text-center" cols="12">
                 <btn-action color="warning" @click="state.create_new_packaging">
                     Create New Packaging
@@ -50,12 +50,18 @@ if (match) {
 //   - the new patched template
 //   - the js code for the new state
 const _get_states_base = reception_scenario.component.methods._get_states;
-const baseWatchers = reception_scenario.component.watch || {};
-const baseMethods = reception_scenario.component.methods || {};
 const ReceptionPackageDimension = process_registry.extend("reception", {
     template: new_template,
+    computed: {
+        ...(reception_scenario.component.computed || {}),
+        show_create_new_packaging_button: function () {
+            const create_new_packaging = this.state.data.create_new_packaging;
+            if (!create_new_packaging) return false;
+            return create_new_packaging;
+        },
+    },
     methods: {
-        ...baseMethods,
+        ...(reception_scenario.component.methods || {}),
         _get_states: function () {
             let states = _get_states_base.bind(this)();
 
