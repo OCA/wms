@@ -194,6 +194,17 @@ class Reception(Component):
             message=self.msg_store.new_packaging_created(packaging),
         )
 
+    def delete_new_packaging(self, picking_id, selected_line_id, packaging_id):
+        picking = self.env["stock.picking"].browse(picking_id)
+        line = self.env["stock.move.line"].browse(selected_line_id)
+        packaging = self.env["product.packaging"].browse(packaging_id)
+        message = None
+        if packaging:
+            message = self.msg_store.packaging_deleted(packaging)
+            packaging.sudo().unlink()
+
+        return self._response_for_set_quantity(picking, line, message=message)
+
 
 class ShopfloorReceptionValidator(Component):
     _inherit = "shopfloor.reception.validator"
@@ -258,6 +269,17 @@ class ShopfloorReceptionValidator(Component):
             },
         }
 
+    def delete_new_packaging(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_id": {
+                "coerce": to_int,
+                "required": True,
+                "type": "integer",
+            },
+            "packaging_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
 
 class ShopfloorReceptionValidatorResponse(Component):
     _inherit = "shopfloor.reception.validator.response"
@@ -308,8 +330,13 @@ class ShopfloorReceptionValidatorResponse(Component):
             next_states=self._set_packaging_dimension_next_states()
         )
 
+    def _create_new_packaging_next_state(self):
+        return {"create_new_packaging", "set_quantity"}
+
     def create_new_packaging(self):
-        return self._response_schema(next_states={"create_new_packaging"})
+        return self._response_schema(
+            next_states=self._create_new_packaging_next_state()
+        )
 
     @property
     def _schema_set_quantity(self):

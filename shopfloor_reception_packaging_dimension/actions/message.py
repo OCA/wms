@@ -21,3 +21,9 @@ class MessageAction(Component):
             "message_type": "success",
             "body": _("Packaging '{}' created.").format(packaging.name),
         }
+
+    def packaging_deleted(self, packaging):
+        return {
+            "message_type": "success",
+            "body": _("Packaging '{}' deleted.").format(packaging.name),
+        }
