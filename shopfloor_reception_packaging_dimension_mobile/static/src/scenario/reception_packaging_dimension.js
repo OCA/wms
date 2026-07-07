@@ -19,7 +19,7 @@ let new_template =
 </div>
 
 <div v-if="state_is('create_new_packaging')">
-    <form-edit-product-packaging :packaging="state.data.packaging" :allowEditName="true" @done="this.state.on_done" @skip="this.state.on_skip"/>
+    <form-edit-product-packaging :packaging="state.data.packaging" :allowEditName="true" :showCancel="true" @done="this.state.on_done" @skip="this.state.on_skip" @cancel="this.state.on_create_packaging_cancel"/>
 </div>
 ` +
     template.substring(pos);
@@ -138,6 +138,15 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     };
 
                     self.wait_call(self.odoo.call("set_packaging_dimension", payload));
+                },
+                on_create_packaging_cancel: async function () {
+                    self.wait_call(
+                        self.odoo.call("delete_new_packaging", {
+                            picking_id: self.state.data.picking.id,
+                            selected_line_id: self.state.data.selected_move_line.id,
+                            packaging_id: self.state.data.packaging.id,
+                        })
+                    );
                 },
             };
             return states;

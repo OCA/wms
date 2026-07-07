@@ -7,6 +7,7 @@ Vue.component("form-edit-product-packaging", {
     props: {
         packaging: {type: Object, required: true},
         allowEditName: {type: Boolean, default: false},
+        showCancel: {type: Boolean, default: false},
     },
     created: function () {
         this.prefill_packaging_form_inputs();
@@ -87,9 +88,14 @@ Vue.component("form-edit-product-packaging", {
                 <btn-action @click="on_done">Done</btn-action>
             </v-col>
         </v-row>
-        <v-row align="center">
+        <v-row align="center" v-if="!showCancel">
             <v-col class="text-center" cols="12">
                 <btn-action color="default" @click="on_skip">Skip</btn-action>
+            </v-col>
+        </v-row>
+        <v-row align="center" v-if="showCancel">
+            <v-col class="text-center" cols="12">
+                <btn-action color="error" @click="on_cancel">Cancel</btn-action>
             </v-col>
         </v-row>
     </div>
@@ -109,6 +115,9 @@ Vue.component("form-edit-product-packaging", {
         },
         on_skip: function () {
             this.$emit("skip");
+        },
+        on_cancel: function () {
+            this.$emit("cancel");
         },
         prefill_packaging_form_inputs: function () {
             const pkg = this.packaging;
