@@ -560,7 +560,7 @@ class LocationContentTransfer(Component):
             else:
                 return self._response_for_scan_destination(location, package_level)
 
-        lot = search.for_products(package_move_lines.product_id).lot_from_scan(barcode)
+        lot = search.lot_from_scan(barcode, products=package_move_lines.product_id)
         if lot and lot in package_move_lines.mapped("lot_id"):
             if lot in other_move_lines.mapped("lot_id"):
                 return self._response_for_start_single(

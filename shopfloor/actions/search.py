@@ -57,6 +57,12 @@ class SearchAction(Component):
         self._use_origin = False
         self._extra_domain = None
 
+    def _reset_modifiers(self):
+        self._products = None
+        self._limit = 1
+        self._use_origin = False
+        self._extra_domain = None
+
     def for_products(self, products):
         self._products = products
         return self
@@ -80,14 +86,10 @@ class SearchAction(Component):
             "package": self._find_package,
             "picking": self._find_picking,
             "location": self._find_location,
-            "location_dest": self._find_location,
             "lot": self._find_lot,
-            "serial": self._find_lot,
             "packaging": self._find_packaging,
             "delivery_packaging": self._find_delivery_packaging,
             "origin_move": self._find_origin_move,
-            # Extra data can be contained in barcodes
-            "expiration_date": self._find_expiration_date,
         }
 
     def _make_search_result(self, **kwargs):
@@ -110,27 +112,31 @@ class SearchAction(Component):
 
         parse_results = self.parser.parse(barcode)
 
-        for btype in types:
-            handler = self._barcode_type_handler.get(btype)
-            if not handler:
-                continue
+        try:
+            for btype in types:
+                handler = self._barcode_type_handler.get(btype)
+                if not handler:
+                    continue
 
-            record = handler(parse_results, btype=btype)
-            if record:
-                return self._make_search_result(
-                    record=record,
-                    code=barcode,
-                    type=btype,
-                    parse_result=parse_results,
-                )
-        return self._make_search_result(type="none", parse_result=parse_results)
+                record = handler(parse_results, btype=btype)
+                if record:
+                    return self._make_search_result(
+                        record=record,
+                        code=barcode,
+                        type=btype,
+                        parse_result=parse_results,
+                    )
+            return self._make_search_result(type="none", parse_result=parse_results)
+        finally:
+            # Ensure no side effects between 2 different find calls on the same component
+            self._reset_modifiers()
 
     # -------------------------------------------------------------------------
     # Public Entry Points (Safe for direct downstream calls)
     # -------------------------------------------------------------------------
 
-    def location_from_scan(self, barcode):
-        res = self.find(barcode, types=["location", "location_dest"])
+    def location_from_scan(self, barcode, limit=1):
+        res = self.with_limit(limit).find(barcode, types=["location"])
         return res.record if res else self.env["stock.location"].browse()
 
     def package_from_scan(self, barcode):
@@ -145,8 +151,8 @@ class SearchAction(Component):
         res = self.find(barcode, types=["product"])
         return res.record if res else self.env["product.product"].browse()
 
-    def lot_from_scan(self, barcode):
-        res = self.find(barcode, types=["lot", "serial"])
+    def lot_from_scan(self, barcode, products=None, limit=1):
+        res = self.for_products(products).with_limit(limit).find(barcode, types=["lot"])
         return res.record if res else self.env["stock.lot"].browse()
 
     def packaging_from_scan(self, barcode):
@@ -160,10 +166,6 @@ class SearchAction(Component):
     def origin_move_from_scan(self, barcode):
         res = self.find(barcode, types=["origin_move"])
         return res.record if res else self.env["stock.move"].browse()
-
-    def expiration_date_from_scan(self, barcode):
-        res = self.find(barcode, types=["expiration_date"])
-        return res.record if res else None
 
     # -------------------------------------------------------------------------
     # Internal Concrete DB Search Methods
@@ -232,6 +234,17 @@ class SearchAction(Component):
             ("company_id", "=", self.env.company.id),
             ("name", "=", barcode),
         ]
+        if product_result := parse_results.get("product"):
+            domain.extend(
+                [
+                    "|",
+                    # also check for False in case we do not have the barcode
+                    # for the product yet in odoo
+                    ("product_id.barcode", "in", [False, product_result.value]),
+                    ("product_id.default_code", "in", [False, product_result.value]),
+                ]
+            )
+
         if self._products:
             domain.append(("product_id", "in", self._products.ids))
         return model.search(domain, limit=self._limit)
@@ -264,7 +277,3 @@ class SearchAction(Component):
         if self._extra_domain:
             outgoing_move_domain = AND([outgoing_move_domain, self._extra_domain])
         return model.search(outgoing_move_domain)
-
-    def _find_expiration_date(self, parse_results, btype="expiration_date"):
-        # TODO
-        return None

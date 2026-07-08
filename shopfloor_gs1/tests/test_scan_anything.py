@@ -46,6 +46,7 @@ class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
         self._test_response_ok(rec_type, data, identifier)
 
     def test_scan_lot(self):
+        self.product_a.barcode = PROD_BARCODE
         record = (
             self.env["stock.lot"]
             .sudo()
@@ -61,7 +62,7 @@ class ScanAnythingCase(ActionsDataDetailCaseBase, ScanAnythingTestMixin):
         identifier = record.name
         data = self.data_detail.lot_detail(record)
         for identifier in (GS1_GTIN_BARCODE_1, record.name):
-            self._test_response_ok(rec_type, data, identifier)
+            self._test_response_ok(rec_type, data, identifier, record_types=["lot"])
 
     def test_scan_transfer(self):
         record = self.picking

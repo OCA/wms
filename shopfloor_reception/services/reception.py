@@ -1189,17 +1189,13 @@ class Reception(Component):
                 picking, selected_line, message=self.msg_store.record_not_found()
             )
 
-        existing_lot = self.env["stock.lot"]
-        lot_expiration_date = None
-
         search = self._actions_for("search").for_products(selected_line.product_id)
         search_result = search.find(
             barcode=barcode,
-            types=["lot", "expiration_date"],
+            types=["lot"],
         )
-
         # Look for more info in the barcode
-        lot_name = barcode
+        existing_lot = search_result.record or self.env["stock.lot"]
         if (
             prod_result := search_result.parse_result.get("product")
         ) and prod_result.value != selected_line.product_id.barcode:
@@ -1209,18 +1205,13 @@ class Reception(Component):
                 message=self.msg_store.lot_product_mismatch(),
             )
 
+        lot_name = barcode
         if lot_result := search_result.parse_result.get("lot"):
             lot_name = lot_result.value
 
+        lot_expiration_date = None
         if exp_result := search_result.parse_result.get("expiration_date"):
             lot_expiration_date = self._locale_date_to_datetime_utc(exp_result.value)
-
-        if search_result.type == "lot":
-            existing_lot = search_result.record
-        if not existing_lot:
-            existing_lot = search.for_products(selected_line.product_id).lot_from_scan(
-                lot_name
-            )
 
         message = None
         if (
@@ -1276,9 +1267,7 @@ class Reception(Component):
         lot = (
             search_result_record
             if search_result_record and search_result_record._name == "stock.lot"
-            else self._actions_for("search")
-            .for_products(product)
-            .lot_from_scan(lot_name)
+            else self._actions_for("search").lot_from_scan(lot_name, products=product)
         )
 
         if product.use_expiration_date and (

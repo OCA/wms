@@ -28,8 +28,8 @@ class TestSearchCase(TestSearchBaseCase):
         rec2 = self.customer_location.sudo().copy(
             {"barcode": "CUSTOMERS2", "name": "Customers"}
         )
-        handler = self.search.with_limit(2).location_from_scan
-        res = handler("Customers")
+        handler = self.search.location_from_scan
+        res = handler("Customers", 2)
         self.assertEqual(res, rec + rec2)
 
     def test_search_package(self):
@@ -65,7 +65,8 @@ class TestSearchCase(TestSearchBaseCase):
                 {"product_id": self.product_a.id, "company_id": self.env.company.id}
             )
         )
-        handler = self.search.for_products(self.product_a).lot_from_scan
+        handler = self.search.lot_from_scan
+        self.assertEqual(handler(rec.name, products=self.product_a), rec)
         self.assertEqual(handler(rec.name), rec)
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
@@ -88,12 +89,11 @@ class TestSearchCase(TestSearchBaseCase):
                 }
             ),
         )
-        handler = self.search.for_products(self.product_a).lot_from_scan
-        self.assertEqual(handler(lots[0].name), lots[0])
-        self.assertEqual(handler(lots[1].name), lots[0])
-        handler = self.search.for_products(self.product_b).lot_from_scan
-        self.assertEqual(handler(lots[0].name), lots[1])
-        self.assertEqual(handler(lots[1].name), lots[1])
+        handler = self.search.lot_from_scan
+        self.assertEqual(handler(lots[0].name, products=self.product_a), lots[0])
+        self.assertEqual(handler(lots[1].name, products=self.product_a), lots[0])
+        self.assertEqual(handler(lots[0].name, products=self.product_b), lots[1])
+        self.assertEqual(handler(lots[1].name, products=self.product_b), lots[1])
 
 
 class TestFindCase(TestSearchBaseCase):
