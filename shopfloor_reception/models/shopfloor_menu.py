@@ -32,7 +32,9 @@ class ShopfloorMenu(models.Model):
             self.filter_today_scheduled_pickings_is_possible
         )
 
-    @api.constrains("scenario_id", "picking_type_ids", "allow_move_create")
+    @api.constrains(
+        "scenario_id", "picking_type_ids", "filter_today_scheduled_pickings"
+    )
     def _check_filter_today_scheduled_pickings(self):
         for menu in self:
             if (
