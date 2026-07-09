@@ -190,14 +190,14 @@ class SearchAction(Component):
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("name", "=", barcode)], limit=1)
+        return model.search([("name", "=", barcode)], limit=self._limit)
 
     def _find_picking(self, parse_results, btype="picking"):
         model = self.env["stock.picking"]
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        picking = model.search([("name", "=", barcode)], limit=1)
+        picking = model.search([("name", "=", barcode)], limit=self._limit)
         # We need to split the domain in two different searches
         # as there might be a case where
         # the name of a picking is the same as the origin of another picking
@@ -212,7 +212,7 @@ class SearchAction(Component):
                 ("origin", "=", barcode),
                 ("state", "=", "assigned"),
             ]
-            return model.search(source_document_domain)
+            return model.search(source_document_domain, limit=self._limit)
         return model.browse()
 
     def _find_product(self, parse_results, btype="product"):
@@ -222,7 +222,7 @@ class SearchAction(Component):
             return model.browse()
         return model.search(
             ["|", ("barcode", "=", barcode), ("default_code", "=", barcode)],
-            limit=1,
+            limit=self._limit,
         )
 
     def _find_lot(self, parse_results, btype="lot"):
@@ -255,7 +255,7 @@ class SearchAction(Component):
         if not barcode:
             return model.browse()
         return model.search(
-            [("barcode", "=", barcode), ("product_id", "!=", False)], limit=1
+            [("barcode", "=", barcode), ("product_id", "!=", False)], limit=self._limit
         )
 
     def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
@@ -263,7 +263,7 @@ class SearchAction(Component):
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("barcode", "=", barcode)], limit=1)
+        return model.search([("barcode", "=", barcode)], limit=self._limit)
 
     def _find_origin_move(self, parse_results, btype="origin_move"):
         model = self.env["stock.move"]
@@ -276,4 +276,4 @@ class SearchAction(Component):
         ]
         if self._extra_domain:
             outgoing_move_domain = AND([outgoing_move_domain, self._extra_domain])
-        return model.search(outgoing_move_domain)
+        return model.search(outgoing_move_domain, limit=self._limit)
