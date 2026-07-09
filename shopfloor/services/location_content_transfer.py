@@ -8,6 +8,7 @@ from odoo.fields import first
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
+from ..actions.search import InvalidProduct
 from ..utils import to_float
 
 # NOTE for the implementation: share several similarities with the "cluster
@@ -610,10 +611,16 @@ class LocationContentTransfer(Component):
             "lot": self._scan_line__by_lot,
             "none": self._scan_line__fallback,
         }
-        search_result = search.for_products(move_line.product_id).find(
-            barcode,
-            types=handlers.keys(),
-        )
+        try:
+            search_result = search.for_products(move_line.product_id).find(
+                barcode,
+                types=handlers.keys(),
+            )
+        except InvalidProduct as e:
+            return self._response_for_start_single(
+                self._find_transfer_move_lines(location).picking_id,
+                message=self.msg_store.wrong_record(e.recordset),
+            )
         handler = handlers.get(search_result.type, self._scan_line__fallback)
         # handler might've been called but returned no response.
         # I.E. package is scanned but doesn't matches move_line's package.

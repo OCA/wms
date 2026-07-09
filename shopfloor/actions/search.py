@@ -7,6 +7,14 @@ from odoo.osv.expression import AND
 from odoo.addons.component.core import Component
 
 
+class InvalidProduct(Exception):
+    __slots__ = ("recordset", "type_")
+
+    def __init__(self, recordset, type_):
+        self.recordset = recordset
+        self.type_ = type_
+
+
 class SearchResult:
     __slots__ = ("record", "type", "code", "parse_result")
 
@@ -50,34 +58,46 @@ class SearchAction(Component):
         parser.search_action = self
         return parser
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._products = None
-        self._limit = 1
-        self._use_origin = False
-        self._extra_domain = None
+    def __init__(
+        self,
+        work_context,
+        products=None,
+        limit=1,
+        use_origin=False,
+        extra_domain=None,
+    ):
+        super().__init__(work_context)
+        self._products = products
+        self._limit = limit
+        self._use_origin = use_origin
+        self._extra_domain = extra_domain
 
-    def _reset_modifiers(self):
-        self._products = None
-        self._limit = 1
-        self._use_origin = False
-        self._extra_domain = None
+    def _get_properties(self):
+        return {
+            "products": self._products,
+            "limit": self._limit,
+            "use_origin": self._use_origin,
+            "extra_domain": self._extra_domain,
+        }
+
+    def _clone_with(self, **updates):
+        """Helper to return a new instance with updated properties."""
+        kwargs = self._get_properties()
+        kwargs.update(updates)
+        # Pass the existing work_context cleanly to the new instance
+        return self.__class__(self.work, **kwargs)
 
     def for_products(self, products):
-        self._products = products
-        return self
+        return self._clone_with(products=products)
 
     def with_limit(self, limit):
-        self._limit = limit
-        return self
+        return self._clone_with(limit=limit)
 
     def with_origin(self, use_origin=True):
-        self._use_origin = use_origin
-        return self
+        return self._clone_with(use_origin=use_origin)
 
     def with_domain(self, extra_domain):
-        self._extra_domain = extra_domain
-        return self
+        return self._clone_with(extra_domain=extra_domain)
 
     @property
     def _barcode_type_handler(self):
@@ -112,24 +132,20 @@ class SearchAction(Component):
 
         parse_results = self.parser.parse(barcode)
 
-        try:
-            for btype in types:
-                handler = self._barcode_type_handler.get(btype)
-                if not handler:
-                    continue
+        for btype in types:
+            handler = self._barcode_type_handler.get(btype)
+            if not handler:
+                continue
 
-                record = handler(parse_results, btype=btype)
-                if record:
-                    return self._make_search_result(
-                        record=record,
-                        code=barcode,
-                        type=btype,
-                        parse_result=parse_results,
-                    )
-            return self._make_search_result(type="none", parse_result=parse_results)
-        finally:
-            # Ensure no side effects between 2 different find calls on the same component
-            self._reset_modifiers()
+            record = handler(parse_results, btype=btype)
+            if record:
+                return self._make_search_result(
+                    record=record,
+                    code=barcode,
+                    type=btype,
+                    parse_result=parse_results,
+                )
+        return self._make_search_result(type="none", parse_result=parse_results)
 
     # -------------------------------------------------------------------------
     # Public Entry Points (Safe for direct downstream calls)
@@ -220,10 +236,16 @@ class SearchAction(Component):
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search(
+        products = model.search(
             ["|", ("barcode", "=", barcode), ("default_code", "=", barcode)],
             limit=self._limit,
         )
+        if self._products and products:
+            valid_products = products & self._products
+            if not valid_products:
+                raise InvalidProduct(products - self._products, "product")
+            return valid_products
+        return products
 
     def _find_lot(self, parse_results, btype="lot"):
         model = self.env["stock.lot"]
@@ -234,29 +256,52 @@ class SearchAction(Component):
             ("company_id", "=", self.env.company.id),
             ("name", "=", barcode),
         ]
-        if product_result := parse_results.get("product"):
-            domain.extend(
-                [
-                    "|",
-                    # also check for False in case we do not have the barcode
-                    # for the product yet in odoo
-                    ("product_id.barcode", "in", [False, product_result.value]),
-                    ("product_id.default_code", "in", [False, product_result.value]),
-                ]
-            )
+        products = None
+        if parse_results.get("product"):
+            invalid_products = invalid_packagings = False
+            try:
+                products = self.with_limit(None)._find_product(parse_results)
+            except InvalidProduct as e:
+                invalid_products = e.recordset
+            try:
+                packagings = self.with_limit(None)._find_packaging(parse_results)
+            except InvalidProduct as e:
+                invalid_packagings = e.recordset
 
-        if self._products:
+            if invalid_products and invalid_packagings:
+                raise (
+                    InvalidProduct(invalid_products, "product")
+                    if invalid_products
+                    else InvalidProduct(invalid_packagings, "packaging")
+                )
+
+            products |= packagings.product_id
+            if not products:
+                return model
+            if self._products:
+                products = products & self._products
+            domain.append(("product_id", "in", products.ids))
+
+        elif self._products:
             domain.append(("product_id", "in", self._products.ids))
         return model.search(domain, limit=self._limit)
 
-    def _find_packaging(self, parse_results, btype="packaging"):
+    def _find_packaging(self, parse_results, btype="products"):
         model = self.env["product.packaging"]
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search(
+        packagings = model.search(
             [("barcode", "=", barcode), ("product_id", "!=", False)], limit=self._limit
         )
+        if self._products and packagings:
+            valid_packagings = packagings.filtered(
+                lambda p: p.product_id in self._products
+            )
+            if not valid_packagings:
+                raise InvalidProduct(packagings - valid_packagings, "packaging")
+            return valid_packagings
+        return packagings
 
     def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
         model = self.env["stock.package.type"]

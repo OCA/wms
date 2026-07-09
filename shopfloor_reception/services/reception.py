@@ -14,7 +14,7 @@ from odoo.tools import float_compare, float_is_zero
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
-from odoo.addons.shopfloor.actions.search import SearchResult
+from odoo.addons.shopfloor.actions.search import InvalidProduct, SearchResult
 from odoo.addons.shopfloor.utils import to_float
 
 UTC = timezone.utc
@@ -637,12 +637,6 @@ class Reception(Component):
             "qty_done": selected_line.qty_done,
         }
         is_return_line = bool(selected_line.move_id.origin_returned_move_id)
-        if product.id != selected_line.product_id.id:
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.wrong_record(product),
-            )
         selected_line.qty_done += 1
         response = self._response_for_set_quantity(picking, selected_line)
         if self.work.menu.allow_return and is_return_line:
@@ -669,12 +663,6 @@ class Reception(Component):
             "qty_done": selected_line.qty_done,
         }
         is_return_line = bool(selected_line.move_id.origin_returned_move_id)
-        if packaging.product_id.id != selected_line.product_id.id:
-            return self._response_for_set_quantity(
-                picking,
-                selected_line,
-                message=self.msg_store.wrong_record(packaging),
-            )
         selected_line.qty_done += packaging.qty
         response = self._response_for_set_quantity(picking, selected_line)
         if self.work.menu.allow_return and is_return_line:
@@ -1059,7 +1047,7 @@ class Reception(Component):
                         single correspondance. Not tracked product
         """
         handlers_by_type = self._scan_document__get_handlers_by_type()
-        search = self._actions_for("search").with_origin()
+        search = self._actions_for("search").with_origin().with_limit(None)
         for handler_type, handler in handlers_by_type.items():
             record = search.find(barcode, [handler_type]).record
             if not record:
@@ -1190,10 +1178,18 @@ class Reception(Component):
             )
 
         search = self._actions_for("search").for_products(selected_line.product_id)
-        search_result = search.find(
-            barcode=barcode,
-            types=["lot"],
-        )
+        try:
+            search_result = search.find(
+                barcode=barcode,
+                types=["lot"],
+            )
+        except InvalidProduct as e:
+            return self._response_for_set_lot(
+                picking,
+                selected_line,
+                message=self.msg_store.wrong_record(e.recordset),
+            )
+
         # Look for more info in the barcode
         existing_lot = search_result.record or self.env["stock.lot"]
         if (
@@ -1362,10 +1358,17 @@ class Reception(Component):
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
         search = self._actions_for("search").for_products(selected_line.product_id)
-        search_result = search.find(
-            barcode,
-            handlers_by_type.keys(),
-        )
+        try:
+            search_result = search.find(
+                barcode,
+                handlers_by_type.keys(),
+            )
+        except InvalidProduct as e:
+            return self._response_for_set_quantity(
+                picking,
+                selected_line,
+                message=self.msg_store.wrong_record(e.recordset),
+            )
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(picking, selected_line, search_result.record)
