@@ -11,7 +11,7 @@
     "maintainers": ["TDu"],
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["shopfloor_reception", "product_packaging_level"],
+    "depends": ["shopfloor_reception", "product_packaging_level", "stock_storage_type"],
     "data": [
         "views/product_packaging_level.xml",
         "views/shopfloor_menu.xml",

@@ -1,6 +1,8 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
+from odoo import Command
+
 from odoo.addons.shopfloor_reception.tests.common import CommonCase
 
 
@@ -27,7 +29,7 @@ class TestPackagingCommon(CommonCase):
         # Picking has 3 products
         # Product A with one packaging
         # Product B with no packaging
-        cls.product_b.packaging_ids = [(5, 0, 0)]
+        cls.product_b.packaging_ids = [Command.clear()]
         # Product C with 2 packaging
         cls.product_c_packaging_2 = (
             cls.env["product.packaging"]

@@ -9,6 +9,11 @@ class TestNewPackaging(TestPackagingCommon):
     def setUpClassBaseData(cls):
         res = super().setUpClassBaseData()
         cls.menu.sudo().create_new_packaging = True
+        cls.product_a.package_type_id = cls.env.ref("stock.package_type_01").id
+        cls.product_a.package_type_id.packaging_level_id = (
+            cls.default_packaging_level.id
+        )
+
         return res
 
     def test_new_packaging(self):
@@ -23,6 +28,7 @@ class TestNewPackaging(TestPackagingCommon):
 
         packaging = self.env["product.packaging"].search([], order="id desc", limit=1)
         self.assertTrue(packaging)
+        self.assertEqual(packaging.packaging_level_id, self.default_packaging_level)
         self._assert_response_create_new_packaging(
             response, self.picking, self.line_with_packaging, packaging
         )

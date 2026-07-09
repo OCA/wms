@@ -183,6 +183,10 @@ class Reception(Component):
                 {
                     "name": "New Packaging (from Shopfloor)",
                     "product_id": line.product_id.id,
+                    "packaging_level_id": line.product_id.package_type_id.packaging_level_id.id
+                    or self.env.ref(
+                        "product_packaging_level.product_packaging_level_default"
+                    ).id,
                 }
             )
         )
