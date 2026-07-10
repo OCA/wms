@@ -256,24 +256,21 @@ class SearchAction(Component):
             ("company_id", "=", self.env.company.id),
             ("name", "=", barcode),
         ]
-        products = None
+        products = self.env["product.product"]
         if parse_results.get("product"):
-            invalid_products = invalid_packagings = False
+            errors = []
             try:
                 products = self.with_limit(None)._find_product(parse_results)
             except InvalidProduct as e:
-                invalid_products = e.recordset
+                errors.append(e)
             try:
                 packagings = self.with_limit(None)._find_packaging(parse_results)
+                products |= packagings.product_id
             except InvalidProduct as e:
-                invalid_packagings = e.recordset
+                errors.append(e)
 
-            if invalid_products and invalid_packagings:
-                raise (
-                    InvalidProduct(invalid_products, "product")
-                    if invalid_products
-                    else InvalidProduct(invalid_packagings, "packaging")
-                )
+            if errors and not products:
+                raise errors[-1]
 
             products |= packagings.product_id
             if not products:
