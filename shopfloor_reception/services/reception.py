@@ -819,7 +819,8 @@ class Reception(Component):
         return self._response(next_state="manual_selection", data=data)
 
     def _response_for_set_lot(self, picking, line, message=None, **kw):
-        # Try pre-fill expiration_date for UI
+        # ↓ In case "lot_name" is pre-filled on the line in odoo, pre-fill
+        # shpofloor screen
         if kw.get("lot_name") and not kw.get("lot_expiration_date") and not message:
             lot = (
                 self._actions_for("search")
