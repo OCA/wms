@@ -484,7 +484,11 @@ class Checkout(Component):
             "none": self._select_lines_from_none,
         }
         try:
-            search_result = self._scan_line_find(picking, barcode, handlers.keys())
+            search = self._actions_for("search")
+            search_result = search.for_products(picking.move_ids.product_id).find(
+                barcode,
+                types=handlers.keys(),
+            )
             scanned_record = search_result.record
             scanned_type = search_result.type
         except InvalidProduct as e:
@@ -504,13 +508,6 @@ class Checkout(Component):
         }
         handler = handlers.get(scanned_type, self._select_lines_from_none)
         return handler(picking, selection_lines, scanned_record, **kwargs)
-
-    def _scan_line_find(self, picking, barcode, search_types):
-        search = self._actions_for("search")
-        return search.for_products(picking.move_ids.product_id).find(
-            barcode,
-            types=search_types,
-        )
 
     def _select_lines_from_none(self, picking, selection_lines, record, **kw):
         """Handle result when no record is found."""
