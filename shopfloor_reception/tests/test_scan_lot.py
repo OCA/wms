@@ -5,7 +5,6 @@ from datetime import date, datetime, timezone
 from unittest import mock
 
 from odoo.addons.shopfloor.actions.barcode_parser import BarcodeParser, BarcodeResult
-from odoo.addons.shopfloor.actions.search import SearchAction, SearchResult
 
 from .common import CommonCase
 
@@ -25,82 +24,85 @@ class TestScanLotName(CommonCase):
         cls.selected_move_line = cls.picking.move_line_ids.filtered(
             lambda l: l.product_id == cls.product_a
         )
-        # ↓ Put a barcode compatible with GS1
-        cls.product_a.write({"tracking": "lot", "barcode": "11111111111111"})
+        # ↓ Put valid GTIN13 barcodes
+        cls.product_a.write({"tracking": "lot", "barcode": "1575138215415"})
+        cls.product_b.write({"tracking": "lot", "barcode": "7513645634040"})
         cls.selected_move_line.shopfloor_user_id = cls.env.uid
 
         return res
 
-    def _generate_gs1(
-        self, product_barcode: str, lot_expiration_date: date, lot_name: str
-    ) -> str:
+    def _get_gs1_parsing_results(
+        self, lot, expiration_date_str=None
+    ) -> dict[str, BarcodeResult]:
+        expiration_date_str = (
+            lot.expiration_date.strftime("%y%m%d")
+            if lot.expiration_date
+            else expiration_date_str or ""
+        )
         gs1_barcode = (
-            f"{GTIN_AI}{product_barcode}"
-            f"{EXPIRATION_DATE_AI}{lot_expiration_date.strftime('%y%m%d')}"
-            f"{LOT_AI}{lot_name}"
+            f"{GTIN_AI}{lot.product_id.barcode.zfill(14)}"
+            + (
+                f"{EXPIRATION_DATE_AI}{expiration_date_str}"
+                if expiration_date_str
+                else ""
+            )
+            + f"{LOT_AI}{lot.name}"
         )
-        return gs1_barcode
+        # Note: the order here is important, the first to match a record
+        # in DB will determine the `type` (and `record`) of the `SearchResult`
+        results = {
+            "unknown": BarcodeResult(
+                type="unknown", value=gs1_barcode, raw=gs1_barcode
+            ),
+            # -> Put "product" in first to test if no error in case the
+            # SearchResult type is not "lot" but "product" when scaning a lot
+            "product": BarcodeResult(
+                type="product", value=lot.product_id.barcode, raw=lot.product_id.barcode
+            ),
+            "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+        }
+        if expiration_date_str:
+            results["expiration_date"] = BarcodeResult(
+                type="expiration_date",
+                value=date(
+                    int("20" + expiration_date_str[:2]),
+                    int(expiration_date_str[2:4]),
+                    int(expiration_date_str[4:6]),
+                ),
+                raw=expiration_date_str,
+            )
 
-    def _generate_search_result(
-        self,
-        full_barcode: str,
-        expiration_date: date,
-        lot_name: str,
-        product_barcode: str,
-        _type="none",
-        record=None,
-    ) -> SearchResult:
-        return SearchResult(
-            record=record,
-            type=_type,
-            parse_result={
-                "unknown": BarcodeResult(
-                    type="unknown", value=full_barcode, raw=full_barcode
-                ),
-                "expiration_date": BarcodeResult(
-                    type="expiration_date",
-                    value=expiration_date,
-                    raw=expiration_date.strftime("%y%m%d"),
-                ),
-                "lot": BarcodeResult(type="lot", value=lot_name, raw=lot_name),
-                "product": BarcodeResult(
-                    type="product", value=product_barcode, raw=product_barcode
-                ),
-            },
-        )
+        return results
 
     def test_scan_lot_extract_expiration_date_new_lot(self):
         """
         Test that the expiration date can be extracted from barcode scan
         (case when the lot does not already exsit in db)
         """
-        expiration_date = date(2022, 7, 2)
-        gs1_barcode = self._generate_gs1(
-            self.product_a.barcode, expiration_date, self.lot.name
+        lot = self._create_lot(
+            product_id=self.product_a.id, expiration_date=datetime(2022, 7, 2)
         )
 
-        with mock.patch.object(SearchAction, "find") as mock_find:
-            mock_find.return_value = self._generate_search_result(
-                gs1_barcode, expiration_date, self.lot.name, self.product_a.barcode
-            )
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            mock_parse.return_value = self._get_gs1_parsing_results(lot)
             res = self.service.dispatch(
                 "scan_lot",
                 params={
                     "picking_id": self.picking.id,
                     "selected_line_id": self.selected_move_line.id,
-                    "barcode": self.lot.name,
+                    "barcode": mock_parse.return_value["unknown"].raw,
                 },
             )
 
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
             datetime.combine(
-                expiration_date, datetime.min.time(), tzinfo=timezone.utc
+                lot.expiration_date, datetime.min.time(), tzinfo=timezone.utc
             ).isoformat(),
         )
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
-            self.lot.name,
+            lot.name,
         )
 
     def test_scan_lot_extract_expiration_date_existing_lot(self):
@@ -110,41 +112,35 @@ class TestScanLotName(CommonCase):
         Ensure there is a warning in case of mismatch between expiration date found in
         the barcode and the one on the existing lot.
         """
-        expiration_date = date(2022, 7, 2)
-        gs1_barcode = self._generate_gs1(
-            self.product_a.barcode, expiration_date, self.lot.name
+        lot = self._create_lot(
+            product_id=self.product_a.id, expiration_date=datetime(2022, 7, 2)
         )
 
-        with mock.patch.object(SearchAction, "find") as mock_find:
-            mock_find.return_value = self._generate_search_result(
-                gs1_barcode,
-                expiration_date,
-                self.lot.name,
-                self.product_a.barcode,
-                _type="lot",
-                record=self.lot,
-            )
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            mock_parse.return_value = self._get_gs1_parsing_results(lot)
+            # change expiration date in odoo to make a mismatch with scanned barcode
+            lot.expiration_date = datetime(2022, 7, 3)
             res = self.service.dispatch(
                 "scan_lot",
                 params={
                     "picking_id": self.picking.id,
                     "selected_line_id": self.selected_move_line.id,
-                    "barcode": self.lot.name,
+                    "barcode": mock_parse.return_value["unknown"].raw,
                 },
             )
 
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["expiration_date"],
             datetime.combine(
-                expiration_date, datetime.min.time(), tzinfo=timezone.utc
+                lot.expiration_date, datetime.min.time(), tzinfo=timezone.utc
             ).isoformat(),
         )
         self.assertEqual(
             res["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
-            self.lot.name,
+            lot.name,
         )
         self.assertMessage(
-            res, self.msg_store.lot_already_exists_different_expiration_date(self.lot)
+            res, self.msg_store.lot_already_exists_different_expiration_date(lot)
         )
 
     def test_scan_lot_name_auto_set_lot_on_move_line(self):
@@ -170,22 +166,17 @@ class TestScanLotName(CommonCase):
         Test that the system detects that the scanned lot is for another product
         than currently selected one.
         """
-        expiration_date = date(2022, 7, 2)
-        other_product_barcode = "01223334444555"
-        gs1_barcode = self._generate_gs1(
-            other_product_barcode, expiration_date, self.lot.name
+        lot_other_product = self._create_lot(
+            product_id=self.product_b.id, expiration_date=datetime(2022, 7, 2)
         )
-
-        with mock.patch.object(SearchAction, "find") as mock_find:
-            mock_find.return_value = self._generate_search_result(
-                gs1_barcode, expiration_date, self.lot.name, other_product_barcode
-            )
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            mock_parse.return_value = self._get_gs1_parsing_results(lot_other_product)
             res = self.service.dispatch(
                 "scan_lot",
                 params={
                     "picking_id": self.picking.id,
                     "selected_line_id": self.selected_move_line.id,
-                    "barcode": self.lot.name,
+                    "barcode": mock_parse.return_value["unknown"].raw,
                 },
             )
         self.assert_response(
@@ -195,7 +186,7 @@ class TestScanLotName(CommonCase):
             data={
                 "picking": self.data.picking(self.picking),
                 "selected_move_line": self._data_for_move_lines(
-                    self.selected_move_line
+                    self.selected_move_line,
                 ),
             },
         )
@@ -205,31 +196,19 @@ class TestScanLotName(CommonCase):
         self.wh.partner_id.sudo().tz = "Europe/Brussels"
 
         picking = self._create_picking()
-        lot = self._create_lot()
-        lot.expiration_date = None
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
         selected_move_line.product_id.sudo().use_expiration_date = True
-        # selected_move_line.lot_id = lot
+
+        lot = self._create_lot(
+            product_id=selected_move_line.product_id.id, expiration_date=None
+        )
+
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
-            # Note: the order here is important, the first to match a record
-            # in DB will determine the `type` (and `record`) of the `SearchResult`
-            mock_parse.return_value = {
-                # -> Put "product" in first to test if no error in case the
-                # SearchResult type is not "lot" but "product"
-                "product": BarcodeResult(
-                    type="product",
-                    value=selected_move_line.product_id.barcode,
-                    raw=selected_move_line.product_id.barcode,
-                ),
-                "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
-                "expiration_date": BarcodeResult(
-                    type="expiration_date",
-                    value=date(2025, 4, 15),
-                    raw="250415",
-                ),
-            }
+            mock_parse.return_value = self._get_gs1_parsing_results(
+                lot, expiration_date_str="250415"
+            )
             response = self.service.dispatch(
                 "scan_line",
                 params={

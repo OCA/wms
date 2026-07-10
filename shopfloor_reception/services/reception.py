@@ -1184,24 +1184,15 @@ class Reception(Component):
                 barcode=barcode,
                 types=["lot"],
             )
-        except InvalidProduct as e:
-            return self._response_for_set_lot(
-                picking,
-                selected_line,
-                message=self.msg_store.wrong_record(e.recordset),
-            )
-
-        # Look for more info in the barcode
-        existing_lot = search_result.record or self.env["stock.lot"]
-        if (
-            prod_result := search_result.parse_result.get("product")
-        ) and prod_result.value != selected_line.product_id.barcode:
+        except InvalidProduct:
             return self._response_for_set_lot(
                 picking,
                 selected_line,
                 message=self.msg_store.lot_product_mismatch(),
             )
 
+        # Look for more info in the barcode
+        existing_lot = search_result.record or self.env["stock.lot"]
         lot_name = barcode
         if lot_result := search_result.parse_result.get("lot"):
             lot_name = lot_result.value
