@@ -25,6 +25,8 @@ setuptools.setup(
         'odoo-addon-shopfloor_mobile_base_auth_api_key>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_product_dimension>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_reception_dock>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_reception_dock_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_packaging_dimension>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_packaging_dimension_mobile>=16.0dev,<16.1dev',
