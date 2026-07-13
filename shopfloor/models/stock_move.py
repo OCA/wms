@@ -104,9 +104,10 @@ class StockMove(models.Model):
             "move_ids": [],
             "move_line_ids": [],
             "backorder_id": picking.id,
+            "batch_id": picking.batch_id.id,
         }
         data.update(dict(default or []))
-        new_picking = picking.copy(data)
+        new_picking = picking.with_context(disable_batch_sanity_check=True).copy(data)
         link = '<a href="#" data-oe-model="stock.picking" data-oe-id="%d">%s</a>' % (
             new_picking.id,
             new_picking.name,
