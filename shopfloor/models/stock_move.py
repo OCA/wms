@@ -104,10 +104,9 @@ class StockMove(models.Model):
             "move_ids": [],
             "move_line_ids": [],
             "backorder_id": picking.id,
-            "batch_id": picking.batch_id.id,
         }
         data.update(dict(default or []))
-        new_picking = picking.with_context(disable_batch_sanity_check=True).copy(data)
+        new_picking = picking.copy(data)
         link = '<a href="#" data-oe-model="stock.picking" data-oe-id="%d">%s</a>' % (
             new_picking.id,
             new_picking.name,
@@ -131,6 +130,10 @@ class StockMove(models.Model):
                 if line.package_id == line.result_package_id:
                     line.result_package_id = False
 
+        # The batch cannot be set during copy as the moves have to be first
+        # extracted to the new picking in order to have a non draft state that
+        # will succeed the batch sanity check
+        new_picking.batch_id = picking.batch_id
         return new_picking
 
     def extract_and_action_done(self):

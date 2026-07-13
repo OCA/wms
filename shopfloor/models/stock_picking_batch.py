@@ -39,8 +39,3 @@ class StockPickingBatch(models.Model):
 
     def _calc_weight(self, pickings):
         return sum(pickings.mapped("total_weight"))
-
-    def _sanity_check(self):
-        if self.env.context.get("disable_batch_sanity_check"):
-            return
-        return super()._sanity_check()

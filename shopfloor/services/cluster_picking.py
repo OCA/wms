@@ -1,8 +1,12 @@
 # Copyright 2020-2021 Camptocamp SA (http://www.camptocamp.com)
-# Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2020 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+from markupsafe import Markup
+
 from odoo import _, fields
+from odoo.exceptions import UserError
 from odoo.osv import expression
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
@@ -1154,47 +1158,80 @@ class ClusterPicking(Component):
     def _unload_write_destination_on_lines(self, lines, location):
         stock = self._actions_for("stock")
         stock.set_destination_on_lines(lines, location)
+        if self.work.menu.unload_package_at_destination:
+            stock.unload_package(lines)
         lines.write({"shopfloor_unloaded": True})
-        for picking in lines.batch_id.picking_ids:
-            picking_lines = lines.filtered(lambda x, p=picking: x.picking_id == p)
-            self._unload_set_picking_to_done(picking, picking_lines)
+        for picking in lines.picking_id:
+            self._unload_set_picking_to_done(picking)
 
-    def _unload_set_picking_to_done(self, picking, picking_lines):
+    def _unload_set_picking_to_done(self, picking):
+        """Set picking to done when all picked move lines have been unloaded"""
         if picking.state == "done":
             return
-        # We set the picking to done only when the last line is
-        # unloaded to avoid backorders.
-        all_lines_unloaded = all(
-            line.shopfloor_unloaded for line in picking.move_line_ids
+        for ml in picking.move_line_ids:
+            if not ml.picked or not ml.has_quantity_reserved:
+                continue
+            # Ensure the quantity picked >= quantity reserved.
+            # At this stage, the move line should have already been split
+            # when setting the destination package.
+            if not ml.is_fully_picked:
+                raise UserError(
+                    _(
+                        "Internal Error: The move line %s is not fully picked",
+                        ml.display_name,
+                    )
+                )
+            if not ml.shopfloor_unloaded:
+                # A move line is not unloaded, exit
+                return
+        stock = self._actions_for("stock")
+        for move in picking.move_ids:
+            move.split_other_move_lines(
+                move.move_line_ids.filtered(lambda ml: ml.picked)
+            )
+        # remove assigned non picked moves
+        moves_to_validate = picking.move_ids.filtered(
+            lambda m: not (m.state == "assigned" and not m.picked)
         )
-        if self.work.menu.unload_package_at_destination and all_lines_unloaded:
-            picking_lines.result_package_id = False
-        if all_lines_unloaded:
-            picking._action_done()
+        stock.validate_moves(moves_to_validate)
+        if picking.state not in ("cancel", "done"):
+            # A split order has been created, remove picking from batch
+            picking.batch_id = False
 
     def _unload_end(self, batch, completion_info_popup=None):
-        """After unloading close the batch transfer.
+        """Remove unprocessed pickings from batch to close it.
 
-        Always close the batch transfer after unloading. The remaining work to do will
-        be assigned to a new one.
         Returns to `start` transition.
         """
-        all_pickings = batch.picking_ids
-        if all(picking.state == "done" for picking in all_pickings):
-            # do not use the 'done()' method because it does many things we
-            # don't care about
-            batch.state = "done"
-            return self._response_for_start(
-                message=self.msg_store.batch_transfer_complete(),
-                popup=completion_info_popup,
+
+        empty_pickings = batch.picking_ids.filtered(
+            lambda picking: picking.state in ("waiting", "confirmed", "assigned")
+            and all(
+                not m.picked or not m.has_quantity_reserved
+                for m in picking.move_ids
+                if m.state not in ("done", "cancel")
             )
-        all_pickings.filtered(lambda x: x.state == "assigned")._action_done()
-        batch.state = "done"
-        # Unassign not validated pickings from the batch, they will be
-        # processed in another batch automatically later on
-        all_pickings.invalidate_recordset(["state"])
-        pickings_not_done = all_pickings.filtered(lambda p: p.state != "done")
-        pickings_not_done.batch_id = False
+        )
+        if empty_pickings:
+            batch.message_post(
+                body=Markup("<b>%s:</b> %s")
+                % (
+                    _("Unprocessed transfer removed from batch"),
+                    ", ".join(
+                        Markup(
+                            "<a href=#id=%s&view_type=form&model=stock.picking>%s</a>"
+                        )
+                        % (p.id, p.name)
+                        for p in empty_pickings
+                    ),
+                )
+            )
+            empty_pickings.batch_id = False
+
+        if batch.state != "done":
+            # As processed pickings are already done, the batch should now be done
+            raise UserError(self.env._("Internal Error: Batch not properly done."))
+
         return self._response_for_start(
             message=self.msg_store.batch_transfer_complete(),
             popup=completion_info_popup,
