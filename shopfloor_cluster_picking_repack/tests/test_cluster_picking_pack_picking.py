@@ -205,8 +205,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
 
     def test_prepare_full_bin_unload(self):
         # process one move_line and call unload
-        # the unload should return a pack_picking state
-        # and once processed continue with next move_lines
+        # the unload will close the batch
         move_lines = self.move_lines
         self._set_dest_package_and_done(move_lines[0], self.bin1)
         move_lines.write({"location_dest_id": self.packing_location.id})
@@ -266,65 +265,20 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
 
-        # once the unload is done, we must process the others move_lines
-        move_line = self.service._next_line_for_pick(self.batch)
-        while move_line:
-            picking = move_line.picking_id
-            self.assertEqual(response["next_state"], "start_line")
-            response = self.service.dispatch(
-                "scan_destination_pack",
-                params={
-                    "picking_batch_id": self.batch.id,
-                    "move_line_id": move_line.id,
-                    "barcode": self.bin1.name,
-                    "quantity": move_line.quantity,
-                },
-            )
-            move_line = self.service._next_line_for_pick(self.batch)
-
-        # everything is processed, we should put in pack...
-        data = self.data.pack_picking(picking)
+        # once the unload is done, the batch is done
+        self.assertRecordValues(self.batch, [{"state": "done"}])
         self.assert_response(
             response,
-            next_state="pack_picking_scan_pack",
-            data=data,
+            next_state="start",
+            message={"message_type": "success", "body": "Batch Transfer complete"},
+            popup=self.ANY,
         )
-        # we scan the pack and  process to the put in pack
-        response = self.service.dispatch(
-            "scan_packing_to_pack",
-            params={
-                "picking_batch_id": self.batch.id,
-                "picking_id": picking.id,
-                "selected_line_ids": picking.move_line_ids.ids,
-                "barcode": self.bin1.name,
-            },
+        self.assertRecordValues(
+            move_lines[0].picking_id, [{"state": "done", "batch_id": self.batch.id}]
         )
-        data = self.data.pack_picking(picking)
-        self.assert_response(
-            response,
-            next_state="pack_picking_put_in_pack",
-            data=data,
+        self.assertRecordValues(
+            move_lines[1].picking_id, [{"state": "assigned", "batch_id": False}]
         )
-        response = self.service.dispatch(
-            "put_in_pack",
-            params={
-                "picking_batch_id": self.batch.id,
-                "picking_id": picking.id,
-                "selected_line_ids": picking.move_line_ids.ids,
-                "nbr_packages": 2,
-            },
-        )
-        data = self._data_for_batch(self.batch, location)
-        self.assert_response(
-            response,
-            next_state="unload_all",
-            data=data,
-            message=self.service.msg_store.stock_picking_packed_successfully(picking),
-        )
-
-        result_package = picking.move_line_ids.mapped("result_package_id")
-        self.assertEqual(len(result_package), 1)
-        self.assertEqual(result_package[0].number_of_parcels, 2)
 
     def test_response_for_scan_destination(self):
         """Check that non internal package are not proposed as package_dest."""
