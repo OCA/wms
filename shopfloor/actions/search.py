@@ -266,7 +266,7 @@ class SearchAction(Component):
         if self._products and products:
             valid_products = products & self._products
             if not valid_products:
-                raise SearchInvalidProduct(products - self._products)
+                raise SearchInvalidProduct(products)
             return valid_products
         return products
 
