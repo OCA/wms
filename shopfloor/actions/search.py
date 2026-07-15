@@ -261,14 +261,14 @@ class SearchAction(Component):
             return model.browse()
         products = model.search(
             ["|", ("barcode", "=", barcode), ("default_code", "=", barcode)],
-            limit=self._limit,
+            limit=None if self._products else self._limit,
         )
         if self._products and products:
             valid_products = products & self._products
             if not valid_products:
                 raise SearchInvalidProduct(products)
-            return valid_products
-        return products
+            return valid_products[: self._limit]
+        return products[: self._limit]
 
     def _find_lot(self, parse_results, btype="lot"):
         model = self.env["stock.lot"]
