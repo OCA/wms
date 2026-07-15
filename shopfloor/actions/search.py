@@ -7,12 +7,20 @@ from odoo.osv.expression import AND
 from odoo.addons.component.core import Component
 
 
-class InvalidProduct(Exception):
-    __slots__ = ("recordset", "type_")
+class SearchInvalidRecordset(Exception):
+    __slots__ = ("recordset",)
 
-    def __init__(self, recordset, type_):
+    def __init__(self, recordset):
+        super().__init__(recordset)
         self.recordset = recordset
-        self.type_ = type_
+
+
+class SearchInvalidProduct(SearchInvalidRecordset):
+    pass
+
+
+class SearchInvalidPackage(SearchInvalidRecordset):
+    pass
 
 
 class SearchResult:
@@ -62,12 +70,14 @@ class SearchAction(Component):
         self,
         work_context,
         products=None,
+        packages=None,
         limit=1,
         use_origin=False,
         extra_domain=None,
     ):
         super().__init__(work_context)
         self._products = products
+        self._packages = packages
         self._limit = limit
         self._use_origin = use_origin
         self._extra_domain = extra_domain
@@ -75,6 +85,7 @@ class SearchAction(Component):
     def _get_properties(self):
         return {
             "products": self._products,
+            "packages": self._packages,
             "limit": self._limit,
             "use_origin": self._use_origin,
             "extra_domain": self._extra_domain,
@@ -89,6 +100,9 @@ class SearchAction(Component):
 
     def for_products(self, products):
         return self._clone_with(products=products)
+
+    def for_packages(self, packages):
+        return self._clone_with(packages=packages)
 
     def with_limit(self, limit):
         return self._clone_with(limit=limit)
@@ -206,7 +220,16 @@ class SearchAction(Component):
         barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("name", "=", barcode)], limit=self._limit)
+
+        packages = model.search([("name", "=", barcode)], limit=self._limit)
+
+        if packages and self._packages:
+            valid_packages = packages & self._packages
+            if not valid_packages:
+                raise SearchInvalidPackage(recordset=packages)
+            return valid_packages
+
+        return packages
 
     def _find_picking(self, parse_results, btype="picking"):
         model = self.env["stock.picking"]
@@ -243,7 +266,7 @@ class SearchAction(Component):
         if self._products and products:
             valid_products = products & self._products
             if not valid_products:
-                raise InvalidProduct(products - self._products, "product")
+                raise SearchInvalidProduct(products - self._products)
             return valid_products
         return products
 
@@ -261,12 +284,12 @@ class SearchAction(Component):
             errors = []
             try:
                 products = self.with_limit(None)._find_product(parse_results)
-            except InvalidProduct as e:
+            except SearchInvalidProduct as e:
                 errors.append(e)
             try:
                 packagings = self.with_limit(None)._find_packaging(parse_results)
                 products |= packagings.product_id
-            except InvalidProduct as e:
+            except SearchInvalidProduct as e:
                 errors.append(e)
 
             if errors and not products:
@@ -296,7 +319,7 @@ class SearchAction(Component):
                 lambda p: p.product_id in self._products
             )
             if not valid_packagings:
-                raise InvalidProduct(packagings - valid_packagings, "packaging")
+                raise SearchInvalidProduct(packagings - valid_packagings)
             return valid_packagings
         return packagings
 

@@ -14,7 +14,7 @@ from odoo.tools import float_compare, float_is_zero
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
-from odoo.addons.shopfloor.actions.search import InvalidProduct, SearchResult
+from odoo.addons.shopfloor.actions.search import SearchInvalidProduct, SearchResult
 from odoo.addons.shopfloor.utils import to_float
 
 UTC = timezone.utc
@@ -1184,7 +1184,7 @@ class Reception(Component):
                 barcode=barcode,
                 types=["lot"],
             )
-        except InvalidProduct:
+        except SearchInvalidProduct:
             return self._response_for_set_lot(
                 picking,
                 selected_line,
@@ -1355,7 +1355,7 @@ class Reception(Component):
                 barcode,
                 handlers_by_type.keys(),
             )
-        except InvalidProduct as e:
+        except SearchInvalidProduct as e:
             return self._response_for_set_quantity(
                 picking,
                 selected_line,

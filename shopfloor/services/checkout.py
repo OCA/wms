@@ -9,7 +9,7 @@ from odoo import _, fields
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
-from ..actions.search import InvalidProduct
+from ..actions.search import SearchInvalidPackage, SearchInvalidProduct
 from ..utils import to_float
 
 
@@ -485,16 +485,46 @@ class Checkout(Component):
         }
         try:
             search = self._actions_for("search")
-            search_result = search.for_products(picking.move_ids.product_id).find(
-                barcode,
-                types=handlers.keys(),
+            search_result = (
+                search.for_products(picking.move_ids.product_id)
+                .for_packages(picking.move_line_ids.package_id)
+                .find(
+                    barcode,
+                    types=handlers.keys(),
+                )
             )
-            scanned_record = search_result.record
-            scanned_type = search_result.type
-        except InvalidProduct as e:
-            # Leave downstream functions deal with more precise error message
-            scanned_record = e.recordset
-            scanned_type = e.type_
+        except SearchInvalidProduct as e:
+            if e.recordset._name == "product.product":
+                product = e.recordset[:1]
+            elif e.recordset._name == "product.packaging":
+                product = e.recordset[:1].product_id
+            else:
+                # should not happen
+                raise e
+            return_picking = self._get_pickings_for_product(product, limit=1)
+            if return_picking:
+                message = self.msg_store.reserved_for_other_picking_type(return_picking)
+            else:
+                message = self.msg_store.product_not_found_in_current_picking(product)
+            return self._response_for_select_line(picking, message=message)
+
+        except SearchInvalidPackage as e:
+            if e.recordset._name == "stock.quant.package":
+                # No line for scanned package in selected picking
+                # Check if there's any picking reserving this product.
+                package = e.recordset
+                return_picking = self._get_pickings_for_package(package, limit=1)
+                if return_picking:
+                    message = self.msg_store.reserved_for_other_picking_type(
+                        return_picking
+                    )
+                else:
+                    message = self.msg_store.package_not_found_in_picking(
+                        package, picking
+                    )
+                return self._response_for_select_line(picking, message=message)
+            else:
+                raise e
 
         # setting scanned record as kwarg in order to make better logs.
         # The reason for this is that from a product we might select various records
@@ -503,11 +533,11 @@ class Checkout(Component):
         kwargs = {
             "confirm_pack_all": confirm_pack_all,
             "confirm_lot": confirm_lot,
-            "scanned_record": scanned_record,
+            "scanned_record": search_result.record,
             "barcode": barcode,
         }
-        handler = handlers.get(scanned_type, self._select_lines_from_none)
-        return handler(picking, selection_lines, scanned_record, **kwargs)
+        handler = handlers.get(search_result.type, self._select_lines_from_none)
+        return handler(picking, selection_lines, search_result.record, **kwargs)
 
     def _select_lines_from_none(self, picking, selection_lines, record, **kw):
         """Handle result when no record is found."""
@@ -521,15 +551,6 @@ class Checkout(Component):
         lines = selection_lines.filtered(
             lambda x: x.package_id == package and not x.shopfloor_checkout_done
         )
-        if not lines:
-            # No line for scanned package in selected picking
-            # Check if there's any picking reserving this product.
-            return_picking = self._get_pickings_for_package(package, limit=1)
-            if return_picking:
-                message = self.msg_store.reserved_for_other_picking_type(return_picking)
-            else:
-                message = self.msg_store.package_not_found_in_picking(package, picking)
-            return self._response_for_select_line(picking, message=message)
         self._select_lines(lines, prefill_qty=prefill_qty)
         if self.work.menu.no_prefill_qty:
             lines = picking.move_line_ids
@@ -545,13 +566,6 @@ class Checkout(Component):
             )
 
         lines = selection_lines.filtered(lambda x: x.product_id == product)
-        if not lines:
-            return_picking = self._get_pickings_for_product(product, limit=1)
-            if return_picking:
-                message = self.msg_store.reserved_for_other_picking_type(return_picking)
-            else:
-                message = self.msg_store.product_not_found_in_current_picking(product)
-            return self._response_for_select_line(picking, message=message)
 
         # When products are as units outside of packages, we can select them for
         # packing, but if they are in a package, we want the user to scan the packages.
@@ -1073,7 +1087,7 @@ class Checkout(Component):
         }
         try:
             search_result = self._scan_package_find(picking, barcode, handlers.keys())
-        except InvalidProduct as e:
+        except SearchInvalidProduct as e:
             return self._response_for_select_package(
                 picking,
                 selected_lines,
