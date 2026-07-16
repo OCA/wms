@@ -83,6 +83,7 @@ from . import test_zone_picking_require_destination_package
 from . import test_misc
 from . import test_move_action_assign
 from . import test_scan_anything
+from . import test_stock_move
 from . import test_stock_split
 from . import test_picking_form
 from . import test_user
