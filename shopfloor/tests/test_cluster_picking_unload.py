@@ -186,8 +186,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination).
         # However, we keep a line without qty_done and destination package,
-        # so when the dest location is set, the endpoint should route back
-        # to the 'start_line' state to work on the remaining line.
+        # it will be moved in a new transfer and the batch closed.
         lines_to_unload = self.move_lines[:2]
         self._set_dest_package_and_done(lines_to_unload, self.bin1)
         lines_to_unload.write({"location_dest_id": self.packing_location.id})
@@ -199,11 +198,18 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 "barcode": self.packing_location.barcode,
             },
         )
-        # Since the whole batch is not complete, state should not be done.
-        # The picking with one line should be "done" because we unloaded its line.
-        # The second one still has a line to pick.
-        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
-        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
+        # The batch is closed
+        self.assertRecordValues(self.batch, [{"state": "done"}])
+        for picking in lines_to_unload.picking_id:
+            self.assertRecordValues(
+                picking, [{"state": "done", "batch_id": self.batch.id}]
+            )
+        # The 2 lines picking has one remaining line
+        self.assertEqual(len(self.two_lines_picking.move_line_ids), 1)
+        self.assertRecordValues(
+            self.two_lines_picking, [{"state": "assigned", "batch_id": False}]
+        )
+        self.new_picking = self.two_lines_picking.backorder_ids
         self.assertRecordValues(
             self.move_lines,
             [
@@ -217,9 +223,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 {
                     "shopfloor_unloaded": True,
                     "qty_done": 10,
-                    # will be done when the second line of the picking is unloaded
-                    "state": "assigned",
-                    "picking_id": self.two_lines_picking.id,
+                    "state": "done",
+                    "picking_id": self.new_picking.id,
                     "location_dest_id": self.packing_location.id,
                 },
                 {
@@ -231,14 +236,10 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 },
             ],
         )
-        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
-
         self.assert_response(
-            # the remaining move line still needs to be picked
             response,
-            next_state="start_line",
-            data=self._line_data(self.move_lines[2]),
-            message={"body": "Batch Transfer line done", "message_type": "success"},
+            next_state="start",
+            message={"body": "Batch Transfer complete", "message_type": "success"},
         )
 
     def test_set_destination_all_picking_unassigned(self):
@@ -268,8 +269,12 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         )
         # The batch should be done with only one picking.
         # The remaining picking has been removed from the current batch
-        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
-        self.assertRecordValues(self.two_lines_picking, [{"state": "confirmed"}])
+        self.assertRecordValues(
+            self.one_line_picking, [{"state": "done", "batch_id": self.batch.id}]
+        )
+        self.assertRecordValues(
+            self.two_lines_picking, [{"state": "confirmed", "batch_id": False}]
+        )
         self.assertRecordValues(self.batch, [{"state": "done"}])
         self.assertEqual(self.one_line_picking.batch_id, self.batch)
         self.assertFalse(self.two_lines_picking.batch_id)

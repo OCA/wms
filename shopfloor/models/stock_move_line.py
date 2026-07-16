@@ -31,6 +31,39 @@ class StockMoveLine(models.Model):
     # allow domain on picking_id.xxx without too much perf penalty
     picking_id = fields.Many2one(auto_join=True)
 
+    @property
+    def picked(self):
+        """:return: True if there is a quantity picked."""
+        self.ensure_one()
+        return (
+            float_compare(
+                self.qty_done,
+                0,
+                precision_rounding=self.product_uom_id.rounding,
+            )
+            > 0
+        )
+
+    @property
+    def is_fully_picked(self):
+        """:return: True if the quantity picked >= quantity reserved."""
+        self.ensure_one()
+        return (
+            float_compare(
+                self.qty_done,
+                self.reserved_uom_qty,
+                precision_rounding=self.product_uom_id.rounding,
+            )
+            >= 0
+        )
+
+    @property
+    def has_quantity_reserved(self):
+        self.ensure_one()
+        return not float_is_zero(
+            self.reserved_uom_qty, precision_rounding=self.product_uom_id.rounding
+        )
+
     def _split_partial_quantity(self):
         """Create new move line for the quantity remaining to do
 
