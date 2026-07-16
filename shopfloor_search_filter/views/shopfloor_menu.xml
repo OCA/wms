@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="shopfloor_menu_form_view">
+        <field name="model">shopfloor.menu</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='options']" position="after">
+                <group name="scan_filters" string="Scan Filters">
+                    <group>
+                        <field name="allow_product_scan" />
+                        <field name="allow_package_scan" />
+                        <field name="allow_picking_scan" />
+                    </group>
+
+                    <group>
+                        <field name="allow_location_scan" />
+                        <field name="allow_lot_scan" />
+                        <field name="allow_packaging_scan" />
+                    </group>
+                </group>
+
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>
