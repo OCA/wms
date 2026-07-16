@@ -15,14 +15,18 @@ class Reception(Component):
         super().__init__(work_context)
         self.packaging_update_done = False
 
-    def _before_state__set_quantity(self, picking, line, message=None):
-        """Show the packaging dimension screen before the set quantity screen."""
+    def _set_lot(self, picking, line, message=None, **kw):
+        """Show the packaging dimension screen before 'set lot' screen."""
         if not self.work.menu.set_packaging_dimension or self.packaging_update_done:
-            return super()._before_state__set_quantity(picking, line, message=message)
+            return super()._set_lot(
+                picking, line, message=message, lot_name=line.lot_name
+            )
 
         packaging = self._get_next_packaging_to_set_dimension(line.product_id)
         if not packaging:
-            return super()._before_state__set_quantity(picking, line, message=message)
+            return super()._set_lot(
+                picking, line, message=message, lot_name=line.lot_name
+            )
 
         return self._response_for_set_packaging_dimension(
             picking, line, packaging, message=message
@@ -108,7 +112,7 @@ class Reception(Component):
         packaging = self.env["product.packaging"].sudo().browse(packaging_id)
 
         if not packaging:
-            return self._before_state__set_quantity(
+            return self._set_lot(
                 picking, selected_line, message=self.msg_store.record_not_found()
             )
 
@@ -127,7 +131,7 @@ class Reception(Component):
             )
 
         self.packaging_update_done = True
-        return self._before_state__set_quantity(picking, selected_line, message=message)
+        return self._set_lot(picking, selected_line, message=message)
 
     def _check_dimension_to_update(self, dimensions):
         """Check if the Shopfloor payload contains data for a packaging update."""
@@ -216,11 +220,6 @@ class ShopfloorReceptionValidatorResponse(Component):
         res.update({"set_packaging_dimension"})
         return res
 
-    def _set_lot_confirm_action_next_states(self):
-        res = super()._set_lot_confirm_action_next_states()
-        res.update({"set_packaging_dimension"})
-        return res
-
     @property
     def _schema_set_packaging_dimension(self):
         return {
@@ -236,7 +235,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         }
 
     def _set_packaging_dimension_next_states(self):
-        return {"set_packaging_dimension", "set_quantity"}
+        return {"set_packaging_dimension", "set_quantity", "set_lot"}
 
     def set_packaging_dimension(self):
         return self._response_schema(
