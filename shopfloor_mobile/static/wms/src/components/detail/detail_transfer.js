@@ -25,7 +25,15 @@ Vue.component("detail-transfer", {
                 },
                 {path: "carrier.name", label: "Carrier"},
                 {path: "priority", label: "Priority"},
-                {path: "note"},
+                {
+                    path: "note",
+                    renderer: function (rec, field) {
+                        return new DOMParser().parseFromString(
+                            _.result(rec, field.path) || "",
+                            "text/html"
+                        ).documentElement.textContent;
+                    },
+                },
             ];
         },
         picking_detail_options() {

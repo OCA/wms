@@ -77,7 +77,7 @@ export var ItemDetailMixin = {
                     query: {displayOnly: 1},
                 });
             } else {
-                console.error("Action handler found not value for", field);
+                console.error("Action handler found no value for", field);
             }
         },
     },
