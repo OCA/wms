@@ -27,21 +27,7 @@ class BarcodeParser(Component):
         """Convert back GS1 AI to search type."""
         return MAPPING_AI_TO_TYPE[ai]
 
-    def _parse_gs1(self, barcode, types, safe=True) -> list[GS1Barcode]:
-        types = types or ()
-        ai_whitelist = ()
-        # Collect all AIs by converting from search types
-        for _type in types:
-            ai = self._search_type_to_gs1_ai(_type)
-            if ai:
-                ai_whitelist += ai
-        if types and not ai_whitelist:
-            # A specific type was asked but no AI could be found.
-            return list()
-        parsed = GS1Barcode.parse(barcode, ai_whitelist=ai_whitelist, safe=safe)
-        return parsed
-
-    def parse(self, barcode, types):
+    def parse(self, barcode):
         """
         This method will parse the barcode and return the
         value with its type if determined.
@@ -50,17 +36,18 @@ class BarcodeParser(Component):
 
         """
         # Retrieve in any case the 'unknown' parsing with raw barcode
-        result = super().parse(barcode, types)
-        parsed = self._parse_gs1(barcode, types)
+        result = super().parse(barcode)
+        if not barcode:
+            return result
+
+        parsed = GS1Barcode.parse(barcode)
         if parsed:
             for barcode_type in self.search_action._barcode_type_handler.keys():
                 for parsed_item in parsed:
                     if parsed_item.ai in MAPPING_TYPE_TO_AI.get(barcode_type, tuple()):
-                        result.append(
-                            BarcodeResult(
-                                type=barcode_type,
-                                value=parsed_item.value,
-                                raw=parsed_item.raw_value,
-                            )
+                        result[barcode_type] = BarcodeResult(
+                            type=barcode_type,
+                            value=parsed_item.value,
+                            raw=parsed_item.raw_value,
                         )
         return result

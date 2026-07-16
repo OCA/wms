@@ -32,14 +32,14 @@ class TestStructuredBarcode(CommonCase):
         )
         # selected_move_line.lot_id = lot
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
-            mock_parse.return_value = [
-                BarcodeResult(type="lot", value=lot.name, raw=lot.name),
-                BarcodeResult(
+            mock_parse.return_value = {
+                "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+                "expiration_date": BarcodeResult(
                     type="expiration_date",
                     value=date(2025, 4, 15),
                     raw="250415",
                 ),
-            ]
+            }
             response = self.service.dispatch(
                 "scan_line",
                 params={

@@ -7,8 +7,23 @@ from odoo.osv.expression import AND
 from odoo.addons.component.core import Component
 
 
-class SearchResult:
+class SearchInvalidRecordset(Exception):
+    __slots__ = ("recordset",)
 
+    def __init__(self, recordset):
+        super().__init__(recordset)
+        self.recordset = recordset
+
+
+class SearchInvalidProduct(SearchInvalidRecordset):
+    pass
+
+
+class SearchInvalidPackage(SearchInvalidRecordset):
+    pass
+
+
+class SearchResult:
     __slots__ = ("record", "type", "code", "parse_result")
 
     def __init__(self, **kw) -> None:
@@ -51,21 +66,64 @@ class SearchAction(Component):
         parser.search_action = self
         return parser
 
+    def __init__(
+        self,
+        work_context,
+        products=None,
+        packages=None,
+        limit=1,
+        use_origin=False,
+        extra_domain=None,
+    ):
+        super().__init__(work_context)
+        self._products = products
+        self._packages = packages
+        self._limit = limit
+        self._use_origin = use_origin
+        self._extra_domain = extra_domain
+
+    def _get_properties(self):
+        return {
+            "products": self._products,
+            "packages": self._packages,
+            "limit": self._limit,
+            "use_origin": self._use_origin,
+            "extra_domain": self._extra_domain,
+        }
+
+    def _clone_with(self, **updates):
+        """Helper to return a new instance with updated properties."""
+        kwargs = self._get_properties()
+        kwargs.update(updates)
+        # Pass the existing work_context cleanly to the new instance
+        return self.__class__(self.work, **kwargs)
+
+    def for_products(self, products):
+        return self._clone_with(products=products)
+
+    def for_packages(self, packages):
+        return self._clone_with(packages=packages)
+
+    def with_limit(self, limit):
+        return self._clone_with(limit=limit)
+
+    def with_origin(self, use_origin=True):
+        return self._clone_with(use_origin=use_origin)
+
+    def with_domain(self, extra_domain):
+        return self._clone_with(extra_domain=extra_domain)
+
     @property
     def _barcode_type_handler(self):
         return {
-            "product": self.product_from_scan,
-            "package": self.package_from_scan,
-            "picking": self.picking_from_scan,
-            "location": self.location_from_scan,
-            "location_dest": self.location_from_scan,
-            "lot": self.lot_from_scan,
-            "serial": self.lot_from_scan,
-            "packaging": self.packaging_from_scan,
-            "delivery_packaging": self.delivery_packaging_from_scan,
-            "origin_move": self.origin_move_from_scan,
-            # Extra data can be contained in barcodes
-            "expiration_date": self.expiration_date_from_scan,
+            "product": self._find_product,
+            "package": self._find_package,
+            "picking": self._find_picking,
+            "location": self._find_location,
+            "lot": self._find_lot,
+            "packaging": self._find_packaging,
+            "delivery_packaging": self._find_delivery_packaging,
+            "origin_move": self._find_origin_move,
         }
 
     def _make_search_result(self, **kwargs):
@@ -76,61 +134,109 @@ class SearchAction(Component):
         """
         return SearchResult(**kwargs)
 
-    def find(self, barcode, types=None, handler_kw=None):
-        """Find Odoo record matching given `barcode`.
+    def _get_parse_results_value(self, parse_results: dict, btype: str):
+        result = parse_results.get(btype) or parse_results.get("unknown")
+        return result.value if result else None
 
-        Plain barcodes
-        """
+    def find(self, barcode: str, types: list[str] = None):
+        """Find Odoo record matching given `barcode`."""
         barcode = barcode or ""
-        return self.generic_find(barcode, types=types, handler_kw=handler_kw)
-
-    def _find_record_by_type(self, barcode, btype, handler_kw=None):
-        handler_kw = handler_kw or {}
-        handler = self._barcode_type_handler.get(btype)
-        if not handler:
-            return
-        return handler(barcode, **handler_kw.get(btype, {}))
-
-    def generic_find(self, barcode, types=None, handler_kw=None):
-        _types = types or self._barcode_type_handler.keys()
         # TODO: decide the best default order in case we don't pass `types`
-        parse_results = self.parser.parse(barcode, types)
-        for parse_result in parse_results:
-            for btype in _types:
-                record = self._find_record_by_type(
-                    parse_result.value, btype, handler_kw
+        types = types or self._barcode_type_handler.keys()
+
+        parse_results = self.parser.parse(barcode)
+
+        for btype in types:
+            handler = self._barcode_type_handler.get(btype)
+            if not handler:
+                continue
+
+            record = handler(parse_results, btype=btype)
+            if record:
+                return self._make_search_result(
+                    record=record,
+                    code=barcode,
+                    type=btype,
+                    parse_result=parse_results,
                 )
-                if record:
-                    return self._make_search_result(
-                        record=record,
-                        code=barcode,
-                        type=btype,
-                        parse_result=parse_results,
-                    )
         return self._make_search_result(type="none", parse_result=parse_results)
 
+    # -------------------------------------------------------------------------
+    # Public Entry Points (Safe for direct downstream calls)
+    # -------------------------------------------------------------------------
+
     def location_from_scan(self, barcode, limit=1):
+        res = self.with_limit(limit).find(barcode, types=["location"])
+        return res.record if res else self.env["stock.location"].browse()
+
+    def package_from_scan(self, barcode):
+        res = self.find(barcode, types=["package"])
+        return res.record if res else self.env["stock.quant.package"].browse()
+
+    def picking_from_scan(self, barcode):
+        res = self.find(barcode, types=["picking"])
+        return res.record if res else self.env["stock.picking"].browse()
+
+    def product_from_scan(self, barcode):
+        res = self.find(barcode, types=["product"])
+        return res.record if res else self.env["product.product"].browse()
+
+    def lot_from_scan(self, barcode, products=None, limit=1):
+        res = self.for_products(products).with_limit(limit).find(barcode, types=["lot"])
+        return res.record if res else self.env["stock.lot"].browse()
+
+    def packaging_from_scan(self, barcode):
+        res = self.find(barcode, types=["packaging"])
+        return res.record if res else self.env["product.packaging"].browse()
+
+    def delivery_packaging_from_scan(self, barcode):
+        res = self.find(barcode, types=["delivery_packaging"])
+        return res.record if res else self.env["stock.package.type"].browse()
+
+    def origin_move_from_scan(self, barcode):
+        res = self.find(barcode, types=["origin_move"])
+        return res.record if res else self.env["stock.move"].browse()
+
+    # -------------------------------------------------------------------------
+    # Internal Concrete DB Search Methods
+    # -------------------------------------------------------------------------
+
+    def _find_location(self, parse_results, btype="location"):
         model = self.env["stock.location"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         # First search location by barcode
-        res = model.search([("barcode", "=", barcode)], limit=limit)
+        res = model.search([("barcode", "=", barcode)], limit=self._limit)
         # And only if we have not found through barcode search on the location name
-        if len(res) < limit:
-            res |= model.search([("name", "=", barcode)], limit=(limit - len(res)))
+        if len(res) < self._limit:
+            res |= model.search(
+                [("name", "=", barcode)], limit=(self._limit - len(res))
+            )
         return res
 
-    def package_from_scan(self, barcode):
+    def _find_package(self, parse_results, btype="package"):
         model = self.env["stock.quant.package"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("name", "=", barcode)], limit=1)
 
-    def picking_from_scan(self, barcode, use_origin=False):
+        packages = model.search([("name", "=", barcode)], limit=self._limit)
+
+        if packages and self._packages:
+            valid_packages = packages & self._packages
+            if not valid_packages:
+                raise SearchInvalidPackage(recordset=packages)
+            return valid_packages
+
+        return packages
+
+    def _find_picking(self, parse_results, btype="picking"):
         model = self.env["stock.picking"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        picking = model.search([("name", "=", barcode)], limit=1)
+        picking = model.search([("name", "=", barcode)], limit=self._limit)
         # We need to split the domain in two different searches
         # as there might be a case where
         # the name of a picking is the same as the origin of another picking
@@ -138,78 +244,101 @@ class SearchAction(Component):
         # the name search takes priority.
         if picking:
             return picking
-        if use_origin:
+        if self._use_origin:
             source_document_domain = [
                 # We could have the same origin for multiple transfers
                 # but we're interested only in the "assigned" ones.
                 ("origin", "=", barcode),
                 ("state", "=", "assigned"),
             ]
-            return model.search(source_document_domain)
+            return model.search(source_document_domain, limit=self._limit)
         return model.browse()
 
-    def product_from_scan(self, barcode):
+    def _find_product(self, parse_results, btype="product"):
         model = self.env["product.product"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search(
-            [
-                "|",
-                ("barcode", "=", barcode),
-                ("default_code", "=", barcode),
-            ],
-            limit=1,
+        products = model.search(
+            ["|", ("barcode", "=", barcode), ("default_code", "=", barcode)],
+            limit=None if self._products else self._limit,
         )
+        if self._products and products:
+            valid_products = products & self._products
+            if not valid_products:
+                raise SearchInvalidProduct(products)
+            return valid_products[: self._limit]
+        return products[: self._limit]
 
-    def lot_from_scan(self, barcode, products=None, limit=1):
+    def _find_lot(self, parse_results, btype="lot"):
         model = self.env["stock.lot"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
         domain = [
             ("company_id", "=", self.env.company.id),
             ("name", "=", barcode),
         ]
-        if products:
+        products = self.env["product.product"]
+        if parse_results.get("product"):
+            errors = []
+            try:
+                products = self.with_limit(None)._find_product(parse_results)
+            except SearchInvalidProduct as e:
+                errors.append(e)
+            try:
+                packagings = self.with_limit(None)._find_packaging(parse_results)
+                products |= packagings.product_id
+            except SearchInvalidProduct as e:
+                errors.append(e)
+
+            if errors and not products:
+                raise errors[-1]
+
+            products |= packagings.product_id
+            if not products:
+                return model
+            if self._products:
+                products = products & self._products
             domain.append(("product_id", "in", products.ids))
-        return model.search(domain, limit=limit)
 
-    def packaging_from_scan(self, barcode):
+        elif self._products:
+            domain.append(("product_id", "in", self._products.ids))
+        return model.search(domain, limit=self._limit)
+
+    def _find_packaging(self, parse_results, btype="products"):
         model = self.env["product.packaging"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search(
-            [("barcode", "=", barcode), ("product_id", "!=", False)], limit=1
+        packagings = model.search(
+            [("barcode", "=", barcode), ("product_id", "!=", False)], limit=self._limit
         )
+        if self._products and packagings:
+            valid_packagings = packagings.filtered(
+                lambda p: p.product_id in self._products
+            )
+            if not valid_packagings:
+                raise SearchInvalidProduct(packagings - valid_packagings)
+            return valid_packagings
+        return packagings
 
-    def generic_packaging_from_scan(self, barcode):
-        model = self.env["product.packaging"]
-        if not barcode:
-            return model.browse()
-        return model.search(
-            [("barcode", "=", barcode), ("product_id", "=", False)], limit=1
-        )
-
-    def delivery_packaging_from_scan(self, barcode):
+    def _find_delivery_packaging(self, parse_results, btype="delivery_packaging"):
         model = self.env["stock.package.type"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("barcode", "=", barcode)], limit=1)
+        return model.search([("barcode", "=", barcode)], limit=self._limit)
 
-    def origin_move_from_scan(self, barcode, extra_domain=None):
+    def _find_origin_move(self, parse_results, btype="origin_move"):
         model = self.env["stock.move"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         outgoing_move_domain = [
             # We could have the same origin for multiple transfers
             # but we're interested only in the "done" ones.
             ("origin", "=", barcode),
             ("state", "=", "done"),
         ]
-        if extra_domain:
-            outgoing_move_domain = AND([outgoing_move_domain, extra_domain])
-        return model.search(outgoing_move_domain)
-
-    def dummy_from_scan(self, barcode):
-        return None
-
-    def expiration_date_from_scan(self, barcode):
-        # TODO
-        return None
+        if self._extra_domain:
+            outgoing_move_domain = AND([outgoing_move_domain, self._extra_domain])
+        return model.search(outgoing_move_domain, limit=self._limit)

@@ -9,11 +9,16 @@ class SearchAction(Component):
     @property
     def _barcode_type_handler(self):
         res = super(SearchAction, self)._barcode_type_handler
-        res["dock"] = self.dock_from_scan
+        res["dock"] = self._find_dock
         return res
 
     def dock_from_scan(self, barcode):
+        res = self.find(barcode, types=["dock"])
+        return res.record if res else self.env["stock.dock"].browse()
+
+    def _find_dock(self, parse_results, btype="dock"):
         model = self.env["stock.dock"]
+        barcode = self._get_parse_results_value(parse_results, btype)
         if not barcode:
             return model.browse()
-        return model.search([("barcode", "=", barcode)], limit=1)
+        return model.search([("barcode", "=", barcode)], limit=self._limit)

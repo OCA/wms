@@ -1,1 +1,1 @@
-from . import search
+from . import barcode_parser

@@ -67,6 +67,7 @@ class TestSearchCase(TestSearchBaseCase):
         )
         handler = self.search.lot_from_scan
         self.assertEqual(handler(rec.name, products=self.product_a), rec)
+        self.assertEqual(handler(rec.name), rec)
         self.assertEqual(handler(False), rec.browse())
         self.assertEqual(handler("NONE"), rec.browse())
 
@@ -94,17 +95,6 @@ class TestSearchCase(TestSearchBaseCase):
         self.assertEqual(handler(lots[0].name, products=self.product_b), lots[1])
         self.assertEqual(handler(lots[1].name, products=self.product_b), lots[1])
 
-    def test_search_generic_packaging(self):
-        rec = (
-            self.env["product.packaging"]
-            .sudo()
-            .create({"name": "TEST PKG", "barcode": "1234"})
-        )
-        handler = self.search.generic_packaging_from_scan
-        self.assertEqual(handler(rec.barcode), rec)
-        self.assertEqual(handler(False), rec.browse())
-        self.assertEqual(handler("NONE"), rec.browse())
-
 
 class TestFindCase(TestSearchBaseCase):
     def test_find_api(self):
@@ -127,9 +117,7 @@ class TestFindCase(TestSearchBaseCase):
         )
         res = self.search.find("Customers", types=("location",))
         self.assertEqual(res.records, None)
-        res = self.search.find(
-            "Customers", types=("location",), handler_kw=dict(location=dict(limit=2))
-        )
+        res = self.search.with_limit(2).find("Customers", types=("location",))
         self.assertEqual(res.records, rec + rec2)
 
     def test_find_package(self):
@@ -165,9 +153,7 @@ class TestFindCase(TestSearchBaseCase):
                 {"product_id": self.product_a.id, "company_id": self.env.company.id}
             )
         )
-        res = self.search.find(
-            rec.name, types=("lot",), handler_kw=dict(lot=dict(products=self.product_a))
-        )
+        res = self.search.for_products(self.product_a).find(rec.name, types=("lot",))
         self.assertEqual(res.record, rec)
 
     def test_find_lot_number_shared_with_multiple_products(self):
@@ -188,28 +174,24 @@ class TestFindCase(TestSearchBaseCase):
                 }
             ),
         )
-        res = self.search.find(
+        res = self.search.for_products(self.product_a).find(
             lots[0].name,
             types=("lot",),
-            handler_kw=dict(lot=dict(products=self.product_a)),
         )
         self.assertEqual(res.record, lots[0])
-        res = self.search.find(
+        res = self.search.for_products(self.product_a).find(
             lots[1].name,
             types=("lot",),
-            handler_kw=dict(lot=dict(products=self.product_a)),
         )
         self.assertEqual(res.record, lots[0])
-        res = self.search.find(
+        res = self.search.for_products(self.product_b).find(
             lots[0].name,
             types=("lot",),
-            handler_kw=dict(lot=dict(products=self.product_b)),
         )
         self.assertEqual(res.record, lots[1])
-        res = self.search.find(
+        res = self.search.for_products(self.product_b).find(
             lots[1].name,
             types=("lot",),
-            handler_kw=dict(lot=dict(products=self.product_b)),
         )
         self.assertEqual(res.record, lots[1])
 
