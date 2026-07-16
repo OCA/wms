@@ -629,6 +629,20 @@ msgid "Ignoring not found putaway is not allowed for menu {}."
 msgstr "Ignorare inoltro non trovato non è consentito per il menu {}."
 
 #. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/services/cluster_picking.py:0
+#, python-format
+msgid "Internal Error: Batch not properly done."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/services/cluster_picking.py:0
+#, python-format
+msgid "Internal Error: The move line %s is not fully picked"
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_location
 msgid "Inventory Locations"
 msgstr "Ubicazioni di inventario"
@@ -2147,6 +2161,13 @@ msgstr "È possibile scaricare colli alla destinazione"
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__unload_package_at_destination
 msgid "Unload package at destination"
 msgstr "Scarico colli alla destinazione"
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/services/cluster_picking.py:0
+#, python-format
+msgid "Unprocessed transfer removed from batch"
+msgstr ""
 
 #. module: shopfloor
 #. odoo-python
