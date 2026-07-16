@@ -50,14 +50,6 @@ class StockPicking(models.Model):
         depends.append("move_ids.release_blocked")
         return depends
 
-    def _create_backorder(self):
-        backorders = super()._create_backorder()
-        # Auto-block backorders
-        for move in backorders.move_ids:
-            if move.rule_id.autoblock_release_on_backorder:
-                move.release_blocked = move._blocked_on_backorder()
-        return backorders
-
     def action_block_release(self):
         """Block the release of the operation."""
         for rec in self:
