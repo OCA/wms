@@ -37,6 +37,7 @@ setuptools.setup(
         'odoo-addon-shopfloor_reception_putinpack_restriction>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_refund_return>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_rest_log>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_single_product_transfer>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_workstation>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_workstation_mobile>=16.0dev,<16.1dev',
         'odoo-addon-stock_available_to_promise_release>=16.0dev,<16.1dev',
