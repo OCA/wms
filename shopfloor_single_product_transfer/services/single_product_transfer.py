@@ -150,6 +150,16 @@ class ShopfloorSingleProductTransfer(Component):
         }
         return self._response(next_state="set_location", data=data, message=message)
 
+    def _message_for_invalid_product(self, exc):
+        product = None
+        if exc.recordset._name == "product.product":
+            product = exc.recordset[:1]
+        elif exc.recordset._name == "product.packaging":
+            product = exc.recordset[:1].product_id
+        if product:
+            return self.msg_store.product_not_found_in_current_picking(product)
+        return self.msg_store.wrong_record(exc.recordset)
+
     # Handlers
 
     def _scan_location__quant_domain(self, location):
@@ -1104,7 +1114,7 @@ class ShopfloorSingleProductTransfer(Component):
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
 
-        search = self._actions_for("search")
+        search = self._actions_for("search").for_products(move_line.product_id)
         handlers = {
             "location": self._scan_line__by_location,
             "package": self._scan_line__by_package,
@@ -1113,11 +1123,19 @@ class ShopfloorSingleProductTransfer(Component):
             "lot": self._scan_line__by_lot,
             "none": self._scan_line__fallback,
         }
-        search_result = search.find(
-            barcode,
-            types=handlers.keys(),
-            handler_kw=dict(lot=dict(products=move_line.product_id)),
-        )
+        try:
+            search_result = search.find(
+                barcode,
+                types=handlers.keys(),
+            )
+        except SearchInvalidProduct as e:
+            message = self._message_for_invalid_product(e)
+            return self._response_for_start_line(
+                move_line,
+                message=message,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
         handler = handlers.get(search_result.type, self._scan_line__fallback)
         response = handler(
             search_result.record,
@@ -1201,15 +1219,7 @@ class ShopfloorSingleProductTransfer(Component):
                     package=package,
                 )
         except SearchInvalidProduct as e:
-            product = None
-            if e.recordset._name == "product.product":
-                product = e.recordset[:1]
-            elif e.recordset._name == "product.packaging":
-                product = e.recordset[:1].product_id
-            if product:
-                message = self.msg_store.product_not_found_in_current_picking(product)
-            else:
-                message = self.msg_store.wrong_record(e.recordset)
+            message = self._message_for_invalid_product(e)
         else:
             message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(
@@ -1246,17 +1256,21 @@ class ShopfloorSingleProductTransfer(Component):
             # Puts the product in a new or an existing pack
             "package": self._set_quantity__by_package,
         }
-        search = self._actions_for("search")
-        search_result = search.find(
-            barcode,
-            types=handlers_by_type.keys(),
-            handler_kw={"lot": {"products": move_line.product_id}},
-        )
-        handler = handlers_by_type.get(search_result.type)
-        if handler:
-            confirmed = confirmation == barcode
-            return handler(move_line, search_result.record, confirmation=confirmed)
-        message = self.msg_store.barcode_not_found()
+        search = self._actions_for("search").for_products(move_line.product_id)
+        try:
+            search_result = search.find(
+                barcode,
+                types=handlers_by_type.keys(),
+            )
+            handler = handlers_by_type.get(search_result.type)
+            if handler:
+                confirmed = confirmation == barcode
+                return handler(move_line, search_result.record, confirmation=confirmed)
+
+        except SearchInvalidProduct as e:
+            message = self._message_for_invalid_product(e)
+        else:
+            message = self.msg_store.barcode_not_found()
         return self._response_for_set_quantity(move_line, message=message)
 
     def set_quantity__action_cancel(self, selected_line_id):
