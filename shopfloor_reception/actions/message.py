@@ -43,10 +43,24 @@ class MessageAction(Component):
             ),
         }
 
-    def lot_product_mismatch(self):
+    def lot_product_mismatch(self, line, lot_product):
         return {
             "message_type": "error",
             "body": _(
-                "The scanned lot does not match the selected product",
+                "The scanned lot does not match the selected product. "
+                "Current product is '%(current_product)s' but the scanned lot "
+                "is for '%(lot_product)s'.",
+                current_product=line.product_id.display_name,
+                lot_product=lot_product.display_name,
+            ),
+        }
+
+    def lot_product_not_found(self, product_barcode):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The scanned lot contains the product barcode '%(product_barcode)s' "
+                "but you have no product with this barcode in Odoo.",
+                product_barcode=product_barcode,
             ),
         }
