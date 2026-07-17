@@ -1,6 +1,9 @@
+# Copyright 2026 ACSONE SA/NV <htts://www.acsone.eu>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+import warnings
 from collections import defaultdict
+from typing import Literal
 
 from odoo import models
 from odoo.osv import expression
@@ -10,7 +13,9 @@ from odoo.tools.float_utils import float_compare
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
-    def _prepare_full_location_reservation_quants_domain(self, package_only=None):
+    def _prepare_full_location_reservation_quants_domain(
+        self, package_only=None, product_only=False
+    ):
         domains = []
         for line in self:
             domain = [("location_id", "=", line.location_id.id)]
@@ -19,15 +24,25 @@ class StockMoveLine(models.Model):
                     domain += [("package_id", "=", line.package_id.id)]
                 else:
                     continue
+            if product_only:
+                domain += [("product_id", "=", line.product_id.id)]
             domains.append(domain)
         return expression.OR(domains)
 
-    def _get_full_location_reservation_quants(self, package_only=None):
-        domain = self._prepare_full_location_reservation_quants_domain(package_only)
+    def _get_full_location_reservation_quants(
+        self, package_only=None, product_only=False
+    ):
+        domain = self._prepare_full_location_reservation_quants_domain(
+            package_only=package_only, product_only=product_only
+        )
         return self.env["stock.quant"].search(domain)
 
-    def _get_full_location_reservable_qties(self, package_only=None):
-        quants = self._get_full_location_reservation_quants(package_only)
+    def _get_full_location_reservable_qties(
+        self, package_only=None, product_only=False
+    ):
+        quants = self._get_full_location_reservation_quants(
+            package_only=package_only, product_only=product_only
+        )
         res = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
         for quant in quants:
             qty_available = quant.available_quantity
@@ -42,24 +57,126 @@ class StockMoveLine(models.Model):
                 ] += qty_available
         return res
 
-    def _full_location_reservation(self, package_only=None):
-        reservable_qties = self._get_full_location_reservable_qties(package_only)
-        moves_to_assign_ids = []
+    def _full_location_reservation_strict(self):
+        """Reserve using Odoo's _gather with strict=True (exact lot/package/owner match).
+
+        Increments reserved_uom_qty on existing move lines - no new moves created.
+        """
+        Quant = self.env["stock.quant"]
+        reserved_qty_by_move = defaultdict(lambda: 0.0)
+        new_reserved_qty_by_move = defaultdict(lambda: 0.0)
         for line in self.exists():  # Move line should have been deleted
-            # Copy location and package as move line could be deleted if merge occurs
+            # gather reserved_qty by move
+
+            for line in self:
+                reserved_qty_by_move[line.move_id] += line.reserved_uom_qty
+            quants = Quant._gather(
+                line.product_id,
+                line.location_id,
+                lot_id=line.lot_id,
+                package_id=line.package_id,
+                owner_id=line.owner_id,
+                strict=True,
+            )
+            if not quants:
+                continue
+            # We let the core mechanism occur that will reserve the needed quants
+            line.reserved_uom_qty += sum(q.available_quantity for q in quants)
+            # get new reserved_qty by move
+            for line in self:
+                new_reserved_qty_by_move[line.move_id] += line.reserved_uom_qty
+        # increase product_uom_qty on moves that have increased reserved_uom_qty
+        for move in reserved_qty_by_move.keys():
+            if (
+                float_compare(
+                    new_reserved_qty_by_move[move],
+                    reserved_qty_by_move[move],
+                    precision_rounding=move.product_uom.rounding,
+                )
+                > 0
+            ):
+                move.with_context(do_not_unreserve=True).product_uom_qty += (
+                    new_reserved_qty_by_move[move] - reserved_qty_by_move[move]
+                )
+
+    def _full_location_reservation_product(self):
+        """Reserve all available qty of each line's product across every package
+        at the location - creates one new move per (package, product) combination.
+        """
+        move_ids = []
+        reservable_qties = self._get_full_location_reservable_qties(product_only=True)
+        for line in self.exists():
+            location_qties = reservable_qties.get(line.location_id, {})
+            for package in list(location_qties.keys()):
+                package_qties = location_qties[package]
+                qty = package_qties.pop(line.product_id, 0)
+                if not package_qties:
+                    location_qties.pop(package)
+                if qty:
+                    move_ids.append(
+                        line.move_id._full_location_reservation_create_move(
+                            line.product_id, qty, line.location_id, package
+                        ).id
+                    )
+        return move_ids
+
+    def _full_location_reservation_by_location(self, package_only=False):
+        """Shared implementation: creates one new move per (location, package, product)
+        combination found in reservable quantities.
+        """
+        move_ids = []
+        reservable_qties = self._get_full_location_reservable_qties(
+            package_only=package_only
+        )
+        for line in self.exists():
             location = line.location_id
             package = line.package_id
             qties = reservable_qties.get(location, {}).get(package, {})
             if not qties:
                 continue
             for product, qty in qties.items():
-                moves_to_assign_ids.append(
+                move_ids.append(
                     line.move_id._full_location_reservation_create_move(
                         product, qty, location, package
                     ).id
                 )
             reservable_qties[location].pop(package)
-        moves_to_assign = self.env["stock.move"].browse(moves_to_assign_ids)
+        return move_ids
+
+    def _full_location_reservation_package(self):
+        """Reserve all products at each line's (location, package),
+        skipping lines that have no package.
+        """
+        return self._full_location_reservation_by_location(package_only=True)
+
+    def _full_location_reservation_default(self):
+        """Reserve all products at each line's (location, package)."""
+        return self._full_location_reservation_by_location()
+
+    def _full_location_reservation(
+        self,
+        reservation_mode: Literal["strict", "package", "product"] | None = None,
+        **kwargs,
+    ):
+        if "package_only" in kwargs:
+            warnings.warn(
+                "The 'package_only' parameter is deprecated. "
+                "Use reservation_mode='package' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if kwargs.pop("package_only"):
+                reservation_mode = "package"
+        if reservation_mode == "strict":
+            self._full_location_reservation_strict()
+            return self.env["stock.move"]
+        elif reservation_mode == "product":
+            move_ids = self._full_location_reservation_product()
+        elif reservation_mode == "package":
+            move_ids = self._full_location_reservation_package()
+        else:
+            move_ids = self._full_location_reservation_default()
+        moves_to_assign = self.env["stock.move"].browse(move_ids)
         if moves_to_assign:
             moves_to_assign._action_confirm()
             moves_to_assign._action_assign()
