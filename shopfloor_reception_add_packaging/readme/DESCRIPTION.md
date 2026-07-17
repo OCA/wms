@@ -1,0 +1,1 @@
+Enables to add a new packaging during a reception in Shopfloor.
