@@ -41,6 +41,7 @@ class TestScanProduct(CommonCase):
     def test_scan_tracked_product(self):
         location = self.location_src
         product = self.product_a
+        self._add_stock_to_product(product, location, 10)
         self._set_product_tracking_by_lot(product)
         with self.assertLogs(LOGGER_NAME) as log_catcher:
             response = self.service.dispatch(
@@ -84,6 +85,7 @@ class TestScanProduct(CommonCase):
         # Scanning the product should return a `No operation found` error
         location = self.location_src
         product = self.product_a
+        self._add_stock_to_product(product, location, 10)
         with self.assertLogs(LOGGER_NAME) as log_catcher:
             response = self.service.dispatch(
                 "scan_product",
@@ -170,6 +172,7 @@ class TestScanProduct(CommonCase):
     def test_scan_product_no_stock(self):
         location = self.location_src
         product = self.product_a
+        self._add_stock_to_product(product, location, 10)
         with self.assertLogs(LOGGER_NAME) as log_catcher:
             response = self.service.dispatch(
                 "scan_product",

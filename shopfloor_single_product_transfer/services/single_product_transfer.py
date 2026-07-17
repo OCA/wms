@@ -12,6 +12,7 @@ from odoo.tools import float_compare
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.component.exception import NoComponentError
+from odoo.addons.shopfloor.actions.search import SearchInvalidProduct
 from odoo.addons.shopfloor.utils import to_float
 
 _logger = logging.getLogger("shopfloor.services.single_product_transfer")
@@ -877,20 +878,31 @@ class ShopfloorSingleProductTransfer(Component):
             "packaging": self._scan_product__scan_packaging,
             "lot": self._scan_product__scan_lot,
         }
-        search = self._actions_for("search")
-        search_result = search.find(
-            barcode,
-            types=handlers_by_type.keys(),
-            handler_kw={"lot": {"products": products}},
-        )
-        handler = handlers_by_type.get(search_result.type)
-        if handler:
-            return handler(
-                search_result.record,
-                location=location,
-                package=package,
+        try:
+            search = self._actions_for("search").for_products(products)
+            search_result = search.find(
+                barcode,
+                types=handlers_by_type.keys(),
             )
-        message = self.msg_store.barcode_not_found()
+            handler = handlers_by_type.get(search_result.type)
+            if handler:
+                return handler(
+                    search_result.record,
+                    location=location,
+                    package=package,
+                )
+        except SearchInvalidProduct as e:
+            product = None
+            if e.recordset._name == "product.product":
+                product = e.recordset[:1]
+            elif e.recordset._name == "product.packaging":
+                product = e.recordset[:1].product_id
+            if product:
+                message = self.msg_store.product_not_found_in_current_picking(product)
+            else:
+                message = self.msg_store.wrong_record(e.recordset)
+        else:
+            message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(
             location=location, package=package, message=message
         )
