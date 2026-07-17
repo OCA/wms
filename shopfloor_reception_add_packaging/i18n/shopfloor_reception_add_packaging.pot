@@ -1,0 +1,41 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception_add_packaging
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_reception_add_packaging
+#: model:ir.model.fields,help:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging
+msgid "Add a button to create a new packaging in 'set_quantity' screen."
+msgstr ""
+
+#. module: shopfloor_reception_add_packaging
+#: model:ir.model.fields,field_description:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging
+msgid "Create New Packaging"
+msgstr ""
+
+#. module: shopfloor_reception_add_packaging
+#: model:ir.model.fields,field_description:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging_is_possible
+msgid "Create New Packaging Is Possible"
+msgstr ""
+
+#. module: shopfloor_reception_add_packaging
+#: model:ir.model,name:shopfloor_reception_add_packaging.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_reception_add_packaging
+#. odoo-python
+#: code:addons/shopfloor_reception_add_packaging/actions/message.py:0
+#, python-format
+msgid "Packaging '{}' created."
+msgstr ""
