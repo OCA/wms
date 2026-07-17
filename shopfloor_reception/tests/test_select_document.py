@@ -198,3 +198,33 @@ class TestSelectDocument(CommonCase):
             data={"pickings": self._data_for_pickings(picking)},
             message=message,
         )
+
+    def test_scan_lot_1(self):
+        picking = self._create_picking()
+        lot = self._create_lot()
+        line_product_a = picking.move_ids.move_line_ids.filtered(
+            lambda line: line.product_id == self.product_a
+        )
+        line_product_a.lot_id = lot
+        response = self.service.dispatch("scan_document", params={"barcode": lot.name})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": self._data_for_pickings(picking)},
+            message=self.msg_store.multiple_picks_found_select_manually(),
+        )
+
+    def test_scan_lot_2(self):
+        picking = self._create_picking()
+        lot = self._create_lot()
+        line_product_a = picking.move_ids.move_line_ids.filtered(
+            lambda line: line.product_id == self.product_a
+        )
+        line_product_a.lot_name = lot.name
+        response = self.service.dispatch("scan_document", params={"barcode": lot.name})
+        self.assert_response(
+            response,
+            next_state="select_document",
+            data={"pickings": self._data_for_pickings(picking)},
+            message=self.msg_store.multiple_picks_found_select_manually(),
+        )
