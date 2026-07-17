@@ -104,7 +104,11 @@ class MoveLineSearch(Component):
         if products:
             domain += [("product_id", "in", products.ids)]
         if lots:
-            domain += [("lot_id", "in", lots.ids)]
+            domain += [
+                "|",
+                ("lot_id", "in", lots.ids),
+                ("lot_name", "in", lots.mapped("name")),
+            ]
         if match_user:
             # we only want to see the lines assigned to the current user
             domain += [
