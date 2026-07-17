@@ -76,8 +76,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor_reception/actions/message.py:0
 #, python-format
-msgid "The scanned lot does not match the selected product"
-msgstr "Il lotto letto non corrisponde al prodotto selezionato"
+msgid ""
+"The scanned lot contains the product barcode '%(product_barcode)s' but you "
+"have no product with this barcode in Odoo."
+msgstr ""
+
+#. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid ""
+"The scanned lot does not match the selected product. Current product is "
+"'%(current_product)s' but the scanned lot is for '%(lot_product)s'."
+msgstr ""
 
 #. module: shopfloor_reception
 #. odoo-python
@@ -89,6 +100,10 @@ msgid ""
 msgstr ""
 "Questo lotto esiste già con data scadenza '%(lot_expiration_date)s'. Non si "
 "può modificare questa data."
+
+#, python-format
+#~ msgid "The scanned lot does not match the selected product"
+#~ msgstr "Il lotto letto non corrisponde al prodotto selezionato"
 
 #~ msgid "Product Moves (Stock Move Line)"
 #~ msgstr "Movimenti prodotto (riga movimento di magazzino)"
