@@ -28,14 +28,12 @@ const Reception = {
                     :options="manual_select_options_for_select_document(true)"
                     :key="make_state_component_key(['reception', 'manual-select-document'])"
                 />
-                <div v-if="state_is('select_document')">
-                    <div class="button-list button-vertical-list full">
-                        <v-row align="center">
-                            <v-col class="text-center" cols="12">
-                                <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
-                            </v-col>
-                        </v-row>
-                    </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-action @click="state.on_manual_selection">Manual selection</btn-action>
+                        </v-col>
+                    </v-row>
                 </div>
             </template>
             <template v-if="state_is('manual_selection') && visible_pickings">
