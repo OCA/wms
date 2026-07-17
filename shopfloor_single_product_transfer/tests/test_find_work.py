@@ -183,7 +183,7 @@ class TestFindWork(CommonCase):
             response,
             next_state="start_line",
             data=data,
-            message=self.msg_store.wrong_record(self.product_b),
+            message=self.msg_store.product_not_found_in_current_picking(self.product_b),
         )
 
     def test_confirm_start_line_scan_product_tracked_by_lot(self):
