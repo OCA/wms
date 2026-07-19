@@ -91,6 +91,9 @@ const messages_fr = {
         back: {
             title: "Retour",
         },
+        start: {
+            title: "Démarrer",
+        },
         confirm: {
             title: "Confirmer",
         },
@@ -106,6 +109,31 @@ const messages_fr = {
         reload_config: {
             title: "Recharger la configuration et le menu",
         },
+    },
+    misc: {
+        btn_get_work: "Obtenir du travail",
+        btn_manual_selection: "Sélection manuelle",
+        stock_zero_check: {
+            confirm_stock_zero: "Rupture de stock",
+            confirm_stock_not_zero: "Confirmer le stock",
+        },
+        actions_popup: {
+            btn_action: "Action",
+        },
+        lines_count: "{priority_lines_count}/{lines_count}",
+        lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
+        picking_count: "{priority_picking_count}/{picking_count}",
+        picking_count_extended: "{priority_picking_count}/{picking_count} transfert(s)",
+    },
+    list: {
+        no_items: "Aucun élément à lister.",
+    },
+    select: {
+        no_items: "Aucun élément à sélectionner.",
+    },
+    order_lines_by: {
+        priority: "Trier par priorité",
+        location: "Trier par emplacement",
     },
 };
 
