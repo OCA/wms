@@ -89,6 +89,9 @@ const messages_en = {
         back: {
             title: "Back",
         },
+        start: {
+            title: "Start",
+        },
         confirm: {
             title: "Confirm",
         },
