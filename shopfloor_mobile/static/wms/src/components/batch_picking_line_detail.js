@@ -70,9 +70,9 @@ export var batch_picking_line = Vue.component("batch-picking-line-detail", {
     :options="{main: true, title_action_field:  {action_val_path: 'name'}}"
     :card_color="utils.colors.color_for(destination ? 'screen_step_done': 'screen_step_todo')"
     >
-    <template v-slot:title>
-      Destination not selected.
-    </template>
+      <template v-slot:title>
+        {{ $t("cluster_picking.batch_picking_line.destination_not_selected") }}
+      </template>
   </item-detail-card>
 
 </div>
@@ -109,28 +109,28 @@ export var batch_picking_line_actions = Vue.component("batch-picking-line-action
         <div class="button-list button-vertical-list full">
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <btn-action @click="handle_action('action_full_bin')">Go to destination - full bin(s)</btn-action>
+              <btn-action @click="handle_action('action_full_bin')">{{ $t("cluster_picking.batch_picking_line.action_full_bin") }}</btn-action>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <btn-action @click="handle_action('action_skip_line')">Skip line</btn-action>
+              <btn-action @click="handle_action('action_skip_line')">{{ $t("cluster_picking.batch_picking_line.action_skip_line") }}</btn-action>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
               <btn-action
-                  @click="handle_action('action_stock_out')">Declare stock out</btn-action>
+                  @click="handle_action('action_stock_out')">{{ $t("cluster_picking.batch_picking_line.action_stock_out") }}</btn-action>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <btn-action @click="handle_action('action_change_pack_or_lot')">Change lot or pack</btn-action>
+              <btn-action @click="handle_action('action_change_pack_or_lot')">{{ $t("cluster_picking.batch_picking_line.action_change_pack_or_lot") }}</btn-action>
             </v-col>
           </v-row>
           <v-row align="center">
             <v-col class="text-center" cols="12">
-              <v-btn x-large @click="dialog = false">Back</v-btn>
+              <v-btn x-large @click="dialog = false">{{ $t("btn.back.title") }}</v-btn>
             </v-col>
           </v-row>
         </div>

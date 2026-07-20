@@ -24,7 +24,9 @@ Vue.component("batch-picking-detail", {
         },
         picking_list_options() {
             return {
-                group_title_default: "Pickings list",
+                group_title_default: this.$t(
+                    "cluster_picking.batch_picking_detail.pickings_list"
+                ),
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_options: {
                     key_title: "name",
@@ -45,12 +47,12 @@ Vue.component("batch-picking-detail", {
       <div class="button-list button-vertical-list full">
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <btn-action @click="$emit('confirm')">Start</btn-action>
+            <btn-action @click="$emit('confirm')">{{ $t("btn.start.title") }}</btn-action>
           </v-col>
         </v-row>
         <v-row align="center">
           <v-col class="text-center" cols="12">
-            <btn-action :action="'cancel'" @click="$emit('cancel')">Cancel</btn-action>
+            <btn-action :action="'cancel'" @click="$emit('cancel')">{{ $t("btn.cancel.title") }}</btn-action>
           </v-col>
         </v-row>
       </div>
