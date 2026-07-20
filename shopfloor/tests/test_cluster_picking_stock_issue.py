@@ -46,7 +46,9 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
                 data=self._line_data(next_line_func()),
             )
         else:
-            data = self._data_for_batch(self.batch, self.packing_location)
+            data = self._data_for_batch(
+                self.batch, self.packing_location, with_move_lines=True
+            )
             data["skip_unload_all_scan"] = False
             self.assert_response(
                 response,

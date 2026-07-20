@@ -92,7 +92,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
         self.assertRecordValues(
             line, [{"qty_done": qty_done, "result_package_id": self.bin2.id}]
         )
-        data = self._data_for_batch(self.batch, self.packing_location)
+        data = self._data_for_batch(
+            self.batch, self.packing_location, with_move_lines=True
+        )
         data["skip_unload_all_scan"] = False
         self.assert_response(
             response,

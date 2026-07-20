@@ -91,7 +91,7 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
         location = self.packing_location
-        data = self._data_for_batch(self.batch, location)
+        data = self._data_for_batch(self.batch, location, with_move_lines=True)
         data["skip_unload_all_scan"] = False
         self.assert_response(
             response,
@@ -312,7 +312,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             params={"picking_batch_id": self.batch.id, "barcode": "NOTFOUND"},
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location)
+        data = self._data_for_batch(self.batch, location, with_move_lines=True)
         data["skip_unload_all_scan"] = False
         self.assert_response(
             response,
@@ -342,7 +342,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location)
+        data = self._data_for_batch(self.batch, location, with_move_lines=True)
         data["skip_unload_all_scan"] = False
         self.assert_response(
             response,
@@ -370,7 +370,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location)
+        data = self._data_for_batch(self.batch, location, with_move_lines=True)
         data["skip_unload_all_scan"] = False
         self.assert_response(
             response,
@@ -394,7 +394,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location)
+        data = self._data_for_batch(self.batch, location, with_move_lines=True)
         data["confirmation"] = barcode
         data["skip_unload_all_scan"] = False
         self.assert_response(
@@ -447,7 +447,9 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                 "confirmation": "other_barcode",
             },
         )
-        data = self._data_for_batch(self.batch, self.packing_a_location)
+        data = self._data_for_batch(
+            self.batch, self.packing_a_location, with_move_lines=True
+        )
         data["confirmation"] = barcode
         data["skip_unload_all_scan"] = False
         self.assert_response(
@@ -615,7 +617,9 @@ class ClusterPickingValidateDestinationAllCase(ClusterPickingUnloadingCommonCase
         response = self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
-        expected = self._data_for_batch(self.batch, self.packing_location)
+        expected = self._data_for_batch(
+            self.batch, self.packing_location, with_move_lines=True
+        )
         expected["skip_unload_all_scan"] = True
         self.assert_response(response, next_state="unload_all", data=expected)
 
@@ -628,7 +632,9 @@ class ClusterPickingValidateDestinationAllCase(ClusterPickingUnloadingCommonCase
         response = self.service.dispatch(
             "prepare_unload", params={"picking_batch_id": self.batch.id}
         )
-        expected = self._data_for_batch(self.batch, self.packing_location)
+        expected = self._data_for_batch(
+            self.batch, self.packing_location, with_move_lines=True
+        )
         expected["skip_unload_all_scan"] = False
         self.assert_response(response, next_state="unload_all", data=expected)
 

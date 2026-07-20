@@ -1047,10 +1047,15 @@ class ClusterPicking(Component):
         # only for the first one
         first_line = fields.first(lines)
         data = self.data.picking_batch(batch)
+        backorder_move_lines = lines.filtered(lambda l: l.qty_done < l.product_uom_qty)
         data.update(
             {
                 "location_dest": self.data.location(first_line.location_dest_id),
                 "skip_unload_all_scan": self.work.menu.skip_unload_all_scan,
+                "move_lines": self.data.move_lines(lines, with_picking=True),
+                "backorder_lines": self.data.move_lines(
+                    backorder_move_lines, with_picking=True
+                ),
             }
         )
         if confirmation:
@@ -1924,6 +1929,12 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "nullable": False,
             "required": False,
         }
+        schema["move_lines"] = self.schemas._schema_list_of(
+            self.schemas.move_line(with_picking=True)
+        )
+        schema["backorder_lines"] = self.schemas._schema_list_of(
+            self.schemas.move_line(with_picking=True)
+        )
         return schema
 
     @property

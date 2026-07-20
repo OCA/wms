@@ -6,6 +6,35 @@
 
 import {ScenarioBaseMixin} from "/shopfloor_mobile_base/static/wms/src/scenario/mixins.js";
 import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
+import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
+
+Vue.component("done-line", {
+    mixins: [ItemDetailMixin],
+    template: `
+        <div class="done-line d-flex align-center flex-wrap">
+            <span class="font-weight-bold mr-3">{{ record.product.display_name }}</span>
+            <packaging-qty-picker-display
+                :key="make_component_key(['done-line-qty', record.id])"
+                v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"
+                />
+            <span class="ml-3 text-no-wrap" v-if="record.lot">{{ $t("cluster_picking.done_line.line.lot") }}: {{ record.lot.name }}</span>
+            <span class="ml-3 text-no-wrap" v-if="record.package_dest">{{ $t("cluster_picking.done_line.line.bin") }}: {{ record.package_dest.name }}</span>
+        </div>
+    `,
+});
+
+Vue.component("backorder-line", {
+    mixins: [ItemDetailMixin],
+    template: `
+        <div class="backorder-line d-flex align-center flex-wrap">
+            <span class="font-weight-bold mr-3">{{ record.product.display_name }}</span>
+            <packaging-qty-picker-display
+                :key="make_component_key(['backorder-line-qty', record.id])"
+                v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.quantity - record.qty_done})"
+                />
+        </div>
+    `,
+});
 
 // TODO: consider replacing the dynamic "autofocus" in the searchbar by an event.
 // At the moment, we need autofocus to be disabled if there's a user popup.
@@ -168,6 +197,23 @@ const ClusterPicking = {
                     </v-card-title>
                 </v-card>
                 <div class="button-list button-vertical-list full" v-if="state.data.skip_unload_all_scan">
+                    <list
+                        v-if="!_.isEmpty(state.data.move_lines)"
+                        :records="state.data.move_lines"
+                        :grouped_records="done_lines_for_list"
+                        :options="done_lines_list_options"
+                        />
+                    <div
+                        v-if="!_.isEmpty(state.data.backorder_lines)"
+                        class="mt-3"
+                        >
+                        <div class="font-weight-bold mb-1">{{ $t("cluster_picking.backorder_lines.title") }}</div>
+                        <list
+                            :records="state.data.backorder_lines"
+                            :grouped_records="backorder_lines_for_list"
+                            :options="backorder_lines_list_options"
+                            />
+                    </div>
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <v-btn color="primary" @click="state.on_validate">
@@ -201,6 +247,70 @@ const ClusterPicking = {
                 {path: "picking_count", label: "Operations"},
                 {path: "move_line_count", label: "Lines"},
             ];
+        },
+        done_lines_for_list: function () {
+            const lines = this.state.data.move_lines || [];
+            const pickings = _.uniqBy(
+                _.map(lines, function (x) {
+                    return x.picking;
+                }),
+                "id"
+            );
+            const grouped = _.groupBy(lines, "picking.id");
+            const self = this;
+            return _.map(grouped, function (value, picking_id) {
+                const picking = _.find(pickings, {
+                    id: parseInt(picking_id, 10),
+                });
+                let title = picking.name;
+                if (picking.partner && picking.partner.name) {
+                    title += " — " + picking.partner.name;
+                }
+                return {
+                    key: picking_id,
+                    title: title,
+                    group_color: self.utils.colors.color_for("screen_step_done"),
+                    records: value,
+                };
+            });
+        },
+        done_lines_list_options: function () {
+            return {
+                no_divider: true,
+                list_item_component: "done-line",
+            };
+        },
+        backorder_lines_for_list: function () {
+            const lines = this.state.data.backorder_lines || [];
+            const pickings = _.uniqBy(
+                _.map(lines, function (x) {
+                    return x.picking;
+                }),
+                "id"
+            );
+            const grouped = _.groupBy(lines, "picking.id");
+            const self = this;
+            return _.map(grouped, function (value, picking_id) {
+                const picking = _.find(pickings, {
+                    id: parseInt(picking_id, 10),
+                });
+                let title = picking.name;
+                if (picking.partner && picking.partner.name) {
+                    title += " — " + picking.partner.name;
+                }
+                return {
+                    key: picking_id,
+                    title: title,
+                    group_color: self.utils.colors.color_for("screen_step_todo"),
+                    records: value,
+                };
+            });
+        },
+        backorder_lines_list_options: function () {
+            return {
+                no_divider: true,
+                list_item_component: "backorder-line",
+            };
         },
     },
     methods: {
