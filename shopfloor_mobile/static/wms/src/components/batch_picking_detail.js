@@ -10,23 +10,36 @@ Vue.component("batch-picking-detail", {
     methods: {
         detail_fields() {
             return [
-                {path: "picking_count", label: "Total operations"},
-                {path: "move_line_count", label: "Total lines"},
-                {path: "weight", label: "Total weight"},
+                {
+                    path: "picking_count",
+                    label: this.$t("batch_picking_detail.total_operations"),
+                },
+                {
+                    path: "move_line_count",
+                    label: this.$t("batch_picking_detail.total_lines"),
+                },
+                {
+                    path: "weight",
+                    label: this.$t("batch_picking_detail.total_weight"),
+                },
             ];
         },
         picking_detail_fields() {
             return [
                 {path: "name", klass: "loud", action_val_path: "name"},
-                {path: "move_line_count", label: "Lines"},
-                {path: "weight", label: "Weight"},
+                {
+                    path: "move_line_count",
+                    label: this.$t("batch_picking_detail.lines"),
+                },
+                {
+                    path: "weight",
+                    label: this.$t("batch_picking_detail.weight"),
+                },
             ];
         },
         picking_list_options() {
             return {
-                group_title_default: this.$t(
-                    "cluster_picking.batch_picking_detail.pickings_list"
-                ),
+                group_title_default: this.$t("batch_picking_detail.pickings_list"),
                 group_color: this.utils.colors.color_for("screen_step_todo"),
                 list_item_options: {
                     key_title: "name",
