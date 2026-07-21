@@ -6,37 +6,41 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2026-07-21 07:46+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: shopfloor_reception_add_packaging
 #: model:ir.model.fields,help:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging
 msgid "Add a button to create a new packaging in 'set_quantity' screen."
 msgstr ""
+"Aggiungere un pulsante per creare un nuovo imballaggio nella schermata "
+"'set_quantity'."
 
 #. module: shopfloor_reception_add_packaging
 #: model:ir.model.fields,field_description:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging
 msgid "Create New Packaging"
-msgstr ""
+msgstr "Crea nuovo imballaggio"
 
 #. module: shopfloor_reception_add_packaging
 #: model:ir.model.fields,field_description:shopfloor_reception_add_packaging.field_shopfloor_menu__create_new_packaging_is_possible
 msgid "Create New Packaging Is Possible"
-msgstr ""
+msgstr "È possibile creare un nuovo imballaggio"
 
 #. module: shopfloor_reception_add_packaging
 #: model:ir.model,name:shopfloor_reception_add_packaging.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
-msgstr ""
+msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor_reception_add_packaging
 #. odoo-python
 #: code:addons/shopfloor_reception_add_packaging/actions/message.py:0
 #, python-format
 msgid "Packaging '{}' created."
-msgstr ""
+msgstr "Imballaggio '{}' creato."
