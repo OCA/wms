@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-22 19:46+0000\n"
+"PO-Revision-Date: 2026-07-21 07:46+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -80,6 +80,9 @@ msgid ""
 "The scanned lot contains the product barcode '%(product_barcode)s' but you "
 "have no product with this barcode in Odoo."
 msgstr ""
+"Il lotto scansionato contiene il codice a barre del prodotto '%"
+"(product_barcode)s', ma in Odoo non è presente alcun prodotto con questo "
+"codice a barre."
 
 #. module: shopfloor_reception
 #. odoo-python
@@ -89,6 +92,9 @@ msgid ""
 "The scanned lot does not match the selected product. Current product is "
 "'%(current_product)s' but the scanned lot is for '%(lot_product)s'."
 msgstr ""
+"Il lotto scansionato non corrisponde al prodotto selezionato. Il prodotto "
+"corrente è '%(current_product)s', ma il lotto scansionato è per '%"
+"(lot_product)s'."
 
 #. module: shopfloor_reception
 #. odoo-python
