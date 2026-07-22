@@ -911,7 +911,10 @@ class MessageAction(Component):
     def new_move_lines_not_assigned(self):
         return {
             "message_type": "error",
-            "body": _("New move lines cannot be assigned: canceled."),
+            "body": _(
+                "Some products in the source location are already reserved. "
+                "It's impossible to reserve them!"
+            ),
         }
 
     def package_open(self):
