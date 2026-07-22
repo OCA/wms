@@ -1,0 +1,44 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_move_source_reassign_release_channel
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-22 10:49+0000\n"
+"PO-Revision-Date: 2026-07-22 10:49+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: stock_move_source_reassign_release_channel
+#: model:ir.model.fields,field_description:stock_move_source_reassign_release_channel.field_stock_move_reassign__release_channel_id
+msgid "Release Channel"
+msgstr ""
+
+#. module: stock_move_source_reassign_release_channel
+#: model:ir.model.fields,field_description:stock_move_source_reassign_release_channel.field_stock_move_reassign__release_channel_id_domain
+msgid "Release Channel Id Domain"
+msgstr ""
+
+#. module: stock_move_source_reassign_release_channel
+#: model:ir.model,name:stock_move_source_reassign_release_channel.model_stock_move
+msgid "Stock Move"
+msgstr ""
+
+#. module: stock_move_source_reassign_release_channel
+#: model:ir.model,name:stock_move_source_reassign_release_channel.model_stock_move_reassign
+msgid "Stock Move Reassign"
+msgstr ""
+
+#. module: stock_move_source_reassign_release_channel
+#. odoo-python
+#: code:addons/stock_move_source_reassign_release_channel/wizards/stock_move_reassign.py:0
+#, python-format
+msgid ""
+"You cannot use the release channel %(name)s as it is not in a correct state!"
+msgstr ""
