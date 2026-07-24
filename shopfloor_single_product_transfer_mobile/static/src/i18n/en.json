@@ -1,0 +1,14 @@
+{
+  "single_product_transfer.start_line.title": "Start by scanning something",
+  "single_product_transfer.start_line.scan_placeholder": "Scan location / pack / product / lot",
+  "single_product_transfer.start_line.scan_placeholder_location_pack": "Scan a location or a package",
+  "single_product_transfer.start_line.scan_placeholder_product_lot_pack": "Scan a product, lot, or package",
+  "single_product_transfer.select_location_or_package.title": "Scan a location or a package",
+  "single_product_transfer.select_location_or_package.scan_placeholder": "Scan location / package",
+  "single_product_transfer.select_product.title": "Select a product",
+  "single_product_transfer.select_product.scan_placeholder": "Scan product / lot",
+  "single_product_transfer.set_quantity.title": "Set quantity",
+  "single_product_transfer.set_quantity.scan_placeholder": "Scan product / packaging / lot / location / package",
+  "single_product_transfer.set_location.title": "Set location",
+  "single_product_transfer.set_location.scan_placeholder": "Scan location"
+}
