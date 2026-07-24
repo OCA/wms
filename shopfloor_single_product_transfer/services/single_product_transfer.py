@@ -1004,8 +1004,8 @@ class ShopfloorSingleProductTransfer(Component):
         """Restrict scanning product or lot first with option on.
 
         When the option first scan location or pack first is on.
-        When the line being worked on has a package, asked to scan the package first.
-        When the line as a lot ask to scan the location first.
+        When the line being worked on has a package, ask to scan the package first,
+        otherwise ask to scan the location first.
         """
         if not self.work.menu.scan_location_or_pack_first:
             return None
