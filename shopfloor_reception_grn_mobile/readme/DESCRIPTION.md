@@ -1,0 +1,1 @@
+Adds GRN on the receptions cards in Shopfloor Reception.
