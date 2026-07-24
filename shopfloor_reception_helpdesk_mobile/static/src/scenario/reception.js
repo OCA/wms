@@ -75,10 +75,13 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
         const self = this;
 
         const handle_declare_helpdesk = function (state) {
+            const selectedLine =
+                self.state.data.selected_move_line &&
+                self.state.data.selected_move_line[0];
             self.wait_call(
                 self.odoo.call("start_helpdesk", {
                     picking_id: self.state.data.picking.id,
-                    selected_line_id: (self.state.data.selected_move_line || [])[0]?.id,
+                    selected_line_id: selectedLine && selectedLine.id,
                     state: state,
                 })
             );
@@ -93,10 +96,13 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
         states["start_helpdesk"] = {
             on_create_helpdesk: () => {
                 const motive = self.state.data.helpdesk_wizard.motive;
+                const selectedLine =
+                    self.state.data.selected_move_line &&
+                    self.state.data.selected_move_line[0];
                 self.wait_call(
                     self.odoo.call("create_helpdesk", {
                         picking_id: self.state.data.picking.id,
-                        selected_line_id: self.state.data.selected_move_line[0]?.id,
+                        selected_line_id: selectedLine && selectedLine.id,
                         helpdesk_wizard_id: self.state.data.helpdesk_wizard.id,
                         description: self.state.data.helpdesk_wizard.description,
                         motive_id: motive ? motive.id : false,
