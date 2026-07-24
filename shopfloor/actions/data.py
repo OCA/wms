@@ -318,7 +318,7 @@ class DataAction(Component):
         supplier_info = fields.first(
             rec.seller_ids.filtered(
                 lambda x: x.product_id == rec
-                or x.product_tmpl_id == rec.product_tmpl_id
+                or (x.product_tmpl_id == rec.product_tmpl_id)
             )
         )
         return supplier_info.product_code or ""
