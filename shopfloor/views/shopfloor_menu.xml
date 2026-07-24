@@ -4,7 +4,7 @@
         <field name="model">shopfloor.menu</field>
         <field name="inherit_id" ref="shopfloor_base.shopfloor_menu_form_view" />
         <field name="arch" type="xml">
-            <field name="profile_id" position="after">
+            <group name="main" position="after">
                 <field name="picking_type_ids">
                     <tree editable="bottom" create="0">
                         <field name="company_id" invisible="1" />
@@ -15,7 +15,7 @@
                         <field name="shopfloor_zero_check" optional="show" />
                     </tree>
                 </field>
-            </field>
+            </group>
             <group name="options" position="inside">
                 <group
                     name="quantity_exceeding_demand"
