@@ -109,6 +109,30 @@ class TestFindWork(CommonCase):
             data=data,
         )
 
+    def test_find_work_with_prefilled_quantity(self):
+        self.menu.sudo().no_prefill_qty = False
+        response = self.service.dispatch("find_work")
+        move_line = fields.first(self.picking_1.move_line_ids)
+        data = self._data_for_start_line(move_line)
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=data,
+        )
+        self.assertEqual(move_line.qty_done, move_line.reserved_uom_qty)
+
+    def test_find_work_with_not_prefilled_quantity(self):
+        self._enable_no_prefill_qty()
+        response = self.service.dispatch("find_work")
+        move_line = fields.first(self.picking_1.move_line_ids)
+        data = self._data_for_start_line(move_line)
+        self.assert_response(
+            response,
+            next_state="start_line",
+            data=data,
+        )
+        self.assertEqual(move_line.qty_done, 0)
+
     def test_confirm_start_line_line_not_found(self):
         response = self.service.dispatch(
             "confirm_start_line",

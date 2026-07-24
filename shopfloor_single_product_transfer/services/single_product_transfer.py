@@ -1085,7 +1085,10 @@ class ShopfloorSingleProductTransfer(Component):
         ):
             message = self.msg_store.no_putaway_destination_available()
             return self._response_for_start(message=message)
-        stock.mark_move_line_as_picked(move_line, quantity=0)
+        if self.work.menu.no_prefill_qty:
+            stock.mark_move_line_as_picked(move_line, quantity=0)
+        else:
+            stock.mark_move_line_as_picked(move_line)
         return self._response_for_start_line(move_line)
 
     def confirm_start_line(
