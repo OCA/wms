@@ -9,4 +9,5 @@
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
     "depends": ["shopfloor_reception", "helpdesk_mgmt_stock", "helpdesk_motive"],
+    "data": ["views/shopfloor_menu.xml"],
 }
