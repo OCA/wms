@@ -59,6 +59,7 @@ const messages_de = {
         loading: "Wird geladen...",
         action: {
             logout: "Ausloggen",
+            toggle_devtools: "Entwicklertools umschalten",
         },
         nav: {
             scenario: "Szenario:",
