@@ -25,7 +25,7 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
 
                 const script = document.createElement("script");
                 script.src =
-                    "/shopfloor_mobile_base/static/wms/src/lib/eruda/eruda.min.js";
+                    "/shopfloor_mobile_base/static/wms/src/lib/eruda/eruda-v3.4.3.min.js";
                 script.id = "script_eruda";
 
                 script.onload = () => {
