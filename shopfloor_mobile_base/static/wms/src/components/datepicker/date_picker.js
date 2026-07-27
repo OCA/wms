@@ -38,7 +38,7 @@ export var DatePicker = Vue.component("date-picker-input", {
     },
     computed: {
         userLocale: function () {
-            const lang = this.$root.user?.lang || "en-US";
+            const lang = (this.$root.user && this.$root.user.lang) || "en-US";
             return lang.replace("_", "-").toLowerCase();
         },
         dateFormatter: function () {
