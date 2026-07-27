@@ -17,13 +17,13 @@ class Reception(Component):
 
     def _set_lot(self, picking, line, message=None, **kw):
         """Show the packaging dimension screen before 'set lot' screen."""
-        if not self.work.menu.set_packaging_dimension or self.packaging_update_done:
-            return super()._set_lot(
-                picking, line, message=message, lot_name=line.lot_name
+        if (
+            not self.work.menu.set_packaging_dimension
+            or self.packaging_update_done
+            or not (
+                packaging := self._get_next_packaging_to_set_dimension(line.product_id)
             )
-
-        packaging = self._get_next_packaging_to_set_dimension(line.product_id)
-        if not packaging:
+        ):
             return super()._set_lot(
                 picking, line, message=message, lot_name=line.lot_name
             )
