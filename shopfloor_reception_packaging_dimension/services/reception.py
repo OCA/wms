@@ -15,7 +15,13 @@ class Reception(Component):
         super().__init__(work_context)
         self.packaging_update_done = False
 
-    def _set_lot(self, picking, line, message=None, **kw):
+    def _before_state__set_lot(
+        self,
+        picking,
+        line,
+        message=None,
+        default_qty=None,
+    ):
         """Show the packaging dimension screen before 'set lot' screen."""
         if (
             not self.work.menu.set_packaging_dimension
@@ -24,8 +30,11 @@ class Reception(Component):
                 packaging := self._get_next_packaging_to_set_dimension(line.product_id)
             )
         ):
-            return super()._set_lot(
-                picking, line, message=message, lot_name=line.lot_name
+            return super()._before_state__set_lot(
+                picking,
+                line,
+                message=message,
+                default_qty=default_qty,
             )
 
         return self._response_for_set_packaging_dimension(
@@ -112,7 +121,7 @@ class Reception(Component):
         packaging = self.env["product.packaging"].sudo().browse(packaging_id)
 
         if not packaging:
-            return self._set_lot(
+            return self._before_state__set_lot(
                 picking, selected_line, message=self.msg_store.record_not_found()
             )
 
@@ -131,7 +140,7 @@ class Reception(Component):
             )
 
         self.packaging_update_done = True
-        return self._set_lot(picking, selected_line, message=message)
+        return self._before_state__set_lot(picking, selected_line, message=message)
 
     def _check_dimension_to_update(self, dimensions):
         """Check if the Shopfloor payload contains data for a packaging update."""
