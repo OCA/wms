@@ -13,7 +13,13 @@ class Reception(Component):
 
     product_barcode_update_done = False
 
-    def _set_lot(self, picking, line, message=None, **kw):
+    def _before_state__set_lot(
+        self,
+        picking,
+        line,
+        message=None,
+        default_qty=None,
+    ):
         """
         Check if product needs its barcode before 'set_lot'
         """
@@ -23,7 +29,12 @@ class Reception(Component):
                 return self._response_for_set_product_barcode(
                     picking, line, message=message
                 )
-        return super()._set_lot(picking, line, message=message, **kw)
+        return super()._before_state__set_lot(
+            picking,
+            line,
+            message=message,
+            default_qty=default_qty,
+        )
 
     def _get_domain_product_needs_barcode(self):
         """
@@ -95,7 +106,7 @@ class Reception(Component):
             self._update_product_barcode(product, barcode)
             message = self.msg_store.product_barcode_updated(product)
         self.product_barcode_update_done = True
-        return super()._set_lot(picking, selected_line, message=message)
+        return super()._before_state__set_lot(picking, selected_line, message=message)
 
     def _update_product_barcode(self, product, barcode) -> None:
         """Update barcode on the product."""

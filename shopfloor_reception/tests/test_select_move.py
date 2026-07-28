@@ -1,6 +1,8 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # pylint: disable=missing-return
+from datetime import datetime
+
 from odoo import fields
 
 from .common import CommonCase
@@ -439,7 +441,6 @@ class TestSelectLine(CommonCase):
 
     def test_select_move_to_set_lot_prefills_lot_name(self):
         picking = self._create_picking()
-
         self.product_a.tracking = "lot"
         self.product_b.tracking = "lot"
 
@@ -453,12 +454,9 @@ class TestSelectLine(CommonCase):
         move_line_b = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_b
         )
-        lot = self._create_lot(
-            product_id=self.product_b.id,
-            name="Pre-Configured Lot Name",
-            expiration_date="2020-02-02 12:00:00",
-        )
-        move_line_b.lot_name = lot.name
+        lot_name = "Pre-Configured Lot Name"
+        expiration_date = datetime(2020, 2, 2, 12)
+        move_line_b.write({"lot_name": lot_name, "expiration_date": expiration_date})
 
         # There is already a lot -> we skip "set_lot"
         response_a = self.service.dispatch(
@@ -467,7 +465,7 @@ class TestSelectLine(CommonCase):
         )
         self.assertEqual(response_a.get("next_state"), "set_quantity")
 
-        # There is a lot name but no lot record -> enter "set_lot"
+        # There is a lot name but lot does not exist yet in odoo -> enter "set_lot"
         response_b = self.service.dispatch(
             "manual_select_move",
             params={"move_id": move_b.id},
@@ -477,7 +475,7 @@ class TestSelectLine(CommonCase):
         # The UI should receive the lot metadata so as to be able to prefill
         self.assertEqual(
             response_b["data"]["set_lot"]["selected_move_line"][0]["lot"]["name"],
-            lot.name,
+            lot_name,
         )
         self.assertEqual(
             response_b["data"]["set_lot"]["selected_move_line"][0]["lot"][

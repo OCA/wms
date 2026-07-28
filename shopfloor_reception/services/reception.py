@@ -295,11 +295,10 @@ class Reception(Component):
             # Destination package is set, go to set_destination
             return self._response_for_set_destination(picking, line, message=message)
 
-        return self._set_lot(
+        return self._prepare_set_lot(
             picking,
             line,
             message=message,
-            lot_name=line.lot_name,
             default_qty=default_qty,
         )
 
@@ -307,7 +306,7 @@ class Reception(Component):
         stock = self._actions_for("stock")
         stock.mark_move_line_as_picked(line, quantity=qty_done, split=False)
 
-        return self._set_lot(picking, line, lot_name=line.lot_name)
+        return self._prepare_set_lot(picking, line)
 
     def _select_line__filter_lines_by_packaging__return(self, lines, packaging):
         return_line = fields.first(
@@ -818,30 +817,41 @@ class Reception(Component):
         data = {"pickings": self._data_for_stock_pickings(pickings, with_lines=False)}
         return self._response(next_state="manual_selection", data=data)
 
-    def _response_for_set_lot(self, picking, line, message=None, **kw):
+    def _response_for_set_lot(
+        self, picking, line, message=None, lot_name=None, lot_expiration_date=None, **kw
+    ):
         # ↓ In case "lot_name" is pre-filled on the line in odoo, pre-fill
         # shpofloor screen
-        if kw.get("lot_name") and not kw.get("lot_expiration_date") and not message:
+        if lot_name and not lot_expiration_date and not message:
             lot = (
                 self._actions_for("search")
                 .for_products(line.product_id)
                 .lot_from_scan(kw.get("lot_name"))
             )
-            kw["lot_expiration_date"] = lot.expiration_date
+            lot_expiration_date = lot.expiration_date
 
         return self._response(
             next_state="set_lot",
             data={
-                "selected_move_line": self._data_for_move_lines(line, **kw),
+                "selected_move_line": self._data_for_move_lines(
+                    line,
+                    lot_name=lot_name,
+                    lot_expiration_date=lot_expiration_date,
+                    **kw,
+                ),
                 "picking": self.data.picking(picking),
             },
             message=message,
         )
 
-    def _set_lot(self, picking, line, message=None, **kw):
+    def _before_state__set_lot(
+        self,
+        picking,
+        line,
+        message=None,
+        default_qty=None,
+    ):
         if not self._move_line_needs_lot(line):
-            # If no qty_done, set default qty_done
-            default_qty = kw.get("default_qty")
             rounding = line.product_uom_id.rounding
             if default_qty and float_is_zero(
                 line.qty_done, precision_rounding=rounding
@@ -850,40 +860,76 @@ class Reception(Component):
 
             return self._before_state__set_quantity(picking, line, message)
 
-        # Bypass "set_lot" screen and send lot info to endpoint directly if
-        # lot info have been found when parsing
-        if response := self._set_lot_from_parse(picking, line):
-            return response
-        return self._response_for_set_lot(picking, line, message, **kw)
+        # Try Bypass "set_lot" screen and send lot info to endpoint directly
+        # if lot already exists in odoo
+        search = self._actions_for("search")
+        if line.lot_name and search.lot_from_scan(line.lot_name, line.product_id):
+            expiration_date = line.expiration_date or None
+            return self.set_lot_confirm_action(
+                picking.id, line.id, line.lot_name, expiration_date
+            )
 
-    def _set_lot_from_parse(self, picking, line):
+        return self._response_for_set_lot(
+            picking,
+            line,
+            message,
+            lot_name=line.lot_name or None,
+            lot_expiration_date=line.expiration_date or None,
+        )
+
+    def _prefill_lot_data(self, line):
+        """
+        Pre-fill lot data on the line so that later RPC calls can access what
+        has been found/parsed in the first scan.
+        """
         parse_result = self.search_result.parse_result
         if not parse_result:
             return
 
-        lot_result = parse_result.get("lot")
-        if lot_result:
-            if self.search_result.type == "lot" and self.search_result.record:
-                lot_name = self.search_result.record.name
-            else:
-                lot_name = lot_result.value
+        lot_name = expiration_date = False
 
-            expiration_date = None
-            exp_result = parse_result.get("expiration_date")
-            if exp_result and line.product_id.use_expiration_date:
-                expiration_date = self._locale_date_to_datetime_utc(exp_result.value)
-
-            return self.set_lot_confirm_action(
-                picking.id, line.id, lot_name, expiration_date
-            )
-
+        if lot_result := self.search_result.parse_result.get("lot"):
+            lot_name = lot_result.value
         # We could have found a lot, but with result type "unknow"
         # Put this afterwards to favor multi-attribute barcode parsing
         # logic first
-        if self.search_result.record and self.search_result.record._name == "stock.lot":
-            return self.set_lot_confirm_action(
-                picking.id, line.id, lot_name=self.search_result.record.name
-            )
+        elif (
+            self.search_result.record and self.search_result.record._name == "stock.lot"
+        ):
+            lot_name = self.search_result.record.name
+
+        # ↓ Remove pre-existing expiration_date on new lot scan
+        if lot_name:
+            expiration_date = False
+
+        if exp_date_result := self.search_result.parse_result.get("expiration_date"):
+            expiration_date = self._locale_date_to_datetime_utc(
+                exp_date_result.value
+            ).replace(tzinfo=None)
+
+        line.write(
+            {
+                "lot_name": lot_name,
+                "expiration_date": expiration_date,
+            }
+        )
+
+    def _prepare_set_lot(
+        self,
+        picking,
+        line,
+        message=None,
+        default_qty=None,
+    ):
+        if self._move_line_needs_lot(line):
+            self._prefill_lot_data(line)
+
+        return self._before_state__set_lot(
+            picking,
+            line,
+            message,
+            default_qty=default_qty,
+        )
 
     def _align_display_product_uom_qty(self, line, response):
         # This method aligns product uom qties on move lines.
