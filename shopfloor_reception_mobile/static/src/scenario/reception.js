@@ -25,7 +25,7 @@ const Reception = {
                 <manual-select
                     class="with-progress-bar"
                     :records="select_move_from_record()"
-                    :options="select_move_from_record_options()"
+                    :options="operation_options()"
                     :key="select_move_from_record_key()"
                 />
                 <div class="button-list button-vertical-list full">
@@ -295,7 +295,7 @@ const Reception = {
         select_move_from_record: function () {
             return this.state.data.picking;
         },
-        select_move_from_record_options: function () {
+        operation_options: function () {
             return {
                 title_action_field: {action_val_path: "name"},
                 fields: this.picking_display_fields(),

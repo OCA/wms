@@ -19,19 +19,20 @@ const new_template =
 
 <template v-if="state_is('manual_selection_shipment')">
 
-<manual-select
-    class="with-progress-bar"
-    :records="dock_available_shipments()"
-    :options="manual_select_shipment_options()"
-    :key="make_state_component_key(['reception', 'manual-select-shipment'])"
+    <manual-select
+        class="with-progress-bar"
+        :records="dock_available_shipments()"
+        :options="manual_select_shipment_options()"
+        :key="make_state_component_key(['reception', 'manual-select-shipment'])"
     />
-<div class="button-list button-vertical-list full">
-    <v-row align="center">
-        <v-col class="text-center" cols="12">
-            <btn-back />
-        </v-col>
-    </v-row>
-</div>
+
+    <div class="button-list button-vertical-list full">
+        <v-row align="center">
+            <v-col class="text-center" cols="12">
+                <btn-back />
+            </v-col>
+        </v-row>
+    </div>
 
 </template>
 
