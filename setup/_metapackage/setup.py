@@ -29,6 +29,8 @@ setuptools.setup(
         'odoo-addon-shopfloor_reception_add_packaging_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_dock>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_dock_mobile>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_reception_grn>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_reception_grn_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_helpdesk>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_helpdesk_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_mobile>=16.0dev,<16.1dev',
