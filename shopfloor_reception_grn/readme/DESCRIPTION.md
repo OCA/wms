@@ -1,0 +1,1 @@
+Enables to select a reception by scanning its GRN.
