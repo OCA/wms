@@ -444,11 +444,13 @@ class ClusterPicking(Component):
         have to precise what they want by scanning one of:
 
         * pack
-        * product
         * lot
+        * product
+
 
         The result must be unambigous. For instance if we scan a product but the
-        product is tracked by lot, scanning the lot has to be required.
+        product is tracked by lot, scanning the lot has to be required. We support
+        multi valued barcodes (like GS1) if lot is provided along with product.
 
         `sublocation_id` is used when the scan_location_or_pack_first option is
         switched on and the location contains multiple products with no lot or package.
@@ -488,6 +490,9 @@ class ClusterPicking(Component):
 
         product = search.product_from_scan(barcode)
         if product and move_line.product_id == product:
+            lot = search.lot_from_scan(barcode, products=move_line.product_id)
+            if lot and move_line.lot_id == lot:
+                return self._scan_line_by_lot(picking, move_line, lot, sublocation)
             return self._scan_line_by_product(picking, move_line, product, sublocation)
 
         packaging = search.packaging_from_scan(barcode)
