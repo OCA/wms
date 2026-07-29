@@ -4,6 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _
 from odoo.fields import first
+from odoo.tools import float_compare
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -218,14 +219,28 @@ class LocationContentTransfer(Component):
         # create moves for each quant
         picking_type = self.picking_types
         move_vals_list = []
+        allow_reserve_only_available = self.work.menu.allow_reserve_only_available
         for quant in quants:
+            if (
+                allow_reserve_only_available
+                and not float_compare(
+                    quant.available_quantity,
+                    0.0,
+                    precision_rounding=quant.product_uom_id.rounding,
+                )
+                > 0
+            ):
+                # Don't take fully reserved quants
+                continue
             move_vals_list.append(
                 {
                     "name": quant.product_id.name,
                     "company_id": picking_type.company_id.id,
                     "product_id": quant.product_id.id,
                     "product_uom": quant.product_uom_id.id,
-                    "product_uom_qty": quant.quantity,
+                    "product_uom_qty": quant.available_quantity
+                    if allow_reserve_only_available
+                    else quant.quantity,
                     "location_id": location.id,
                     "location_dest_id": picking_type.default_location_dest_id.id,
                     "origin": self.work.menu.name,

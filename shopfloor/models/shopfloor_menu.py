@@ -81,6 +81,13 @@ class ShopfloorMenu(models.Model):
         help="If you tick this box, this scenario will allow operator to move"
         " goods even if a reservation is made by a different operation type.",
     )
+    reserve_only_available_is_possible = fields.Boolean(
+        compute="_compute_reserve_only_available_is_possible"
+    )
+    allow_reserve_only_available = fields.Boolean(
+        string="Allow to reserve only available quantities on source location",
+        help="Check this if you want the scenario to reserve only available quantities",
+    )
     ignore_no_putaway_available_is_possible = fields.Boolean(
         compute="_compute_ignore_no_putaway_available_is_possible"
     )
@@ -335,6 +342,13 @@ class ShopfloorMenu(models.Model):
                     "'Unload package at destination' and 'Multiple moves "
                     "same destination package'."
                 )
+            )
+
+    @api.depends("scenario_id", "picking_type_ids")
+    def _compute_reserve_only_available_is_possible(self):
+        for menu in self:
+            menu.reserve_only_available_is_possible = bool(
+                menu.scenario_id.has_option("allow_reserve_only_available")
             )
 
     @api.depends("scenario_id", "picking_type_ids")

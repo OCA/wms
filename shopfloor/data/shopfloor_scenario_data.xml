@@ -74,7 +74,8 @@
     "no_prefill_qty": true,
     "allow_move_line_search_sort_order": true,
     "allow_move_line_search_additional_domain": true,
-    "allow_quantity_exceeding_demand": true
+    "allow_quantity_exceeding_demand": true,
+    "allow_reserve_only_available": true
 
 }
         </field>
