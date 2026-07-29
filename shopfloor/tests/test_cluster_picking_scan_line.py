@@ -448,3 +448,19 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             )
 
         self.assertEqual(res["message"], self.msg_store.wrong_record(self.product_b))
+
+    def test_scan_line_multi_barcode_ok(self):
+        self._simulate_batch_selected(self.batch)
+        lot = self._create_lot(self.product_a)
+        line = self.batch.picking_ids.move_line_ids
+        line.lot_id = lot
+        with mock.patch.object(BarcodeParser, "parse") as mock_parse:
+            mock_parse.return_value = {
+                "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+                "product": BarcodeResult(
+                    type="product",
+                    value=self.product_a.barcode,
+                    raw=self.product_a.barcode,
+                ),
+            }
+            self._scan_line_ok(line, f"(01){self.product_a.barcode}(17){lot.name}")
