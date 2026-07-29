@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+from odoo.fields import first
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
 
@@ -68,6 +69,12 @@ class ClusterPickingUnloadingCommonCase(ClusterPickingCommonCase):
             )
         )
 
+    def _get_line_to_unload(self, package):
+        line = first(
+            package.planned_move_line_ids.filtered(self.service._filter_for_unload)
+        )
+        return line
+
 
 class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
     """Tests covering the /prepare_unload endpoint
@@ -100,6 +107,28 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
             data=data,
         )
 
+    def test_prepare_unload_all_same_dest_single(self):
+        """
+        Check that the `prepare_unload()` will return
+        a single unload response.
+        """
+        self.menu.sudo().unload_single_package = True
+        move_lines = self.move_lines
+        self._set_dest_package_and_done(move_lines[:2], self.bin1)
+        self._set_dest_package_and_done(move_lines[2:], self.bin2)
+        move_lines.write({"location_dest_id": self.packing_location.id})
+        response = self.service.dispatch(
+            "prepare_unload", params={"picking_batch_id": self.batch.id}
+        )
+        location = self.packing_location
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, self.bin1)
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
     def test_prepare_unload_different_dest(self):
         """All move lines have different destination locations"""
         move_lines = self.move_lines
@@ -112,7 +141,8 @@ class ClusterPickingPrepareUnloadCase(ClusterPickingUnloadingCommonCase):
         )
         first_line = move_lines[0]
         location = first_line.location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -300,7 +330,8 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -480,7 +511,8 @@ class ClusterPickingUnloadSplitCase(ClusterPickingUnloadingCommonCase):
             "unload_split", params={"picking_batch_id": self.batch.id}
         )
         location = move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             # the remaining move line still needs to be picked
             response,
@@ -517,7 +549,8 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = self.move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -535,12 +568,266 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             },
         )
         location = self.move_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_single",
             data=data,
             message={"message_type": "error", "body": "Wrong bin"},
+        )
+
+    def test_unload_scan_pack_ok_single_multi(self):
+        """Endpoint /unload_scan_pack is called, result ok"""
+        self.menu.sudo().unload_single_package = True
+        self.menu.sudo().unload_single_package_choice = True
+        self.move_lines[1].picking_id._put_in_pack(self.move_lines[1])
+
+        pack_2 = self.move_lines[1].result_package_id
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        location = self.move_lines[1].location_dest_id
+        line = self._get_line_to_unload(pack_2)
+        data = self._data_for_batch(self.batch, location, line, pack=pack_2)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+
+
+class ClusterPickingUnloadScanPackSingleCase(ClusterPickingUnloadingCommonCase):
+    """ """
+
+    @classmethod
+    def setUpClassBaseData(cls, *args, **kwargs):
+        super().setUpClassBaseData(*args, **kwargs)
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.menu.sudo().unload_single_package = True
+        cls.menu.sudo().unload_single_package_choice = True
+
+    def test_unload_scan_pack_ok_single_multi_twice(self):
+        """
+        Try to unload the same package to the destination twice
+        """
+        self._set_dest_package_and_done(self.move_lines, self.bin1)
+        self.move_lines[1].picking_id._put_in_pack(self.move_lines[1])
+
+        pack_2 = self.move_lines[1].result_package_id
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        location = self.move_lines[1].location_dest_id
+        line = self._get_line_to_unload(pack_2)
+        data = self._data_for_batch(self.batch, location, line, pack=pack_2)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": pack_2.id,
+                "barcode": self.packing_a_location.barcode,
+            },
+        )
+
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
+
+        # Check we try to pack the next line
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
+        # We scan the package we've just finished to unload
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": pack_2.name,
+            },
+        )
+        message = {
+            "message_type": "error",
+            "body": f"The package '{pack_2.name}' is already unloaded there: "
+            f"{pack_2.planned_move_line_ids.location_dest_id.name}, you cannot do it twice!",
+        }
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+            message=message,
+        )
+
+    def test_unload_scan_pack_ok_single_multi_done_twice(self):
+        """
+        Unload the packages of the first picking
+        It has been done
+        Try to unload a package of that first picking
+        An error message should occur
+        """
+        self._set_dest_package_and_done(self.one_line_picking.move_line_ids, self.bin1)
+        self._set_dest_package_and_done(self.two_lines_picking.move_line_ids, self.bin2)
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        location = self.one_line_picking.location_dest_id
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.packing_a_location.barcode,
+            },
+        )
+
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
+
+        # Check we try to pack the next line
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
+        self.assertEqual(self.one_line_picking.state, "done")
+
+        # We scan the package we've just finished to unload
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin2.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        message = {
+            "message_type": "error",
+            "body": f"The package '{self.bin1.name}' is already unloaded there: "
+            f"{self.bin1.location_id.name}, you cannot do it twice!",
+        }
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+            message=message,
+        )
+
+    def test_unload_scan_destination_ok_single_multi_done_twice(self):
+        """
+        Unload the packages of the first picking
+        It has been done
+        Try to unload a package of that first picking with
+        the 'unload_scan_destination' call.
+
+        This can happen if barcode scanner is too fast and call twice the
+        scan destination action.
+
+        An error message should occur
+        """
+        self._set_dest_package_and_done(self.one_line_picking.move_line_ids, self.bin1)
+        self._set_dest_package_and_done(self.two_lines_picking.move_line_ids, self.bin2)
+
+        # Pass the second package barcode instead of the one
+        # provided
+        response = self.service.dispatch(
+            "unload_scan_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.bin1.name,
+            },
+        )
+        location = self.one_line_picking.location_dest_id
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
+        self.assert_response(
+            response,
+            next_state="unload_set_destination",
+            data=data,
+        )
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.packing_a_location.barcode,
+            },
+        )
+
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
+
+        # Check we try to pack the next line
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+        )
+
+        self.assertEqual(self.one_line_picking.state, "done")
+
+        # We scan the package we've just finished to unload
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": self.packing_a_location.barcode,
+            },
+        )
+        message = {
+            "message_type": "error",
+            "body": f"The package '{self.bin1.name}' is already unloaded there: "
+            f"{self.bin1.location_id.name}, you cannot do it twice!",
+        }
+        self.assert_response(
+            response,
+            next_state="unload_single",
+            data=data,
+            message=message,
         )
 
 
@@ -573,7 +860,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
     def test_unload_scan_destination_ok(self):
         """Endpoint /unload_scan_destination is called, result ok"""
         dest_location = self.bin1_lines[0].location_dest_id
-
+        line = self._get_line_to_unload(self.bin2)
         response = self.service.dispatch(
             "unload_scan_destination",
             params={
@@ -623,7 +910,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
 
         location = self.bin2_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -691,7 +978,6 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self._set_dest_package_and_done(bin3_line, bin3)
 
         dest_location = bin2_line.location_dest_id
-
         response = self.service.dispatch(
             "unload_scan_destination",
             params={
@@ -731,7 +1017,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         )
         self.assertRecordValues(self.batch, [{"state": "in_progress"}])
         location = bin3_line.location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=bin3)
+        line = self._get_line_to_unload(bin3)
+        data = self._data_for_batch(self.batch, location, line, pack=bin3)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -796,7 +1083,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -822,7 +1110,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -846,7 +1135,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         self.assert_response(
             response,
             next_state="unload_set_destination",
@@ -866,7 +1156,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin1_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin1)
+        line = self._get_line_to_unload(self.bin1)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin1)
         data["confirmation"] = barcode
         self.assert_response(
             response,
@@ -933,7 +1224,8 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             },
         )
         location = self.bin2_lines[0].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=self.bin2)
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
         self.assert_response(
             response,
             next_state="unload_single",
@@ -941,5 +1233,69 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
                 "body": f"Last operation of transfer {picking.name}. Next operation "
                 f"({next_picking.name}) is ready to proceed."
             },
+            data=data,
+        )
+
+    def test_unload_single_pack_at_once(self):
+        """
+        Check scenario with a pack at once
+        """
+        self.menu.sudo().unload_single_package = True
+        dest_location = self.bin1_lines[0].location_dest_id
+
+        response = self.service.dispatch(
+            "unload_scan_destination",
+            params={
+                "picking_batch_id": self.batch.id,
+                "package_id": self.bin1.id,
+                "barcode": dest_location.barcode,
+            },
+        )
+
+        # The scan of destination set 'unloaded' to True to track the fact
+        # that we set the destination for the line. In this case, the line
+        # and the stock.picking are 'done' because all the lines of the picking
+        # have been unloaded
+        self.assertRecordValues(self.one_line_picking, [{"state": "done"}])
+        self.assertRecordValues(self.two_lines_picking, [{"state": "assigned"}])
+        self.assertRecordValues(
+            self.bin1_lines,
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "picking_id": self.one_line_picking.id,
+                    "location_dest_id": self.packing_a_location.id,
+                }
+            ],
+        )
+        self.assertRecordValues(
+            self.bin2_lines,
+            [
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+                {
+                    "shopfloor_unloaded": False,
+                    "qty_done": 10,
+                    "state": "assigned",
+                    "picking_id": self.two_lines_picking.id,
+                    "location_dest_id": self.packing_b_location.id,
+                },
+            ],
+        )
+        self.assertRecordValues(self.batch, [{"state": "in_progress"}])
+
+        location = self.bin2_lines[0].location_dest_id
+        line = self._get_line_to_unload(self.bin2)
+        data = self._data_for_batch(self.batch, location, line, pack=self.bin2)
+        self.assert_response(
+            response,
+            next_state="unload_single",
             data=data,
         )

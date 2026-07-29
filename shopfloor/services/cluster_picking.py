@@ -399,6 +399,16 @@ class ClusterPicking(Component):
         remaining_lines = self._lines_to_pick(picking_batch)
         return fields.first(remaining_lines)
 
+    def _response_package_already_unloaded_or_done(self, batch, package):
+        return self._unload_next_package(
+            batch, message=self.msg_store.package_already_unloaded_or_done(package)
+        )
+
+    def _response_package_already_unloaded(self, batch, package):
+        return self._unload_next_package(
+            batch, message=self.msg_store.package_already_unloaded(package)
+        )
+
     def _response_batch_does_not_exist(self):
         return self._response_for_start(message=self.msg_store.record_not_found())
 
@@ -833,6 +843,10 @@ class ClusterPicking(Component):
         It goes to different screens depending if all the move lines have
         the same destination or not.
 
+        This behavior can be changed (unload_single_package in menu)
+        if unload should be done in a different
+        location and that location is not known yet.
+
         Transitions:
         * unload_all: when all lines go to the same destination
         * unload_single: when lines have different destinations
@@ -840,7 +854,10 @@ class ClusterPicking(Component):
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
-        if self._are_all_dest_location_same(batch):
+        if (
+            not self.work.menu.unload_single_package
+            and self._are_all_dest_location_same(batch)
+        ):
             return self._response_for_unload_all(batch)
         else:
             # the lines have different destinations
@@ -868,6 +885,7 @@ class ClusterPicking(Component):
             {
                 "package": self.data.package(package),
                 "location_dest": self.data.location(line.location_dest_id),
+                "selected_move_line": self.data.move_line(line),
             }
         )
         return data
@@ -1254,6 +1272,24 @@ class ClusterPicking(Component):
 
         return self._unload_next_package(batch)
 
+    def _response_for_unload_single_wrong_bin(self, batch, package):
+        return self._response_for_unload_single(
+            batch,
+            package,
+            message={"message_type": "error", "body": _("Wrong bin")},
+        )
+
+    def _check_package_unloadable(self, batch, package) -> dict:
+        """
+        Check the scanned package is unloadable as it could have already
+        been scanned and put in destination and/or linked
+        picking has already been done.
+        """
+        lines = self._lines_to_unload(batch)
+        if not (lines & package.planned_move_line_ids):
+            return self._response_package_already_unloaded(batch, package)
+        return {}
+
     def unload_scan_pack(self, picking_batch_id, package_id, barcode):
         """Check that the operator scans the correct package (bin) on unload
 
@@ -1271,11 +1307,16 @@ class ClusterPicking(Component):
         if not package.exists():
             return self._unload_next_package(batch)
         if package.name != barcode:
-            return self._response_for_unload_single(
-                batch,
-                package,
-                message={"message_type": "error", "body": _("Wrong bin")},
-            )
+            wrong = True
+            if self.work.menu.unload_single_package_choice:
+                package_from_barcode = batch._get_package_from_barcode(barcode)
+                if package_from_barcode:
+                    package = package_from_barcode
+                    wrong = False
+            if wrong:
+                return self._response_for_unload_single_wrong_bin(batch, package)
+        if unloadable_check := self._check_package_unloadable(batch, package):
+            return unloadable_check
         return self._response_for_unload_set_destination(batch, package)
 
     def unload_scan_destination(
@@ -1304,6 +1345,9 @@ class ClusterPicking(Component):
         package = self.env["stock.quant.package"].browse(package_id)
         if not package.exists():
             return self._unload_next_package(batch)
+
+        if unloadable_check := self._check_package_unloadable(batch, package):
+            return unloadable_check
 
         # we work only on the lines of the scanned package
         lines = self._lines_to_unload(batch).filtered(
@@ -1347,11 +1391,11 @@ class ClusterPicking(Component):
             batch, completion_info_popup=completion_info_popup
         )
 
-    def _unload_next_package(self, batch, completion_info_popup=None):
+    def _unload_next_package(self, batch, completion_info_popup=None, message=None):
         next_package = self._next_bin_package_for_unload_single(batch)
         if next_package:
             return self._response_for_unload_single(
-                batch, next_package, popup=completion_info_popup
+                batch, next_package, popup=completion_info_popup, message=message
             )
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
@@ -1664,6 +1708,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         schema = self.schemas.picking_batch()
         schema["package"] = self.schemas._schema_dict_of(self.schemas.package())
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
+        schema["selected_move_line"] = self.schemas._schema_dict_of(
+            self.schemas.move_line()
+        )
         schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
         return schema
 

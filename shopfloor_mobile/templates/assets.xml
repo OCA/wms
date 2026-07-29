@@ -47,6 +47,11 @@
                 type="module"
             />
             <script
+                id="script_component_detail_location_destination_operation"
+                t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_location_destination_operation.js?v=#{mod_version}"
+                type="module"
+            />
+            <script
                 id="script_component_detail_location"
                 t-attf-src="/shopfloor_mobile/static/wms/src/components/detail/detail_location.js?v=#{mod_version}"
                 type="module"
