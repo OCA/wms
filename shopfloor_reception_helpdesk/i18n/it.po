@@ -1,0 +1,32 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_reception_helpdesk
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: shopfloor_reception_helpdesk
+#. odoo-python
+#: code:addons/shopfloor_reception_helpdesk/actions/messages.py:0
+#, python-format
+msgid "Helpdesk ticket (%(ticket_name)s) created!"
+msgstr ""
+
+#. module: shopfloor_reception_helpdesk
+#: model:ir.model.fields,field_description:shopfloor_reception_helpdesk.field_stock_helpdesk_ticket_create__motive_id
+msgid "Motive"
+msgstr ""
+
+#. module: shopfloor_reception_helpdesk
+#: model:ir.model,name:shopfloor_reception_helpdesk.model_stock_helpdesk_ticket_create
+msgid "Wizard to create Heldpesk ticket in stock"
+msgstr ""
