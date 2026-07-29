@@ -14,17 +14,17 @@ Vue.component("detail-transfer", {
             return [
                 {
                     path: "scheduled_date",
-                    label: "Scheduled on",
+                    label: this.$t("detail.transfer.scheduled_on"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "operation_type.name",
-                    label: "Operation type",
+                    label: this.$t("detail.transfer.operation_type"),
                 },
-                {path: "carrier.name", label: "Carrier"},
-                {path: "priority", label: "Priority"},
+                {path: "carrier.name", label: this.$t("detail.transfer.carrier")},
+                {path: "priority", label: this.$t("detail.transfer.priority")},
                 {
                     path: "note",
                     renderer: function (rec, field) {
@@ -63,13 +63,17 @@ Vue.component("detail-transfer", {
                 },
                 {
                     path: "package_src.name",
-                    label: "Pack",
+                    label: this.$t("detail.transfer.pack"),
                     action_val_path: "package_src.name",
                 },
-                {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
+                {
+                    path: "lot.name",
+                    label: this.$t("detail.transfer.lot"),
+                    action_val_path: "lot.name",
+                },
                 {
                     path: "quantity",
-                    label: "Qty reserved",
+                    label: this.$t("detail.transfer.qty_reserved"),
                     render_component: "packaging-qty-picker-display",
                     render_props: function (record) {
                         return self.utils.wms.move_line_qty_picker_props(record, {
@@ -79,7 +83,7 @@ Vue.component("detail-transfer", {
                 },
                 {
                     path: "product.qty_available",
-                    label: "Qty in stock",
+                    label: this.$t("detail.transfer.qty_in_stock"),
                     render_component: "packaging-qty-picker-display",
                     render_props: function (record) {
                         return self.utils.wms.move_line_qty_picker_props(record, {
@@ -110,7 +114,7 @@ Vue.component("detail-transfer", {
                         dark
                         small
                         color="green"
-                        title="Edit carrier"
+                        :title="$t('detail.transfer.edit_carrier')"
                         @click="$router.push({'name': 'edit_form', params: {form_name: 'form_edit_stock_picking', record_id: record.id}})"
                     >
                         <v-icon>mdi-truck-outline</v-icon>

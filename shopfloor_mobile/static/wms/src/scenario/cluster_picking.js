@@ -51,11 +51,11 @@ const ClusterPicking = {
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <v-btn color="primary" @click="state.on_action_full_bin" v-if="!state.data.disable_full_bin_action">
-                                Full bin
+                                {{ $t("cluster_picking.scan_destination.full_bin") }}
                             </v-btn>
                             <v-btn color="default" disabled v-else="">
                                 <v-icon color="warning" class="pr-1">mdi-block-helper</v-icon>
-                                Full bin disabled by menu
+                                {{ $t("cluster_picking.scan_destination.full_bin_disabled") }}
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -81,7 +81,7 @@ const ClusterPicking = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="default" @click="state.on_back">Back</v-btn>
+                            <v-btn color="default" @click="state.on_back">{{ $t("btn.back.title") }}</v-btn>
                         </v-col>
                     </v-row>
                 </div>
@@ -99,7 +99,7 @@ const ClusterPicking = {
                     <v-card-title>
                         <div class="main-info">
                             <div class="destination">
-                                <span class="label">Destination:</span>
+                                <span class="label">{{ $t("cluster_picking.unload_all.destination") }}</span>
                                 {{ state.data.location_dest.name }}
                             </div>
                         </div>
@@ -108,7 +108,7 @@ const ClusterPicking = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <v-btn color="primary" @click="$emit('action', 'action_split')">Split [TODO]</v-btn>
+                            <v-btn color="primary" @click="$emit('action', 'action_split')">{{ $t("cluster_picking.unload_all.split") }}</v-btn>
                         </v-col>
                     </v-row>
                 </div>
