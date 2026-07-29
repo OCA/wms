@@ -1118,9 +1118,9 @@ class ShopfloorSingleProductTransfer(Component):
         handlers = {
             "location": self._scan_line__by_location,
             "package": self._scan_line__by_package,
+            "lot": self._scan_line__by_lot,
             "product": self._scan_line__by_product,
             "packaging": self._scan_line__by_packaging,
-            "lot": self._scan_line__by_lot,
             "none": self._scan_line__fallback,
         }
         try:
