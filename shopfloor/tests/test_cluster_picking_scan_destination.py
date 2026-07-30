@@ -98,6 +98,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             # they reach the same destination so next state unload_all
             next_state="unload_all",
             data=data,
+            message=self.service.msg_store.x_units_put_in_package(
+                line.qty_done, line.product_id, self.bin2
+            ),
         )
 
     def test_scan_destination_pack_not_empty_same_picking(self):
