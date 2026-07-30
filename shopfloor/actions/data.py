@@ -332,7 +332,13 @@ class DataAction(Component):
 
     @property
     def _picking_batch_parser(self):
-        return ["id", "name", "picking_count", "move_line_count", "total_weight:weight"]
+        return [
+            "id",
+            "display_name:name",
+            "picking_count",
+            "move_line_count",
+            "total_weight:weight",
+        ]
 
     @ensure_model("stock.picking.type")
     def picking_type(self, record, **kw):
