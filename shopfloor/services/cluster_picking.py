@@ -105,7 +105,9 @@ class ClusterPicking(Component):
             popup=popup,
         )
 
-    def _response_for_scan_destination(self, move_line, message=None, qty_done=None):
+    def _response_for_scan_destination(
+        self, move_line, message=None, qty_done=None, popup=None
+    ):
         if qty_done is None:
             data = self._data_move_line(move_line)
         else:
@@ -120,7 +122,9 @@ class ClusterPicking(Component):
                 picking=move_line.picking_id,
             )
             data["disable_full_bin_action"] = self.work.menu.disable_full_bin_action
-        return self._response(next_state="scan_destination", data=data, message=message)
+        return self._response(
+            next_state="scan_destination", data=data, message=message, popup=popup
+        )
 
     def _response_for_change_pack_lot(self, move_line, message=None):
         return self._response(
@@ -174,6 +178,22 @@ class ClusterPicking(Component):
             data=self._data_for_unload_single(
                 batch, package, confirmation=confirmation
             ),
+        )
+
+    def _response_for_start_product(self, batch, product, location, message=None):
+        return self._response(
+            next_state="start_product",
+            data=self._data_for_product_scan(batch, product, location),
+            message=message,
+        )
+
+    def _response_for_scan_product_destination(
+        self, batch, product, location, message=None
+    ):
+        return self._response(
+            next_state="scan_product_destination",
+            data=self._data_for_product_scan(batch, product, location),
+            message=message,
         )
 
     def find_batch(self):
@@ -321,6 +341,8 @@ class ClusterPicking(Component):
         line to pick.
 
         Transitions:
+        * start_product: when aggregatable products exist and
+          pick_by_product is enabled
         * start_line: when the batch has at least one line without destination
           package
         * start: if the condition above is wrong (rare case of race condition...)
@@ -328,16 +350,97 @@ class ClusterPicking(Component):
         batch = self.env["stock.picking.batch"].browse(picking_batch_id)
         if not batch.exists():
             return self._response_batch_does_not_exist()
-        return self._pick_next_line(batch)
+        return self._pick_next_state(batch)
 
-    def _pick_next_line(self, batch, message=None, force_line=None):
+    def scan_product(self, picking_batch_id, barcode):
+        """Scan the expected product for product-based picking
+
+        Validates the barcode matches the product shown on the start_product
+        screen. No data is mutated — this is pure validation.
+
+        Transitions:
+        * scan_product_destination: when the barcode matches the expected product
+        * start_product: when the barcode does not match
+        """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+        product, location = self._find_next_product_location(batch)
+        if not product:
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        search = self._actions_for("search")
+        scanned = search.product_from_scan(barcode)
+        if not scanned:
+            return self._response_for_start_product(
+                batch,
+                product,
+                location,
+                message=self.msg_store.barcode_not_found(),
+            )
+        if scanned != product:
+            return self._response_for_start_product(
+                batch,
+                product,
+                location,
+                message=self.msg_store.wrong_record(scanned),
+            )
+        return self._response_for_scan_product_destination(batch, product, location)
+
+    def scan_product_destination_pack(
+        self, picking_batch_id, product_id, location_id, barcode, quantity
+    ):
+        """Set the destination package and qty_done for all lines of a product
+
+        Distributes the total quantity across all aggregatable lines of this
+        product, sorted by scheduled_date (earliest first). The destination
+        package is assigned to all affected lines.
+
+        Transitions:
+        * start_product: when more aggregatable products remain
+        * start_line: when non-aggregatable lines remain
+        * unload_all: when all lines are done and have same destination
+        * unload_single: when all lines are done and have different destinations
+        """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+        product = self.env["product.product"].browse(product_id)
+        if not product.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+        location = self.env["stock.location"].browse(location_id)
+        if not location.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+
+        lines = self._aggregate_product_location_lines(
+            product, location, self._aggregatable_lines(batch)
+        )
+
+        search = self._actions_for("search")
+        bin_package = search.package_from_scan(barcode)
+        if not bin_package:
+            return self._response_for_scan_product_destination(
+                batch,
+                product,
+                location,
+                message=self.msg_store.bin_not_found_for_barcode(barcode),
+            )
+
+        distributed_qty = self._distribute_qty_by_scheduled_date(
+            lines, quantity, bin_package
+        )
+
+        return self._pick_next_state(
+            batch, product=product, total_qty=distributed_qty, bin_package=bin_package
+        )
+
+    def _pick_next_line(self, batch, message=None, force_line=None, popup=None):
         if force_line:
             next_line = force_line
         else:
             next_line = self._next_line_for_pick(batch)
         if not next_line:
-            return self.prepare_unload(batch.id)
-        return self._response_for_start_line(next_line, message=message)
+            return self.prepare_unload(batch.id, message=message)
+        return self._response_for_start_line(next_line, message=message, popup=popup)
 
     @staticmethod
     def _sort_key_lines(line):
@@ -413,6 +516,107 @@ class ClusterPicking(Component):
         data["scan_location_or_pack_first"] = self.work.menu.scan_location_or_pack_first
         data.update(kw)
         return data
+
+    def _aggregatable_lines(self, batch):
+        """Return lines eligible for product-based picking.
+
+        A line is aggregatable if:
+        - It has no source package (package_id is False)
+        - Its product is not tracked by lot or serial number
+        """
+        return self._lines_to_pick(batch).filtered(
+            lambda l: not l.package_id and l.product_id.tracking == "none"
+        )
+
+    def _aggregate_product_location_lines(self, product, location, lines):
+        """Return lines eligible for `product` and `location`."""
+        return lines.filtered(
+            lambda l: l.product_id == product and l.location_id == location
+        )
+
+    def _find_next_product_location(self, batch):
+        """Find the first (product, location) with aggregatable lines, by picking sequence."""
+        lines = self._aggregatable_lines(batch)
+        if not lines:
+            return self.env["product.product"], self.env["stock.location"]
+        first_line = fields.first(lines)
+        return first_line.product_id, first_line.location_id
+
+    def _data_for_product_scan(self, batch, product, location):
+        """Build response data for product scan states."""
+        lines = self._aggregate_product_location_lines(
+            product, location, self._aggregatable_lines(batch)
+        )
+        total_qty = sum(lines.mapped("product_uom_qty"))
+        data = {
+            "product": self.data.product(product),
+            "quantity": total_qty,
+            "location_src": self.data.location(location),
+            "lines": [
+                {
+                    "id": line.id,
+                    "picking": self.data.picking(line.picking_id),
+                    "product_uom_qty": line.product_uom_qty,
+                    "product_uom": line.product_uom_id.name,
+                    "qty_done": line.qty_done,
+                }
+                for line in lines
+            ],
+            "batch": self.data.picking_batch(batch),
+        }
+        return data
+
+    def _distribute_qty_by_scheduled_date(self, lines, total_qty, bin_package):
+        """Distribute total_qty across lines, earliest scheduled_date first.
+
+        The last line may get a partial quantity.
+        Returns the total quantity actually distributed.
+        """
+        sorted_lines = lines.sorted(
+            key=lambda l: (
+                l.move_id.date,
+                l.move_id.sequence,
+                l.move_id.id,
+                l.id,
+            )
+        )
+        remaining = total_qty
+        for line in sorted_lines:
+            if remaining <= 0:
+                break
+            qty = min(line.product_uom_qty, remaining)
+            # Do not split the line if qty is less than expected: we want a backorder
+            # for remaining qty
+            new_line, qty_check = line._split_qty_to_be_done(qty, split_partial=False)
+            if qty_check == "greater":
+                break
+            line.write({"qty_done": qty, "result_package_id": bin_package.id})
+            remaining -= qty
+        return total_qty - remaining
+
+    def _pick_next_state(self, batch, product=None, total_qty=0, bin_package=None):
+        """Route to the next state for the batch.
+
+        When product and bin_package are provided, a success message is included.
+
+        Transitions:
+        * start_product: when aggregatable products remain and
+          pick_by_product is enabled
+        * start_line: when non-aggregatable lines remain
+        * unload_all / unload_single: when all lines are done
+        """
+        message = None
+        if product and bin_package:
+            message = self.msg_store.x_units_put_in_package(
+                total_qty, product, bin_package
+            )
+        if self.work.menu.pick_by_product:
+            next_product, location = self._find_next_product_location(batch)
+            if next_product:
+                return self._response_for_start_product(
+                    batch, next_product, location, message=message
+                )
+        return self._pick_next_line(batch, message=message)
 
     def unassign(self, picking_batch_id):
         """Unassign and reset to draft a started picking batch
@@ -818,7 +1022,7 @@ class ClusterPicking(Component):
         lines_to_unload = self._lines_to_unload(batch)
         return len(lines_to_unload.mapped("location_dest_id")) == 1
 
-    def prepare_unload(self, picking_batch_id):
+    def prepare_unload(self, picking_batch_id, message=None):
         """Initiate the unloading phase of the scenario
 
         It goes to different screens depending if all the move lines have
@@ -832,7 +1036,7 @@ class ClusterPicking(Component):
         if not batch.exists():
             return self._response_batch_does_not_exist()
         if self._are_all_dest_location_same(batch):
-            return self._response_for_unload_all(batch)
+            return self._response_for_unload_all(batch, message=message)
         else:
             # the lines have different destinations
             return self._unload_next_package(batch)
@@ -843,7 +1047,17 @@ class ClusterPicking(Component):
         # only for the first one
         first_line = fields.first(lines)
         data = self.data.picking_batch(batch)
-        data.update({"location_dest": self.data.location(first_line.location_dest_id)})
+        backorder_move_lines = lines.filtered(lambda l: l.qty_done < l.product_uom_qty)
+        data.update(
+            {
+                "location_dest": self.data.location(first_line.location_dest_id),
+                "skip_unload_all_scan": self.work.menu.skip_unload_all_scan,
+                "move_lines": self.data.move_lines(lines, with_picking=True),
+                "backorder_lines": self.data.move_lines(
+                    backorder_move_lines, with_picking=True
+                ),
+            }
+        )
         if confirmation:
             data.update({"confirmation": confirmation})
         return data
@@ -1146,6 +1360,38 @@ class ClusterPicking(Component):
         completion_info_popup = completion_info.popup(lines)
         return self._unload_end(batch, completion_info_popup=completion_info_popup)
 
+    def validate_destination_all(self, picking_batch_id):
+        """Validate the destination for all the lines of the batch with a dest. package
+
+        This method must be used only if all the move lines which have a destination
+        package and qty done have the same destination location.
+        The expected destination location is used without any barcode scan.
+
+        Transitions:
+        * start_line: the batch still have move lines without destination package
+        * unload_all: if destinations were not the same (race condition)
+        * unload_single: if destinations were not the same (race condition)
+        * start: batch is totally done. In this case, this method *has*
+          to handle the closing of the batch to create backorders.
+        """
+        batch = self.env["stock.picking.batch"].browse(picking_batch_id)
+        if not batch.exists():
+            return self._response_batch_does_not_exist()
+
+        if not self._are_all_dest_location_same(batch):
+            return self.prepare_unload(batch.id)
+
+        lines = self._lines_to_unload(batch)
+        if not lines:
+            return self._unload_end(batch)
+
+        first_line = fields.first(lines)
+        location = first_line.location_dest_id
+        self._unload_write_destination_on_lines(lines, location)
+        completion_info = self._actions_for("completion.info")
+        completion_info_popup = completion_info.popup(lines)
+        return self._unload_end(batch, completion_info_popup=completion_info_popup)
+
     def _unload_write_destination_on_lines(self, lines, location):
         stock = self._actions_for("stock")
         stock.set_destination_and_unload_lines(
@@ -1180,8 +1426,8 @@ class ClusterPicking(Component):
 
         next_line = self._next_line_for_pick(batch)
         if next_line:
-            return self._response_for_start_line(
-                next_line,
+            return self._pick_next_line(
+                batch,
                 message=self.msg_store.batch_transfer_line_done(),
                 popup=completion_info_popup,
             )
@@ -1343,6 +1589,26 @@ class ShopfloorClusterPickingValidator(Component):
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
         }
 
+    def scan_product(self):
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": True, "type": "string"},
+        }
+
+    def scan_product_destination_pack(self):
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "product_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "location_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": True, "type": "string"},
+            "quantity": {
+                "coerce": to_float,
+                "required": True,
+                "nullable": True,
+                "type": "float",
+            },
+        }
+
     def unassign(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
@@ -1408,6 +1674,11 @@ class ShopfloorClusterPickingValidator(Component):
             "confirmation": {"type": "string", "nullable": True, "required": False},
         }
 
+    def validate_destination_all(self):
+        return {
+            "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"},
+        }
+
     def unload_split(self):
         return {
             "picking_batch_id": {"coerce": to_int, "required": True, "type": "integer"}
@@ -1455,6 +1726,8 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "unload_set_destination": self._schema_for_unload_single,
             "confirm_unload_set_destination": self._schema_for_unload_single,
             "change_pack_lot": self._schema_for_single_line_details,
+            "start_product": self._schema_for_product_scan,
+            "scan_product_destination": self._schema_for_product_scan,
         }
 
     def find_batch(self):
@@ -1470,6 +1743,7 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         return self._response_schema(
             next_states={
                 "start_line",
+                "start_product",
                 # we reopen a batch already started where all the lines were
                 # already picked and have to be unloaded to the same
                 # destination
@@ -1477,6 +1751,21 @@ class ShopfloorClusterPickingValidatorResponse(Component):
                 # we reopen a batch already started where all the lines were
                 # already picked and have to be unloaded to the different
                 # destinations
+                "unload_single",
+            }
+        )
+
+    def scan_product(self):
+        return self._response_schema(
+            next_states={"start_product", "scan_product_destination"}
+        )
+
+    def scan_product_destination_pack(self):
+        return self._response_schema(
+            next_states={
+                "start_product",
+                "start_line",
+                "unload_all",
                 "unload_single",
             }
         )
@@ -1570,6 +1859,20 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             }
         )
 
+    def validate_destination_all(self):
+        return self._response_schema(
+            next_states={
+                # if the batch still contain lines
+                "start_line",
+                # this endpoint was called but after checking, lines
+                # have different destination locations
+                "unload_all",
+                "unload_single",
+                # batch finished
+                "start",
+            }
+        )
+
     def unload_split(self):
         return self._response_schema(next_states={"unload_single"})
 
@@ -1621,6 +1924,17 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         schema = self.schemas.picking_batch()
         schema["location_dest"] = self.schemas._schema_dict_of(self.schemas.location())
         schema["confirmation"] = {"type": "string", "nullable": True, "required": False}
+        schema["skip_unload_all_scan"] = {
+            "type": "boolean",
+            "nullable": False,
+            "required": False,
+        }
+        schema["move_lines"] = self.schemas._schema_list_of(
+            self.schemas.move_line(with_picking=True)
+        )
+        schema["backorder_lines"] = self.schemas._schema_list_of(
+            self.schemas.move_line(with_picking=True)
+        )
         return schema
 
     @property
@@ -1648,4 +1962,28 @@ class ShopfloorClusterPickingValidatorResponse(Component):
     def _schema_for_scan_destination(self):
         schema = self._schema_for_single_line_details
         schema["disable_full_bin_action"] = {"type": "boolean"}
+        return schema
+
+    @property
+    def _schema_for_product_scan(self):
+        schema = {
+            "product": self.schemas._schema_dict_of(self.schemas.product()),
+            "quantity": {"required": True, "type": "float"},
+            "location_src": self.schemas._schema_dict_of(self.schemas.location()),
+            "lines": {
+                "type": "list",
+                "required": True,
+                "schema": {
+                    "type": "dict",
+                    "schema": {
+                        "id": {"type": "integer", "required": True},
+                        "picking": self.schemas._schema_dict_of(self.schemas.picking()),
+                        "product_uom_qty": {"type": "float", "required": True},
+                        "product_uom": {"type": "string", "required": True},
+                        "qty_done": {"type": "float", "required": True},
+                    },
+                },
+            },
+            "batch": self.schemas._schema_dict_of(self.schemas.picking_batch()),
+        }
         return schema
