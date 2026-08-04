@@ -130,10 +130,13 @@ class StockMove(models.Model):
                 if line.package_id == line.result_package_id:
                     line.result_package_id = False
 
-        # The batch cannot be set during copy as the moves have to be first
-        # extracted to the new picking in order to have a non draft state that
-        # will succeed the batch sanity check
-        new_picking.batch_id = picking.batch_id
+        # We skip the sanity check on the batch assignment to the new picking because in
+        # some cases, the batch may contain done pickings, which would make the sanity check
+        # fail. This could be the case when using the cluster_picking set_destination_all
+        # method, when the batch contains lines partially processed from different pickings.
+        new_picking.with_context(
+            skip_batch_sanity_check=True
+        ).batch_id = picking.batch_id
         return new_picking
 
     def extract_and_action_done(self):
