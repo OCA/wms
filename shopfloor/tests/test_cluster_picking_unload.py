@@ -182,6 +182,32 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
 
     def test_set_destination_all_remaining_lines(self):
         """Set destination on all lines for a part of the batch"""
+
+        # force the order to ensure the opposite behaviour of the next test
+        # (That should not matter since by default the order is based on the move line id,
+        # and the two lines picking has a lower id than the one line picking,
+        # but we want to be sure)
+        self.one_line_picking.move_line_ids.shopfloor_priority = 20
+        self.two_lines_picking.move_line_ids.shopfloor_priority = 5
+
+        self._test_set_destination_all_remaining_lines()
+
+    def test_set_destination_all_remaining_lines_two_lines_picking_higher_priority(
+        self,
+    ):
+        """Same outcome when the two lines picking has a higher priority value
+        than the one line picking.
+
+        This is a regression test to ensure that when a split order is created for
+        the remaining lines and added to a cluster picking already containing a
+        picking done (the one line picking), no exception is raised by the sanity
+        check of the batch picking from the odoo base module stock_picking_batch
+        """
+        self.one_line_picking.move_line_ids.shopfloor_priority = 5
+        self.two_lines_picking.move_line_ids.shopfloor_priority = 20
+        self._test_set_destination_all_remaining_lines()
+
+    def _test_set_destination_all_remaining_lines(self):
         # Put destination packages, the whole quantity on lines and a similar
         # destination (when /set_destination_all is called, all the lines to
         # unload must have the same destination).
