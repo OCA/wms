@@ -14,9 +14,9 @@ for (let i = 1; i < count + 1; i++) {
         {},
         {lines_count: demotools.getRandomInt(5), line_random_pack: true}
     );
-    for (let i = 0; i < demotools.getRandomInt(move_lines.length); i++) {
+    for (let j = 0; j < demotools.getRandomInt(move_lines.length); j++) {
         // Set some as done
-        move_lines[i].qty_done = move_lines[i].quantity;
+        move_lines[j].qty_done = move_lines[j].quantity;
     }
     pickings.push(
         demotools.makePicking(

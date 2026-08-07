@@ -3,10 +3,9 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
-/* eslint-disable strict */
-/* eslint-disable no-implicit-globals */
-import {PickingDetailSelectMixin} from "./mixins.js";
+
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
+import {PickingDetailSelectMixin} from "./mixins.esm.js";
 
 Vue.component("detail-picking-select", {
     mixins: [PickingDetailSelectMixin],
@@ -16,12 +15,15 @@ Vue.component("detail-picking-select", {
             return {
                 action_qty_edit: {
                     comp_name: "edit-action",
+                    /* eslint-disable no-unused-vars */
                     get_record: function (rec, action) {
                         return rec;
                     },
+                    /* eslint-disable no-unused-vars */
                     get_options: function (rec, action) {
                         return {click_event: "qty_edit"};
                     },
+                    /* eslint-disable no-unused-vars */
                     enabled: function (rec, action) {
                         return true;
                     },
@@ -43,7 +45,7 @@ Vue.component("picking-select-line-content", {
             // Display detail fields on demand if the package contains only 1 line
             if (
                 this.options.show_oneline_package_content &&
-                record.package_dest.move_line_count == 1
+                record.package_dest.move_line_count === 1
             ) {
                 fields = [
                     {path: "product.display_name", label: "Product"},
@@ -69,6 +71,7 @@ Vue.component("picking-select-line-content", {
             opts.loud_title = true;
             return opts;
         },
+        /* eslint-disable no-unused-vars */
         get_wrapper_klass(record) {
             return "";
         },

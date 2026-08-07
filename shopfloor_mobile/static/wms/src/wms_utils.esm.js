@@ -7,16 +7,17 @@
 import {utils_registry} from "/shopfloor_mobile_base/static/wms/src/services/utils_registry.js";
 
 export class WMSUtils {
-    group_lines_by_location(lines, options) {
+    group_lines_by_location(lines, opts) {
         const self = this;
         // {'key': 'no-group', 'title': '', 'records': []}
-        options = _.defaults(options || {}, {
+        const options = _.defaults(opts || {}, {
             group_key: "location_src",
             group_no_title: false,
             name_prefix: "Location",
             prepare_records: function (recs) {
                 return recs;
             },
+            /* eslint-disable no-unused-vars */
             group_color_maker: function (recs) {
                 return "";
             },
@@ -32,11 +33,12 @@ export class WMSUtils {
         // TODO: grouped.forEach?
         _.forEach(grouped, function (value, loc_id) {
             const location = _.first(_.filter(locations, {id: parseInt(loc_id, 10)}));
-            const title = options.group_no_title
-                ? ""
-                : options.name_prefix
-                ? options.name_prefix + ": " + location.name
-                : location.name;
+            let title = location.name;
+            if (options.group_no_title) {
+                title = "";
+            } else if (options.name_prefix) {
+                title = options.name_prefix + ": " + location.name;
+            }
             res.push({
                 _is_group: true,
                 key: loc_id,
@@ -48,10 +50,10 @@ export class WMSUtils {
         return res;
     }
 
-    group_lines_by_locations(lines, options) {
+    group_lines_by_locations(lines, opts) {
         const self = this;
         // {key: 'no-group', location_src: {}, location_dest: {} records: []}
-        options = _.defaults(options || {}, {
+        const options = _.defaults(opts || {}, {
             prepare_records: function (recs) {
                 return recs;
             },
@@ -86,10 +88,10 @@ export class WMSUtils {
         return res;
     }
 
-    group_lines_by_product(lines, options) {
+    group_lines_by_product(lines, opts) {
         const self = this;
         // {'key': 'no-group', 'title': '', 'records': []}
-        options = _.defaults(options || {}, {
+        const options = _.defaults(opts || {}, {
             group_no_title: false,
             prepare_records: function (recs) {
                 return recs;
@@ -101,18 +103,19 @@ export class WMSUtils {
         const res = [];
         const products = _.uniqBy(
             _.map(lines, function (x) {
-                return x["product"];
+                return x.product;
             }),
             "id"
         );
         const grouped = _.groupBy(lines, "product.id");
         _.forEach(grouped, function (value, prod_id) {
             const product = _.first(_.filter(products, {id: parseInt(prod_id, 10)}));
-            const title = options.group_no_title
-                ? ""
-                : options.name_prefix
-                ? options.name_prefix + ": " + product.name
-                : product.name;
+            let title = product.name;
+            if (options.group_no_title) {
+                title = "";
+            } else if (options.name_prefix) {
+                title = `${options.name_prefix}: ${product.name}`;
+            }
             res.push({
                 _is_group: true,
                 key: prod_id,
@@ -169,8 +172,8 @@ export class WMSUtils {
             res.push({
                 _is_group: true,
                 // GroupBy gives undefined as string
-                key: packaging_name == "undefined" ? "no-packaging" : packaging_name,
-                title: packaging_name == "undefined" ? "" : packaging_name,
+                key: packaging_name === "undefined" ? "no-packaging" : packaging_name,
+                title: packaging_name === "undefined" ? "" : packaging_name,
                 records: products,
             });
         });
@@ -201,7 +204,7 @@ export class WMSUtils {
         const res = [];
         grouped.forEach(function (group) {
             if (group.pack) {
-                let single_line = group.records[0];
+                const single_line = group.records[0];
                 single_line._grouped_by_pack = true;
                 single_line._pack_lines = group.records;
                 res.push(single_line);
@@ -244,11 +247,11 @@ export class WMSUtils {
             line = line.records[0];
         }
         let klass = "";
-        if (line.qty_done == line.quantity) {
+        if (line.qty_done === line.quantity) {
             klass = "done screen_step_done lighten-1";
         } else if (line.qty_done && line.qty_done < line.quantity) {
             klass = "partial screen_step_todo lighten-2";
-        } else if (line.qty_done == 0) {
+        } else if (line.qty_done === 0) {
             klass = "not-done screen_step_todo lighten-1";
         }
         return "move-line-" + klass;
@@ -259,7 +262,7 @@ export class WMSUtils {
         if (!records) {
             return;
         }
-        let avg_progress =
+        const avg_progress =
             records.reduce((acc, next) => {
                 return next.progress + acc;
             }, 0) / records.length;
@@ -283,7 +286,7 @@ export class WMSUtils {
      *
      * @param {*} line The move line
      */
-    move_line_product_detail_options(line, options = {}) {
+    move_line_product_detail_options(line, opts = {}) {
         const self = this;
         const default_fields = [
             {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
@@ -303,7 +306,7 @@ export class WMSUtils {
             },
             {path: "product.qty_available", label: "Qty on hand"},
         ];
-        options = _.defaults({}, options, {
+        const options = _.defaults({}, opts, {
             main: true,
             key_title: "product.display_name",
             title_action_field: {

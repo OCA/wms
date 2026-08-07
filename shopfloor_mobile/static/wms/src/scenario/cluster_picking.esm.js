@@ -189,10 +189,10 @@ const ClusterPicking = {
             scan_destination_qty: 0,
             states: {
                 start: {
-                    on_get_work: (evt) => {
+                    on_get_work: () => {
                         this.wait_call(this.odoo.call("find_batch"));
                     },
-                    on_manual_selection: (evt) => {
+                    on_manual_selection: () => {
                         this.wait_call(this.odoo.call("list_batch"));
                     },
                 },
@@ -375,8 +375,8 @@ const ClusterPicking = {
                         // FIXME: use state_load or traverse the state
                         // this.current_state_key = "unload_all";
                         // this.state.on_scan(scanned, confirmation);
-                        confirmation = this.state.data.confirmation || "";
-                        this.states.unload_all.on_scan(scanned, confirmation);
+                        const confirm = this.state.data.confirmation || confirmation;
+                        this.states.unload_all.on_scan(scanned, confirm);
                     },
                 },
                 unload_single: {
@@ -422,7 +422,8 @@ const ClusterPicking = {
                         this.wait_call(
                             this.odoo.call("unload_scan_destination", {
                                 picking_batch_id: this.current_batch().id,
-                                package_id: null, // FIXME: where does it come from? backend data?
+                                // FIXME: where does it come from? backend data?
+                                package_id: null,
                                 barcode: scanned.text,
                                 confirmation: this.state.data.confirmation || "",
                             })

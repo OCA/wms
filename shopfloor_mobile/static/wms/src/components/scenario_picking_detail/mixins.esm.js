@@ -3,9 +3,8 @@
  * @author Simone Orsi <simahawk@gmail.com>
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
-/* eslint-disable strict */
-/* eslint-disable no-implicit-globals */
-import {PickingDetailMixin} from "../detail/detail_picking.js";
+
+import {PickingDetailMixin} from "../detail/detail_picking.esm.js";
 
 // Maybe worth to move it to its own file
 export var ListActionsConsumerMixin = {

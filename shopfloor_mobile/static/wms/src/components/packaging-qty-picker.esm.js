@@ -8,12 +8,14 @@
 
 export var PackagingQtyPickerMixin = {
     props: {
-        options: Object, // options are replaced by props
+        // Options are replaced by props
+        options: Object,
         mode: String,
         qtyInit: Number,
         uom: {type: Object, required: true},
         availablePackaging: Array,
-        pkgNameKey: String, // "code" or "name"
+        // "code" or "name"
+        pkgNameKey: String,
     },
     data: function () {
         return {
@@ -56,8 +58,8 @@ export var PackagingQtyPickerMixin = {
         packaging_by_id: function (id) {
             // Special case for UOM ids as they can clash w/ pkg ids
             // we prefix it w/ "uom-"
-            id = id.startsWith("uom-") ? id : parseInt(id, 10);
-            return _.find(this.sorted_packaging, ["id", id]);
+            const _id = id.startsWith("uom-") ? id : parseInt(id, 10);
+            return _.find(this.sorted_packaging, ["id", _id]);
         },
         /**
          *
@@ -89,10 +91,9 @@ export var PackagingQtyPickerMixin = {
             const res = {};
             // Const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function (pkg) {
-                let qty_per_pkg = 0;
-                [qty_per_pkg, qty] = self._qty_by_pkg(pkg.qty, qty);
-                res[pkg.id] = qty_per_pkg;
-                if (!qty) return;
+                const [_qty_per_pkg, _qty] = self._qty_by_pkg(pkg.qty, qty);
+                res[pkg.id] = _qty_per_pkg;
+                if (!_qty) return;
             });
             return res;
         },
@@ -140,7 +141,7 @@ export var PackagingQtyPickerMixin = {
          * Include the uom
          */
         sorted_packaging: function () {
-            let packagings = _.reverse(
+            const packagings = _.reverse(
                 _.sortBy(
                     _.filter(this.availablePackaging, _.property("qty")),
                     _.property("qty")
@@ -158,10 +159,10 @@ export var PackagingQtyPickerMixin = {
          */
         contained_packaging: function () {
             const self = this;
-            let res = {},
-                qty_per_pkg,
-                remaining,
-                elected_next_pkg;
+            const res = {};
+            let qty_per_pkg = [],
+                remaining = 0,
+                elected_next_pkg = {};
             const packaging = this.sorted_packaging;
             _.forEach(packaging, function (pkg, i) {
                 const next_pkgs = packaging.slice(i + 1);
@@ -192,14 +193,15 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     },
     data: function () {
         return {
-            panel: 0, // expand panel by default
+            // Expand panel by default
+            panel: 0,
         };
     },
     watch: {
         qty_by_pkg: {
             deep: true,
             handler: function () {
-                // prevent watched qty to update again qty_by_pkg
+                // Prevent watched qty to update again qty_by_pkg
                 this.qty_by_pkg_manual = true;
                 this.compute_qty();
                 this.qty_by_pkg_manual = false;
@@ -215,7 +217,7 @@ export var PackagingQtyPicker = Vue.component("packaging-qty-picker", {
     },
     computed: {
         qty_color: function () {
-            if (this.qty == this.qtyTodo) {
+            if (this.qty === this.qtyTodo) {
                 if (this.readonly) return "";
                 return "background-color: rgb(143, 191, 68)";
             }
@@ -309,7 +311,7 @@ export var PackagingQtyPickerDisplay = Vue.component("packaging-qty-picker-displ
             });
             // Do not display if only uom packaging
             if (
-                packagings.length == 1 &&
+                packagings.length === 1 &&
                 packagings[0].id.toString().startsWith("uom-")
             )
                 return [];

@@ -4,9 +4,8 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-/* eslint-disable strict */
-/* eslint-disable no-implicit-globals */
-import {PickingDetailListMixin} from "./mixins.js";
+/* eslint-disable sort-imports */
+import {PickingDetailListMixin} from "./mixins.esm.js";
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("picking-summary", {
@@ -38,6 +37,7 @@ Vue.component("picking-summary", {
             return {
                 action_change_pkg: {
                     comp_name: "edit-action",
+                    /* eslint-disable no-unused-vars */
                     get_record: function (rec, action) {
                         /**
                          * Here we can get records grouped.
@@ -54,9 +54,11 @@ Vue.component("picking-summary", {
                         }
                         return rec;
                     },
+                    /* eslint-disable no-unused-vars */
                     get_options: function (rec, action) {
                         return {click_event: "pkg_change_type"};
                     },
+                    /* eslint-disable no-unused-vars */
                     enabled: function (rec, action) {
                         // Exclude for non-packaged records.
                         // NOTE: `pack` is available only if records are grouped.
@@ -66,11 +68,13 @@ Vue.component("picking-summary", {
                 },
                 action_cancel_line: {
                     comp_name: "cancel-move-line-action",
+                    /* eslint-disable no-unused-vars */
                     get_options: function (rec, action) {
                         return {
                             package_cancel_key: self.$props.action_cancel_package_key,
                         };
                     },
+                    /* eslint-disable no-unused-vars */
                     get_record: function (rec, action) {
                         if (rec.records) {
                             // Lines grouped, get real line
@@ -78,6 +82,7 @@ Vue.component("picking-summary", {
                         }
                         return rec;
                     },
+                    /* eslint-disable no-unused-vars */
                     enabled: function (rec, action) {
                         return true;
                     },
@@ -102,9 +107,10 @@ Vue.component("picking-summary-content", {
     },
     watch: {
         panel: {
+            /* eslint-disable no-unused-vars */
             handler: function (newVal, oldVal) {
                 // The panel is opened
-                $(this.$parent.$el).toggleClass("inner-panel-expanded", newVal == 0);
+                $(this.$parent.$el).toggleClass("inner-panel-expanded", newVal === 0);
             },
         },
     },

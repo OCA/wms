@@ -52,6 +52,7 @@ Vue.component("detail-lot", {
                 [supp.partner, supp.product_name, supp.product_code].join("|")
             );
         },
+        /* eslint-disable no-unused-vars */
         render_packaging(record, field) {
             return [record.name, "(" + record.code + ")", "= " + record.qty].join(" ");
         },

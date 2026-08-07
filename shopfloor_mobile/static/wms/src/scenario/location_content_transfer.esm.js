@@ -190,10 +190,11 @@ const LocationContentTransfer = {
         },
         // Common actions
         on_line_action: function (action) {
-            this["on_" + action.event_name].call(this);
+            this["on_" + action.event_name](this);
         },
         on_action_postpone: function () {
-            let endpoint, endpoint_data;
+            let endpoint = "";
+            let endpoint_data = {};
             const data = this.state.data;
             if (data.package_level) {
                 endpoint = "postpone_package";
@@ -235,9 +236,11 @@ const LocationContentTransfer = {
                     },
                 },
                 get_work: {
+                    /* eslint-disable no-unused-vars */
                     on_get_work: (evt) => {
                         this.wait_call(this.odoo.call("find_work"));
                     },
+                    /* eslint-disable no-unused-vars */
                     on_manual_selection: (evt) => {
                         this.state_to("scan_location");
                     },
@@ -292,7 +295,8 @@ const LocationContentTransfer = {
                         ),
                     },
                     on_scan: (scanned) => {
-                        let endpoint, endpoint_data;
+                        let endpoint = "";
+                        let endpoint_data = {};
                         const data = this.state.data;
                         if (data.package_level) {
                             endpoint = "scan_package";
@@ -329,7 +333,8 @@ const LocationContentTransfer = {
                         this.scan_destination_qty = parseInt(qty, 10);
                     },
                     on_scan: (scanned) => {
-                        let endpoint, endpoint_data;
+                        let endpoint = "";
+                        let endpoint_data = {};
                         const data = this.state.data;
                         if (data.package_level) {
                             endpoint = "set_destination_package";
@@ -363,7 +368,8 @@ const LocationContentTransfer = {
                         this.reset_notification();
                     },
                     on_confirm_stock_issue: () => {
-                        let endpoint, endpoint_data;
+                        let endpoint = "";
+                        let endpoint_data = {};
                         const data = this.state.data;
                         if (data.package_level) {
                             endpoint = "stock_out_package";

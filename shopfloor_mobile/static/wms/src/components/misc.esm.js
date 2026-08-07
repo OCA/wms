@@ -4,8 +4,6 @@
  * License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
  */
 
-/* eslint-disable strict */
-
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 // TODO: could be merged w/ userConfirmation

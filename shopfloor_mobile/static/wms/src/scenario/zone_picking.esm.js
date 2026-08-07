@@ -378,6 +378,7 @@ const ZonePicking = {
                 },
             ];
         },
+        /* eslint-disable no-unused-vars */
         picking_type_render_lines_count(record, field) {
             return _.template("(${counters}) ${name}")({
                 counters: this.$t("misc.lines_count", record),
@@ -525,9 +526,8 @@ const ZonePicking = {
                     renderer: function (rec, field) {
                         if (rec.handle_complete_mix_pack) {
                             return "";
-                        } else {
-                            return rec.product.display_name;
                         }
+                        return rec.product.display_name;
                     },
                 },
                 {
@@ -583,7 +583,7 @@ const ZonePicking = {
         },
         toggle_sort_lines_by() {
             this.order_lines_by =
-                this.order_lines_by == "priority" ? "location" : "priority";
+                this.order_lines_by === "priority" ? "location" : "priority";
             return this.list_move_lines(this.current_picking_type().id);
         },
         list_move_lines(picking_type_id) {
@@ -594,7 +594,7 @@ const ZonePicking = {
             return this.wait_call(this.odoo.call("list_move_lines", {}));
         },
         scan_source(barcode) {
-            let data = {
+            const data = {
                 barcode: barcode,
                 confirmation: this.state.data.confirmation_required || "",
             };
@@ -670,7 +670,7 @@ const ZonePicking = {
     },
     computed: {
         sort_lines_by_btn_label() {
-            return this.order_lines_by == "priority"
+            return this.order_lines_by === "priority"
                 ? this.$t("order_lines_by.location")
                 : this.$t("order_lines_by.priority");
         },
@@ -783,12 +783,11 @@ const ZonePicking = {
                                         return "Scan product / lot";
                                     }
                                     return "Scan product";
-                                } else {
-                                    if (this.any_line_with_lot()) {
-                                        return "Scan pack / product / lot";
-                                    }
-                                    return "Scan pack / product";
                                 }
+                                if (this.any_line_with_lot()) {
+                                    return "Scan pack / product / lot";
+                                }
+                                return "Scan pack / product";
                             }
                             if (this.any_line_with_lot()) {
                                 return "Scan location / pack / product / lot";
@@ -817,8 +816,8 @@ const ZonePicking = {
                         while (!barcode) {
                             _.forEach(
                                 ["lot.name", "product.barcode", "location_src.barcode"],
-                                function (path) {
-                                    barcode = _.result(selected, path);
+                                function (pth) {
+                                    barcode = _.result(selected, pth);
                                 }
                             );
                         }
@@ -863,16 +862,14 @@ const ZonePicking = {
                             // Only locations are allowed.
                             display_info.scan_placeholder =
                                 display_info.scan_placeholder_location;
+                        } else if (full_qty === 0 || full_qty === false) {
+                            // Only packages are allowed.
+                            display_info.scan_placeholder =
+                                display_info.scan_placeholder_package;
                         } else {
-                            if (!full_qty) {
-                                // Only packages are allowed.
-                                display_info.scan_placeholder =
-                                    display_info.scan_placeholder_package;
-                            } else {
-                                // Both are allowed.
-                                display_info.scan_placeholder =
-                                    display_info.scan_placeholder_full;
-                            }
+                            // Both are allowed.
+                            display_info.scan_placeholder =
+                                display_info.scan_placeholder_full;
                         }
                     },
                     on_scan: (scanned) => {
@@ -889,7 +886,7 @@ const ZonePicking = {
                                 barcode: scanned.text,
                                 quantity: quantity,
                                 confirmation: data.confirmation_required || "",
-                                // package_id: data.is_complete_mix_pack ? data.move_line.package_src.id : null,
+                                // Package_id: data.is_complete_mix_pack ? data.move_line.package_src.id : null,
                                 handle_complete_mix_pack: data.handle_complete_mix_pack,
                             })
                         );

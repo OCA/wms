@@ -64,7 +64,7 @@ const move_lines = demotools.makePickingLines(
 const select_line_move_lines = _.orderBy(move_lines, ["priority"], ["desc"]);
 _.forEach(select_line_move_lines, function (line, i) {
     // Simulate random flag
-    line.location_will_be_empty = i % 3 == 0;
+    line.location_will_be_empty = i % 3 === 0;
     // Simulate adding 1 qty
     line.qty_done++;
 });
@@ -111,7 +111,7 @@ const DEMO_CASE_1 = {
     },
     list_move_lines: function (data) {
         const res = _.cloneDeep(list_move_lines);
-        if (data.order == "location") {
+        if (data.order === "location") {
             res.data.select_line.move_lines = _.orderBy(
                 res.data.select_line.move_lines,
                 ["location_src.name"]
