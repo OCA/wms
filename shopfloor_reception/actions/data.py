@@ -18,7 +18,7 @@ class DataAction(Component):
         data_detail_action = self._actions_for("data_detail")
         return res + [
             "use_expiration_date",
-            ("image_256:image", data_detail_action._product_image_url),
+            ("image_128:image", data_detail_action._product_image_url),
         ]
 
     @property
