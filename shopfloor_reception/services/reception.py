@@ -20,6 +20,10 @@ from odoo.addons.shopfloor.utils import to_float
 UTC = timezone.utc
 
 
+class RollbackTransaction(Exception):
+    """Internal exception used to trigger a savepoint rollback without bubbling up."""
+
+
 class Reception(Component):
     """
     Methods for the Reception Process
@@ -741,16 +745,35 @@ class Reception(Component):
         selected_line.result_package_id = package
         return self._response_for_set_destination(picking, selected_line)
 
-    def _set_quantity__by_location(self, picking, selected_line, location):
-        if not self.is_dest_location_valid(selected_line.move_id, location):
-            message = self.msg_store.dest_location_not_allowed()
-            return self._response_for_set_quantity(
-                picking, selected_line, message=message
+    def _set_quantity__by_location(self, picking, selected_line, location, quantity=1):
+        err_message = None
+        try:
+            with self.env.cr.savepoint():
+                self.process_without_pack(
+                    picking.id,
+                    selected_line.id,
+                    quantity,
+                    is_over_reception_confirmed=False,
+                )
+                response = self.set_destination(
+                    picking.id,
+                    selected_line.id,
+                    location.name,
+                    confirmation=location.name,
+                )
+                # If location wasn't applied, trigger rollback
+                if selected_line.location_dest_id != location:
+                    err_message = response.get("message")
+                    raise RollbackTransaction()
+        except RollbackTransaction:
+            # TODO: this is necessary because we hit `set_quantity__assign_quantity`
+            # before entering this function
+            selected_line.qty_done = 0
+
+            response = self._response_for_set_quantity(
+                picking, selected_line, message=err_message
             )
-        # process without pack, set destination location, and go back to
-        # `select_move`
-        selected_line.location_dest_id = location
-        return self._response_for_select_move(picking)
+        return response
 
     def _set_quantity__by_lot(self, picking, selected_line, lot):
         if selected_line.lot_id.name == lot.name or selected_line.lot_name == lot.name:
@@ -1399,19 +1422,18 @@ class Reception(Component):
             "product": self._set_quantity__by_product,
             "packaging": self._set_quantity__by_packaging,
             "package": self._set_quantity__by_package,
-            "location": self._set_quantity__by_location,
             "lot": self._set_quantity__by_lot,
         }
 
     def _set_quantity__by_barcode(
-        self, picking, selected_line, barcode, confirmation=None
+        self, picking, selected_line, barcode, confirmation=None, quantity=1
     ):
         handlers_by_type = self._set_quantity__get_handlers_by_type()
         search = self._actions_for("search").for_products(selected_line.product_id)
         try:
             search_result = search.find(
                 barcode,
-                handlers_by_type.keys(),
+                [*handlers_by_type.keys(), "location"],
             )
         except SearchInvalidProduct as e:
             return self._response_for_set_quantity(
@@ -1422,6 +1444,12 @@ class Reception(Component):
         handler = handlers_by_type.get(search_result.type)
         if handler:
             return handler(picking, selected_line, search_result.record)
+
+        # We scanned a location -> skip the "set destination" screen
+        if search_result.type == "location":
+            return self._set_quantity__by_location(
+                picking, selected_line, search_result.record, quantity
+            )
 
         # Nothing found, ask user if we should create a new pack for the scanned
         # barcode
@@ -1489,7 +1517,11 @@ class Reception(Component):
             # Then, we add the qty of whatever was scanned
             # on top of the qty of the picker.
             return self._set_quantity__by_barcode(
-                picking, selected_line, barcode, confirmation
+                picking,
+                selected_line,
+                barcode,
+                confirmation,
+                quantity if quantity else 1,
             )
         return self._response_for_set_quantity(picking, selected_line)
 
