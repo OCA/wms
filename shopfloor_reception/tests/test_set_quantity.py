@@ -323,8 +323,11 @@ class TestSetQuantity(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "barcode": self.dispatch_location.barcode,
+                "quantity": 4,
             },
         )
+        self.assertTrue(selected_move_line.shopfloor_unloaded)
+        self.assertEqual(selected_move_line.qty_done, 4)
         self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
         self.assert_response(
             response, next_state="select_move", data=self._data_for_select_move(picking)
@@ -342,8 +345,11 @@ class TestSetQuantity(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": selected_move_line.id,
                 "barcode": self.packing_location.barcode,
+                "quantity": 4,
             },
         )
+        self.assertFalse(selected_move_line.shopfloor_unloaded)
+        self.assertEqual(selected_move_line.qty_done, 0)
         data = self.data.picking(picking)
         self.assert_response(
             response,
