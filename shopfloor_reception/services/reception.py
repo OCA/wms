@@ -821,7 +821,7 @@ class Reception(Component):
         self, picking, line, message=None, lot_name=None, lot_expiration_date=None, **kw
     ):
         # ↓ In case "lot_name" is pre-filled on the line in odoo, pre-fill
-        # shpofloor screen
+        # shopfloor screen
         if lot_name and not lot_expiration_date and not message:
             lot = (
                 self._actions_for("search")
