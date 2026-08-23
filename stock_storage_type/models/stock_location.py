@@ -435,6 +435,8 @@ class StockLocation(models.Model):
         putaway_location = super()._putaway_strategy_finalizer(
             putaway_location, product, quantity, package, packaging, additional_qty
         )
+        if self.env.context.get("disable_package_type_putaway_strategy"):
+            return putaway_location
         if package:
             # If package provided, the product is not set (in the get_putaway_strategy() method)
             product = package.single_product_id or product
@@ -508,9 +510,9 @@ class StockLocation(models.Model):
                 # Reapply putaway strategy if particular rules have been put on product level
                 # Check if the allowed location is not self to avoid recursive computations
                 if allowed_location != self:
-                    final_location = allowed_location._get_putaway_strategy(
-                        product, quantity, package
-                    )
+                    final_location = allowed_location.with_context(
+                        disable_package_type_putaway_strategy=True
+                    )._get_putaway_strategy(product, quantity, package)
                     return final_location
                 return allowed_location
         _logger.debug(
