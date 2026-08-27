@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor GS1",
     "summary": "Integrate GS1 barcode scan into Shopfloor app",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.1.1",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
