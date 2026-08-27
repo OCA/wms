@@ -72,3 +72,9 @@ class TestUtils(BaseCase):
         self.assertFalse(GS1Barcode())
 
         self.assertEqual(str(res[0]), "<GS1Barcode: ai=01>")
+
+    def test_do_not_parse_invalid_gs1(self):
+        code = "10LOT"
+        res = GS1Barcode.parse(code)
+        # we should not parse this plain (non-GS1) barcode into "LOT"
+        self.assertFalse(res)

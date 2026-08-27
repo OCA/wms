@@ -13,6 +13,8 @@ DEFAULT_AI_WHITELIST = tuple(MAPPING_AI_TO_TYPE.keys())
 class GS1Barcode:
     """GS1 barcode parser and wrapper."""
 
+    PRIMARY_AIS = ("01", "240")
+
     __slots__ = ("ai", "code", "value", "raw_value")
 
     def __init__(self, **kw) -> None:
@@ -51,6 +53,14 @@ class GS1Barcode:
         return value
 
     @classmethod
+    def _is_valid_gs1(cls, parsed):
+        # Standalone secondary AIs (e.g. lot '10LOT') without primary keys
+        # prefixes are ambiguous and usually false positive plain barcodes.
+        return any(
+            element.ai.ai in cls.PRIMARY_AIS for element in parsed.element_strings
+        )
+
+    @classmethod
     def parse(cls, barcode, ai_whitelist=None, safe=True):
         """Parse given barcode
 
@@ -71,7 +81,7 @@ class GS1Barcode:
                 if not safe:
                     raise
                 parsed = None
-        if not parsed:
+        if not parsed or not cls._is_valid_gs1(parsed):
             return res
         # Use whitelist if given, to respect a specific order
         ai_whitelist = ai_whitelist or DEFAULT_AI_WHITELIST
