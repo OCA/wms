@@ -16,8 +16,10 @@ MAPPING_TYPE_TO_AI = {
     "serial": ("21",),
     "manuf_product_code": ("240",),
     "location": ("254",),
+    "package": ("00",),
 }
 MAPPING_AI_TO_TYPE = {
+    "00": "package",
     "01": "product",
     "10": "lot",
     "11": "production_date",

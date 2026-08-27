@@ -13,7 +13,7 @@ DEFAULT_AI_WHITELIST = tuple(MAPPING_AI_TO_TYPE.keys())
 class GS1Barcode:
     """GS1 barcode parser and wrapper."""
 
-    PRIMARY_AIS = ("01", "240")
+    PRIMARY_AIS = ("00", "01", "02", "240")
 
     __slots__ = ("ai", "code", "value", "raw_value")
 

@@ -73,8 +73,23 @@ class TestUtils(BaseCase):
 
         self.assertEqual(str(res[0]), "<GS1Barcode: ai=01>")
 
-    def test_do_not_parse_invalid_gs1(self):
-        code = "10LOT"
+    def test_parse_single_sscc(self):
+        code = "(00)354123450000000014"
         res = GS1Barcode.parse(code)
-        # we should not parse this plain (non-GS1) barcode into "LOT"
+        self.assertEqual(len(res), 1, res)
+        item = [x for x in res if x.ai == "00"][0]
+        self.assertEqual(item.code, code)
+        self.assertEqual(item.value, "354123450000000014")
+        self.assertEqual(item.raw_value, "354123450000000014")
+
+    def test_do_not_parse_invalid_gs1(self):
+        # Do not parse if no primary AI
+        code = "(10)LOT"
+        res = GS1Barcode.parse(code)
+        self.assertFalse(res)
+
+        # Do not parse if invalid GS1 format
+        # 00 AI should be of the form (\d{18}), see https://ref.gs1.org/ai/00
+        code = "(00)PACK1"
+        res = GS1Barcode.parse(code)
         self.assertFalse(res)
