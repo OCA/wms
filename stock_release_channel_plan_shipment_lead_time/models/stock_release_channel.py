@@ -24,7 +24,9 @@ class StockReleaseChannel(models.Model):
         store=True,
     )
 
-    @api.depends("delivery_weekday_ids", "shipment_lead_time")
+    @api.depends(
+        "delivery_weekday_ids", "shipment_lead_time", "warehouse_id.calendar_id"
+    )
     def _compute_preparation_weekday_ids(self):
         """Preparation weekdays are delivery weekdays - lead time"""
         for channel in self:
