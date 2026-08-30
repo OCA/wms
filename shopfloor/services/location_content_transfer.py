@@ -100,6 +100,25 @@ class LocationContentTransfer(Component):
             next_state="scan_destination_all", data=data, message=message
         )
 
+    def _response_for_scan_destination_lines_all(
+        self, move_lines, message=None, confirmation_required=None
+    ):
+        """Transition to the 'scan_destination_all' state
+
+        The client screen shows a summary of all the lines and packages
+        to move to a single destination.
+
+        If `confirmation_required` is set,
+        the client will ask to scan again the destination
+        """
+        data = self._data_content_line_all_for_location(move_lines=move_lines)
+        data["confirmation_required"] = confirmation_required
+        if confirmation_required and not message:
+            message = self.msg_store.need_confirmation()
+        return self._response(
+            next_state="scan_destination_all", data=data, message=message
+        )
+
     def _response_for_start_single(self, pickings, message=None, popup=None):
         """Transition to the 'start_single' state
 
@@ -131,11 +150,27 @@ class LocationContentTransfer(Component):
         return self._response(next_state="scan_destination", data=data, message=message)
 
     def _data_content_all_for_location(self, pickings):
+        """
+        TODO: Remove this preferring using move lines instead
+        """
         sorter = self._actions_for("location_content_transfer.sorter")
         sorter.feed_pickings(pickings)
         lines = sorter.move_lines()
         package_levels = sorter.package_levels()
         location = pickings.mapped("move_line_ids.location_id")
+        assert len(location) == 1, "There should be only one src location at this stage"
+        return {
+            "location": self.data.location(location),
+            "move_lines": self.data.move_lines(lines),
+            "package_levels": self.data.package_levels(package_levels),
+        }
+
+    def _data_content_line_all_for_location(self, move_lines):
+        sorter = self._actions_for("location_content_transfer.sorter")
+        sorter.feed_lines(move_lines)
+        lines = sorter.move_lines()
+        package_levels = sorter.package_levels()
+        location = move_lines.location_id
         assert len(location) == 1, "There should be only one src location at this stage"
         return {
             "location": self.data.location(location),
@@ -167,37 +202,42 @@ class LocationContentTransfer(Component):
             return None
         return next_content
 
-    def _router_single_or_all_destination(self, pickings, message=None):
-        location_dest = pickings.mapped("move_line_ids.location_dest_id")
-        location_src = pickings.mapped("move_line_ids.location_id")
+    def _router_single_or_all_destination(self, move_lines, message=None):
+        location_dest = move_lines.location_dest_id
+        location_src = move_lines.location_id
         if len(location_dest) == len(location_src) == 1:
-            return self._response_for_scan_destination_all(pickings, message=message)
+            return self._response_for_scan_destination_lines_all(
+                move_lines, message=message
+            )
         else:
-            return self._response_for_start_single(pickings, message=message)
+            return self._response_for_start_single(
+                move_lines.picking_id, message=message
+            )
 
-    def _domain_recover_pickings(self):
+    def _domain_recover_move_lines(self):
         return [
-            ("user_id", "=", self.env.uid),
-            ("state", "=", "assigned"),
+            ("picking_id.user_id", "=", self.env.uid),
+            ("picking_id.state", "=", "assigned"),
             ("picking_type_id", "in", self.picking_types.ids),
+            ("qty_done", ">", 0),
         ]
 
-    def _search_recover_pickings(self):
-        candidate_pickings = self.env["stock.picking"].search(
-            self._domain_recover_pickings()
+    def _search_recover_move_lines(self):
+        """
+        Get the move lines that have already been marked as done
+        """
+        started_move_lines = self.env["stock.move.line"].search(
+            self._domain_recover_move_lines()
         )
-        started_pickings = candidate_pickings.filtered(
-            lambda picking: any(line.qty_done for line in picking.move_line_ids)
-        )
-        return started_pickings
+        return started_move_lines
 
-    def _recover_started_picking(self):
+    def _recover_started_move_lines(self):
         """Get the next response if the user has work in progress."""
-        started_pickings = self._search_recover_pickings()
-        if not started_pickings:
+        started_move_lines = self._search_recover_move_lines()
+        if not started_move_lines:
             return False
         return self._router_single_or_all_destination(
-            started_pickings, message=self.msg_store.recovered_previous_session()
+            started_move_lines, message=self.msg_store.recovered_previous_session()
         )
 
     def start_or_recover(self):
@@ -207,7 +247,7 @@ class LocationContentTransfer(Component):
         and reopen the menu, we want to directly reopen the screens to choose
         destinations. Otherwise, we go to the "start" state.
         """
-        response = self._recover_started_picking()
+        response = self._recover_started_move_lines()
         return response or self._response_for_start()
 
     def _create_moves_from_location(self, location):
@@ -254,7 +294,7 @@ class LocationContentTransfer(Component):
         * start: no work found
         * scan_location: with the location to work form for confirmation
         """
-        response = self._recover_started_picking()
+        response = self._recover_started_move_lines()
         if response:
             return response
 
@@ -411,7 +451,7 @@ class LocationContentTransfer(Component):
 
         savepoint.release()
 
-        return self._router_single_or_all_destination(move_lines.picking_id)
+        return self._router_single_or_all_destination(move_lines)
 
     def _find_transfer_move_lines_domain(self, location):
         return [

@@ -11,10 +11,18 @@ class LocationContentTransferSorter(Component):
     def __init__(self, work_context):
         super().__init__(work_context)
         self._pickings = self.env["stock.picking"].browse()
+        self._lines = self.env["stock.move.line"].browse()
         self._content = None
 
     def feed_pickings(self, pickings):
         self._pickings |= pickings
+
+    def feed_lines(self, move_lines):
+        """
+        TODO: Remove pickings to use move lines directly instead
+        """
+        self._lines |= move_lines
+        self._pickings |= move_lines.picking_id
 
     def move_lines(self):
         """Returns valid move lines.
@@ -26,8 +34,10 @@ class LocationContentTransferSorter(Component):
         An invalid package level has one of its line not targetting the
         expected package.
         """
+        # TODO: Remove this when using only move lines
+        lines = self._lines if self._lines else self._pickings.move_line_ids
         # lines without package level only (raw products)
-        move_lines = self._pickings.move_line_ids.filtered(
+        move_lines = lines.filtered(
             lambda line: not line.package_level_id
             and line.state not in ("cancel", "done")
         )
