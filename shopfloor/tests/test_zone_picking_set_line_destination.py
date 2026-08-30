@@ -79,7 +79,9 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.customer_location
+            ),
             qty_done=quantity_done,
         )
         # Confirm the destination with the right destination this time
@@ -127,7 +129,9 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
             zone_location,
             picking_type,
             move_line,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.packing_sublocation_b
+            ),
             qty_done=quantity_done,
         )
 

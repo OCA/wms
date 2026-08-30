@@ -1592,7 +1592,7 @@ class Checkout(Component):
         if scanned_location not in allowed_locations:
             return self._response_for_select_child_location(
                 picking,
-                message=self.msg_store.dest_location_not_allowed(),
+                message=self.msg_store.dest_location_not_allowed(scanned_location),
             )
         lines_done = self._lines_checkout_done(picking)
         for line in lines_done:

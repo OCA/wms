@@ -117,7 +117,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             package_level,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(customer_location),
         )
 
     def test_set_destination_package_dest_location_move_nok(self):
@@ -141,7 +141,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             package_level,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(self.shelf2),
         )
 
     def test_set_destination_package_dest_location_to_confirm(self):
@@ -309,7 +309,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             move_line,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(customer_location),
         )
 
     def test_set_destination_line_dest_location_move_nok(self):
@@ -333,7 +333,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         self.assert_response_scan_destination(
             response,
             move_line,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(self.shelf2),
         )
 
     def test_set_destination_line_dest_location_to_confirm(self):

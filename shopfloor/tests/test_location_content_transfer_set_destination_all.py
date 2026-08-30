@@ -310,7 +310,9 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.assert_response_scan_destination_all(
             response,
             self.pickings,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(
+                self.dispatch_location
+            ),
         )
 
     def test_set_destination_all_dest_location_move_invalid(self):
@@ -332,7 +334,7 @@ class LocationContentTransferSetDestinationAllCase(LocationContentTransferCommon
         self.assert_response_scan_destination_all(
             response,
             self.pickings,
-            message=self.service.msg_store.dest_location_not_allowed(),
+            message=self.service.msg_store.dest_location_not_allowed(self.shelf2),
         )
 
     def test_go_to_single(self):
