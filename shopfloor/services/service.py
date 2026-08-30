@@ -132,7 +132,7 @@ class BaseShopfloorProcess(AbstractComponent):
         """
         return location.is_sublocation_of(self.picking_types.default_location_src_id)
 
-    def is_dest_location_valid(self, moves, location):
+    def is_dest_location_valid(self, moves, location, pick_type=False):
         """Check the destination location is valid for given moves.
 
         We ensure the destination is either valid regarding the picking
@@ -143,9 +143,17 @@ class BaseShopfloorProcess(AbstractComponent):
         condition and not anymore this one that has a destination to an
         intermediate location)
         """
-        return location.is_sublocation_of(
-            moves.picking_id.location_dest_id, func=all
-        ) or location.is_sublocation_of(moves.location_dest_id, func=all)
+        return (
+            location.is_sublocation_of(moves.picking_id.location_dest_id, func=all)
+            or location.is_sublocation_of(moves.location_dest_id, func=all)
+            or (
+                location.is_sublocation_of(
+                    moves.picking_type_id.default_location_dest_id, func=all
+                )
+                if pick_type
+                else False
+            )
+        )
 
     def is_dest_location_to_confirm(self, location_dest_id, location):
         """Check the destination location requires confirmation
