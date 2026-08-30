@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 # pylint: disable=missing-return
+from contextlib import contextmanager
 
 from odoo.addons.shopfloor.tests.common import CommonCase
 from odoo.addons.stock.models.stock_move import PROCUREMENT_PRIORITIES
@@ -168,9 +169,8 @@ class TestBatchCreate(CommonCase):
     def test_create_batch_max_volume_all_exceed(self):
         """Test batch creation with all pickings exceeding the max volume.
 
-        In such case the batch is anyway created with the first picking in it
-        because it's ok to have one picking exceeding the max volume (otherwise
-        those pickings will never be processed).
+        In such case no batch is created except if the option to split the
+        picking exceeding the limits is enabled.
         """
         # each picking has 2 lines of 10 units, set volume of 0.1m3 per unit,
         # we'll have a total volume of 2m3 per picking
@@ -180,6 +180,8 @@ class TestBatchCreate(CommonCase):
         self.product_d.volume = 0.1
         self.pickings.move_ids._compute_volume()
         self.pickings._compute_volume()
+        for picking in self.pickings:
+            self.assertGreater(picking.volume, 1)
         # with a max volume of 1, we can normally take no picking
         self.device.max_volume = 1
         batch = self.auto_batch.create_batch(
@@ -187,7 +189,15 @@ class TestBatchCreate(CommonCase):
             stock_device_types=self.device,
             maximum_number_of_preparation_lines=20,
         )
-        self.assertFalse(batch.picking_ids)
+        self.assertFalse(batch)
+        batch = self.auto_batch.create_batch(
+            self.picking_type,
+            stock_device_types=self.device,
+            maximum_number_of_preparation_lines=20,
+            split_picking_exceeding_limits=True,
+        )
+        self.assertTrue(batch.picking_ids)
+        self.assertLessEqual(sum(batch.picking_ids.mapped("volume")), 1)
 
     def test_cluster_picking_select(self):
         self.menu.sudo().batch_create = True
@@ -280,3 +290,33 @@ class TestBatchCreate(CommonCase):
             lines.mapped("product_id"),
             self.product_b + self.product_c + self.product_d + self.product_a,
         )
+
+    def test_menu_options_passed_to_batch_wizard(self):
+        self.menu.sudo().batch_create = True
+        self.menu.sudo().batch_group_by_commercial_partner = True
+        self.menu.sudo().batch_maximum_number_of_preparation_lines = 10
+        self.menu.sudo().batch_split_picking_exceeding_limits = True
+        wizard_class = self.env["make.picking.batch"].__class__
+        method_called = False
+
+        @contextmanager
+        def mock_create_batch_and_check_attributes(*args, **kwargs):
+            def side_effect(*args, **kwargs):
+                nonlocal method_called
+                method_called = True
+                self_mock = args[0]
+                self.assertEqual(self_mock.restrict_to_same_partner, True)
+                self.assertEqual(self_mock.maximum_number_of_preparation_lines, 10)
+                self.assertEqual(self_mock.split_picking_exceeding_limits, True)
+                return self.env["stock.picking.batch"].create(
+                    {"name": "test", "picking_ids": self.pickings.ids}
+                )
+
+            original_create_batch = wizard_class._create_batch
+            wizard_class._create_batch = side_effect
+            yield
+            wizard_class._create_batch = original_create_batch
+
+        with mock_create_batch_and_check_attributes():
+            self.service.dispatch("find_batch")
+            self.assertTrue(method_called)
