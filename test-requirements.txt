@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-shopfloor-product-dimension @ git+https://github.com/OCA/wms@refs/pull/1004/head#subdirectory=setup/shopfloor_product_dimension
