@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-base-report-to-printer @ git+https://github.com/OCA/report-print-send@refs/pull/413/head#subdirectory=setup/base_report_to_printer
