@@ -69,7 +69,40 @@ class ShopfloorSingleProductTransfer(Component):
     _usage = "single_product_transfer"
     _description = __doc__
 
+    _advisory_lock_find_work = "single_product_transfer_find_work"
+
     # Responses
+    def _response_for_start(self, message=None, popup=None):
+        """Transition to the 'start' or 'get_work' state
+
+        The switch to 'get_work' is done if the option is enabled on the scenario
+        """
+        if self.work.menu.allow_get_work:
+            return self._response(
+                next_state="get_work", data={}, message=message, popup=popup
+            )
+        return self._response_for_select_location_or_package(message=message)
+
+    def _response_for_start_line(
+        self,
+        move_line,
+        message=None,
+        selected_location_id=None,
+        selected_package_id=None,
+    ):
+        """Transition to the 'start_line' state
+
+        This is used to confirm the processing of a move line
+        by the user. The user will be requested to select the
+        product or the package to process the move line.
+        """
+        data = {
+            "move_line": self.data.move_line(move_line),
+            "selected_location_id": selected_location_id,
+            "selected_package_id": selected_package_id,
+            "scan_location_or_pack_first": self.work.menu.scan_location_or_pack_first,
+        }
+        return self._response(next_state="start_line", data=data, message=message)
 
     def _response_for_select_location_or_package(self, message=None, popup=None):
         return self._response(
@@ -116,6 +149,16 @@ class ShopfloorSingleProductTransfer(Component):
             "package": self.data.package(package),
         }
         return self._response(next_state="set_location", data=data, message=message)
+
+    def _message_for_invalid_product(self, exc):
+        product = None
+        if exc.recordset._name == "product.product":
+            product = exc.recordset[:1]
+        elif exc.recordset._name == "product.packaging":
+            product = exc.recordset[:1].product_id
+        if product:
+            return self.msg_store.product_not_found_in_current_picking(product)
+        return self.msg_store.wrong_record(exc.recordset)
 
     # Handlers
 
@@ -679,11 +722,19 @@ class ShopfloorSingleProductTransfer(Component):
         message = self.msg_store.transfer_done_success(move_line.picking_id)
         completion_info = self._actions_for("completion.info")
         completion_info_popup = completion_info.popup(move_line)
+        if self.work.menu.allow_get_work:
+            return self._response_for_start(
+                message=message, popup=completion_info_popup
+            )
         if (
             not self.is_allow_move_create()
             and not self._has_pending_operations_at_same_location(move_line)
         ):
             return self._response_for_select_location_or_package(
+                message=message, popup=completion_info_popup
+            )
+        if self.work.menu.allow_get_work:
+            return self._response_for_start(
                 message=message, popup=completion_info_popup
             )
         return self._response_for_select_product(
@@ -814,14 +865,290 @@ class ShopfloorSingleProductTransfer(Component):
             return response
         return self._response_for_select_product(location=location)
 
-    # Endpoints
+    def _recover_previous_session(self):
+        """When a user starts a transfer, then leaves the session and comes back later,
+        we want to be able to restore the previous session so they can continue where
+        they left off.
+        This method looks for any move line in progress for the user and returns the
+        corresponding response to restore the session.
 
-    def start(self):
+        :return: A response to restore the previous session, or False if no session to
+        recover
+        """
+
+        response = False
         move_line = self._find_user_move_line()
         if move_line:
             message = self.msg_store.recovered_previous_session()
-            return self._response_for_set_quantity(move_line, message=message)
-        return self._response_for_select_location_or_package()
+            response = self._response_for_set_quantity(move_line, message=message)
+        return response
+
+    def _scan_line_scan_loc__check_product_tracking(
+        self,
+        move_line,
+        selected_location_id=None,
+        selected_package_id=None,
+    ):
+        product = move_line.product_id
+        if product.tracking == "lot":
+            return self._response_for_start_line(
+                move_line,
+                message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+
+    def _scan_line__by_location(
+        self, location, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        if location == move_line.location_id:
+            message = self._check_first_scan_location_or_pack_first(
+                move_line,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+                scanned_location=location,
+            )
+            if message:
+                return message
+            response = self._scan_line_scan_loc__check_product_tracking(
+                move_line,
+                selected_location_id=location.id,
+                selected_package_id=selected_package_id,
+            )
+            if response:
+                return response
+            return self._response_for_set_quantity(move_line)
+
+    def _scan_line__by_package(
+        self, package, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        if move_line.package_id == package:
+            message = self._check_first_scan_location_or_pack_first(
+                move_line,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+                scanned_package=package,
+            )
+            if message:
+                return message
+            return self._response_for_set_quantity(move_line)
+
+    def _scan_line__by_product(
+        self, product, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        if product == move_line.product_id:
+            message = self._check_first_scan_location_or_pack_first(
+                move_line,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+            if message:
+                return message
+
+            response = self._scan_line_scan_loc__check_product_tracking(
+                move_line,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+            if response:
+                return response
+            else:
+                return self._response_for_set_quantity(move_line)
+
+    def _scan_line__by_packaging(
+        self, packaging, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        response = self._scan_line_scan_loc__check_product_tracking(
+            move_line,
+            selected_location_id=selected_location_id,
+            selected_package_id=selected_package_id,
+        )
+        if response:
+            return response
+        return self._scan_line__by_product(
+            packaging.product_id,
+            move_line,
+            selected_location_id=selected_location_id,
+            selected_package_id=selected_package_id,
+        )
+
+    def _scan_line__by_lot(
+        self, lot, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        if lot == move_line.lot_id:
+            message = self._check_first_scan_location_or_pack_first(
+                move_line,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+            if message:
+                return message
+            return self._response_for_set_quantity(move_line)
+
+    def _scan_line__fallback(
+        self, record, move_line, selected_location_id=None, selected_package_id=None
+    ):
+        # Nothing matches what is expected from the move line.
+        if record:
+            return self._response_for_start_line(
+                move_line,
+                message=self.msg_store.wrong_record(record),
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+        return self._response_for_start_line(
+            move_line,
+            message=self.msg_store.barcode_not_found(),
+            selected_location_id=selected_location_id,
+            selected_package_id=selected_package_id,
+        )
+
+    def _check_first_scan_location_or_pack_first(
+        self,
+        move_line,
+        selected_location_id=None,
+        selected_package_id=None,
+        scanned_location=None,
+        scanned_package=None,
+    ):
+        """Restrict scanning product or lot first with option on.
+
+        When the option first scan location or pack first is on.
+        When the line being worked on has a package, ask to scan the package first,
+        otherwise ask to scan the location first.
+        """
+        if not self.work.menu.scan_location_or_pack_first:
+            return None
+        message = None
+        if move_line.package_id:
+            if not selected_package_id and not scanned_package:
+                message = self.msg_store.line_has_package_scan_package()
+        elif not selected_location_id and not scanned_location:
+            message = self.msg_store.scan_the_location_first()
+        if message:
+            return self._response_for_start_line(
+                move_line,
+                message=message,
+                selected_location_id=selected_location_id or scanned_location.id
+                if scanned_location
+                else None,
+                selected_package_id=selected_package_id or scanned_package.id
+                if scanned_package
+                else None,
+            )
+        return None
+
+    def _try_select_move_line(self, move_line):
+        """Check if the move line can be worked on by the user.
+
+        This is a method hookable to apply specific rules on which move lines can be
+        selected/skipped when looking for the next move line to work on.
+
+        By default, it checks if the move line has no putaway available when the option
+        'ignore_no_putaway_available' is enabled, and if so, it will skip the move line.
+        """
+        if self.work.menu.ignore_no_putaway_available and self._actions_for(
+            "stock"
+        ).no_putaway_available(self.picking_types, move_line):
+            return None
+        return move_line
+
+    def _get_next_move_line_to_work(self):
+        """Get the next move line to work on for the user."""
+        move_lines = self.search_move_line.search_move_lines(match_user=True)
+        for line in move_lines:
+            if line := self._try_select_move_line(line):
+                return line
+        return None
+
+    # Endpoints
+
+    def start(self):
+        response = self._recover_previous_session()
+        return response or self._response_for_start()
+
+    def find_work(self):
+        """Find the new location to work from, for a user.
+
+        First recover any started pickings.
+        The find the first move line from the oldest transfer that can be worked on.
+        Mark the first move lines as picked.
+        And ask the user to confirm.
+
+        Transitions:
+        * start: no work found
+        * start: a move line has been found but no putaway location is available
+        * select_line: a move line has been found and marked as picked,
+            ask the user to confirm
+        """
+        response = self._recover_previous_session()
+        if response:
+            return response
+        self._actions_for("lock").advisory(self._advisory_lock_find_work)
+        move_line = self._get_next_move_line_to_work()
+        if not move_line:
+            return self._response_for_start(message=self.msg_store.no_work_found())
+        stock = self._actions_for("stock")
+        if (
+            not self.work.menu.ignore_no_putaway_available
+            and stock.no_putaway_available(self.picking_types, move_line)
+        ):
+            message = self.msg_store.no_putaway_destination_available()
+            return self._response_for_start(message=message)
+        if self.work.menu.no_prefill_qty:
+            stock.mark_move_line_as_picked(move_line, quantity=0)
+        else:
+            stock.mark_move_line_as_picked(move_line)
+        return self._response_for_start_line(move_line)
+
+    def confirm_start_line(
+        self,
+        selected_line_id,
+        barcode,
+        selected_location_id=None,
+        selected_package_id=None,
+    ):
+        """Validate the selected line by scanning the location, product, lot
+        or package."""
+        move_line = self.env["stock.move.line"].browse(selected_line_id)
+        if not move_line.exists():
+            return self._response_for_start(message=self.msg_store.record_not_found())
+
+        search = self._actions_for("search").for_products(move_line.product_id)
+        handlers = {
+            "location": self._scan_line__by_location,
+            "package": self._scan_line__by_package,
+            "lot": self._scan_line__by_lot,
+            "product": self._scan_line__by_product,
+            "packaging": self._scan_line__by_packaging,
+            "none": self._scan_line__fallback,
+        }
+        try:
+            search_result = search.find(
+                barcode,
+                types=handlers.keys(),
+            )
+        except SearchInvalidProduct as e:
+            message = self._message_for_invalid_product(e)
+            return self._response_for_start_line(
+                move_line,
+                message=message,
+                selected_location_id=selected_location_id,
+                selected_package_id=selected_package_id,
+            )
+        handler = handlers.get(search_result.type, self._scan_line__fallback)
+        response = handler(
+            search_result.record,
+            move_line,
+            selected_location_id=selected_location_id,
+            selected_package_id=selected_package_id,
+        )
+        return response or self._scan_line__fallback(
+            search_result.record,
+            move_line,
+            selected_location_id=selected_location_id,
+            selected_package_id=selected_package_id,
+        )
 
     def scan_location_or_package(self, barcode):
         """Scan a source location or a source package.
@@ -892,15 +1219,7 @@ class ShopfloorSingleProductTransfer(Component):
                     package=package,
                 )
         except SearchInvalidProduct as e:
-            product = None
-            if e.recordset._name == "product.product":
-                product = e.recordset[:1]
-            elif e.recordset._name == "product.packaging":
-                product = e.recordset[:1].product_id
-            if product:
-                message = self.msg_store.product_not_found_in_current_picking(product)
-            else:
-                message = self.msg_store.wrong_record(e.recordset)
+            message = self._message_for_invalid_product(e)
         else:
             message = self.msg_store.barcode_not_found()
         return self._response_for_select_product(
@@ -908,7 +1227,7 @@ class ShopfloorSingleProductTransfer(Component):
         )
 
     def scan_product__action_cancel(self):
-        return self._response_for_select_location_or_package()
+        return self._response_for_start()
 
     def set_quantity(self, selected_line_id, barcode, quantity, confirmation=None):
         """Sets quantity done if a product is scanned,
@@ -937,13 +1256,21 @@ class ShopfloorSingleProductTransfer(Component):
             # Puts the product in a new or an existing pack
             "package": self._set_quantity__by_package,
         }
-        search = self._actions_for("search")
-        search_result = search.find(barcode, types=handlers_by_type.keys())
-        handler = handlers_by_type.get(search_result.type)
-        if handler:
-            confirmed = confirmation == barcode
-            return handler(move_line, search_result.record, confirmation=confirmed)
-        message = self.msg_store.barcode_not_found()
+        search = self._actions_for("search").for_products(move_line.product_id)
+        try:
+            search_result = search.find(
+                barcode,
+                types=handlers_by_type.keys(),
+            )
+            handler = handlers_by_type.get(search_result.type)
+            if handler:
+                confirmed = confirmation == barcode
+                return handler(move_line, search_result.record, confirmation=confirmed)
+
+        except SearchInvalidProduct as e:
+            message = self._message_for_invalid_product(e)
+        else:
+            message = self.msg_store.barcode_not_found()
         return self._response_for_set_quantity(move_line, message=message)
 
     def set_quantity__action_cancel(self, selected_line_id):
@@ -954,7 +1281,7 @@ class ShopfloorSingleProductTransfer(Component):
         else:
             stock = self._actions_for("stock")
             stock.unmark_move_line_as_picked(move_line)
-        return self._response_for_select_location_or_package()
+        return self._response_for_start()
 
     def set_location(self, selected_line_id, package_id, barcode):
         """Sets the destination location
@@ -981,6 +1308,9 @@ class ShopfloorSingleProductTransferValidator(Component):
     _usage = "single_product_transfer.validator"
 
     def start(self):
+        return {}
+
+    def get_work(self):
         return {}
 
     def scan_location_or_package(self):
@@ -1016,6 +1346,22 @@ class ShopfloorSingleProductTransferValidator(Component):
             "barcode": {"required": True, "type": "string"},
         }
 
+    def confirm_start_line(self):
+        return {
+            "selected_line_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "barcode": {"required": True, "type": "string"},
+            "selected_location_id": {
+                "coerce": to_int,
+                "required": False,
+                "type": "integer",
+            },
+            "selected_package_id": {
+                "coerce": to_int,
+                "required": False,
+                "type": "integer",
+            },
+        }
+
 
 class ShopfloorSingleProductTransferValidatorResponse(Component):
     _inherit = "base.shopfloor.validator.response"
@@ -1030,6 +1376,8 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
             "select_product": self._schema_select_product,
             "set_quantity": self._schema_set_quantity,
             "set_location": self._schema_set_location,
+            "start_line": self._schema_start_line,
+            "get_work": {},
         }
 
     def start(self):
@@ -1054,11 +1402,17 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
             next_states=self._set_quantity__action_cancel_next_states()
         )
 
+    def confirm_start_line(self):
+        return self._response_schema(next_states=self._confirm_start_line_next_states())
+
     def set_location(self):
         return self._response_schema(next_states=self._set_location_next_states())
 
+    def find_work(self):
+        return self._response_schema(next_states=self._find_work_next_states())
+
     def _start_next_states(self):
-        return {"select_location_or_package", "set_quantity"}
+        return {"select_location_or_package", "set_quantity", "get_work"}
 
     def _scan_location_next_states(self):
         return {"select_location_or_package", "select_product"}
@@ -1067,16 +1421,22 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return {"select_product", "set_quantity"}
 
     def _scan_product__action_cancel_next_states(self):
-        return {"select_location_or_package"}
+        return {"select_location_or_package", "get_work"}
 
     def _set_quantity_next_states(self):
-        return {"set_quantity", "select_product", "set_location"}
+        return {"set_quantity", "select_product", "set_location", "get_work"}
 
     def _set_quantity__action_cancel_next_states(self):
-        return {"select_location_or_package"}
+        return {"select_location_or_package", "get_work"}
 
     def _set_location_next_states(self):
         return {"set_quantity", "select_product", "set_location"}
+
+    def _find_work_next_states(self):
+        return {"start_line", "get_work"}
+
+    def _confirm_start_line_next_states(self):
+        return {"start_line", "set_quantity", "get_work"}
 
     @property
     def _schema_select_location_or_package(self):
@@ -1109,4 +1469,17 @@ class ShopfloorSingleProductTransferValidatorResponse(Component):
         return {
             "move_line": {"type": "dict", "schema": self.schemas.move_line()},
             "package": {"type": "dict", "schema": self.schemas.package()},
+        }
+
+    @property
+    def _schema_start_line(self):
+        return {
+            "move_line": {"type": "dict", "schema": self.schemas.move_line()},
+            "selected_location_id": {"type": "integer", "nullable": True},
+            "selected_package_id": {"type": "integer", "nullable": True},
+            "scan_location_or_pack_first": {
+                "type": "boolean",
+                "nullable": False,
+                "required": False,
+            },
         }

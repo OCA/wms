@@ -357,6 +357,36 @@ class TestSetQuantity(CommonCase):
             response, next_state="set_quantity", message=expected_message, data=data
         )
 
+    def test_set_quantity_scan_lot_not_unique(self):
+        """Even if the lot is not unique, we should be able to process the line by
+        scanning the lot, if the scanned lot is the one on the move line."""
+        self._set_product_tracking_by_lot(self.product_b)
+        duplicate_lot = self._create_lot_for_product(self.product_b, "LOT_BARCODE")
+        self._add_stock_to_product(self.product_b, self.location, 10, lot=duplicate_lot)
+        # First, select a picking
+        self._set_product_tracking_by_lot(self.product)
+        lot = self._create_lot_for_product(self.product, duplicate_lot.name)
+        self._add_stock_to_product(self.product, self.location, 5, lot=lot)
+        picking = self._setup_picking(lot=lot)
+        move_line = picking.move_line_ids
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": self.location.id, "barcode": lot.name},
+        )
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 1,
+                "barcode": lot.name,
+            },
+        )
+        data = {
+            "move_line": self._data_for_move_line(move_line),
+            "asking_confirmation": None,
+        }
+        self.assert_response(response, next_state="set_quantity", data=data)
+
     def test_set_quantity_scan_packaging(self):
         """Scan a packaging to process an existing line."""
         # First, select a picking
@@ -689,6 +719,30 @@ class TestSetQuantity(CommonCase):
         # Ensure the picking is not cancelled if allow_move_create is not enabled
         self.assertTrue(move_line.picking_id.state == "assigned")
 
+    def test_action_cancel_with_get_work(self):
+        self.menu.sudo().allow_get_work = True
+        picking = self._setup_picking()
+        self.service.dispatch(
+            "scan_product",
+            params={
+                "location_id": self.location.id,
+                "barcode": self.product.barcode,
+            },
+        )
+        move_line = picking.move_line_ids
+        move_line.qty_done = 10.0
+        response = self.service.dispatch(
+            "set_quantity__action_cancel",
+            params={"selected_line_id": move_line.id},
+        )
+        data = {}
+        self.assert_response(response, next_state="get_work", data=data)
+        # Ensure qty_picked and user has been reset.
+        self.assertFalse(move_line.picking_id.user_id)
+        self.assertEqual(move_line.qty_done, 0.0)
+        # Ensure the picking is not cancelled if allow_move_create is not enabled
+        self.assertTrue(move_line.picking_id.state == "assigned")
+
     def test_action_cancel_allow_move_create(self):
         # We perform the same actions as in test_action_cancel,
         # but with the allow_move_create option enabled
@@ -788,6 +842,33 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(
             picking.move_line_ids.move_id.location_id,
             self.picking_type.default_location_src_id,
+        )
+
+    def test_set_quantity_scan_location_with_get_work(self):
+        self.menu.sudo().allow_get_work = True
+        picking = self._setup_picking()
+        location = self.location
+        self.service.dispatch(
+            "scan_product",
+            params={"location_id": location.id, "barcode": self.product.barcode},
+        )
+        move_line = picking.move_line_ids
+        response = self.service.dispatch(
+            "set_quantity",
+            params={
+                "selected_line_id": move_line.id,
+                "quantity": 6,
+                "barcode": self.dispatch_location.name,
+            },
+        )
+        completion_info = self.service._actions_for("completion.info")
+        expected_popup = completion_info.popup(move_line)
+        expected_message = self.msg_store.transfer_done_success(move_line.picking_id)
+        self.assert_response(
+            response,
+            next_state="get_work",
+            message=expected_message,
+            popup=expected_popup,
         )
 
     def test_set_quantity_scan_location_allow_move_create(self):
