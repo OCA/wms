@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from collections import defaultdict
 
+from odoo.osv.expression import OR
 from odoo.tools.float_utils import float_round
 
 from odoo.addons.component.core import Component
@@ -139,9 +140,16 @@ class DataDetailAction(Component):
     def product_detail(self, record, **kw):
         # Defined new method to not overload the base one used in many places
         data = self._jsonify(record, self._product_detail_parser, **kw)
-        suppliers = self.env["product.supplierinfo"].search(
-            [("product_id", "=", record.id)]
+        domain = OR(
+            [
+                [
+                    ("product_tmpl_id", "=", record.product_tmpl_id.id),
+                    ("product_id", "=", False),
+                ],
+                [("product_id", "=", record.id)],
+            ]
         )
+        suppliers = self.env["product.supplierinfo"].search(domain)
         data["suppliers"] = self._jsonify(
             suppliers, self._product_supplierinfo_parser, multi=True
         )
