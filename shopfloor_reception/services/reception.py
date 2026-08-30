@@ -2067,11 +2067,17 @@ class ShopfloorReceptionValidatorResponse(Component):
 
     @property
     def _schema_set_lot(self):
+        # on set lot, we want to suggest a lot to the user if possible,
+        # so we add the suggestion schema since information received from
+        # the client could be partial against the lot model (e.g.
+        # no lot name, no expiration date, ..)
+        move_line_schema = self.schemas.move_line()
+        move_line_schema["lot"]["schema"] = self.schemas.lot_suggestion()
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {
                 "type": "list",
-                "schema": {"type": "dict", "schema": self.schemas.move_line()},
+                "schema": {"type": "dict", "schema": move_line_schema},
             },
         }
 
