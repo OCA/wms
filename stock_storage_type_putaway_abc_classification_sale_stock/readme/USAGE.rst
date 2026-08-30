@@ -1,0 +1,2 @@
+See product_abc_classification and stock_storage_type_putaway_abc modules
+for configuration.
