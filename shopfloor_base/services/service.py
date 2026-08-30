@@ -1,5 +1,6 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2020 Akretion (http://www.akretion.com)
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 from werkzeug.exceptions import BadRequest
@@ -299,3 +300,23 @@ class BaseShopfloorProcess(AbstractComponent):
 
     _requires_header_menu = True
     _requires_header_profile = True
+
+    @property
+    def env(self):
+        env = super().env()
+        if (
+            not hasattr(self, "work")
+            or not hasattr(self.work, "menu")
+            or not hasattr(self.work.menu, "picking_type_ids")
+        ):
+            return env
+        company = self.work.menu.picking_type_ids.company_id
+        if not company:
+            return env
+        context = dict(self.collection.env.context)
+        context.update(
+            {
+                "allowed_company_ids": company.ids,
+            }
+        )
+        return env(context=context)
