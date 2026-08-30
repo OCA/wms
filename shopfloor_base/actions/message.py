@@ -1,8 +1,16 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+
 from odoo import _
 
 from odoo.addons.component.core import Component
+
+MESSAGE_TYPES = {
+    "info": 0,
+    "success": 1,
+    "warning": 2,
+    "error": 3,
+}
 
 
 class MessageAction(Component):
@@ -18,6 +26,24 @@ class MessageAction(Component):
     _name = "shopfloor.message.action"
     _inherit = "shopfloor.process.action"
     _usage = "message"
+
+    @property
+    def message_queue(self):
+        if not hasattr(self, "_message_queue"):
+            self._message_queue = []
+        return self._message_queue
+
+    def add_message(self, body, message_type="info"):
+        if not isinstance(body, str):
+            raise TypeError("You should set a string to message queue!")
+        if message_type not in MESSAGE_TYPES.keys():
+            raise TypeError("You should use a correct Shopfloor message type!")
+        if not hasattr(self, "_message_queue"):
+            self._message_queue = []
+        self._message_queue.append(ShopfloorMessage(body, message_type))
+
+    def clear_queue(self):
+        self._message_queue = list()
 
     def generic_record_not_found(self):
         return {
@@ -46,3 +72,13 @@ class MessageAction(Component):
     # then all depending modules can simply create records they need
     # instea of overriding and polluting the component.
     # Additional goodie: users can edit messages via UI.
+
+
+class ShopfloorMessage:
+
+    body = str()
+    message_type = str()
+
+    def __init__(self, body, message_type, **kwargs):
+        self.body = body
+        self.message_type = message_type

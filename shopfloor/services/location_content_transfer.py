@@ -387,12 +387,15 @@ class LocationContentTransfer(Component):
             move_lines = new_moves.move_line_ids
             for line in move_lines:
                 if not self.is_dest_location_valid(line.move_id, line.location_dest_id):
-                    savepoint.rollback()
-                    return self._response_for_start(
-                        message=self.msg_store.location_content_unable_to_transfer(
-                            location
+                    move = line.move_id
+                    location_dest = line.location_id
+                    self.msg_store.add_message(
+                        **self.msg_store.location_content_unable_to_transfer(
+                            move, location, location_dest
                         )
                     )
+                    savepoint.rollback()
+                    return self._response_for_start()
 
         stock = self._actions_for("stock")
         if self.work.menu.ignore_no_putaway_available and stock.no_putaway_available(
