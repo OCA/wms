@@ -565,10 +565,7 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         )
         self.assertEqual(
             response["message"],
-            {
-                "body": "Package FREE_PACKAGE is already used.",
-                "message_type": "warning",
-            },
+            self.msg_store.package_already_used(self.free_package),
         )
         # Now enable `multiple_move_single_pack` and try again
         self.menu.sudo().write(
@@ -625,11 +622,9 @@ class ZonePickingSetLineDestinationCase(ZonePickingCommonCase):
         )
         self.assertEqual(
             response["message"],
-            {
-                "body": "Package FREE_PACKAGE contains already lines"
-                " from a different operation type test.",
-                "message_type": "warning",
-            },
+            self.msg_store.package_different_picking_type(
+                self.free_package, picking_type
+            ),
         )
 
     def test_set_destination_location_zero_quantity(self):

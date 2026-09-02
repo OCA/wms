@@ -41,10 +41,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "body": "No transfer found for barcode A",
-            },
+            message=self.msg_store.transfer_not_found_for_barcode(barcode),
             data={"restrict_scan_first": True},
         )
 
@@ -59,10 +56,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "body": "No transfer found for barcode NOPE",
-            },
+            message=self.msg_store.transfer_not_found_for_barcode("NOPE"),
             data={"restrict_scan_first": False},
         )
 
@@ -82,10 +76,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "body": f"Transfer {picking.name} is not available.",
-            },
+            message=self.msg_store.stock_picking_not_available(picking),
             data={"restrict_scan_first": False},
         )
 
@@ -113,7 +104,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={"message_type": "error", "body": "Location not allowed here."},
+            message=self.msg_store.location_not_allowed(),
             data={"restrict_scan_first": False},
         )
 
@@ -123,15 +114,10 @@ class CheckoutScanCase(CheckoutCommonCase):
         picking.action_assign()
         barcode = barcode_func(picking)
         response = self.service.dispatch("scan_document", params={"barcode": barcode})
-        picking_name = picking.name
-        type_name = picking.picking_type_id.name
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "body": f"Reserved for {type_name} {picking_name}",
-            },
+            message=self.msg_store.reserved_for_other_picking_type(picking),
             data={"restrict_scan_first": False},
         )
 

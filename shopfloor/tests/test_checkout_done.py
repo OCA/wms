@@ -18,10 +18,7 @@ class CheckoutDoneCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "success",
-                "body": f"Transfer {picking.name} done",
-            },
+            message=self.msg_store.transfer_done_success(picking),
             data={"restrict_scan_first": False},
         )
 

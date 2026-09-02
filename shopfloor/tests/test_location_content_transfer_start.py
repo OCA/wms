@@ -197,10 +197,7 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
         )
         self.assert_response_start(
             response,
-            message={
-                "message_type": "error",
-                "body": "You cannot move this using this menu.",
-            },
+            message=self.msg_store.cannot_move_something_in_picking_type(),
         )
 
     def test_scan_location_wrong_picking_type_allow_unreserve_ok(self):

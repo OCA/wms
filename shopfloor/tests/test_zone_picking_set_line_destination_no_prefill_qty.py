@@ -63,10 +63,7 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             qty_done=qty_done,
-            message={
-                "body": f"Package {wrong_package.name} is not empty.",
-                "message_type": "warning",
-            },
+            message=self.msg_store.package_not_empty(wrong_package),
         )
 
     def test_set_destination_increment_with_wrong_product(self):
@@ -90,7 +87,9 @@ class ZonePickingSetLineDestinationNoPrefillQtyCase(ZonePickingCommonCase):
             picking_type,
             move_line,
             qty_done=qty_done,
-            message={"body": "The package A doesn't exist", "message_type": "error"},
+            message=self.msg_store.package_not_found_for_barcode(
+                self.product_a.barcode
+            ),
         )
 
     def test_set_destination_increment_with_lot(self):
