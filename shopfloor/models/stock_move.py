@@ -107,11 +107,10 @@ class StockMove(models.Model):
         }
         data.update(dict(default or []))
         new_picking = picking.copy(data)
-        link = '<a href="#" data-oe-model="stock.picking" data-oe-id="%d">%s</a>' % (
-            new_picking.id,
-            new_picking.name,
+        message = _(
+            "The split order %s has been created.",
+            picking._get_html_link(title=picking.name),
         )
-        message = (_("The split order {} has been created.")).format(link)
         picking.message_post(body=message)
         self.picking_id = new_picking.id
         self.move_line_ids.picking_id = new_picking.id
