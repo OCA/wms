@@ -1217,13 +1217,7 @@ class ClusterPicking(Component):
                 body=Markup("<b>%s:</b> %s")
                 % (
                     _("Unprocessed transfer removed from batch"),
-                    ", ".join(
-                        Markup(
-                            "<a href=#id=%s&view_type=form&model=stock.picking>%s</a>"
-                        )
-                        % (p.id, p.name)
-                        for p in empty_pickings
-                    ),
+                    Markup(", ").join(p._get_html_link() for p in empty_pickings),
                 )
             )
             empty_pickings.batch_id = False
