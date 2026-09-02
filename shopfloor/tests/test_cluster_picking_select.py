@@ -357,10 +357,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         )
         self.assert_response(
             response,
-            message={
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            message=self.msg_store.record_not_found(),
             next_state="start",
         )
 
@@ -381,7 +378,7 @@ class ClusterPickingSelectedCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"body": "Batch Transfer complete", "message_type": "success"},
+            message=self.msg_store.batch_transfer_complete(),
         )
 
     # TODO: add a test for lines sorting

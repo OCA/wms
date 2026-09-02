@@ -129,10 +129,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(self.picking, done=True),
                 "all_processed": False,
             },
-            message={
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
     def test_cancel_line_error_line_not_found(self):
@@ -147,8 +144,5 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(self.picking, done=True),
                 "all_processed": False,
             },
-            message={
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            message=self.msg_store.record_not_found(),
         )

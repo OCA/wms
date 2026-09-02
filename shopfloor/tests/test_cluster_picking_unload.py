@@ -177,7 +177,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "success", "body": "Batch Transfer complete"},
+            message=self.msg_store.batch_transfer_complete(),
         )
 
     def test_set_destination_all_remaining_lines(self):
@@ -273,7 +273,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"body": "Batch Transfer complete", "message_type": "success"},
+            message=self.msg_store.batch_transfer_complete(),
         )
 
     def test_set_destination_all_picking_unassigned(self):
@@ -512,10 +512,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_all",
             data=data,
-            message={
-                "message_type": "error",
-                "body": "No location found for this barcode.",
-            },
+            message=self.msg_store.no_location_found(),
         )
 
     def test_set_destination_all_error_location_invalid(self):
@@ -541,7 +538,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_all",
             data=data,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_set_destination_all_error_location_move_invalid(self):
@@ -620,7 +617,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "success", "body": "Batch Transfer complete"},
+            message=self.msg_store.batch_transfer_complete(),
         )
 
     def test_set_destination_all_check_confirmation(self):
@@ -971,7 +968,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
         self.assert_response(
             response,
             next_state="start",
-            message={"body": "Batch Transfer complete", "message_type": "success"},
+            message=self.msg_store.batch_transfer_complete(),
         )
 
     def test_unload_scan_destination_error_location_not_found(self):
@@ -990,10 +987,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_set_destination",
             data=data,
-            message={
-                "message_type": "error",
-                "body": "No location found for this barcode.",
-            },
+            message=self.msg_store.no_location_found(),
         )
 
     def test_unload_scan_destination_error_location_invalid(self):
@@ -1016,7 +1010,7 @@ class ClusterPickingUnloadScanDestinationCase(ClusterPickingUnloadingCommonCase)
             response,
             next_state="unload_set_destination",
             data=data,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_unload_scan_destination_error_location_move_invalid(self):
