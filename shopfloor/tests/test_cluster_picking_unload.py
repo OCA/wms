@@ -233,7 +233,15 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         # The 2 lines picking has one remaining line
         self.assertEqual(len(self.two_lines_picking.move_line_ids), 1)
         self.assertRecordValues(
-            self.two_lines_picking, [{"state": "assigned", "batch_id": False}]
+            self.two_lines_picking,
+            [
+                {
+                    "state": "assigned",
+                    "batch_id": False,
+                    "user_id": False,
+                    "printed": False,
+                }
+            ],
         )
         self.new_picking = self.two_lines_picking.backorder_ids
         self.assertRecordValues(

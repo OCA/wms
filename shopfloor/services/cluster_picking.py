@@ -1164,6 +1164,9 @@ class ClusterPicking(Component):
         for picking in lines.picking_id:
             self._unload_set_picking_to_done(picking)
 
+    def _clear_batch_and_assignment(self, pickings):
+        pickings.write({"batch_id": False, "user_id": False, "printed": False})
+
     def _unload_set_picking_to_done(self, picking):
         """Set picking to done when all picked move lines have been unloaded"""
         if picking.state == "done":
@@ -1196,7 +1199,7 @@ class ClusterPicking(Component):
         stock.validate_moves(moves_to_validate)
         if picking.state not in ("cancel", "done"):
             # A split order has been created, remove picking from batch
-            picking.batch_id = False
+            self._clear_batch_and_assignment(picking)
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Remove unprocessed pickings from batch to close it.
@@ -1220,7 +1223,7 @@ class ClusterPicking(Component):
                     Markup(", ").join(p._get_html_link() for p in empty_pickings),
                 )
             )
-            empty_pickings.batch_id = False
+            self._clear_batch_and_assignment(empty_pickings)
 
         if batch.state != "done":
             # As processed pickings are already done, the batch should now be done
