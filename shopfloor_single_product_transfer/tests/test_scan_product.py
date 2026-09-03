@@ -32,10 +32,12 @@ class TestScanProduct(CommonCase):
         response = self.service.dispatch(
             "scan_product", params={"location_id": location.id, "barcode": "NOPE"}
         )
-        expected_message = {"message_type": "error", "body": "Barcode not found"}
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.barcode_not_found(),
+            data=data,
         )
 
     def test_scan_tracked_product(self):
@@ -49,13 +51,12 @@ class TestScanProduct(CommonCase):
                 params={"location_id": location.id, "barcode": product.barcode},
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
-        expected_message = {
-            "message_type": "warning",
-            "body": "Product tracked by lot, please scan one.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
+            data=data,
         )
 
     def test_scan_product_multiple_lines_in_picking_no_prefill_qty_enabled(self):
@@ -92,13 +93,12 @@ class TestScanProduct(CommonCase):
                 params={"location_id": location.id, "barcode": product.barcode},
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
-        expected_message = {
-            "message_type": "error",
-            "body": "No operation found for this menu and profile.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.no_operation_found(),
+            data=data,
         )
 
     def test_scan_product_with_move_line(self):
@@ -136,13 +136,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": "No operation found for this menu and profile.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.no_operation_found(),
+            data=data,
         )
 
     def test_scan_product_with_stock_create_move_enabled(self):
@@ -180,13 +179,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": "No operation found for this menu and profile.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.no_operation_found(),
+            data=data,
         )
 
     def test_scan_product_with_reserved_stock_unreserve_move_disabled(self):
@@ -208,13 +206,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": f"Reserved for {self.other_picking_type.name} {other_picking.name}",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.reserved_for_other_picking_type(other_picking),
+            data=data,
         )
 
     def test_scan_product_with_reserved_stock_unreserve_move_enabled(self):
@@ -256,13 +253,12 @@ class TestScanProduct(CommonCase):
                 "scan_product", params={"location_id": location.id, "barcode": lot.name}
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
-        expected_message = {
-            "message_type": "error",
-            "body": "Barcode not found",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.barcode_not_found(),
+            data=data,
         )
 
     def test_scan_lot_with_move_line(self):
@@ -306,13 +302,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": "No operation found for this menu and profile.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.no_operation_found(),
+            data=data,
         )
 
     def test_scan_lot_with_stock_create_move_enabled(self):
@@ -354,13 +349,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": f"Reserved for {self.other_picking_type.name} {other_picking.name}",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", message=expected_message, data=data
+            response,
+            next_state="select_product",
+            message=self.msg_store.reserved_for_other_picking_type(other_picking),
+            data=data,
         )
 
     def test_scan_lot_with_reserved_stock_unreserve_move_enabled(self):
@@ -406,13 +400,12 @@ class TestScanProduct(CommonCase):
             )
             self.assertIn(ROLLBACK_LOG, log_catcher.output)
         self.assertFalse(self.get_new_move_line())
-        expected_message = {
-            "message_type": "error",
-            "body": "No putaway destination is available.",
-        }
         data = {"location": self._data_for_location(location)}
         self.assert_response(
-            response, next_state="select_product", data=data, message=expected_message
+            response,
+            next_state="select_product",
+            data=data,
+            message=self.msg_store.no_putaway_destination_available(),
         )
 
     def test_scan_product_no_putaway_ignore_no_putaway_disabled(self):
