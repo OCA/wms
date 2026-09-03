@@ -550,7 +550,7 @@ class LocationContentTransfer(Component):
         if empty_package:
             if not self._is_package_empty(empty_package):
                 message = self.package_not_empty_anymore(empty_package)
-                empty_package = self.env["stock.quant.pacakge"]
+                empty_package = self.env["stock.quant.package"]
         return message, empty_package
 
     def set_destination_all(
@@ -558,7 +558,7 @@ class LocationContentTransfer(Component):
     ):
         """Scan destination location for all the moves of the location
 
-        barcode is a stock.location or a package in ta location for the destination
+        barcode is a stock.location or a package in that location for the destination
 
         Transitions:
         * scan_destination_all: invalid destination or could not set moves to done
