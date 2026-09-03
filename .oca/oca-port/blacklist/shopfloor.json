@@ -6,6 +6,7 @@
     "OCA/wms#623": "already ported",
     "OCA/wms#637": "already ported",
     "OCA/wms#656": "already ported",
-    "OCA/wms#945": "ported into 'stock_move_line_change_lot' in OCA/stock-logistics-workflow#1825"
+    "OCA/wms#945": "ported into 'stock_move_line_change_lot' in OCA/stock-logistics-workflow#1825",
+    "OCA/wms#1134": "Already ported in OCA/wms#1143"
   }
 }
