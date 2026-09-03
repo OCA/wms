@@ -146,11 +146,7 @@ class CheckoutScanCase(CheckoutCommonCase):
         self.assert_response(
             response,
             next_state="select_document",
-            message={
-                "message_type": "error",
-                "body": "Several transfers found, please scan a package"
-                " or select a transfer manually.",
-            },
+            message=self.msg_store.multiple_picks_found_scan_pack_or_select_manually(),
             data={"restrict_scan_first": False},
         )
 

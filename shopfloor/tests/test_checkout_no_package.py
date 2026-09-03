@@ -61,10 +61,7 @@ class CheckoutNoPackageCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
             # go pack to the screen to select lines to put in packages
             next_state="select_line",
             data=self._data_for_select_line(self.picking),
-            message={
-                "message_type": "success",
-                "body": "Product(s) processed as raw product(s)",
-            },
+            message=self.msg_store.products_processed_as_raw_products(),
         )
 
     def test_no_package_disabled(self):
