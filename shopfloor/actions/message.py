@@ -139,7 +139,7 @@ class MessageAction(Component):
     def package_not_empty_anymore(self, package):
         return {
             "message_type": "warning",
-            "body": _("Package {} is not empty anmyore.").format(package.name),
+            "body": _("Package {} is not empty anymore.").format(package.name),
         }
 
     def package_already_used(self, package):
