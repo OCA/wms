@@ -1006,8 +1006,8 @@ msgstr "Il collo {} non è disponibile nel trasferimento {}."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} is not empty anmyore."
-msgstr "Il collo {} non è più vuoto."
+msgid "Package {} is not empty anymore."
+msgstr ""
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -1569,8 +1569,8 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
 "id=\"%d\">%s</a> has been created."
 msgstr ""
-"È stato creato l'ordine residuo <a href=\"#\" data-oe-model=\"stock."
-"picking\" data-oe-id=\"%d\">%s</a> ."
+"È stato creato l'ordine residuo <a href=\"#\" data-oe-"
+"model=\"stock.picking\" data-oe-id=\"%d\">%s</a> ."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
@@ -2099,6 +2099,10 @@ msgstr "{} non trovato nel trasferimento attuale o già nel collo."
 #, python-format
 msgid "{} {} put in {}"
 msgstr "{} {} metti in {}"
+
+#, python-format
+#~ msgid "Package {} is not empty anmyore."
+#~ msgstr "Il collo {} non è più vuoto."
 
 #, python-format
 #~ msgid "Package {} is not in the current transfer."

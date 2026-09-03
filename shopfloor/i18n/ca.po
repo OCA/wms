@@ -937,7 +937,7 @@ msgstr ""
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} is not empty anmyore."
+msgid "Package {} is not empty anymore."
 msgstr ""
 
 #. module: shopfloor

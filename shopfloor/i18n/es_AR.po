@@ -990,7 +990,7 @@ msgstr "El Paquete {} no está disponible en la transferencia {}."
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Package {} is not empty anmyore."
+msgid "Package {} is not empty anymore."
 msgstr ""
 
 #. module: shopfloor
@@ -1560,8 +1560,8 @@ msgid ""
 "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
 "id=\"%d\">%s</a> has been created."
 msgstr ""
-"Se ha creado el pedido pendiente <a href=\"#\" data-oe-model=\"stock."
-"picking\" data-oe-id=\"%d\">%s</a>."
+"Se ha creado el pedido pendiente <a href=\"#\" data-oe-"
+"model=\"stock.picking\" data-oe-id=\"%d\">%s</a>."
 
 #. module: shopfloor
 #: code:addons/shopfloor/actions/message.py:0
