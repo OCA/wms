@@ -406,3 +406,14 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
             "NO_EXISTING_BARCODE",
             {"message_type": "error", "body": "Barcode not found"},
         )
+
+    def test_scan_line_prevent_location_scan(self):
+        self.menu.sudo().force_detailed_scan = True
+        self._simulate_batch_selected(self.batch, in_package=True)
+        line = self.batch.picking_ids.move_line_ids
+        self._scan_line_error(
+            line=line,
+            scanned=line.location_id.barcode,
+            message=None,
+            sublocation=line.location_id,
+        )
