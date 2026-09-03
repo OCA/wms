@@ -130,10 +130,7 @@ class CheckoutListSetPackagingCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(self.picking, done=True),
                 "all_processed": False,
             },
-            message={
-                "message_type": "success",
-                "body": f"Packaging changed on package {self.package.name}",
-            },
+            message=self.msg_store.packaging_changed_on_package(self.package),
         )
 
     def test_set_packaging_error_package_not_found(self):

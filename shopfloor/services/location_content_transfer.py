@@ -2,7 +2,6 @@
 # Copyright 2020-2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2023 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _
 from odoo.fields import first
 
 from odoo.addons.base_rest.components.service import to_int
@@ -355,10 +354,7 @@ class LocationContentTransfer(Component):
             picking_types = move_lines.picking_id.picking_type_id
             if len(picking_types) > 1:
                 return self._response_for_start(
-                    message={
-                        "message_type": "error",
-                        "body": _("This location content can't be moved at once."),
-                    }
+                    message=self.msg_store.location_cant_be_moved_at_once()
                 )
             if picking_types - self.picking_types:
                 return self._response_for_start(
@@ -556,7 +552,7 @@ class LocationContentTransfer(Component):
                 # the correct package, so ask to scan the package.
                 return self._response_for_start_single(
                     move_lines.mapped("picking_id"),
-                    message={"message_type": "error", "body": _("Scan the package")},
+                    message=self.msg_store.scan_the_package(),
                 )
             else:
                 return self._response_for_scan_destination(location, package_level)
@@ -566,7 +562,7 @@ class LocationContentTransfer(Component):
             if lot in other_move_lines.mapped("lot_id"):
                 return self._response_for_start_single(
                     move_lines.mapped("picking_id"),
-                    message={"message_type": "error", "body": _("Scan the package")},
+                    message=self.msg_store.scan_the_package(),
                 )
             else:
                 return self._response_for_scan_destination(location, package_level)

@@ -215,7 +215,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_product_nok_different_line(self):
@@ -228,7 +228,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_product_nok_product_tracked(self):
@@ -237,7 +237,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_lot_nok_different_package(self):
@@ -258,7 +258,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_lot_nok_different_line(self):
@@ -279,7 +279,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_package_level_not_exists(self):

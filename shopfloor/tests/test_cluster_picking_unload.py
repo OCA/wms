@@ -563,7 +563,7 @@ class ClusterPickingUnloadScanPackCase(ClusterPickingUnloadingCommonCase):
             response,
             next_state="unload_single",
             data=data,
-            message={"message_type": "error", "body": "Wrong bin"},
+            message=self.msg_store.wrong_bin(),
         )
 
 

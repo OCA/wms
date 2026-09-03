@@ -118,10 +118,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "info",
-                "body": "No more work to do, please create a new batch transfer",
-            },
+            message=self.msg_store.no_more_batch_todo(),
         )
 
     def test_list_batch(self):
@@ -219,10 +216,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="manual_selection",
-            message={
-                "message_type": "warning",
-                "body": "This batch cannot be selected.",
-            },
+            message=self.msg_store.batch_cannot_be_selected(),
             data={"size": 0, "records": []},
         )
 
@@ -239,10 +233,7 @@ class ClusterPickingSelectionCase(ClusterPickingCommonCase):
         self.assert_response(
             response,
             next_state="manual_selection",
-            message={
-                "message_type": "warning",
-                "body": "This batch cannot be selected.",
-            },
+            message=self.msg_store.batch_cannot_be_selected(),
             data={"size": 0, "records": []},
         )
 

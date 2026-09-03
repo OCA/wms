@@ -144,11 +144,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="scan_destination",
             data=self._line_data(line, qty_done=10.0),
-            message={
-                "message_type": "error",
-                "body": f"The destination bin {self.bin1.name} is not empty, "
-                "please take another.",
-            },
+            message=self.msg_store.destination_bin_not_empty(self.bin1),
         )
 
     def test_scan_destination_pack_not_empty_multi_pick_allowed(self):

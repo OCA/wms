@@ -206,10 +206,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line1: line1.reserved_uom_qty, line2: line2.reserved_uom_qty},
-            message={
-                "body": "Negative quantity not allowed.",
-                "message_type": "error",
-            },
+            message=self.msg_store.negative_quantity_not_allowed(),
         )
 
     def test_set_custom_qty_partial(self):

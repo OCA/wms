@@ -166,10 +166,7 @@ class TestLocationContentTransferStart(LocationContentTransferCommonCase):
         )
         self.assert_response_start(
             response,
-            message={
-                "message_type": "error",
-                "body": "This location content can't be moved at once.",
-            },
+            message=self.msg_store.location_cant_be_moved_at_once(),
         )
 
 
