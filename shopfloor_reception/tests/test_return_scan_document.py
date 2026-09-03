@@ -16,7 +16,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_scan_document_no_default_location(self):
@@ -33,13 +33,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
         )
         return_picking = self.get_new_pickings()
         self.assertFalse(return_picking)
-        message = {
-            "message_type": "error",
-            "body": (
-                "Operation types for this menu are missing "
-                "default source and destination locations."
-            ),
-        }
+        message = self.msg_store.no_default_location_on_picking_type()
         self.assert_response(
             response,
             next_state="select_document",
@@ -60,10 +54,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={
-                "message_type": "error",
-                "body": "Barcode not found",
-            },
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_scan_delivered_order(self):
@@ -80,7 +71,7 @@ class TestScanDocumentReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.msg_store.barcode_not_found(),
         )
         # Now, enable `allow_return`
         self._enable_allow_return()
