@@ -20,7 +20,7 @@ class TestReceptionDone(CommonCase):
             response,
             next_state="confirm_done",
             data={"picking": self._data_for_picking_with_moves(picking)},
-            message={"message_type": "warning", "body": "Are you sure?"},
+            message=self.msg_store.need_confirmation(),
         )
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id, "confirmation": True}
@@ -31,10 +31,7 @@ class TestReceptionDone(CommonCase):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={
-                "message_type": "success",
-                "body": f"Transfer {picking.name} done",
-            },
+            message=self.msg_store.transfer_done_success(picking),
         )
 
     def test_set_done_no_qty_processed(self):
@@ -46,10 +43,7 @@ class TestReceptionDone(CommonCase):
             response,
             next_state="select_move",
             data=self._data_for_select_move(picking),
-            message={
-                "message_type": "warning",
-                "body": "No quantity has been processed, unable to complete the transfer.",
-            },
+            message=self.msg_store.transfer_no_qty_done(),
         )
 
     def test_set_done_with_backorder(self):
@@ -68,13 +62,7 @@ class TestReceptionDone(CommonCase):
             response,
             next_state="confirm_done",
             data={"picking": self._data_for_picking_with_moves(picking)},
-            message={
-                "message_type": "warning",
-                "body": (
-                    "Not all lines have been processed with full quantity. "
-                    "Do you confirm partial operation?"
-                ),
-            },
+            message=self.msg_store.transfer_confirm_done(),
         )
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id, "confirmation": True}
@@ -86,8 +74,5 @@ class TestReceptionDone(CommonCase):
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(picking_due_today)},
-            message={
-                "message_type": "success",
-                "body": f"Transfer {picking.name} done",
-            },
+            message=self.msg_store.transfer_done_success(picking),
         )
