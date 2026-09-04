@@ -1230,7 +1230,7 @@ class ClusterPicking(Component):
 
         if batch.state != "done":
             # As processed pickings are already done, the batch should now be done
-            raise UserError(self.env._("Internal Error: Batch not properly done."))
+            raise UserError(_("Internal Error: Batch not properly done."))
 
         return self._response_for_start(
             message=self.msg_store.batch_transfer_complete(),
