@@ -1,12 +1,16 @@
 # Copyright 2019-2020 Camptocamp (https://www.camptocamp.com)
 # Copyright 2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
+import logging
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 
 from psycopg2 import sql
 
-from odoo import models
+from odoo import api, models
+from odoo.tools.float_utils import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 class StockMove(models.Model):
@@ -54,18 +58,16 @@ class StockMove(models.Model):
                 )
             else:
                 moves_with_routing_details[move] = self._no_routing_details()
-
-        self._apply_routing_rule_pull(moves_with_routing_details)
-        self._apply_routing_rule_push(moves_with_routing_details)
+        self._apply_routing_rule(moves_with_routing_details)
 
     def _action_assign(self, force_qty=False):
         if self.env.context.get("exclude_apply_dynamic_routing"):
-            return super()._action_assign(force_qty=force_qty)
+            super()._action_assign(force_qty=force_qty)
         else:
-            # these methods will call _action_assign in a savepoint
-            # and modify the routing if necessary
-            moves = self._split_and_apply_routing()
-            return super(StockMove, moves)._action_assign()
+            # These methods will call _action_assign in a savepoint and modify
+            # the routing if necessary. Call to super is done in the method.
+            self._split_and_apply_routing()
+        return
 
     def _split_and_apply_routing(self):
         """Apply routing rules
@@ -75,10 +77,6 @@ class StockMove(models.Model):
         * split the moves if their move lines have different source or
           destination locations and need routing
         * apply the routing rules (pull and push)
-
-        Important: if you inherit this method to skip the routing for some
-        moves, the method has to return the moves in ``self`` so they are
-        assigned.
         """
         moves_routing = self._prepare_routing_pull()
         if not moves_routing:
@@ -86,13 +84,11 @@ class StockMove(models.Model):
             # called _action_assign(), returning an empty recordset will
             # prevent the caller of the method to call _action_assign() again
             # on the same moves
-            return self.browse()
+            return
         # apply the routing
         moves_with_routing_details = self._routing_splits(moves_routing)
         moves = self.browse(move.id for move in moves_with_routing_details)
-        moves._apply_routing_rule_pull(moves_with_routing_details)
-        moves._apply_routing_rule_push(moves_with_routing_details)
-        return moves
+        moves._apply_routing_rule(moves_with_routing_details, assign=True)
 
     def _prepare_routing_pull(self):
         """Prepare pull routing rules for moves
@@ -118,7 +114,11 @@ class StockMove(models.Model):
         self.env.cr.execute(
             sql.SQL("SAVEPOINT {}").format(sql.Identifier(savepoint_name))
         )
-        super()._action_assign()
+        _logger.debug("Prepare pull re-routing")
+        super(
+            StockMove,
+            self.with_context(bypass_entire_pack=True, avoid_putaway_rules=True),
+        )._action_assign()
 
         moves_routing = self._routing_compute_rules()
         if not any(
@@ -131,8 +131,13 @@ class StockMove(models.Model):
             self.env.cr.execute(
                 sql.SQL("RELEASE SAVEPOINT {}").format(sql.Identifier(savepoint_name))
             )
+            self.mapped("picking_id")._check_entire_pack()
+            self.filtered(
+                lambda move: move.state in ("assigned", "partially_available")
+            ).move_line_ids._apply_putaway_strategy()
             return {}
 
+        _logger.debug("Rollback computation for applying pull re-routing")
         # rollback _action_assign, it'll be called again after the routing
         self.env.clear()
         # pylint: disable=sql-injection
@@ -216,10 +221,30 @@ class StockMove(models.Model):
                 # lines with different routing (or lines with a dynamic
                 # routing, lines without). We split the lines according to
                 # these.
-                new_move_vals = move._split(qty)
-                if new_move_vals:
-                    new_move = self.env["stock.move"].create(new_move_vals)
-                    new_move._action_confirm(merge=False)
+                # NOTE: starting from Odoo 18.0, '_split' method doesn't check
+                # anymore the move quantity against the qty to split, and performs
+                # a split in all cases, letting an empty move behind. Avoid this.
+                new_move_vals_list = []
+                if (
+                    float_compare(
+                        move.product_qty,
+                        qty,
+                        precision_rounding=move.product_id.uom_id.rounding,
+                    )
+                    == 1
+                ):
+                    new_move_vals_list = move.with_context(
+                        bypass_log_message=True
+                    )._split(qty)
+                if new_move_vals_list:
+                    confirm_dict = dict(
+                        state=move.state, reservation_date=move.reservation_date
+                    )
+                    [d.update(confirm_dict) for d in new_move_vals_list]
+                    # Only create the move, do not call _action_confirm as
+                    # since Odoo 15.0, it calls _action_assign() or we only
+                    # want to split
+                    new_move = self.env["stock.move"].create(new_move_vals_list)
                 else:
                     # If no split occurred keep the current move
                     new_move = move
@@ -227,7 +252,47 @@ class StockMove(models.Model):
 
         return moves_with_routing_details
 
-    def _apply_routing_rule_pull(self, routing_details):
+    def _after_apply_dynamic_routing_rule(self):
+        # Hook used by stock_move_source_relocate to also relocate confirmed
+        # moves causing them to get merged back with relocated available moves.
+        # That will prevent next moves to be split.
+        return self
+
+    def _apply_routing_rule(self, routing_details, assign=False):
+        non_relocated_moves = self.browse()
+        pull_routing_details = {}
+        push_routing_details = {}
+        for move in self:
+            move_routing_details = routing_details[move]
+            routing_rule = move_routing_details.rule
+            if not routing_rule:
+                non_relocated_moves |= move
+                continue
+            if move.picking_type_id == routing_rule.picking_type_id:
+                # no routing to apply
+                non_relocated_moves |= move
+                continue
+            if routing_rule.method == "pull":
+                pull_routing_details[move] = move_routing_details
+            if routing_rule.method == "push":
+                push_routing_details[move] = move_routing_details
+        push_moves = self._apply_routing_rule_push(push_routing_details)
+        next_moves_to_update = self._apply_routing_rule_pull(
+            pull_routing_details, assign=assign
+        )
+        moves = non_relocated_moves | push_moves
+        moves = moves._after_apply_dynamic_routing_rule()
+        if assign:
+            # assign the moves that have not been relocated.
+            # Do this before updating next moves.
+            super(StockMove, moves)._action_assign()
+        # Update the destination moves. This might trigger a new routing on the
+        # destination move.
+        next_moves_to_update._routing_pull_switch_source()
+        return
+
+    @api.model
+    def _apply_routing_rule_pull(self, routing_details, assign=False):
         """Apply pull dynamic routing
 
         When a move has a dynamic routing configured on its location and the
@@ -237,40 +302,49 @@ class StockMove(models.Model):
         """
         pickings_to_check_for_emptiness = self.env["stock.picking"]
         move_ids_to_assign_per_location = defaultdict(list)
-        move_ids_to_assign_nonrelocated = []
         next_moves_to_update = self.browse()
         routing_to_apply = [
             (move, detail.rule) for move, detail in routing_details.items()
         ]
         for move, routing_rule in routing_to_apply:
-            if not routing_rule:
-                move_ids_to_assign_nonrelocated.append(move.id)
-                continue
-
-            if routing_rule.method == "push":
-                # In this case, we should not assign the move inside the
-                # pull dynamic routing. The push move must first be added before the
-                # initial move is assigned. Otherwise, when the destination
-                # location of the initial move is changed by the push rule, the
-                # putaway won't be recomputed as it is already assigned.
-                continue
-
-            if move.picking_id.picking_type_id == routing_rule.picking_type_id:
-                # already correct
-                move_ids_to_assign_nonrelocated.append(move.id)
-                continue
+            # Add the routing rule to the context for stock_dynamic_routing_delivery
+            move = move.with_context(__routing_rule=routing_rule)
 
             # we expect all the lines to go to the same destination for
             # pull routing rules
             original_destination = move.location_dest_id
             current_picking_type = move.picking_id.picking_type_id
-            move.with_context(
-                __applying_routing_rule=True
-            ).location_id = routing_rule.location_src_id
-            move.picking_type_id = routing_rule.picking_type_id
-            dest_location = move.location_dest_id
-            rule_location = routing_rule.location_dest_id
-            if rule_location.is_sublocation_of(dest_location):
+            _logger.debug(
+                f"Rerouting {move} with pull rule of transfer {move.picking_id.name}"
+            )
+
+            # Use the source location of the routing rule, if not already done
+            # If a sublocation is used, it's respected.
+            if not move.location_id._child_of(routing_rule.location_src_id):
+                _logger.debug(
+                    "- changed source location: "
+                    f"{routing_rule.location_src_id.display_name}"
+                )
+                move.with_context(
+                    __applying_routing_rule=True
+                ).location_id = routing_rule.location_src_id
+
+            # Use the picking type of the routing rule, if not already done
+            if move.picking_type_id != routing_rule.picking_type_id:
+                _logger.debug(
+                    f"- changed picking type: {routing_rule.picking_type_id.name}"
+                )
+                move.picking_type_id = routing_rule.picking_type_id
+
+            if move.location_dest_id == routing_rule.location_dest_id:
+                next_moves_to_update |= move.move_dest_ids.filtered(
+                    lambda r: r.state == "waiting"
+                )
+            elif routing_rule.location_dest_id._child_of(move.location_dest_id):
+                _logger.debug(
+                    "- changed destination location: "
+                    f"{routing_rule.location_dest_id.display_name}"
+                )
                 # The destination of the move, is a parent of the destination
                 # of the routing, goes to the correct place, but is not precise
                 # enough: set the new destination to match the rule's one.
@@ -281,8 +355,11 @@ class StockMove(models.Model):
                 next_moves_to_update |= move.move_dest_ids.filtered(
                     lambda r: r.state == "waiting"
                 )
-
-            elif not dest_location.is_sublocation_of(rule_location):
+            elif not move.location_dest_id._child_of(routing_rule.location_dest_id):
+                _logger.debug(
+                    "- changed destination location: "
+                    f"{routing_rule.location_dest_id.display_name}"
+                )
                 # The destination of the move is unrelated (nor identical, nor
                 # a parent or a child) to the routing destination: in this case
                 # we have to add a routing move after to reach the original destination
@@ -349,27 +426,27 @@ class StockMove(models.Model):
         # by another move, sort the moves by their source location, from the
         # most precise to the least precise. The order of the move ids within
         # one location is preserved.
-        #
-        # The non routed moves are assigned at last. This allows compatibility
-        # with the module stock_move_source_relocate and ensures we call
-        # _action_assign on the complete set of moves
-        sorted_locations = sorted(
-            move_ids_to_assign_per_location, key=lambda l: l.parent_path, reverse=True
-        )
-        to_assign_ids = []
-        for location in sorted_locations:
-            to_assign_ids += move_ids_to_assign_per_location[location]
-        to_assign_ids += move_ids_to_assign_nonrelocated
 
-        self.browse(to_assign_ids).with_context(
-            exclude_apply_dynamic_routing=True
-        )._action_assign()
+        if assign:
+            sorted_locations = sorted(
+                move_ids_to_assign_per_location,
+                key=lambda loc: loc.parent_path,
+                reverse=True,
+            )
+            to_assign_ids = []
+            for location in sorted_locations:
+                to_assign_ids += move_ids_to_assign_per_location[location]
 
-        # Update the destination moves. This might trigger a new routing on the
-        # destination move.
-        next_moves_to_update._routing_pull_switch_source()
+            super(
+                StockMove,
+                self.browse(to_assign_ids).with_context(
+                    exclude_apply_dynamic_routing=True
+                ),
+            )._action_assign()
 
         pickings_to_check_for_emptiness._dynamic_routing_handle_empty()
+
+        return next_moves_to_update
 
     def _routing_pull_switch_source(self):
         """Switch the source location of the move in place.
@@ -378,6 +455,7 @@ class StockMove(models.Model):
         new move but switch the source location of the current move.  This
         might trigger a new routing on the destination move.
         """
+        next_move_in_chain_ids = []
         for move in self:
             origmoves_by_location = OrderedDict()
             for orig_move in move.move_orig_ids:
@@ -398,8 +476,17 @@ class StockMove(models.Model):
                     # we have a different routing
                     move.move_orig_ids -= orig_moves
                     split_move.move_orig_ids = orig_moves
-                split_move.location_id = location_id
+                if split_move.location_id != location_id:
+                    split_move.with_context(
+                        __applying_routing_rule=True
+                    ).location_id = location_id
+                next_move_in_chain_ids.append(split_move.id)
+        # Apply dynamic routing on next waiting moves in the chain
+        self.browse(next_move_in_chain_ids).filtered(
+            lambda r: r.state == "waiting"
+        )._chain_apply_routing()
 
+    @api.model
     def _apply_routing_rule_push(self, routing_details):
         """Apply push dynamic routing
 
@@ -409,25 +496,19 @@ class StockMove(models.Model):
         the routing ones and creates a new chained move after it.
         """
         pickings_to_check_for_emptiness = self.env["stock.picking"]
-        for move in self:
-            move_routing_details = routing_details[move]
-            # At this point, we should not have lines with different source
-            # locations, they have been split by _routing_splits()
+        push_moves = self.browse()
+        for move, move_routing_details in routing_details.items():
             routing_rule = move_routing_details.rule
-            if not routing_rule.method == "push":
-                continue
-            if move.picking_id.picking_type_id == routing_rule.picking_type_id:
-                # the routing rule has already been applied and re-classified
-                # the move in the picking type
-                continue
+            push_moves |= move
+            # Add the routing rule to the context for stock_dynamic_routing_delivery
+            move = move.with_context(__routing_rule=routing_rule)
+
             if move.location_dest_id == routing_rule.location_src_id:
                 # the routing rule has already been applied and added a new
                 # routing move after this one
                 continue
 
-            rule_location = routing_rule.location_src_id
-            location = move.location_id
-            if location.is_sublocation_of(rule_location):
+            if move.location_id._child_of(routing_rule.location_src_id):
                 # The source is already correct (or more precise than the routing),
                 # but we still want to classify the move in the routing's picking
                 # type.
@@ -446,6 +527,7 @@ class StockMove(models.Model):
                 )
 
         pickings_to_check_for_emptiness._dynamic_routing_handle_empty()
+        return push_moves
 
     def _routing_push_switch_picking_type(self, routing_rule):
         """Switch the picking type of the move in place
@@ -470,8 +552,13 @@ class StockMove(models.Model):
         goes to the correct place. For all other moves, the destination is the
         one of the picking type to respect the locations chain.
         """
-        self.location_dest_id = routing_rule.location_src_id
+        # Do not compute putaway for the new move location dest by first
+        # setting the new location on the move line because the putaway will
+        # not consider the package
         self.move_line_ids.location_dest_id = routing_rule.location_src_id
+        self.location_dest_id = routing_rule.location_src_id
+        # Recompute putaway considering the package if any
+        self.move_line_ids._apply_putaway_strategy()
         routing_move = self._insert_routing_moves(
             routing_rule.picking_type_id,
             routing_rule.location_src_id,
@@ -488,6 +575,10 @@ class StockMove(models.Model):
     def _insert_routing_moves(self, picking_type, location, destination):
         """Create a chained move for a routing rule"""
         self.ensure_one()
+        _logger.debug(
+            f"- changed with inserted move from {location.display_name} to "
+            f"{destination.display_name}"
+        )
         dest_moves = self.move_dest_ids
         # Insert move between the source and destination for the new
         # operation
