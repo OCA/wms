@@ -39,10 +39,7 @@ class TestSelectDestPackage(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "new_package_name": "FooBar",
             },
-            message={
-                "message_type": "warning",
-                "body": ("Create new PACK FooBar? " "Scan it again to confirm."),
-            },
+            message=self.msg_store.create_new_pack_ask_confirmation("FooBar"),
         )
         # Try again with confirmation = True
         response = self.service.dispatch(
@@ -98,10 +95,7 @@ class TestSelectDestPackage(CommonCase):
                 "packages": package_data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
             },
-            message={
-                "message_type": "warning",
-                "body": "Package FOO is not empty.",
-            },
+            message=self.msg_store.package_not_empty(self.package),
         )
 
     def test_scan_existing_package(self):

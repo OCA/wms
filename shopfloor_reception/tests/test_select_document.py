@@ -26,7 +26,7 @@ class TestSelectDocument(CommonCase):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_scan_picking_name(self):
@@ -51,17 +51,11 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": "Somewhere together"}
         )
-        message = (
-            "This source document is part of multiple transfers, please scan a package."
-        )
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(pickings)},
-            message={
-                "message_type": "warning",
-                "body": message,
-            },
+            message=self.msg_store.source_document_multiple_pickings_scan_package(),
         )
 
     @freeze_time(_TODAY)
@@ -133,12 +127,11 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_a_packaging.barcode}
         )
-        body = "Several transfers found, please select a transfer manually."
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(p1 | p2)},
-            message={"message_type": "error", "body": body},
+            message=self.msg_store.multiple_picks_found_select_manually(),
         )
 
     def test_scan_product_multiple_pickings(self):
@@ -148,12 +141,11 @@ class TestSelectDocument(CommonCase):
         response = self.service.dispatch(
             "scan_document", params={"barcode": self.product_a.barcode}
         )
-        body = "Several transfers found, please select a transfer manually."
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(p1 | p2)},
-            message={"message_type": "error", "body": body},
+            message=self.msg_store.multiple_picks_found_select_manually(),
         )
 
     def test_scan_product_one_picking(self):

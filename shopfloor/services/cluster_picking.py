@@ -209,10 +209,7 @@ class ClusterPicking(Component):
             return self._response_for_confirm_start(selected)
         else:
             return self._response_for_start(
-                message={
-                    "message_type": "info",
-                    "body": _("No more work to do, please create a new batch transfer"),
-                },
+                message=self.msg_store.no_more_batch_todo(),
             )
 
     def list_batch(self):
@@ -316,10 +313,7 @@ class ClusterPicking(Component):
         else:
             return self._response(
                 base_response=self.list_batch(),
-                message={
-                    "message_type": "warning",
-                    "body": _("This batch cannot be selected."),
-                },
+                message=self.msg_store.batch_cannot_be_selected(),
             )
 
     def confirm_start(self, picking_batch_id):
@@ -796,12 +790,7 @@ class ClusterPicking(Component):
         if not multi_pick_allowed and (bin_package.quant_ids or different_picking):
             return self._response_for_scan_destination(
                 move_line,
-                message={
-                    "message_type": "error",
-                    "body": _(
-                        "The destination bin {} is not empty, please take another."
-                    ).format(bin_package.name),
-                },
+                message=self.msg_store.destination_bin_not_empty(bin_package),
                 qty_done=quantity,
             )
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
@@ -1274,7 +1263,7 @@ class ClusterPicking(Component):
             return self._response_for_unload_single(
                 batch,
                 package,
-                message={"message_type": "error", "body": _("Wrong bin")},
+                message=self.msg_store.wrong_bin(),
             )
         return self._response_for_unload_set_destination(batch, package)
 

@@ -104,10 +104,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             line.product_id.barcode,
-            {
-                "message_type": "warning",
-                "body": "Product tracked by lot, please scan one.",
-            },
+            self.msg_store.scan_lot_on_product_tracked_by_lot(),
         )
 
     def test_scan_line_lot_ok_only_one_in_location(self):
@@ -135,11 +132,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             move.product_id.barcode,
-            {
-                "message_type": "warning",
-                "body": "This product is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.product_multiple_packages_scan_package(),
         )
 
     def test_scan_line_product_error_in_one_package_and_raw_same_location(self):
@@ -157,11 +150,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             move.product_id.barcode,
-            {
-                "message_type": "warning",
-                "body": "This product is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.product_multiple_packages_scan_package(),
         )
 
     def test_scan_line_product_error_in_one_package_and_raw_different_location(self):
@@ -193,11 +182,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             line.lot_id.name,
-            {
-                "message_type": "warning",
-                "body": "This lot is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.lot_multiple_packages_scan_package(),
         )
 
     def test_scan_line_lot_error_in_one_package_and_unit(self):
@@ -213,11 +198,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             line.lot_id.name,
-            {
-                "message_type": "warning",
-                "body": "This lot is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.lot_multiple_packages_scan_package(),
         )
 
     def test_scan_line_location_ok_single_package(self):
@@ -267,10 +248,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             location.barcode,
-            {
-                "message_type": "warning",
-                "body": "Several packages found in Stock, please scan a package.",
-            },
+            self.msg_store.several_packs_in_location(location),
             sublocation=location,
         )
         # scanning the package works
@@ -289,10 +267,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             location.barcode,
-            {
-                "message_type": "warning",
-                "body": "Several products found in Stock, please scan a product.",
-            },
+            self.msg_store.several_products_in_location(location),
             sublocation=location,
         )
         self._scan_line_ok(line, self.product_a.barcode)
@@ -322,10 +297,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             line,
             location.barcode,
-            {
-                "message_type": "warning",
-                "body": "Several lots found in Stock, please scan a lot.",
-            },
+            self.msg_store.several_lots_in_location(location),
             sublocation=location,
         )
         self._scan_line_ok(line, line.lot_id.name)
@@ -337,7 +309,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             pack.name,
-            {"message_type": "error", "body": "Wrong pack."},
+            self.msg_store.wrong_record(pack),
         )
 
     def test_scan_line_error_wrong_product(self):
@@ -356,7 +328,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             product.barcode,
-            {"message_type": "error", "body": "Wrong product."},
+            self.msg_store.wrong_record(product),
         )
 
     def test_scan_line_error_wrong_lot(self):
@@ -376,7 +348,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             lot.name,
-            {"message_type": "error", "body": "Wrong lot."},
+            self.msg_store.wrong_record(lot),
         )
 
     def test_scan_line_error_wrong_location(self):
@@ -395,7 +367,7 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             location.barcode,
-            {"message_type": "error", "body": "Wrong location."},
+            self.msg_store.wrong_record(location),
         )
 
     def test_scan_line_error_not_found(self):
@@ -404,5 +376,5 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
         self._scan_line_error(
             self.batch.picking_ids.move_line_ids,
             "NO_EXISTING_BARCODE",
-            {"message_type": "error", "body": "Barcode not found"},
+            self.msg_store.barcode_not_found(),
         )

@@ -72,10 +72,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
 
@@ -120,10 +117,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
 
@@ -170,10 +164,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
     def test_set_custom_qty_above(self):
@@ -195,11 +186,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line1: line1.reserved_uom_qty + 1, line2: line2.reserved_uom_qty},
-            message={
-                "body": "Please note that the scanned quantity "
-                "is higher than the maximum allowed.",
-                "message_type": "warning",
-            },
+            message=self.msg_store.line_scanned_qty_done_higher_than_allowed(),
         )
 
     def test_set_custom_qty_negative(self):
@@ -219,10 +206,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line1: line1.reserved_uom_qty, line2: line2.reserved_uom_qty},
-            message={
-                "body": "Negative quantity not allowed.",
-                "message_type": "error",
-            },
+            message=self.msg_store.negative_quantity_not_allowed(),
         )
 
     def test_set_custom_qty_partial(self):
