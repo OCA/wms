@@ -162,8 +162,9 @@ class StockMove(models.Model):
             # a new transfer to validate. All remaining moves stay in the
             # current transfer.
             else:
-                new_picking = moves_todo._extract_in_split_order()
-                assert new_picking.state == "assigned"
+                new_picking = moves_todo._extract_in_split_order(
+                    default={"printed": True}
+                )
             new_picking._action_done()
             new_backorders |= new_picking.backorder_ids - existing_backorders
         return new_backorders
