@@ -29,9 +29,9 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
         )
         cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
-            picking1.move_lines, in_package=True, location=cls.content_loc
+            picking1.move_ids, in_package=True, location=cls.content_loc
         )
-        cls._fill_stock_for_moves(picking2.move_lines, location=cls.content_loc)
+        cls._fill_stock_for_moves(picking2.move_ids, location=cls.content_loc)
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
         cls.sub_shelf1 = (
@@ -101,7 +101,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.location_package.name,
             },
         )
@@ -119,7 +119,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.sub_shelf1
+                self.content_loc, self.sub_shelf1
             ),
         )
         self.assertRecordValues(
@@ -154,7 +154,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.sub_shelf1
+                self.content_loc, self.sub_shelf1
             ),
         )
         for move in package_level.move_line_ids.mapped("move_id"):
@@ -205,7 +205,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.empty_package.name,
             },
         )
@@ -223,7 +223,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             params={
                 "location_id": self.content_loc.id,
                 "move_line_id": move_line.id,
-                "quantity": move_line.product_uom_qty,
+                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.sub_shelf1.barcode,
                 "package_id": self.empty_package.id,
             },
@@ -242,7 +242,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.sub_shelf1
+                self.content_loc, self.sub_shelf1
             ),
         )
         # Check the correct package has been assigned
@@ -291,7 +291,7 @@ class LocationContentTransferSetDestinationAsPackage(LocationContentTransferComm
             response,
             move_lines.mapped("picking_id"),
             message=self.service.msg_store.location_content_transfer_item_complete(
-                self.sub_shelf1
+                self.content_loc, self.sub_shelf1
             ),
         )
         for move in package_level.move_line_ids.mapped("move_id"):

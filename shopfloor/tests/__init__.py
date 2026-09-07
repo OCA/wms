@@ -59,6 +59,7 @@ from . import test_location_content_transfer_get_work
 from . import test_location_content_transfer_set_destination_all
 from . import test_location_content_transfer_scan_location
 from . import test_location_content_transfer_single
+from . import test_location_content_transfer_set_destination_as_package
 from . import test_location_content_transfer_set_destination_package_or_line
 from . import test_location_content_transfer_putaway
 from . import test_location_content_transfer_mix
