@@ -122,6 +122,8 @@ class TestLocationContentTransferPutaway(LocationContentTransferCommonCase):
                 "location_out_id": self.env.ref("stock.location_refrigerator_small").id,
             }
         )
+        # Prevent put-away computation based on package type
+        self.test_loc.quant_ids.package_id.write({"package_type_id": False})
         # Check the result
         existing_moves = self.env["stock.move"].search(
             [("location_id", "=", self.test_loc.id), ("state", "=", "assigned")]
