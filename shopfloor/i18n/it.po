@@ -636,13 +636,6 @@ msgid "Internal Error: Batch not properly done."
 msgstr "Errore interno: lotto non completato correttamente."
 
 #. module: shopfloor
-#. odoo-python
-#: code:addons/shopfloor/services/cluster_picking.py:0
-#, python-format
-msgid "Internal Error: The move line %s is not fully picked"
-msgstr "Errore interno: la riga di movimento %s non è completamente prelevata"
-
-#. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_location
 msgid "Inventory Locations"
 msgstr "Ubicazioni di inventario"
@@ -2412,6 +2405,11 @@ msgstr "Prelievo per area"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid "Internal Error: The move line %s is not fully picked"
+#~ msgstr ""
+#~ "Errore interno: la riga di movimento %s non è completamente prelevata"
 
 #, python-format
 #~ msgid "Packaging {} dimension updated."
