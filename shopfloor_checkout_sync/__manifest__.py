@@ -7,7 +7,7 @@
     "category": "Warehouse Management",
     "version": "14.0.1.3.0",
     "license": "AGPL-3",
-    "maintainers": ["guewen"],
+    "maintainers": ["jbaudoux", "mmequignon", "TDu"],
     "depends": [
         "shopfloor",
         # OCA/stock-logistics-warehouse
