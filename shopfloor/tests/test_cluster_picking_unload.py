@@ -320,6 +320,91 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
             message=self.service.msg_store.batch_transfer_complete(),
         )
 
+    def test_set_destination_all_picking_partial(self):
+        """Set destination on lines partially processed for one transfer.
+
+        Process a partially available move line.
+        Increase the stock after picking causing a line partially processed.
+        Check a backorder is created.
+        """
+        self.one_line_picking.do_unreserve()
+        location = self.one_line_picking.location_id
+        move = self.one_line_picking.move_ids
+        product = move.product_id
+        qty = move.product_uom_qty
+        # note: there are 2 move lines => qty * 2
+        self._update_qty_in_location(location, product, qty * 2 - 2)
+        self.one_line_picking.action_assign()
+        self.assertEqual(move.state, "partially_available")
+        # Process all lines
+        move_lines = self.batch.picking_ids.move_line_ids
+        self._set_dest_package_and_done(move_lines, self.bin1)
+        # Increase quantity available
+        self._update_qty_in_location(location, product, qty * 2)
+        self.one_line_picking.action_assign()
+        self.assertEqual(move.state, "assigned")
+        # Finalize
+        move_lines.write({"location_dest_id": self.packing_location.id})
+
+        response = self.service.dispatch(
+            "set_destination_all",
+            params={
+                "picking_batch_id": self.batch.id,
+                "barcode": self.packing_location.barcode,
+            },
+        )
+        self.assert_response(
+            response,
+            next_state="start",
+            message=self.service.msg_store.batch_transfer_complete(),
+        )
+        # since the whole batch is complete, we expect the batch and all
+        # pickings to be 'done'
+        self.assertRecordValues(
+            move_lines.mapped("picking_id"), [{"state": "done"}, {"state": "done"}]
+        )
+        self.assertRecordValues(
+            move_lines.sorted("qty_done"),
+            [
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 8,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+                {
+                    "shopfloor_unloaded": True,
+                    "qty_done": 10,
+                    "state": "done",
+                    "location_dest_id": self.packing_location.id,
+                },
+            ],
+        )
+        # There was a split order, the initial one line picking contains what
+        # still remains to do
+        self.assertRecordValues(
+            self.one_line_picking, [{"state": "assigned", "batch_id": False}]
+        )
+        self.assertRecordValues(
+            self.one_line_picking.move_line_ids,
+            [
+                {
+                    "shopfloor_unloaded": False,
+                    "shopfloor_user_id": False,
+                    "reserved_uom_qty": 2,
+                    "qty_done": 0,
+                    "state": "assigned",
+                    "location_dest_id": self.packing_location.id,
+                },
+            ],
+        )
+
     def test_set_destination_all_but_different_dest(self):
         """Endpoint was called but destinations are different"""
         move_lines = self.move_lines

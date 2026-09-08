@@ -1172,21 +1172,16 @@ class ClusterPicking(Component):
         if picking.state == "done":
             return
         for ml in picking.move_line_ids:
+            if ml.picked and not ml.shopfloor_unloaded:
+                # A picked move line is not unloaded, exit
+                return
+        for ml in picking.move_line_ids:
             if not ml.picked or not ml.has_quantity_reserved:
                 continue
-            # Ensure the quantity picked >= quantity reserved.
-            # At this stage, the move line should have already been split
-            # when setting the destination package.
-            if not ml.is_fully_picked:
-                raise UserError(
-                    _(
-                        "Internal Error: The move line %s is not fully picked",
-                        ml.display_name,
-                    )
-                )
-            if not ml.shopfloor_unloaded:
-                # A move line is not unloaded, exit
-                return
+            # Normally at this stage everything should have been fully picked
+            # but it can happen the reservation of a partially available move
+            # increases. In this case, we split the partially picked move line.
+            ml._split_partial_quantity_to_be_done(ml.qty_picked)
         stock = self._actions_for("stock")
         for move in picking.move_ids:
             move.split_other_move_lines(

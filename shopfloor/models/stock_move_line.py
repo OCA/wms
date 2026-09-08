@@ -17,9 +17,11 @@ class StockMoveLine(models.Model):
     _inherit = ["stock.move.line", "shopfloor.priority.postpone.mixin"]
 
     # TODO use a serialized field
-    shopfloor_unloaded = fields.Boolean(default=False)
-    shopfloor_checkout_done = fields.Boolean(default=False)
-    shopfloor_user_id = fields.Many2one(comodel_name="res.users", index=True)
+    shopfloor_unloaded = fields.Boolean(default=False, copy=False)
+    shopfloor_checkout_done = fields.Boolean(default=False, copy=False)
+    shopfloor_user_id = fields.Many2one(
+        comodel_name="res.users", index=True, copy=False
+    )
 
     date_planned = fields.Datetime(related="move_id.date", store=True, index=True)
 
@@ -32,6 +34,10 @@ class StockMoveLine(models.Model):
     picking_id = fields.Many2one(auto_join=True)
 
     @property
+    def qty_picked(self):
+        return self.qty_done
+
+    @property
     def picked(self):
         """:return: True if there is a quantity picked."""
         self.ensure_one()
@@ -42,19 +48,6 @@ class StockMoveLine(models.Model):
                 precision_rounding=self.product_uom_id.rounding,
             )
             > 0
-        )
-
-    @property
-    def is_fully_picked(self):
-        """:return: True if the quantity picked >= quantity reserved."""
-        self.ensure_one()
-        return (
-            float_compare(
-                self.qty_done,
-                self.reserved_uom_qty,
-                precision_rounding=self.product_uom_id.rounding,
-            )
-            >= 0
         )
 
     @property
@@ -213,14 +206,17 @@ class StockMoveLine(models.Model):
             return (new_line, "lesser")
         return (new_line, "full")
 
-    def _split_partial_quantity_to_be_done(self, quantity_done, split_default_vals):
+    def _split_partial_quantity_to_be_done(
+        self, quantity_done, split_default_vals=None
+    ):
         """Create a new move line with the remaining quantity to process."""
         # split the move line which will be processed later (maybe the user
         # has to pick some goods from another place because the location
         # contained less items than expected)
         remaining = self.reserved_uom_qty - quantity_done
         vals = {"reserved_uom_qty": remaining, "qty_done": 0}
-        vals.update(split_default_vals)
+        if split_default_vals:
+            vals.update(split_default_vals)
         new_line = self.copy(vals)
         # if we didn't bypass reservation update, the quant reservation
         # would be reduced as much as the deduced quantity, which is wrong
