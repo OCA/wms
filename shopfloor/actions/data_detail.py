@@ -1,6 +1,8 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+import hashlib
 from collections import defaultdict
+from datetime import datetime
 
 from odoo.tools.float_utils import float_round
 
@@ -212,7 +214,9 @@ class DataDetailAction(Component):
     def _product_image_url(self, record, field_name):
         if not record[field_name]:
             return None
-        return f"/web/image/product.product/{record.id}/{field_name}"
+        write_date = record.write_date or datetime.now()
+        sha = hashlib.sha512(str(write_date).encode("utf-8")).hexdigest()[:7]
+        return f"/web/image/product.product/{record.id}/{field_name}?unique={sha}"
 
     @property
     def _product_supplierinfo_parser(self):
