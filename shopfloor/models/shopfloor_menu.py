@@ -264,9 +264,17 @@ class ShopfloorMenu(models.Model):
         "and the destination location to process a line. "
         "The unload step will be skipped.",
     )
-
     require_destination_package_is_possible = fields.Boolean(
         compute="_compute_require_destination_package_is_possible"
+    )
+    stock_issue_strategy_is_possible = fields.Boolean(
+        compute="_compute_stock_issue_strategy_is_possible"
+    )
+    stock_issue_strategy = fields.Selection(
+        selection=[
+            ("inventory_correction", "Inventory Correction"),
+        ],
+        default="inventory_correction",
     )
 
     @api.onchange("unload_package_at_destination")
@@ -552,6 +560,49 @@ class ShopfloorMenu(models.Model):
             menu.allow_quantity_exceeding_demand_is_possible = (
                 menu.scenario_id.has_option("allow_quantity_exceeding_demand")
             )
+
+    @api.depends("scenario_id")
+    def _compute_stock_issue_strategy_is_possible(self):
+        for menu in self:
+            # we only consider it possible if the scenario has the option and there
+            # is more than one selection available (IOW if a new strategy is provided
+            # by a specialized addon)
+            menu.stock_issue_strategy_is_possible = (
+                menu.scenario_id.has_option("uses_stock_issue")
+                and len(self._fields["stock_issue_strategy"].selection) > 1
+            )
+
+    def _get_stock_issue_strategy_help_entries(self):
+        """Return a mapping of `stock_issue_strategy` value to a description
+        of what that strategy does.
+
+        An addon adding a new value to `stock_issue_strategy` (through
+        `selection_add`) must extend this method (calling `super()`) to
+        document it, so it shows up in the field's help text.
+        """
+        return {
+            "inventory_correction": _(
+                "Adjust the quant's on-hand quantity down to what is "
+                "actually available, so it can no longer be reserved by "
+                "other operations."
+            ),
+        }
+
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        res = super().fields_get(allfields=allfields, attributes=attributes)
+        if "stock_issue_strategy" in res:
+            selection = dict(self._fields["stock_issue_strategy"].selection)
+            entries = self._get_stock_issue_strategy_help_entries()
+            res["stock_issue_strategy"]["help"] = _(
+                "Strategy used when the operator reports a stock issue "
+                "(missing quantity) on a move line:\n"
+            ) + "\n".join(
+                f"- {selection[value]}: {text}"
+                for value, text in entries.items()
+                if value in selection
+            )
+        return res
 
     @api.constrains(
         "move_line_search_sort_order", "move_line_search_sort_order_custom_code"

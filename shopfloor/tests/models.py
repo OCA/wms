@@ -28,3 +28,13 @@ class StockPackageType(models.Model):
     package_carrier_type = fields.Selection(
         selection_add=[("test", "TEST")], ondelete={"test": "set default"}
     )
+
+
+class ShopfloorMenuFakeStockIssue(
+    models.Model
+):  # pylint: disable=consider-merging-classes-inherited
+    _inherit = "shopfloor.menu"
+
+    stock_issue_strategy = fields.Selection(
+        selection_add=[("test", "TEST")], ondelete={"test": "set default"}
+    )
