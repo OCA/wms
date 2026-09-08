@@ -17,9 +17,11 @@ class StockMoveLine(models.Model):
     _inherit = ["stock.move.line", "shopfloor.priority.postpone.mixin"]
 
     # TODO use a serialized field
-    shopfloor_unloaded = fields.Boolean(default=False)
-    shopfloor_checkout_done = fields.Boolean(default=False)
-    shopfloor_user_id = fields.Many2one(comodel_name="res.users", index=True)
+    shopfloor_unloaded = fields.Boolean(default=False, copy=False)
+    shopfloor_checkout_done = fields.Boolean(default=False, copy=False)
+    shopfloor_user_id = fields.Many2one(
+        comodel_name="res.users", index=True, copy=False
+    )
 
     date_planned = fields.Datetime(related="move_id.date", store=True, index=True)
 
