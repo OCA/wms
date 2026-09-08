@@ -24,7 +24,8 @@
     "allow_alternative_destination_package": true,
     "allow_move_line_search_sort_order": false,
     "allow_move_line_search_additional_domain": true,
-    "require_destination_package": true
+    "require_destination_package": true,
+    "uses_stock_issue": true
 }
         </field>
     </record>
@@ -36,7 +37,8 @@
     "unload_package_at_destination": true,
     "multiple_move_single_pack": true,
     "no_prefill_qty": true,
-    "scan_location_or_pack_first": true
+    "scan_location_or_pack_first": true,
+    "uses_stock_issue": true
 }
         </field>
     </record>
@@ -74,7 +76,8 @@
     "no_prefill_qty": true,
     "allow_move_line_search_sort_order": true,
     "allow_move_line_search_additional_domain": true,
-    "allow_quantity_exceeding_demand": true
+    "allow_quantity_exceeding_demand": true,
+    "uses_stock_issue": true
 
 }
         </field>

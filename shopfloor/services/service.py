@@ -88,6 +88,17 @@ class BaseShopfloorProcess(AbstractComponent):
             sort_order_custom_code=self.sort_order_custom_code,
         )
 
+    @property
+    def stock_issue_strategy(self):
+        return self.work.menu.stock_issue_strategy
+
+    @property
+    def inventory(self):
+        return self._actions_for(
+            "inventory",
+            stock_issue_strategy=self.stock_issue_strategy,
+        )
+
     def _check_picking_consistency(self, pickings):
         if not pickings.exists():
             return self.msg_store.stock_picking_not_found()

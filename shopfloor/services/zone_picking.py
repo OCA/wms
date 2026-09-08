@@ -1386,34 +1386,19 @@ class ZonePicking(Component):
         move_line = self.env["stock.move.line"].browse(move_line_id)
         if not move_line.exists():
             return self._response_for_start(message=self.msg_store.record_not_found())
-        inventory = self._actions_for("inventory")
-        # create a draft inventory for a user to check
-        inventory.create_control_stock(
-            move_line.location_id,
-            move_line.product_id,
-            move_line.package_id,
-            move_line.lot_id,
-        )
         move = move_line.move_id
         lot = move_line.lot_id
         package = move_line.package_id
         location = move_line.location_id
 
-        # unreserve every lines for the same product/lot in the same location and
+        # Get every lines for the same product/lot in the same batch and
         # not done yet, so the same user doesn't have to declare 2 times the
         # stock issue for the same thing!
         domain = self._domain_stock_issue_unlink_lines(move_line)
-        unreserve_move_lines = move_line | self.env["stock.move.line"].search(domain)
-        unreserve_moves = unreserve_move_lines.mapped("move_id").sorted()
-        unreserve_move_lines.unlink()
-
-        # Then, create an inventory with just enough qty so the other assigned
-        # move lines for the same product in other batches and the other move lines
-        # already picked stay assigned.
-        inventory.create_stock_issue(move, location, package, lot)
-
-        # try to reassign the moves in case we have stock in another location
-        unreserve_moves._action_assign()
+        move_lines_with_issue = move_line | self.env["stock.move.line"].search(domain)
+        self.inventory.handle_stock_issue(
+            move, location, package, lot, move_lines_with_issue
+        )
 
         if move.move_line_ids:
             return self._response_for_set_line_destination(move.move_line_ids[0])

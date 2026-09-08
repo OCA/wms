@@ -1006,7 +1006,6 @@ class LocationContentTransfer(Component):
         if not package_level.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        inventory = self._actions_for("inventory")
         package_move_lines = package_level.move_line_ids
         package_moves = package_move_lines.mapped("move_id")
         package = package_level.package_id
@@ -1020,21 +1019,18 @@ class LocationContentTransfer(Component):
             # the move_line will not be deleted
             package_move.move_line_ids.write({"qty_done": 0})
             package = package_level.package_id
+            lines = package_move.move_line_ids
             if (
                 self.is_allow_move_create()
                 and self.env.user == package_move.picking_id.create_uid
             ):
                 # Owned by the user deleting the move
                 package_move._action_cancel()
-            else:
-                # Not owned only unreserved
-                package_move._do_unreserve()
-                package_move._recompute_state()
-            # Create an inventory at 0 in the move's source location
-            inventory.create_stock_issue(package_move, location, package, lot)
-            # Create a draft inventory to control stock
-            inventory.create_control_stock(
-                location, package_move.product_id, package, lot
+                lines = self.env["stock.move.line"]
+            # Declare the stock issue for `lines` (still live records unless
+            # the move above was canceled)
+            self.inventory.handle_stock_issue(
+                package_move, location, package, lot, lines
             )
         # remove the package level (this is what does the `picking.do_unreserve()`
         # method, but here we want to unreserve+unlink this package alone)
@@ -1064,7 +1060,6 @@ class LocationContentTransfer(Component):
         if not move_line.exists():
             move_lines = self._find_transfer_move_lines(location)
             return self._response_for_start_single(move_lines.mapped("picking_id"))
-        inventory = self._actions_for("inventory")
         move_line.move_id.split_other_move_lines(move_line)
         move_line_src_location = move_line.location_id
         move = move_line.move_id
@@ -1073,18 +1068,15 @@ class LocationContentTransfer(Component):
         # We need to set qty_done at 0 because otherwise
         # the move_line will not be deleted
         move_line.qty_done = 0
+        lines = move.move_line_ids
         if self.is_allow_move_create() and self.env.user == move.picking_id.create_uid:
             # Owned by the user deleting the move
             move._action_cancel()
-        else:
-            # Not owned unreserve
-            move._do_unreserve()
-            move._recompute_state()
-        # Create an inventory at 0 in the move's source location
-        inventory.create_stock_issue(move, move_line_src_location, package, lot)
-        # Create a draft inventory to control stock
-        inventory.create_control_stock(
-            move_line_src_location, move.product_id, package, lot
+            lines = self.env["stock.move.line"]
+        # Declare the stock issue for `lines` (still live records unless the
+        # move above was canceled)
+        self.inventory.handle_stock_issue(
+            move, move_line_src_location, package, lot, lines
         )
         move_lines = self._find_transfer_move_lines(location)
         return self._response_for_start_single(move_lines.mapped("picking_id"))
