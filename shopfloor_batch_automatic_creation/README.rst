@@ -1,3 +1,7 @@
+.. image:: https://odoo-community.org/readme-banner-image
+   :target: https://odoo-community.org/get-involved?utm_source=readme
+   :alt: Odoo Community Association
+
 =============================================
 Shopfloor - Batch Transfer Automatic Creation
 =============================================
@@ -13,7 +17,7 @@ Shopfloor - Batch Transfer Automatic Creation
 .. |badge1| image:: https://img.shields.io/badge/maturity-Alpha-red.png
     :target: https://odoo-community.org/page/development-status
     :alt: Alpha
-.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fwms-lightgray.png?logo=github
@@ -103,14 +107,6 @@ This module is maintained by the OCA.
 OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
-
-.. |maintainer-guewen| image:: https://github.com/guewen.png?size=40px
-    :target: https://github.com/guewen
-    :alt: guewen
-
-Current `maintainer <https://odoo-community.org/page/maintainer-role>`__:
-
-|maintainer-guewen| 
 
 This module is part of the `OCA/wms <https://github.com/OCA/wms/tree/14.0/shopfloor_batch_automatic_creation>`_ project on GitHub.
 
