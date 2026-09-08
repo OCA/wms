@@ -11,7 +11,7 @@
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, BCIM, Akretion, Odoo Community Association (OCA)",
-    "maintainers": ["guewen", "simahawk", "sebalix"],
+    "maintainers": ["simahawk", "sebalix"],
     "license": "AGPL-3",
     "application": True,
     "depends": [
