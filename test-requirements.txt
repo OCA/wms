@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+odoo-addon-stock-quant-lock @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/2449/head#subdirectory=setup/stock_quant_lock
+odoo-addon-stock-picking-operation-loss-quantity @ git+https://github.com/OCA/stock-logistics-workflow.git@refs/pull/1394/head#subdirectory=setup/stock_picking_operation_loss_quantity
