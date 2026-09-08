@@ -12,6 +12,7 @@ from odoo.tools import DotDict
 from odoo.addons.component.core import AbstractComponent
 
 from ..actions.base_action import get_actions_for
+from ..actions.message import MESSAGE_TYPES
 from ..apispec.service_apispec import ShopfloorRestServiceAPISpec
 
 
@@ -32,6 +33,10 @@ class BaseShopfloorService(AbstractComponent):
     def _profile(self):
         # User private attributes to not mess up w/ public endpoints
         return getattr(self.work, "profile", self.env["shopfloor.profile"])
+
+    def __init__(self, work_context):
+        super().__init__(work_context=work_context)
+        self._msg_store = False
 
     def _get_api_spec(self, **params):
         return ShopfloorRestServiceAPISpec(self, **params)
@@ -75,6 +80,45 @@ class BaseShopfloorService(AbstractComponent):
             res.append(self._convert_one_record(record))
         return res
 
+    def _get_message_type(self, message):
+        """
+        TODO: To be removed if we change the API to support multiple messages
+              (and types) per result.
+        """
+        message_type = "info"
+        if message and "message_type" in message:
+            message_type = message["message_type"]
+        for message_element in self.msg_store.message_queue:
+            message_type = (
+                message_element.message_type
+                if MESSAGE_TYPES[message_element.message_type]
+                > MESSAGE_TYPES[message_type]
+                else message_type
+            )
+        return message_type
+
+    def _get_message_body(self, message) -> str:
+        body = ""
+        if "body" in message:
+            body = message["body"]
+        if self.msg_store and self.msg_store.message_queue:
+            body += "\n".join(element.body for element in self.msg_store.message_queue)
+        return body
+
+    def _get_message(self, message=None) -> dict:
+        """
+        This will combine the message contained in response and the
+        messages contained in the message queue
+        """
+        if message is None:
+            message = {}
+        message_type = self._get_message_type(message)
+        body = self._get_message_body(message)
+        if message_type and body:
+            message["message_type"] = message_type
+            message["body"] = body
+        return message
+
     def _response(
         self, base_response=None, data=None, next_state=None, message=None, popup=None
     ):
@@ -117,8 +161,9 @@ class BaseShopfloorService(AbstractComponent):
         elif data:
             response["data"] = data
 
-        if message:
+        if message := self._get_message(message):
             response["message"] = message
+        self.msg_store.clear_queue()
 
         if popup:
             response["popup"] = popup
@@ -201,7 +246,14 @@ class BaseShopfloorService(AbstractComponent):
 
     @property
     def msg_store(self):
-        return self._actions_for("message")
+        if self._msg_store:
+            return self._msg_store
+        self._msg_store = self._actions_for("message")
+        return self._msg_store
+
+    @msg_store.setter
+    def _set_msg_store(self, store):
+        self._msg_store = store
 
     # TODO: maybe to be proposed to base_rest
     # TODO: add tests
