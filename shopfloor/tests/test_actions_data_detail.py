@@ -349,3 +349,37 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         self.assert_schema(self.schema_detail.product_detail(), data)
         expected = self._expected_product_detail(product, full=True)
         self.assertDictEqual(data, expected)
+
+    def test_product_template(self):
+        # Check product supplierinfo on template level
+        move_line = self.move_b.move_line_ids
+        product = move_line.product_id.with_context(location=move_line.location_id.id)
+        Partner = self.env["res.partner"].sudo()
+        manuf = Partner.create({"name": "Manuf 1"})
+        product.sudo().write(
+            {
+                "image_128": fake_colored_image(size=(128, 128)),
+                "manufacturer_id": manuf.id,
+            }
+        )
+        vendor_a = Partner.create({"name": "Supplier A"})
+        vendor_b = Partner.create({"name": "Supplier B"})
+        SupplierInfo = self.env["product.supplierinfo"].sudo()
+        SupplierInfo.create(
+            {
+                "partner_id": vendor_a.id,
+                "product_tmpl_id": product.product_tmpl_id.id,
+                "product_code": "SUPP1",
+            }
+        )
+        SupplierInfo.create(
+            {
+                "partner_id": vendor_b.id,
+                "product_tmpl_id": product.product_tmpl_id.id,
+                "product_code": "SUPP2",
+            }
+        )
+        data = self.data_detail.product_detail(product)
+        self.assert_schema(self.schema_detail.product_detail(), data)
+        expected = self._expected_product_detail(product, full=True)
+        self.assertDictEqual(data, expected)
