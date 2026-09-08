@@ -152,10 +152,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": f"No pending operation for package {self.pack_a.name}.",
-            },
+            message=self.msg_store.no_pending_operation_for_pack(self.pack_a),
         )
 
     def test_start_no_operation_create(self):
@@ -233,10 +230,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_pack_moved(),
         )
 
         self.assertRecordValues(
@@ -277,10 +271,9 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": "The package THIS_BARCODE_DOES_NOT_EXIST" " doesn't exist",
-            },
+            message=self.msg_store.package_not_found_for_barcode(
+                "THIS_BARCODE_DOES_NOT_EXIST"
+            ),
         )
 
     def test_start_pack_empty(self):
@@ -355,10 +348,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": f"Location {self.shelf2.name} doesn't contain any package.",
-            },
+            message=self.msg_store.no_pack_in_location(self.shelf2),
         )
 
     def test_start_pack_from_location_several_packs(self):
@@ -392,11 +382,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "warning",
-                "body": f"Several packages found in {self.shelf1.name}, "
-                "please scan a package.",
-            },
+            message=self.msg_store.several_packs_in_location(self.shelf1),
         )
 
     def test_start_pack_outside_of_location(self):
@@ -418,12 +404,9 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": f"You cannot work on a package ({self.pack_a.name}) "
-                "outside of locations: "
-                f"{self.picking_type.default_location_src_id.name}",
-            },
+            message=self.msg_store.package_not_allowed_in_src_location(
+                self.pack_a.name, self.picking_type
+            ),
         )
 
     def test_start_already_started(self):
@@ -458,11 +441,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "warning",
-                "body": "Operation's already running."
-                " Would you like to take it over?",
-            },
+            message=self.msg_store.already_running_ask_confirmation(),
             data=dict(
                 self._response_package_level_data(package_level),
                 confirmation_required=barcode,
@@ -496,12 +475,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
 
         self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            response, next_state="start", message=self.msg_store.confirm_pack_moved()
         )
 
         self.assertRecordValues(
@@ -578,10 +552,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_pack_moved(),
         )
         # process the second package
         package_level_b = self._simulate_started(self.pack_b)
@@ -604,10 +575,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
                 "body": f"Last operation of transfer {self.picking.name}. "
                 f"Next operation ({next_picking.name}) is ready to proceed."
             },
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_pack_moved(),
         )
 
     def test_validate_not_found(self):
@@ -623,12 +591,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         )
 
         self.assert_response(
-            response,
-            next_state="start",
-            message={
-                "message_type": "error",
-                "body": "This operation does not exist anymore.",
-            },
+            response, next_state="start", message=self.msg_store.operation_not_found()
         )
 
     def test_validate_location_not_found(self):
@@ -658,10 +621,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="scan_location",
             data=self.ANY,
-            message={
-                "message_type": "error",
-                "body": "No location found for this barcode.",
-            },
+            message=self.msg_store.no_location_found(),
         )
 
     def test_validate_location_forbidden(self):
@@ -696,7 +656,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             response,
             next_state="scan_location",
             data=self.ANY,
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_validate_location_move_not_child_of_picking_allowed(self):
@@ -732,10 +692,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_pack_moved(),
         )
 
     def test_validate_location_to_confirm(self):
@@ -842,10 +799,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "The pack has been moved, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_pack_moved(),
         )
 
         self.assertRecordValues(
@@ -892,10 +846,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "Canceled, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_canceled_scan_next_pack(),
         )
 
     def test_cancel_transfer_created_by_user(self):
@@ -933,10 +884,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "success",
-                "body": "Canceled, you can scan a new pack.",
-            },
+            message=self.msg_store.confirm_canceled_scan_next_pack(),
         )
 
     def test_cancel_already_canceled(self):
@@ -974,10 +922,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": "This operation does not exist anymore.",
-            },
+            message=self.msg_store.operation_not_found(),
         )
         package_level_b = self._simulate_started(self.pack_b)
         # keep references for later checks
@@ -1032,7 +977,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={"message_type": "info", "body": "Operation already processed."},
+            message=self.msg_store.already_done(),
         )
 
     def test_cancel_not_found(self):
@@ -1046,10 +991,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
         self.assert_response(
             response,
             next_state="start",
-            message={
-                "message_type": "error",
-                "body": "This operation does not exist anymore.",
-            },
+            message=self.msg_store.operation_not_found(),
         )
 
 

@@ -213,7 +213,7 @@ class MessageAction(Component):
         return {
             "message_type": "warning",
             "body": _(
-                "Confirm location change from %(location_from)s to " "%(location_to)s?"
+                "Confirm location change from %(location_from)s to %(location_to)s?"
             )
             % dict(location_from=from_location.name, location_to=to_location.name),
         }
@@ -289,6 +289,9 @@ class MessageAction(Component):
 
     def wrong_record(self, record):
         return {"message_type": "error", "body": self._wrong_record_msg(record._name)}
+
+    def wrong_bin(self):
+        return {"message_type": "error", "body": _("Wrong bin")}
 
     def no_lot_for_barcode(self, barcode):
         return {
@@ -548,6 +551,15 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("Several transfers found, please select a transfer manually."),
+        }
+
+    def multiple_picks_found_scan_pack_or_select_manually(self):
+        return {
+            "message_type": "error",
+            "body": _(
+                "Several transfers found, please scan a package"
+                " or select a transfer manually."
+            ),
         }
 
     def no_transfer_for_packaging(self):
@@ -1042,4 +1054,61 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": body,
+        }
+
+    def negative_quantity_not_allowed(self):
+        return {
+            "body": _("Negative quantity not allowed."),
+            "message_type": "error",
+        }
+
+    def products_processed_as_raw_products(self):
+        return {
+            "message_type": "success",
+            "body": _("Product(s) processed as raw product(s)"),
+        }
+
+    def packaging_changed_on_package(self, pack):
+        return {
+            "message_type": "success",
+            "body": _("Packaging changed on package %s", pack.name),
+        }
+
+    def remaining_raw_product_not_packed(self):
+        return {
+            "message_type": "warning",
+            "body": _("Remaining raw product not packed, proceed anyway?"),
+        }
+
+    def no_more_batch_todo(self):
+        return {
+            "message_type": "info",
+            "body": _("No more work to do, please create a new batch transfer"),
+        }
+
+    def batch_cannot_be_selected(self):
+        return {
+            "message_type": "warning",
+            "body": _("This batch cannot be selected."),
+        }
+
+    def destination_bin_not_empty(self, bin_package):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The destination bin %s is not empty, please take another.",
+                bin_package.name,
+            ),
+        }
+
+    def package_cancelled(self):
+        return {"message_type": "success", "body": _("Package cancelled")}
+
+    def line_cancelled(self):
+        return {"message_type": "success", "body": _("Line cancelled")}
+
+    def location_cant_be_moved_at_once(self):
+        return {
+            "message_type": "error",
+            "body": _("This location content can't be moved at once."),
         }

@@ -4,7 +4,7 @@
 
 from werkzeug.exceptions import BadRequest
 
-from odoo import _, fields
+from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
@@ -248,13 +248,7 @@ class Checkout(Component):
         pickings = lines.mapped("picking_id")
         if len(pickings) > 1:
             return self._response_for_select_document(
-                message={
-                    "message_type": "error",
-                    "body": _(
-                        "Several transfers found, please scan a package"
-                        " or select a transfer manually."
-                    ),
-                }
+                message=self.msg_store.multiple_picks_found_scan_pack_or_select_manually()
             )
         # Keep track of what has been initially scan, and forward it through kwargs
         kwargs = {**kw, "current_state": "select_document"}
@@ -846,10 +840,7 @@ class Checkout(Component):
         for move_line in move_lines:
             qty_done = quantity_func(move_line)
             if qty_done < 0:
-                message = {
-                    "body": _("Negative quantity not allowed."),
-                    "message_type": "error",
-                }
+                message = self.msg_store.negative_quantity_not_allowed()
             else:
                 new_line = self.env["stock.move.line"]
                 if qty_done > 0:
@@ -1296,10 +1287,7 @@ class Checkout(Component):
             return response
         return self._response_for_select_line(
             picking,
-            message={
-                "message_type": "success",
-                "body": _("Product(s) processed as raw product(s)"),
-            },
+            message=self.msg_store.products_processed_as_raw_products(),
         )
 
     def list_dest_package(self, picking_id, selected_line_ids):
@@ -1464,10 +1452,7 @@ class Checkout(Component):
         package.package_type_id = packaging
         return self._response_for_summary(
             picking,
-            message={
-                "message_type": "success",
-                "body": _("Packaging changed on package {}").format(package.name),
-            },
+            message=self.msg_store.packaging_changed_on_package(package),
         )
 
     def cancel_line(self, picking_id, package_id=None, line_id=None):
@@ -1512,13 +1497,11 @@ class Checkout(Component):
                         "shopfloor_checkout_done": False,
                     }
                 )
-            msg = _("Package cancelled")
+            msg = self.msg_store.package_cancelled()
         if line:
             line.write({"qty_done": 0, "shopfloor_checkout_done": False})
-            msg = _("Line cancelled")
-        return self._response_for_select_line(
-            picking, message={"message_type": "success", "body": msg}
-        )
+            msg = self.msg_store.line_cancelled()
+        return self._response_for_select_line(picking, message=msg)
 
     def done(self, picking_id, confirmation=False):
         """Set the moves as done
@@ -1548,10 +1531,7 @@ class Checkout(Component):
                 return self._response_for_summary(
                     picking,
                     need_confirm=True,
-                    message={
-                        "message_type": "warning",
-                        "body": _("Remaining raw product not packed, proceed anyway?"),
-                    },
+                    message=self.msg_store.remaining_raw_product_not_packed(),
                 )
         lines_done = self._lines_checkout_done(picking)
         dest_location = lines_done.move_id.location_dest_id

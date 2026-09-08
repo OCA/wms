@@ -55,10 +55,9 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(self.next_line),
-            message={
-                "message_type": "success",
-                "body": f"{self.line.qty_done} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
-            },
+            message=self.msg_store.x_units_put_in_package(
+                self.line.qty_done, self.line.product_id, self.bin1
+            ),
         )
 
     def test_is_zero_is_not_empty(self):
@@ -83,8 +82,7 @@ class ClusterPickingIsZeroCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(self.next_line),
-            message={
-                "message_type": "success",
-                "body": f"{self.line.qty_done} {self.line.product_id.display_name} put in {self.bin1.name}",  # noqa
-            },
+            message=self.msg_store.x_units_put_in_package(
+                self.line.qty_done, self.line.product_id, self.bin1
+            ),
         )

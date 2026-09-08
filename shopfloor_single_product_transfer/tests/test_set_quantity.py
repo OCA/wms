@@ -54,13 +54,15 @@ class TestSetQuantity(CommonCase):
                 "barcode": "NOPE",
             },
         )
-        expected_message = {"message_type": "error", "body": "Barcode not found"}
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
         self.assert_response(
-            response, next_state="set_quantity", message=expected_message, data=data
+            response,
+            next_state="set_quantity",
+            message=self.msg_store.barcode_not_found(),
+            data=data,
         )
 
     def test_set_quantity_line_done(self):
@@ -140,12 +142,11 @@ class TestSetQuantity(CommonCase):
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
-        expected_message = {
-            "message_type": "error",
-            "body": f"You must not pick more than {move_line.reserved_uom_qty} units.",
-        }
         self.assert_response(
-            response, next_state="set_quantity", message=expected_message, data=data
+            response,
+            next_state="set_quantity",
+            message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
+            data=data,
         )
 
     def test_set_quantity_scan_product_prefill_qty_enabled(self):
@@ -202,12 +203,11 @@ class TestSetQuantity(CommonCase):
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
-        expected_message = {
-            "message_type": "error",
-            "body": f"You must not pick more than {move_line.reserved_uom_qty} units.",
-        }
         self.assert_response(
-            response, next_state="set_quantity", message=expected_message, data=data
+            response,
+            next_state="set_quantity",
+            message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
+            data=data,
         )
 
     def test_set_picker_quantity(self):
@@ -504,13 +504,15 @@ class TestSetQuantity(CommonCase):
                 "barcode": wrong_location.barcode,
             },
         )
-        expected_message = {"message_type": "error", "body": "You cannot place it here"}
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
         self.assert_response(
-            response, next_state="set_quantity", message=expected_message, data=data
+            response,
+            next_state="set_quantity",
+            message=self.msg_store.dest_location_not_allowed(),
+            data=data,
         )
 
     def test_set_quantity_menu_default_location(self):
@@ -531,19 +533,17 @@ class TestSetQuantity(CommonCase):
             "barcode": self.dispatch_location.barcode,
         }
         response = self.service.dispatch("set_quantity", params=params)
-        expected_message = {
-            "message_type": "warning",
-            "body": (
-                f"Confirm location change from {move_line.location_dest_id.name} "
-                f"to {self.dispatch_location.name}?"
-            ),
-        }
         data = {
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": self.dispatch_location.barcode,
         }
         self.assert_response(
-            response, next_state="set_quantity", message=expected_message, data=data
+            response,
+            next_state="set_quantity",
+            message=self.msg_store.confirm_location_changed(
+                move_line.location_dest_id, self.dispatch_location
+            ),
+            data=data,
         )
         # Now, calling the same endpoint with the confirmation set is ok
         params["confirmation"] = self.dispatch_location.barcode

@@ -101,10 +101,7 @@ class TestSetQuantity(CommonCase):
         )
         self.assertEqual(selected_move_line.qty_done, 10.0)
         data = self.data.picking(picking)
-        message = {
-            "message_type": "warning",
-            "body": "Create new PACK 4? Scan it again to confirm.",
-        }
+        message = self.msg_store.create_new_pack_ask_confirmation("4")
         self.assert_response(
             response,
             next_state="set_quantity",
@@ -279,7 +276,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "confirmation_required": None,
             },
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_scan_package_without_location(self):
@@ -353,7 +350,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "confirmation_required": None,
             },
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_scan_location_view_usage(self):
@@ -381,7 +378,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "confirmation_required": None,
             },
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_scan_new_package(self):
@@ -408,10 +405,7 @@ class TestSetQuantity(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "confirmation_required": "FooBar",
             },
-            message={
-                "message_type": "warning",
-                "body": "Create new PACK FooBar? Scan it again to confirm.",
-            },
+            message=self.msg_store.create_new_pack_ask_confirmation("FooBar"),
         )
         response = self.service.dispatch(
             "set_quantity",

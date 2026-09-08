@@ -40,7 +40,7 @@ class ShopfloorWorkstationCase(CommonCase):
         res = self.service.dispatch("setdefault", params={"barcode": "bc-???"})
         self.assert_response(
             res,
-            message={"body": "Workstation not found", "message_type": "error"},
+            message=self.msg_store.workstation_not_found(),
             data={},
         )
 
@@ -49,10 +49,7 @@ class ShopfloorWorkstationCase(CommonCase):
         res = self.service.dispatch("setdefault", params={"barcode": "ws-1"})
         self.assert_response(
             res,
-            message={
-                "body": "Default workstation set to Pollux",
-                "message_type": "info",
-            },
+            message=self.msg_store.default_workstation_set_to(self.ws1),
             data={
                 "id": self.ws1.id,
                 "name": "Pollux",

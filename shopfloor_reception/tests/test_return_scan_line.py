@@ -20,10 +20,7 @@ class TestScanLineReturn(CommonCaseReturn):
             response,
             next_state="select_move",
             data={"picking": self._data_for_picking_with_moves(return_picking)},
-            message={
-                "message_type": "error",
-                "body": f"Product {wrong_product.name} is not in the current transfer.",
-            },
+            message=self.msg_store.product_not_found_in_current_picking(wrong_product),
         )
 
     def test_scan_product_in_delivery(self):
@@ -69,10 +66,7 @@ class TestScanLineReturn(CommonCaseReturn):
             response,
             next_state="select_move",
             data={"picking": self._data_for_picking_with_moves(return_picking)},
-            message={
-                "message_type": "warning",
-                "body": "Packaging not found in the current transfer.",
-            },
+            message=self.msg_store.packaging_not_found_in_picking(),
         )
 
     def test_scan_packaging_in_delivery(self):
