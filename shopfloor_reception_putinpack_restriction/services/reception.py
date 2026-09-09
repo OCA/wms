@@ -18,7 +18,9 @@ class Reception(Component):
         if picking.put_in_pack_restriction == "with_package" and not with_pack:
             return self.msg_store.package_required_for_operation(picking)
 
-    def process_with_existing_pack(self, picking_id, selected_line_id, quantity):
+    def process_with_existing_pack(
+        self, picking_id, selected_line_id, quantity, is_over_reception_confirmed=False
+    ):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
 
@@ -28,11 +30,15 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        res = super().process_with_existing_pack(picking_id, selected_line_id, quantity)
+        res = super().process_with_existing_pack(
+            picking_id, selected_line_id, quantity, is_over_reception_confirmed
+        )
 
         return res
 
-    def process_with_new_pack(self, picking_id, selected_line_id, quantity):
+    def process_with_new_pack(
+        self, picking_id, selected_line_id, quantity, is_over_reception_confirmed=False
+    ):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
 
@@ -42,11 +48,15 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        res = super().process_with_new_pack(picking_id, selected_line_id, quantity)
+        res = super().process_with_new_pack(
+            picking_id, selected_line_id, quantity, is_over_reception_confirmed
+        )
 
         return res
 
-    def process_without_pack(self, picking_id, selected_line_id, quantity):
+    def process_without_pack(
+        self, picking_id, selected_line_id, quantity, is_over_reception_confirmed=False
+    ):
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
 
@@ -56,7 +66,9 @@ class Reception(Component):
             return self._response_for_set_quantity(
                 picking, selected_line, message=message
             )
-        res = super().process_without_pack(picking_id, selected_line_id, quantity)
+        res = super().process_without_pack(
+            picking_id, selected_line_id, quantity, is_over_reception_confirmed
+        )
 
         return res
 
