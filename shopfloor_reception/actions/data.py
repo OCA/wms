@@ -15,7 +15,11 @@ class DataAction(Component):
         parser functions. We use *args to capture them.
         """
         res = super(DataAction, self)._product_parser
-        return res + ["use_expiration_date"]
+        data_detail_action = self._actions_for("data_detail")
+        return res + [
+            "use_expiration_date",
+            ("image_256:image", data_detail_action._product_image_url),
+        ]
 
     @property
     def _lot_parser_reception(self):
