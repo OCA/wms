@@ -478,6 +478,14 @@ const Reception = {
             let lot_name = this.line_being_handled.lot.name;
             if (!lot_name) return false;
 
+            let product = this.line_being_handled.product;
+            if (
+                product.use_expiration_date &&
+                (!this.line_being_handled.lot ||
+                    !this.line_being_handled.lot.expiration_date)
+            )
+                return false;
+
             return true;
         },
         move_card_color: function (move) {
