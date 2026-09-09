@@ -24,9 +24,9 @@ const Reception = {
             <template v-if="state_is('select_document')">
                 <manual-select
                     class="with-progress-bar"
-                    :records="state.data.pickings"
-                    :options="manual_select_options_for_select_document(true)"
-                    :key="make_state_component_key(['reception', 'manual-select-document'])"
+                    :records="select_move_from_record()"
+                    :options="operation_options()"
+                    :key="select_move_from_record_key()"
                 />
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
@@ -71,7 +71,7 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_mark_as_done">Mark as Done</btn-action>
+                            <btn-action v-if="state.data.picking" @click="state.on_mark_as_done">Mark as Done</btn-action>
                         </v-col>
                     </v-row>
                 </div>
@@ -243,8 +243,11 @@ const Reception = {
         line_being_handled: function () {
             return this.state.data.selected_move_line[0] || {};
         },
+        moves_to_select: function () {
+            return _.result(this.state, "data.picking.moves", []);
+        },
         ordered_moves: function () {
-            const moves = _.result(this.state, "data.picking.moves", []);
+            const moves = this.moves_to_select;
             if (_.isEmpty(moves)) {
                 return;
             }
@@ -289,11 +292,20 @@ const Reception = {
                 },
             ];
         },
+        select_move_from_record: function () {
+            return this.state.data.picking;
+        },
         operation_options: function () {
             return {
                 title_action_field: {action_val_path: "name"},
                 fields: this.picking_display_fields(),
             };
+        },
+        select_move_from_record_key: function () {
+            return this.make_state_component_key([
+                "reception-select-move-from-record",
+                this.state.data.picking.id,
+            ]);
         },
         select_document_display_fields: function () {
             var fields = this.picking_display_fields();

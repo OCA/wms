@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2023 Camptocamp SA (http://www.camptocamp.com)
+    License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_shipment_advice_app_assets"
+        inherit_id="shopfloor_mobile.shopfloor_app_assets"
+    >
+        <script id="script_component_detail_location" position="after">
+          <script
+                id="script_component_detail_shipment"
+                t-attf-src="/shopfloor_shipment_advice_mobile/static/src/components/detail/detail_shipment_advice.js?v=#{app_info.version}"
+                type="module"
+            />
+        </script>
+    </template>
+</odoo>
