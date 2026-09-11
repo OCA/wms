@@ -166,6 +166,12 @@
                   </div>
                 </group>
                 <group
+                    attrs="{'invisible': [('force_detailed_scan_is_possible', '=', False)]}"
+                >
+                    <field name="force_detailed_scan_is_possible" invisible="1" />
+                    <field name="force_detailed_scan" />
+                </group>
+                <group
                     name="auto_post_line"
                     attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
                 >

@@ -269,6 +269,20 @@ class ShopfloorMenu(models.Model):
         compute="_compute_require_destination_package_is_possible"
     )
 
+    force_detailed_scan = fields.Boolean(
+        help="Force the operator to explicitly scan the product, lot/serial number, "
+        "or package barcode to confirm a move line instead of relying on location "
+        "or system deductions.\n\n"
+        "Without this, Shopfloor may automatically validate unique products, lots, or packages "
+        "as soon as the location is scanned. In practice, the physical inventory at "
+        "the location might differ from what the system expects "
+        "leading to silent stock drift and broken traceability.",
+    )
+
+    force_detailed_scan_is_possible = fields.Boolean(
+        compute="_compute_force_detailed_scan_is_possible"
+    )
+
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
         # Uncheck pick_pack_same_time when unload_package_at_destination is set to True
@@ -551,6 +565,13 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.allow_quantity_exceeding_demand_is_possible = (
                 menu.scenario_id.has_option("allow_quantity_exceeding_demand")
+            )
+
+    @api.depends("scenario_id")
+    def _compute_force_detailed_scan_is_possible(self):
+        for menu in self:
+            menu.force_detailed_scan_is_possible = menu.scenario_id.has_option(
+                "force_detailed_scan"
             )
 
     @api.constrains(
