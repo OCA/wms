@@ -4,7 +4,3 @@
 
 class ConcurentWorkOnTransfer(Exception):
     """Some user already processed some transfers."""
-
-
-class CannotProcessMoreThanPlanned(Exception):
-    """Cannot process more units than the quantity"""

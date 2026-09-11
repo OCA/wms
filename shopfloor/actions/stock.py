@@ -127,11 +127,11 @@ class StockAction(Component):
                 )
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
-            line.qty_done = qty_done
             if split:
-                line._split_partial_quantity()
+                line._split_partial_quantity_to_be_done(qty_done)
             data = {
                 "shopfloor_user_id": user.id,
+                "qty_done": qty_done,
             }
             if package:
                 # destination package is set to the scanned one
@@ -192,16 +192,33 @@ class StockAction(Component):
         - moves to process are exactly the assigned moves of the related transfer:
             the transfer is validated as usual, creating a backorder.
         """
-        moves.split_unavailable_qty()
+        # remove assigned non picked moves
+        moves = moves.filtered(lambda m: not (m.state == "assigned" and not m.picked))
+
         backorders = self.env["stock.picking"]
         for picking in moves.picking_id:
+            moves_todo = picking.move_ids & moves
+            if not picking.is_shopfloor_created:
+                # Normally at this stage everything should have been fully
+                # picked but it can happen the reservation of a partially
+                # available move increases. In this case, we split the
+                # partially picked move line.
+                for ml in moves_todo.move_line_ids:
+                    ml._split_partial_quantity()
+                # Put non picked move lines in a new move.
+                for move in moves_todo:
+                    new_move = move.split_other_move_lines(
+                        move.move_line_ids.filtered(lambda ml: ml.picked)
+                    )
+                    if new_move.move_line_ids:
+                        moves_todo |= new_move
+
             # the backorder strategy is checked in the 'button_validate' method
             # on odoo standard. Since we call the sub-method '_action_done' here,
             # we have to set the context key 'cancel_backorder' as it is done
             # in the 'button_validate' method according to the backorder strategy.
             not_to_backorder = picking.picking_type_id.create_backorder == "never"
             picking = picking.with_context(cancel_backorder=not_to_backorder)
-            moves_todo = picking.move_ids & moves
             if self._check_backorder(picking, moves_todo):
                 existing_backorders = picking.backorder_ids
                 picking._action_done()
