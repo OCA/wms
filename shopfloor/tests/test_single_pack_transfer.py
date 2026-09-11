@@ -82,7 +82,7 @@ class TestSinglePackTransfer(SinglePackTransferCommonBase):
             "weight_uom": package_level.package_id.weight_uom_id.name,
             "weight": package_level.package_id.pack_weight,
             "estimated_weight_kg": package_level.package_id.estimated_pack_weight_kg,
-            "location_src": self.data.location(package_level.location_id),
+            "location_src": self.data.location(package_level.package_id.location_id),
             "location_dest": self.data.location(package_level.location_dest_id),
             "picking": self.data.picking(self.picking),
             "products": self.data.products(self.product_a),

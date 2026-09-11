@@ -1175,23 +1175,8 @@ class ClusterPicking(Component):
             if ml.picked and not ml.shopfloor_unloaded:
                 # A picked move line is not unloaded, exit
                 return
-        for ml in picking.move_line_ids:
-            if not ml.picked or not ml.has_quantity_reserved:
-                continue
-            # Normally at this stage everything should have been fully picked
-            # but it can happen the reservation of a partially available move
-            # increases. In this case, we split the partially picked move line.
-            ml._split_partial_quantity_to_be_done(ml.qty_picked)
         stock = self._actions_for("stock")
-        for move in picking.move_ids:
-            move.split_other_move_lines(
-                move.move_line_ids.filtered(lambda ml: ml.picked)
-            )
-        # remove assigned non picked moves
-        moves_to_validate = picking.move_ids.filtered(
-            lambda m: not (m.state == "assigned" and not m.picked)
-        )
-        stock.validate_moves(moves_to_validate)
+        stock.validate_moves(picking.move_ids)
         if picking.state not in ("cancel", "done"):
             # A split order has been created, remove picking from batch
             self._clear_batch_and_assignment(picking)
