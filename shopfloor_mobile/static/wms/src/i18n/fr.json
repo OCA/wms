@@ -38,6 +38,7 @@
   "detail.transfer.qty_reserved": "Qté réservée",
   "detail.transfer.qty_in_stock": "Qté en stock",
   "detail.transfer.edit_carrier": "Modifier le transporteur",
+  "cluster_picking.unload_scan_pack.scan_placeholder": "Scannez la boîte",
   "location_content_transfer.scan_destination.title": "Définissez une qté et scannez l'emplacement de destination",
   "location_content_transfer.scan_destination_all.title": "Scannez l'emplacement de destination pour tous les produits",
   "location_content_transfer.scan_location.title": "Commencez en scannant un emplacement",

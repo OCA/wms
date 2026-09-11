@@ -58,9 +58,11 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 }
             )
 
-    def _data_for_batch(self, batch, location, pack=None):
+    def _data_for_batch(self, batch, location, line=None, pack=None):
         data = self.data.picking_batch(batch)
         data["location_dest"] = self.data.location(location)
+        if line:
+            data["selected_move_line"] = self.data.move_line(line)
         if pack:
             data["package"] = self.data.package(pack)
         return data
