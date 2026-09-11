@@ -388,11 +388,10 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
         )
         # There was a split order, the initial one line picking contains what
         # still remains to do
+        backorder = self.one_line_picking.backorder_ids
+        self.assertRecordValues(backorder, [{"state": "assigned", "batch_id": False}])
         self.assertRecordValues(
-            self.one_line_picking, [{"state": "assigned", "batch_id": False}]
-        )
-        self.assertRecordValues(
-            self.one_line_picking.move_line_ids,
+            backorder.move_line_ids,
             [
                 {
                     "shopfloor_unloaded": False,

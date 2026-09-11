@@ -589,6 +589,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         picking = self._create_picking(
             lines=[(self.product_a, 10), (self.product_b, 10)]
         )
+        picking.is_shopfloor_created = True
         picking.picking_type_id.sudo().create_backorder = "never"
         self._update_qty_in_location(picking.location_id, self.product_a, 20)
         self._update_qty_in_location(picking.location_id, self.product_b, 20)
