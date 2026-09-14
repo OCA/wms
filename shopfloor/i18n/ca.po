@@ -1687,9 +1687,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
-msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+msgid "The backorder %s has been created"
 msgstr ""
 
 #. module: shopfloor
@@ -1792,7 +1790,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
-msgid "The split order {} has been created."
+msgid "The split order %s has been created."
 msgstr ""
 
 #. module: shopfloor

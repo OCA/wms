@@ -1818,13 +1818,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
-msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+msgid "The backorder %s has been created"
 msgstr ""
-"È stato creato l'ordine residuo <a href=\"#\" data-oe-"
-"model=\"stock.picking\" data-oe-"
-"id=\"%(new_picking_id)d\">%(new_picking_name)s</a>."
 
 #. module: shopfloor
 #. odoo-python
@@ -1934,8 +1929,8 @@ msgstr "Il record su cui si stava lavorando non esiste più."
 #. odoo-python
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
-msgid "The split order {} has been created."
-msgstr "L'ordine suddiviso {} è stato creato."
+msgid "The split order %s has been created."
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
@@ -2405,6 +2400,19 @@ msgstr "Prelievo per area"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid ""
+#~ "The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
+#~ "id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+#~ msgstr ""
+#~ "È stato creato l'ordine residuo <a href=\"#\" data-oe-"
+#~ "model=\"stock.picking\" data-oe-"
+#~ "id=\"%(new_picking_id)d\">%(new_picking_name)s</a>."
+
+#, python-format
+#~ msgid "The split order {} has been created."
+#~ msgstr "L'ordine suddiviso {} è stato creato."
 
 #, python-format
 #~ msgid "Internal Error: The move line %s is not fully picked"

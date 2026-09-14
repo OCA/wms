@@ -1776,9 +1776,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/shopfloor/models/stock_picking.py:0
 #, python-format
-msgid ""
-"The backorder <a href=\"#\" data-oe-model=\"stock.picking\" data-oe-"
-"id=\"%(new_picking_id)d\">%(new_picking_name)s</a> has been created."
+msgid "The backorder %s has been created"
 msgstr ""
 
 #. module: shopfloor
@@ -1886,8 +1884,8 @@ msgstr "El registro en el que estaba trabajando ya no existe."
 #. odoo-python
 #: code:addons/shopfloor/models/stock_move.py:0
 #, python-format
-msgid "The split order {} has been created."
-msgstr "Se ha creado el pedido dividido {}."
+msgid "The split order %s has been created."
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__picking_id
@@ -2336,6 +2334,10 @@ msgstr "Zona de Entreda"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} no es un paquete de destino válido."
+
+#, python-format
+#~ msgid "The split order {} has been created."
+#~ msgstr "Se ha creado el pedido dividido {}."
 
 #, python-format
 #~ msgid "Content transfer to {} completed"
