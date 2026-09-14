@@ -819,6 +819,12 @@ class MessageAction(Component):
             "body": _("This location does not exist."),
         }
 
+    def unable_to_pick_negative(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot pick a negative quantity."),
+        }
+
     def unable_to_pick_more(self, quantity):
         return {
             "message_type": "error",

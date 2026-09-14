@@ -4,6 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, exceptions, fields
 from odoo.osv.expression import AND
+from odoo.tools import float_compare
 
 from odoo.addons.component.core import AbstractComponent
 
@@ -123,6 +124,16 @@ class BaseShopfloorProcess(AbstractComponent):
         message = self._check_picking_status(pickings, states=states)
         if message:
             return message
+
+    def _check_move_line_qty_picked(self, move_line, qty_picked):
+        rounding = move_line.product_id.uom_id.rounding
+        if float_compare(qty_picked, 0, precision_rounding=rounding) < 0:
+            return self.msg_store.unable_to_pick_negative()
+        if not self.work.menu.allow_quantity_exceeding_demand:
+            rounding = move_line.product_id.uom_id.rounding
+            qty_todo = move_line.reserved_uom_qty
+            if float_compare(qty_picked, qty_todo, precision_rounding=rounding) > 0:
+                return self.msg_store.unable_to_pick_more(qty_todo)
 
     def is_src_location_valid(self, location):
         """Check the source location is valid for given process.
