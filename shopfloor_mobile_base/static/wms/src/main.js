@@ -324,9 +324,10 @@ new Vue({
             return translation_registry.available_langs_display(this);
         },
         switch_language: function (lang_id) {
-            this.$i18n.locale = lang_id;
-            this.$set(this, "current_language", lang_id);
-            event_hub.$emit("language:updated", lang_id);
+            const resolved_lang = translation_registry.ensure_lang(lang_id, true);
+            this.$i18n.locale = resolved_lang;
+            this.$set(this, "current_language", resolved_lang);
+            event_hub.$emit("language:updated", resolved_lang);
         },
         /*
         Trigger and event on the event hub.
