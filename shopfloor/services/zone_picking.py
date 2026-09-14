@@ -954,8 +954,9 @@ class ZonePicking(Component):
                     continue
                 _move_line.qty_done = move_line.reserved_uom_qty
                 move_lines |= _move_line
+        if quantity:
+            move_line._split_partial_quantity_to_be_done(quantity)
         self._write_destination_on_lines(move_lines, location)
-
         try:
             stock.mark_move_line_as_picked(move_lines, quantity, check_user=True)
         except ConcurentWorkOnTransfer as error:
@@ -1033,6 +1034,8 @@ class ZonePicking(Component):
             return (package_changed, response)
         # the quantity done is set to the passed quantity
         # but if we move a partial qty, we need to split the move line
+        if quantity:
+            move_line._split_partial_quantity_to_be_done(quantity)
         stock = self._actions_for("stock")
         stock._lock_lines(move_line)
         try:

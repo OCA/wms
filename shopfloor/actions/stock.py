@@ -117,7 +117,14 @@ class StockAction(Component):
         check_user=False,
         split=True,
     ):
-        """Set the qty_done and extract lines in new order"""
+        """Set the qty_done and extract lines in new order
+
+        If the quantity is None, all move lines will be marked as fully picked.
+        Else there can be only one move line. If the quantity == 0, only the
+        user will be set.
+        """
+        if quantity:
+            move_lines.ensure_one()
         user = user or self.env.user
         if check_user:
             picking_users = move_lines.picking_id.user_id
@@ -127,8 +134,6 @@ class StockAction(Component):
                 )
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
-            if split:
-                line._split_partial_quantity_to_be_done(qty_done)
             data = {
                 "shopfloor_user_id": user.id,
                 "qty_done": qty_done,
