@@ -89,11 +89,15 @@ export var PackagingQtyPickerMixin = {
         _product_qty_by_packaging: function (pkg_by_qty, qty) {
             const self = this;
             const res = {};
+            let _remaining_qty = qty;
             // Const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function (pkg) {
-                const [_qty_per_pkg, _qty] = self._qty_by_pkg(pkg.qty, qty);
+                const [_qty_per_pkg, _remaining_qty] = self._qty_by_pkg(
+                    pkg.qty,
+                    _remaining_qty
+                );
                 res[pkg.id] = _qty_per_pkg;
-                if (!_qty) return;
+                if (!_remaining_qty) return;
             });
             return res;
         },
