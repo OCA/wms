@@ -333,7 +333,7 @@ class ClusterPickingStockIssue(ClusterPickingCommonCase):
         self.assertEqual(set(self.batch.picking_ids.mapped("state")), {"assigned"})
 
         pick_line1, pick_line2 = self.move1.move_line_ids
-        new_line, __ = pick_line1._split_qty_to_be_done(1)
+        new_line = pick_line1._split_partial_quantity_to_be_done(1)
         self._set_dest_package_and_done(pick_line1, self.dest_package)
 
         self.assertEqual(pick_line1.reserved_qty, 1.0)

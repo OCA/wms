@@ -126,6 +126,7 @@ class StockMoveLine(models.Model):
                     default=default, backorder=True
                 )
 
+    # MIGRATION NOTE: deprecated method to delete
     def _split_pickings_from_source_location(self):
         """Ensure that the related pickings will have the same source location.
 
@@ -178,6 +179,7 @@ class StockMoveLine(models.Model):
             )
         return self.picking_id
 
+    # MIGRATION NOTE: deprecated method to delete
     def _split_qty_to_be_done(self, qty_done, split_partial=True, **split_default_vals):
         """Check qty to be done for current move line. Split it if needed.
 
@@ -185,6 +187,10 @@ class StockMoveLine(models.Model):
         :param split_partial: split if qty is less than expected
             otherwise rely on a backorder.
         """
+        _logger.warning(
+            "`_split_qty_to_be_done` is deprecated "
+            "and replaced by `_split_partial_quantity_to_be_done`"
+        )
         if self.reserved_uom_qty < 0:
             raise UserError(_("The demand cannot be negative"))
         # store a new line if we have split our line (not enough qty)
