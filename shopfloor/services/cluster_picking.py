@@ -690,6 +690,13 @@ class ClusterPicking(Component):
                     ),
                     sublocation=location,
                 )
+
+        # Prevent auto select of the move line in case detailed scan is ON
+        if self.work.menu.force_detailed_scan:
+            return self._response_for_start_line(
+                move_line,
+                sublocation=location,
+            )
         quantity = self._get_prefill_qty(move_line)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 

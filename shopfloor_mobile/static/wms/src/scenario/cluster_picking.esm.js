@@ -39,6 +39,7 @@ const ClusterPicking = {
                 v-if="state_in(['start_line', 'scan_destination', 'change_pack_lot', 'stock_issue'])"
                 :line="state.data"
                 :article-scanned="state_is('scan_destination')"
+                :location-scanned="state.data.sublocation"
                 :show-qty-picker="state_is('scan_destination')"
                 />
             <batch-picking-line-actions
