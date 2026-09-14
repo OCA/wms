@@ -530,9 +530,7 @@ class ShopfloorSingleProductTransfer(Component):
     def _set_quantity__check_quantity_done(
         self, move_line, location=None, package=None, confirmation=None
     ):
-        stock = self._actions_for("stock")
-        if not stock.move_line_check_qty_picked(move_line):
-            message = self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty)
+        if message := self._check_move_line_qty_picked(move_line, move_line.qty_picked):
             return self._response_for_set_quantity(move_line, message=message)
 
     def _set_quantity__check_no_prefill_qty(
