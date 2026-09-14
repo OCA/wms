@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2022 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
@@ -117,7 +118,25 @@ class StockAction(Component):
         check_user=False,
         split=True,
     ):
-        """Set the qty_done and extract lines in new order"""
+        """Set the qty_done and extract lines in new order
+
+        :param move_lines: The move lines to mark as picked.
+        :param quantity: If the quantity is None, all move lines will be marked
+            as fully picked. Else there can be only one move line. If the
+            quantity == 0, only the user will be set.
+        :param package: Destination package to set on the picked move line.
+        :param user: Operator associated to the move lines and to the picking
+            in case of split. Default to current user.
+        :param check_user: Check the current picking is not already assigned to
+            another operator. Only used when split=True.
+        :param split: If True, move lines will be extracted in a new split
+            order if there are other move lines in the picking or other moves
+            to do. This ensures the picking is dedicated to the operator.
+            Set to False when you want multiple operators to work on the same
+            picking.
+        """
+        if quantity:
+            move_lines.ensure_one()
         user = user or self.env.user
         if check_user:
             picking_users = move_lines.picking_id.user_id
@@ -127,8 +146,6 @@ class StockAction(Component):
                 )
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
-            if split:
-                line._split_partial_quantity_to_be_done(qty_done)
             data = {
                 "shopfloor_user_id": user.id,
                 "qty_done": qty_done,
