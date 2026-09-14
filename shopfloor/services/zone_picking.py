@@ -958,15 +958,12 @@ class ZonePicking(Component):
             move_line._split_partial_quantity_to_be_done(quantity)
         self._write_destination_on_lines(move_lines, location)
         try:
-            stock.mark_move_line_as_picked(move_lines, quantity, check_user=True)
-        except ConcurentWorkOnTransfer as error:
+            stock.mark_move_line_as_picked(move_lines, quantity)
+        except ConcurentWorkOnTransfer:
             values = {"qty_done": quantity} if quantity is not None else {}
             response = self._response_for_set_line_destination(
                 move_line,
-                message={
-                    "message_type": "error",
-                    "body": str(error),
-                },
+                message=self.msg_store.concurrent_work(),
                 **values,
             )
             return (location_changed, response)
@@ -1039,16 +1036,11 @@ class ZonePicking(Component):
         stock = self._actions_for("stock")
         stock._lock_lines(move_line)
         try:
-            stock.mark_move_line_as_picked(
-                move_line, quantity, package, check_user=True
-            )
-        except ConcurentWorkOnTransfer as error:
+            stock.mark_move_line_as_picked(move_line, quantity, package)
+        except ConcurentWorkOnTransfer:
             response = self._response_for_set_line_destination(
                 move_line,
-                message={
-                    "message_type": "error",
-                    "body": str(error),
-                },
+                message=self.msg_store.concurrent_work(),
                 qty_done=quantity,
             )
             return (package_changed, response)

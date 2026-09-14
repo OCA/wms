@@ -1,7 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _, fields
+from odoo import fields
 from odoo.tools.float_utils import float_compare, float_round
 
 from odoo.addons.component.core import Component
@@ -114,7 +114,7 @@ class StockAction(Component):
         quantity=None,
         package=None,
         user=None,
-        check_user=False,
+        check_user=True,
         split=True,
     ):
         """Set the qty_done and extract lines in new order
@@ -126,12 +126,12 @@ class StockAction(Component):
         if quantity:
             move_lines.ensure_one()
         user = user or self.env.user
-        if check_user:
-            picking_users = move_lines.picking_id.user_id
+        if split and check_user:
+            # Unless we don't split the move lines in it's own picking, we
+            # always want to check the user
+            picking_users = move_lines.picking_id.filtered("printed").user_id
             if not all(pick_user == user for pick_user in picking_users):
-                raise ConcurentWorkOnTransfer(
-                    _("Someone is already working on these transfers")
-                )
+                raise ConcurentWorkOnTransfer()
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
             data = {
