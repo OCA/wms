@@ -768,15 +768,6 @@ class MessageAction(Component):
             ),
         }
 
-    def line_scanned_qty_done_higher_than_allowed(self):
-        return {
-            "message_type": "warning",
-            "body": _(
-                "Please note that the scanned quantity "
-                "is higher than the maximum allowed."
-            ),
-        }
-
     def recovered_previous_session(self):
         return {
             "message_type": "info",
@@ -811,6 +802,12 @@ class MessageAction(Component):
         return {
             "message_type": "error",
             "body": _("This location does not exist."),
+        }
+
+    def unable_to_pick_negative(self):
+        return {
+            "message_type": "error",
+            "body": _("You cannot pick a negative quantity."),
         }
 
     def unable_to_pick_more(self, quantity):
