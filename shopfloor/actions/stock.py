@@ -296,10 +296,6 @@ class StockAction(Component):
         self._lock_lines(lines)
         lines.result_package_id = package
 
-    def move_line_increment_qty_picked(self, move_line, packaging=False):
-        qty = packaging and packaging.qty or 1
-        move_line.qty_done += qty
-
     def move_line_check_qty_picked(self, move_line):
         rounding = move_line.product_id.uom_id.rounding
         qty_done = move_line.qty_done

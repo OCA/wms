@@ -586,7 +586,7 @@ class ClusterPicking(Component):
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
             )
-        quantity = self._get_prefill_qty(move_line, qty=1)
+        quantity = self.get_qty_picked(move_line)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_packaging(self, picking, move_line, packaging, sublocation):
@@ -617,7 +617,7 @@ class ClusterPicking(Component):
                 move_line,
                 message=self.msg_store.product_multiple_packages_scan_package(),
             )
-        quantity = self._get_prefill_qty(move_line, packaging.qty)
+        quantity = self.get_qty_picked(move_line, packaging)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_lot(self, picking, move_line, lot, sublocation):
@@ -643,7 +643,7 @@ class ClusterPicking(Component):
             return self._response_for_start_line(
                 move_line, message=self.msg_store.lot_multiple_packages_scan_package()
             )
-        quantity = self._get_prefill_qty(move_line, 1.0)
+        quantity = self.get_qty_picked(move_line)
         return self._response_for_scan_destination(move_line, qty_done=quantity)
 
     def _scan_line_by_location(self, picking, move_line, location):
