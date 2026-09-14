@@ -140,11 +140,11 @@ class StockMove(models.Model):
 
         _logger.debug("Rollback computation for applying pull re-routing")
         # rollback _action_assign, it'll be called again after the routing
-        self.env.clear()
         # pylint: disable=sql-injection
         self.env.cr.execute(
             sql.SQL("ROLLBACK TO SAVEPOINT {}").format(sql.Identifier(savepoint_name))
         )
+        self.env.clear()
         return moves_routing
 
     def _routing_compute_rules(self):
