@@ -773,7 +773,10 @@ class Reception(Component):
             kw["with_progress"] = True
         data = self.data.picking(picking, **kw)
         if with_lines:
-            data.update({"moves": self._data_for_moves(picking.move_ids)})
+            sml = self.search_move_line
+            sort_key = sml._sort_key_move_lines(sml.work.sort_order)
+            sorted_moves = picking.move_line_ids.sorted(sort_key).move_id
+            data.update({"moves": self._data_for_moves(sorted_moves)})
         return data
 
     def _data_for_stock_pickings(self, pickings, with_lines=False):
