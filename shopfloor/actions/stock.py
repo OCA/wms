@@ -253,14 +253,17 @@ class StockAction(Component):
         We want to create a normal backorder if:
 
             - the moves are equal to all available moves of the current picking
-              but there are still unavailable moves to process
             - the moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_ids.filtered(lambda m: m.state == "assigned")
-        has_ancestors = bool(
+        assigned_moves = picking.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
+        if moves != assigned_moves:
+            return False
+        has_open_ancestors = bool(
             moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
         )
-        return moves == assigned_moves and not has_ancestors
+        return not has_open_ancestors
 
     def put_package_level_in_move(self, package_level):
         """Ensure to put the package level in its own move.
