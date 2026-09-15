@@ -7,7 +7,7 @@
     "version": "16.0.1.0.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/stock-logistics-tracking",
+    "website": "https://github.com/OCA/wms",
     "depends": ["stock", "delivery_procurement_group_carrier"],
     "data": [
         "security/ir.model.access.csv",
