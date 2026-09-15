@@ -1704,13 +1704,6 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/models/stock_picking.py:0
-#, python-format
-msgid "The backorder %s has been created"
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "The content of {} cannot be transferred with this scenario."
