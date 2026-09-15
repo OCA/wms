@@ -119,6 +119,9 @@ class StockAction(Component):
     ):
         """Set the qty_done and extract lines in new order"""
         user = user or self.env.user
+
+        self._lock_lines(move_lines)
+
         if check_user:
             picking_users = move_lines.picking_id.user_id
             if not all(pick_user == user for pick_user in picking_users):
@@ -154,6 +157,7 @@ class StockAction(Component):
 
     def unmark_move_line_as_picked(self, move_lines, split=True):
         """Reverse the change from `mark_move_line_as_picked`."""
+        self._lock_lines(move_lines)
         move_lines.write(
             {
                 "shopfloor_user_id": False,
@@ -238,6 +242,7 @@ class StockAction(Component):
         this process easy.
         """
         package_move_lines = package_level.move_line_ids
+        self._lock_lines(package_move_lines)
         package_moves = package_move_lines.move_id
         for package_move in package_moves:
             # Check if there is no other lines linked to the move others than

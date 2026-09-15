@@ -1034,7 +1034,6 @@ class ZonePicking(Component):
         # the quantity done is set to the passed quantity
         # but if we move a partial qty, we need to split the move line
         stock = self._actions_for("stock")
-        stock._lock_lines(move_line)
         try:
             stock.mark_move_line_as_picked(
                 move_line, quantity, package, check_user=True

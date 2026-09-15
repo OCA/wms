@@ -454,10 +454,6 @@ class LocationContentTransfer(Component):
         stock = self._actions_for("stock")
         stock.validate_moves(move_lines.move_id)
 
-    def _lock_lines(self, lines):
-        """Lock move lines"""
-        self._actions_for("lock").for_update(lines)
-
     def _is_package_empty(self, package):
         return not bool(package.quant_ids)
 
@@ -576,7 +572,6 @@ class LocationContentTransfer(Component):
             return self._response_for_scan_destination_all(
                 pickings, confirmation_required=barcode, package=empty_package
             )
-        self._lock_lines(move_lines)
 
         if empty_package and not scan_package:
             scan_package = empty_package
@@ -825,8 +820,6 @@ class LocationContentTransfer(Component):
                 confirmation_required=barcode,
                 package=empty_package,
             )
-        package_move_lines = package_level.move_line_ids
-        self._lock_lines(package_move_lines)
         stock = self._actions_for("stock")
 
         if empty_package and not scan_package:
@@ -915,8 +908,6 @@ class LocationContentTransfer(Component):
                 move_line,
                 message=self.msg_store.unable_to_pick_more(move_line.qty_done),
             )
-
-        self._lock_lines(move_line)
 
         move_line.qty_done = quantity
         if empty_package and not scan_package:
