@@ -57,14 +57,29 @@ class StockMove(models.Model):
                 qty_to_split = self.product_uom_qty - sum(
                     move_lines.mapped("reserved_uom_qty")
                 )
-            split_move_vals = self._split(qty_to_split)
-            split_move = self.create(split_move_vals)
-            split_move.move_line_ids = to_move
-            split_move._action_confirm(merge=False)
-            split_move._recompute_state()
-            split_move._action_assign()
+            prec = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            # Do not split if we have full quantity to split
+            if (
+                float_compare(qty_to_split, self.product_uom_qty, precision_digits=prec)
+                == 0
+            ):
+                return self.browse()
+            new_move_vals_list = self._split(qty_to_split)
+            for vals in new_move_vals_list:
+                vals.update(
+                    state=self.state,
+                    reservation_date=self.reservation_date,
+                )
+            # Only create the move, never call _action_confirm on an already
+            # confirmed/assigned move as since Odoo 15.0, it calls
+            # _action_assign()
+            new_move = self.env["stock.move"].create(new_move_vals_list)
+            new_move.move_line_ids = to_move
+            new_move._recompute_state()
             self._recompute_state()
-            return split_move
+            return new_move
         return self.browse()
 
     def split_unavailable_qty(self):
