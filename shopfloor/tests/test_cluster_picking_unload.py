@@ -469,6 +469,7 @@ class ClusterPickingSetDestinationAllCase(ClusterPickingUnloadingCommonCase):
                     "qty_done": 0,
                     "state": "assigned",
                     "location_dest_id": self.packing_location.id,
+                    "result_package_id": False,
                 },
             ],
         )

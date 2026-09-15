@@ -63,7 +63,9 @@ class StockMoveLine(models.Model):
         self.ensure_one()
         if not self.picked or not self.has_quantity_reserved:
             return self.browse()
-        return self._split_partial_quantity_to_be_done(self.qty_picked)
+        return self._split_partial_quantity_to_be_done(
+            self.qty_picked, {"result_package_id": False}
+        )
 
     def _extract_in_split_order(self, default=None):
         """Have pickings fully reserved with only those move lines.
