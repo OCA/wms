@@ -195,11 +195,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line1: line1.reserved_uom_qty + 1, line2: line2.reserved_uom_qty},
-            message={
-                "body": "Please note that the scanned quantity "
-                "is higher than the maximum allowed.",
-                "message_type": "warning",
-            },
+            message=self.msg_store.unable_to_pick_more(line1.reserved_uom_qty),
         )
 
     def test_set_custom_qty_negative(self):
@@ -219,10 +215,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line1: line1.reserved_uom_qty, line2: line2.reserved_uom_qty},
-            message={
-                "body": "Negative quantity not allowed.",
-                "message_type": "error",
-            },
+            message=self.msg_store.unable_to_pick_negative(),
         )
 
     def test_set_custom_qty_partial(self):

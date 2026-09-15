@@ -906,14 +906,11 @@ class LocationContentTransfer(Component):
                 confirmation_required=barcode,
                 package=empty_package,
             )
-        if (
-            quantity > move_line.qty_done
-            and not self.work.menu.allow_quantity_exceeding_demand
-        ):
+        if message := self._check_move_line_qty_picked(move_line, quantity):
             return self._response_for_scan_destination(
                 location,
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.qty_done),
+                message=message,
             )
 
         self._lock_lines(move_line)
