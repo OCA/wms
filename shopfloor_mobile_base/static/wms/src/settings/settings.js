@@ -17,6 +17,45 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                 return page.metadata.is_enabled(self, page);
             });
         },
+        _loadEruda: function () {
+            return new Promise((resolve, reject) => {
+                if (typeof eruda !== "undefined") {
+                    return resolve(window.eruda);
+                }
+
+                const script = document.createElement("script");
+                script.src =
+                    "/shopfloor_mobile_base/static/wms/src/lib/eruda/eruda-v3.4.3.min.js";
+                script.id = "script_eruda";
+
+                script.onload = () => {
+                    resolve(window.eruda);
+                };
+                script.onerror = () => {
+                    console.error("Impossible to load Eruda devtools.");
+                    reject(new Error("Failed to load Eruda"));
+                };
+
+                document.head.appendChild(script);
+            });
+        },
+        toggleDevTools: async function () {
+            try {
+                await this._loadEruda();
+            } catch (e) {
+                return;
+            }
+
+            const isErudaActive = !!this.$storage.get("eruda_active", false);
+
+            if (!isErudaActive || !eruda._isInit) {
+                eruda.init();
+                this.$storage.set("eruda_active", true);
+            } else {
+                eruda.destroy();
+                this.$storage.set("eruda_active", false);
+            }
+        },
     },
     template: `
         <Screen :screen_info="{title: $t('screen.settings.home.title'), klass: 'settings settings-control-panel'}">
@@ -29,6 +68,14 @@ export var SettingsControlPanel = Vue.component("settings-control-panel", {
                         <v-btn @click="$router.push({'name': page.key})" :data-action="'setting-' + page.key">
                             <v-icon v-text="page.metadata.icon || 'mdi-account-cog'"/>
                             <span>{{ page.metadata.display_name(_self, page) }}</span>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row align="center">
+                    <v-col class="text-center" cols="12">
+                        <v-btn @click="toggleDevTools()">
+                            <v-icon left>mdi-bug</v-icon>
+                            {{ $t('app.action.toggle_devtools') || 'Toggle DevTools' }}
                         </v-btn>
                     </v-col>
                 </v-row>
