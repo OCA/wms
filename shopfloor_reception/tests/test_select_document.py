@@ -40,6 +40,52 @@ class TestSelectDocument(CommonCase):
             data=self._data_for_select_move(picking),
         )
 
+    def test_scan_picking_sorted_moves(self):
+        custom_sort_code = (
+            "key = get_sort_key_assigned_to_current_user(line) "
+            "+ ( (line.product_id.name or '').lower(), line.id,)"
+        )
+        self.menu.sudo().write(
+            {
+                "move_line_search_sort_order": "custom_code",
+                "move_line_search_sort_order_custom_code": custom_sort_code,
+            }
+        )
+        products_sudo = self.env["product.product"].sudo()
+        product_names = [
+            "Dehydrated Water (Just Add Water)",
+            "Invisibility Cloak (Batteries Not Included)",
+            "Emergency Sarcasm Generator",
+            "Self-Lacing Socks",
+        ]
+        picking = self._create_picking(
+            lines=[
+                (
+                    products_sudo.create(
+                        {
+                            "name": name,
+                            "type": "product",
+                            "default_code": name,
+                            "barcode": name,
+                            "weight": 42,
+                        }
+                    ),
+                    10,
+                )
+                for name in product_names
+            ]
+        )
+
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": picking.name}
+        )
+
+        response_moves_product_names = [
+            m["product"]["name"]
+            for m in response["data"]["select_move"]["picking"]["moves"]
+        ]
+        self.assertEqual(response_moves_product_names, sorted(product_names))
+
     def test_scan_picking_origin_multiple_pickings(self):
         # Multiple pickings with this origin are found.
         # Return the filtered list of pickings.
