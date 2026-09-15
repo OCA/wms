@@ -1,7 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2025 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
-from odoo import _, fields
+from odoo import fields
 from odoo.tools.float_utils import float_compare, float_round
 
 from odoo.addons.component.core import Component
@@ -114,24 +114,29 @@ class StockAction(Component):
         quantity=None,
         package=None,
         user=None,
-        check_user=False,
+        check_user=True,
         split=True,
     ):
-        """Set the qty_done and extract lines in new order"""
+        """Set the qty_done and extract lines in new order
+
+        If the quantity is None, all move lines will be marked as fully picked.
+        Else there can be only one move line. If the quantity == 0, only the
+        user will be set.
+        """
+        if quantity:
+            move_lines.ensure_one()
         user = user or self.env.user
-        if check_user:
-            picking_users = move_lines.picking_id.user_id
+        if split and check_user:
+            # Unless we don't split the move lines in it's own picking, we
+            # always want to check the user
+            picking_users = move_lines.picking_id.filtered("printed").user_id
             if not all(pick_user == user for pick_user in picking_users):
-                raise ConcurentWorkOnTransfer(
-                    _("Someone is already working on these transfers")
-                )
+                raise ConcurentWorkOnTransfer()
         for line in move_lines:
             qty_done = quantity if quantity is not None else line.reserved_uom_qty
-            line.qty_done = qty_done
-            if split:
-                line._split_partial_quantity()
             data = {
                 "shopfloor_user_id": user.id,
+                "qty_done": qty_done,
             }
             if package:
                 # destination package is set to the scanned one
@@ -192,16 +197,33 @@ class StockAction(Component):
         - moves to process are exactly the assigned moves of the related transfer:
             the transfer is validated as usual, creating a backorder.
         """
-        moves.split_unavailable_qty()
+        # remove assigned non picked moves
+        moves = moves.filtered(lambda m: not (m.state == "assigned" and not m.picked))
+
         backorders = self.env["stock.picking"]
         for picking in moves.picking_id:
+            moves_todo = picking.move_ids & moves
+            if not picking.is_shopfloor_created:
+                # Normally at this stage everything should have been fully
+                # picked but it can happen the reservation of a partially
+                # available move increases. In this case, we split the
+                # partially picked move line.
+                for ml in moves_todo.move_line_ids:
+                    ml._split_partial_quantity()
+                # Put non picked move lines in a new move.
+                for move in moves_todo:
+                    new_move = move.split_other_move_lines(
+                        move.move_line_ids.filtered(lambda ml: ml.picked)
+                    )
+                    if new_move.move_line_ids:
+                        moves_todo |= new_move
+
             # the backorder strategy is checked in the 'button_validate' method
             # on odoo standard. Since we call the sub-method '_action_done' here,
             # we have to set the context key 'cancel_backorder' as it is done
             # in the 'button_validate' method according to the backorder strategy.
             not_to_backorder = picking.picking_type_id.create_backorder == "never"
             picking = picking.with_context(cancel_backorder=not_to_backorder)
-            moves_todo = picking.move_ids & moves
             if self._check_backorder(picking, moves_todo):
                 existing_backorders = picking.backorder_ids
                 picking._action_done()
@@ -219,14 +241,17 @@ class StockAction(Component):
         We want to create a normal backorder if:
 
             - the moves are equal to all available moves of the current picking
-              but there are still unavailable moves to process
             - the moves are not linked to unprocessed ancestor moves
         """
-        assigned_moves = picking.move_ids.filtered(lambda m: m.state == "assigned")
-        has_ancestors = bool(
+        assigned_moves = picking.move_ids.filtered(
+            lambda m: m.state in ("assigned", "partially_available")
+        )
+        if moves != assigned_moves:
+            return False
+        has_open_ancestors = bool(
             moves.move_orig_ids.filtered(lambda m: m.state not in ("cancel", "done"))
         )
-        return moves == assigned_moves and not has_ancestors
+        return not has_open_ancestors
 
     def put_package_level_in_move(self, package_level):
         """Ensure to put the package level in its own move.
@@ -278,10 +303,6 @@ class StockAction(Component):
     def set_package_on_lines(self, lines, package):
         self._lock_lines(lines)
         lines.result_package_id = package
-
-    def move_line_increment_qty_picked(self, move_line, packaging=False):
-        qty = packaging and packaging.qty or 1
-        move_line.qty_done += qty
 
     def move_line_check_qty_picked(self, move_line):
         rounding = move_line.product_id.uom_id.rounding

@@ -194,6 +194,8 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
             move_line_g.reserved_uom_qty,
             self.free_package,
         )
+        # a split order has been created
+        self.assertEqual(move_line_g.picking_id, self.picking6.backorder_ids)
         self.service._set_destination_package(
             move_line_h,
             move_line_h.reserved_uom_qty,
@@ -212,9 +214,11 @@ class ZonePickingUnloadAllCase(ZonePickingCommonCase):
         self.assertEqual(move_line_h.state, "done")
         self.assertEqual(move_line_h.picking_id.state, "done")
         self.assertEqual(move_line_h.qty_done, 3)
-        #   current picking (backorder)
-        backorder = (move_line_g | move_line_h).picking_id.backorder_id
-        self.assertEqual(backorder, self.picking6)
+        # move_g fully picked, no backorder
+        backorder = move_line_g.picking_id.backorder_ids
+        self.assertFalse(backorder)
+        # move_h partially picked, backorder
+        backorder = move_line_h.picking_id.backorder_ids - move_line_g.picking_id
         self.assertEqual(backorder.state, "confirmed")
         self.assertEqual(backorder.move_ids.product_id, self.product_h)
         self.assertEqual(backorder.move_ids.product_uom_qty, 3)
