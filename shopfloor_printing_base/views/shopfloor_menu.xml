@@ -14,6 +14,9 @@
                     </group>
                     <group>
                         <field name="label_print_report_id" />
+                        <field name="lot_label_print_report_id" />
+                        <field name="product_label_print_report_id" />
+                        <field name="package_label_print_report_id" />
                     </group>
                 </group>
             </xpath>

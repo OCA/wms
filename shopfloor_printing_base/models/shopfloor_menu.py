@@ -7,10 +7,32 @@ class ShopfloorMenu(models.Model):
     _inherit = "shopfloor.menu"
 
     label_print_report_id = fields.Many2one(
-        string="Print Report for Labels",
+        string="Default Print Report for Labels",
         comodel_name="ir.actions.report",
         domain=[("label", "=", True)],
         help="Choose here the report to print. "
         "Only reports with 'label' field checked will be available.",
     )
+    lot_label_print_report_id = fields.Many2one(
+        string="Print Report for Lot Labels",
+        comodel_name="ir.actions.report",
+        domain=[("label", "=", True)],
+        help="Choose here the report to print. "
+        "Only reports with 'label' field checked will be available.",
+    )
+    product_label_print_report_id = fields.Many2one(
+        string="Print Report for Product Labels",
+        comodel_name="ir.actions.report",
+        domain=[("label", "=", True)],
+        help="Choose here the report to print. "
+        "Only reports with 'label' field checked will be available.",
+    )
+    package_label_print_report_id = fields.Many2one(
+        string="Print Report for Package Labels",
+        comodel_name="ir.actions.report",
+        domain=[("label", "=", True)],
+        help="Choose here the report to print. "
+        "Only reports with 'label' field checked will be available.",
+    )
+
     display_print_label_button = fields.Boolean()
