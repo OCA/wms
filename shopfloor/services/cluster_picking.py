@@ -1160,7 +1160,7 @@ class ClusterPicking(Component):
                 continue
             picking_lines = picking.mapped("move_line_ids")
             if all(line.shopfloor_unloaded for line in picking_lines):
-                picking._action_done()
+                self._unload_validate_pickings(picking)
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Try to close the batch if all transfers are done.
@@ -1169,10 +1169,10 @@ class ClusterPicking(Component):
         otherwise try to validate all the transfers of the batch.
         """
         all_pickings = batch.picking_ids
-        if all(picking.state == "done" for picking in all_pickings):
+        if all(self._unload_is_picking_done(picking) for picking in all_pickings):
             # do not use the 'done()' method because it does many things we
             # don't care about
-            batch.state = "done"
+            self._unload_validate_batch(batch)
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
                 popup=completion_info_popup,
@@ -1189,17 +1189,34 @@ class ClusterPicking(Component):
             # TODO add tests for this (for instance a picking is not 'done'
             # because a move was unassigned, we want to validate the batch to
             # produce backorders)
-            all_pickings.filtered(lambda x: x.state == "assigned")._action_done()
-            batch.state = "done"
+            self._unload_validate_pickings(
+                all_pickings.filtered(lambda x: x.state == "assigned")
+            )
+            self._unload_validate_batch(batch)
             # Unassign not validated pickings from the batch, they will be
             # processed in another batch automatically later on
             all_pickings.invalidate_cache(["state"])
             pickings_not_done = all_pickings.filtered(lambda p: p.state != "done")
-            pickings_not_done.batch_id = False
+            self._unload_unset_batch(pickings_not_done)
             return self._response_for_start(
                 message=self.msg_store.batch_transfer_complete(),
                 popup=completion_info_popup,
             )
+
+    def _unload_is_picking_done(self, picking):
+        return picking.state == "done"
+
+    def _unload_validate_pickings(self, pickings):
+        """Validate `pickings`."""
+        pickings._action_done()
+
+    def _unload_unset_batch(self, pickings_not_done):
+        """Unset the batch from `pickings_not_done`."""
+        pickings_not_done.batch_id = False
+
+    def _unload_validate_batch(self, batch):
+        """Validate `batch`."""
+        batch.state = "done"
 
     def unload_split(self, picking_batch_id):
         """Indicates that now the batch must be treated line per line
