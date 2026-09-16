@@ -769,13 +769,6 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Negative quantity not allowed."
-msgstr ""
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "New move lines cannot be assigned: canceled."
@@ -2172,6 +2165,13 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "You cannot move this using this menu."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
+msgid "You cannot pick a negative quantity."
 msgstr ""
 
 #. module: shopfloor

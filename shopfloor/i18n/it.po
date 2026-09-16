@@ -857,13 +857,6 @@ msgstr "È possibile avere movimenti multipli per singolo pacco"
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/services/checkout.py:0
-#, python-format
-msgid "Negative quantity not allowed."
-msgstr "Quantità negativa non consentita."
-
-#. module: shopfloor
-#. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "New move lines cannot be assigned: canceled."
@@ -2346,6 +2339,13 @@ msgstr "Questo non si può movimentare con questo menu."
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
+msgid "You cannot pick a negative quantity."
+msgstr ""
+
+#. module: shopfloor
+#. odoo-python
+#: code:addons/shopfloor/actions/message.py:0
+#, python-format
 msgid "You cannot place it here"
 msgstr "Questo non può essere messo qui"
 
@@ -2416,6 +2416,10 @@ msgstr "Prelievo per area"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid "Negative quantity not allowed."
+#~ msgstr "Quantità negativa non consentita."
 
 #, python-format
 #~ msgid "Someone is already working on these transfers"
