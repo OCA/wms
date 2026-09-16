@@ -31,6 +31,17 @@ class TestSetDestinationPrinting(CommonCase):
         )
 
     @contextmanager
+    def _mock_printing(self, return_value=None):
+        """Helper to mock shopfloor printing component service."""
+        if return_value is None:
+            return_value = {"message_type": "success", "body": "Print job sent"}
+        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
+            mock_printing = mock.MagicMock()
+            mock_printing.print.return_value = return_value
+            mock_printing_for.return_value = mock_printing
+            yield mock_printing
+
+    @contextmanager
     def _work_on_services(self, collection=None, env=None, **params):
         collection = collection or self.shopfloor_app
         if env:
@@ -57,10 +68,7 @@ class TestSetDestinationPrinting(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
-        with mock.patch.object(
-            IrActionsReport, "print_document_client_action"
-        ) as mock_print:
-            mock_print.return_value = False
+        with self._mock_printing() as mock_printing:
             response = self.service.dispatch(
                 "print_labels",
                 params={
@@ -69,8 +77,7 @@ class TestSetDestinationPrinting(CommonCase):
                     "quantity": 2,
                 },
             )
-            mock_print.assert_not_called()
-
+            mock_printing.print.assert_not_called()
             self.assertMessage(response, self.msg_store.print_no_report())
 
     def test_print_labels_supported_models(self):
@@ -101,10 +108,7 @@ class TestSetDestinationPrinting(CommonCase):
         for model, expected_ids in models_to_test:
             with self.subTest(model=model):
                 report.sudo().model = model
-                with mock.patch.object(
-                    IrActionsReport, "print_document_client_action"
-                ) as mock_print:
-                    mock_print.return_value = True
+                with self._mock_printing() as mock_printing:
                     response = self.reception.dispatch(
                         "print_labels",
                         params={
@@ -113,7 +117,9 @@ class TestSetDestinationPrinting(CommonCase):
                             "quantity": 2,
                         },
                     )
-                    mock_print.assert_called_once_with(expected_ids, **{"quantity": 2})
+                    mock_printing.print.assert_called_once_with(
+                        record_ids=expected_ids, quantity=2, report=report
+                    )
                     message = {"message_type": "success", "body": "Print job sent"}
                     self.assertMessage(response, message)
 
@@ -231,14 +237,7 @@ class TestSetDestinationPrinting(CommonCase):
 
         # 1. Line without lot -> select product label report
         selected_move_line.lot_id = False
-        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
-            mock_printing = mock.MagicMock()
-            mock_printing.print.return_value = {
-                "message_type": "success",
-                "body": "Print job sent",
-            }
-            mock_printing_for.return_value = mock_printing
-
+        with self._mock_printing() as mock_printing:
             self.reception.dispatch(
                 "print_labels",
                 params={
@@ -260,14 +259,7 @@ class TestSetDestinationPrinting(CommonCase):
             }
         )
         selected_move_line.lot_id = lot
-        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
-            mock_printing = mock.MagicMock()
-            mock_printing.print.return_value = {
-                "message_type": "success",
-                "body": "Print job sent",
-            }
-            mock_printing_for.return_value = mock_printing
-
+        with self._mock_printing() as mock_printing:
             self.reception.dispatch(
                 "print_labels",
                 params={
@@ -287,14 +279,7 @@ class TestSetDestinationPrinting(CommonCase):
                 "lot_label_print_report_id": False,
             }
         )
-        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
-            mock_printing = mock.MagicMock()
-            mock_printing.print.return_value = {
-                "message_type": "success",
-                "body": "Print job sent",
-            }
-            mock_printing_for.return_value = mock_printing
-
+        with self._mock_printing() as mock_printing:
             self.reception.dispatch(
                 "print_labels",
                 params={
