@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-barcodes-gtin @ git+https://github.com/OCA/stock-logistics-barcode@refs/pull/764/head#subdirectory=setup/barcodes_gtin
