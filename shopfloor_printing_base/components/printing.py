@@ -18,18 +18,18 @@ class ShopFloorPrintingAction(AbstractComponent):
     @property
     def report_to_print(self):
         """
-        Returns the report to print
+        Returns the default report to print
         """
         return self.work.menu.label_print_report_id.sudo()
 
-    def print(self, record_ids, quantity=1, **kwargs) -> dict:
+    def print(self, record_ids, quantity=1, report=None, **kwargs) -> dict:
         """
         Print the current report defined on menu level with the
         defined quantity.
 
         return: A message dictionary
         """
-        report = self.report_to_print
+        report = report or self.report_to_print
         message = dict()
         if not report:
             message = self.msg_store.print_no_report()
