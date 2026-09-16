@@ -207,3 +207,102 @@ class TestSetDestinationPrinting(CommonCase):
             mock_print.assert_called_once_with(
                 selected_move_line.ids, **{"quantity": 1}
             )
+
+    def test_get_reception_label_report_precedence(self):
+        report_default = self.env.ref(
+            "shopfloor_reception_print_label.report_test_document"
+        ).sudo()
+        report_product = report_default.copy({"name": "Product Report"})
+        report_lot = report_default.copy({"name": "Lot Report"})
+
+        menu = self.reception.work.menu.sudo()
+        menu.write(
+            {
+                "label_print_report_id": report_default.id,
+                "product_label_print_report_id": report_product.id,
+                "lot_label_print_report_id": report_lot.id,
+            }
+        )
+
+        picking = self._create_picking()
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+
+        # 1. Line without lot -> select product label report
+        selected_move_line.lot_id = False
+        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
+            mock_printing = mock.MagicMock()
+            mock_printing.print.return_value = {
+                "message_type": "success",
+                "body": "Print job sent",
+            }
+            mock_printing_for.return_value = mock_printing
+
+            self.reception.dispatch(
+                "print_labels",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "quantity": 1,
+                },
+            )
+            mock_printing.print.assert_called_once_with(
+                record_ids=selected_move_line.ids, quantity=1, report=report_product
+            )
+
+        # 2. Line with lot -> select lot label report
+        lot = self.env["stock.lot"].create(
+            {
+                "name": "Test Lot Precedence",
+                "product_id": self.product_a.id,
+                "company_id": picking.company_id.id,
+            }
+        )
+        selected_move_line.lot_id = lot
+        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
+            mock_printing = mock.MagicMock()
+            mock_printing.print.return_value = {
+                "message_type": "success",
+                "body": "Print job sent",
+            }
+            mock_printing_for.return_value = mock_printing
+
+            self.reception.dispatch(
+                "print_labels",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "quantity": 1,
+                },
+            )
+            mock_printing.print.assert_called_once_with(
+                record_ids=selected_move_line.ids, quantity=1, report=report_lot
+            )
+
+        # 3. Fallback to default label_print_report_id when specific reports are missing
+        menu.write(
+            {
+                "product_label_print_report_id": False,
+                "lot_label_print_report_id": False,
+            }
+        )
+        with mock.patch.object(self.reception, "_printing_for") as mock_printing_for:
+            mock_printing = mock.MagicMock()
+            mock_printing.print.return_value = {
+                "message_type": "success",
+                "body": "Print job sent",
+            }
+            mock_printing_for.return_value = mock_printing
+
+            self.reception.dispatch(
+                "print_labels",
+                params={
+                    "picking_id": picking.id,
+                    "selected_line_id": selected_move_line.id,
+                    "quantity": 1,
+                },
+            )
+            mock_printing.print.assert_called_once_with(
+                record_ids=selected_move_line.ids, quantity=1, report=report_default
+            )

@@ -7,6 +7,17 @@ from odoo.addons.component.core import Component
 class Reception(Component):
     _inherit = "shopfloor.reception"
 
+    def _get_reception_label_report(self, selected_line):
+        if selected_line.lot_id:
+            report = self._menu.lot_label_print_report_id
+        else:
+            report = self._menu.product_label_print_report_id
+
+        if not report:
+            report = self._menu.label_print_report_id
+
+        return report.sudo()
+
     def print_labels(
         self,
         picking_id,
@@ -21,7 +32,7 @@ class Reception(Component):
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
 
         printing = self._printing_for("reception")
-        report = printing.report_to_print
+        report = self._get_reception_label_report(selected_line)
 
         if not report:
             return self._response_for_set_destination(
@@ -55,7 +66,9 @@ class Reception(Component):
                 message=self.msg_store.report_model_unsupported(report),
             )
 
-        message = printing.print(record_ids=record_ids, quantity=quantity)
+        message = printing.print(
+            record_ids=record_ids, quantity=quantity, report=report
+        )
         return self._response_for_set_destination(
             picking, selected_line, message=message
         )
