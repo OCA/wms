@@ -13,6 +13,7 @@ from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.component.exception import NoComponentError
 from odoo.addons.shopfloor.actions.search import SearchInvalidProduct
+from odoo.addons.shopfloor.exceptions import ConcurentWorkOnTransfer
 from odoo.addons.shopfloor.utils import to_float
 
 _logger = logging.getLogger("shopfloor.services.single_product_transfer")
@@ -256,16 +257,20 @@ class ShopfloorSingleProductTransfer(Component):
     ):
         move_line = self._select_move_line_from_product(product, location, package, lot)
         if move_line:
-            stock = self._actions_for("stock")
-            if self.work.menu.no_prefill_qty:
-                # First, mark move line as picked with qty_picked = 0,
-                # so the move wont be split because 0 < qty_picked < quantity
-                stock.mark_move_line_as_picked(move_line, quantity=0)
-                # Then, set the no prefill qty on the move line
-                stock.move_line_increment_qty_picked(move_line, packaging=packaging)
-            else:
-                stock.mark_move_line_as_picked(move_line)
+            try:
+                self._mark_move_line_as_picked(move_line, packaging=packaging)
+            except ConcurentWorkOnTransfer:
+                return self._response_for_select_product(
+                    location=location,
+                    package=package,
+                    message=self.msg_store.concurrent_work(),
+                )
             return self._response_for_set_quantity(move_line)
+
+    def _mark_move_line_as_picked(self, move_line, packaging=None):
+        stock = self._actions_for("stock")
+        qty_picked = self.get_qty_picked(move_line, packaging=packaging)
+        stock.mark_move_line_as_picked(move_line, quantity=qty_picked)
 
     def _select_move_line_from_product(self, product, location, package, lot):
         domain = self._scan_product__select_move_line_domain(
@@ -504,14 +509,7 @@ class ShopfloorSingleProductTransfer(Component):
         move_line = move.move_line_ids[0]
         if lot:
             move_line.lot_id = lot
-        stock = self._actions_for("stock")
-        if self.work.menu.no_prefill_qty:
-            # We ensure the qty_picked is 0 here, so we can set it manually after
-            # to avoid the split of the move line by 'mark_move_line_as_picked'.
-            stock.mark_move_line_as_picked(move_line, quantity=0)
-            stock.move_line_increment_qty_picked(move_line, packaging=packaging)
-        else:
-            stock.mark_move_line_as_picked(move_line)
+        self._mark_move_line_as_picked(move_line, packaging=packaging)
         return move
 
     def _set_quantity__check_product_in_line(
@@ -553,8 +551,12 @@ class ShopfloorSingleProductTransfer(Component):
 
         # When we reach this handler, the 'no_prefill_qty' is enabled
         # For product or lot, we increment by 1 by default
-        stock = self._actions_for("stock")
-        stock.move_line_increment_qty_picked(move_line, packaging=packaging)
+        if self.work.menu.no_prefill_qty:
+            qty_picked = self.get_qty_picked(move_line, packaging=packaging)
+            move_line.qty_done += qty_picked
+        else:
+            # We should never reach this but there are tests for it?!?
+            move_line.qty_done += packaging and packaging.qty or 1
         return self._response_for_set_quantity(move_line)
 
     def _set_quantity__scan_product_handlers(self):

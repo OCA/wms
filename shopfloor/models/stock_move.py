@@ -50,7 +50,7 @@ class StockMove(models.Model):
             to_move = self.move_line_ids & move_lines
         else:
             to_move = other_move_lines
-        if other_move_lines or self.state == "partially_available":
+        if other_move_lines:
             if intersection:
                 qty_to_split = sum(to_move.mapped("reserved_uom_qty"))
             else:
@@ -83,13 +83,38 @@ class StockMove(models.Model):
         return self.browse()
 
     def split_unavailable_qty(self):
-        """Put unavailable qty of a partially available move in their own
-        move (which will be 'confirmed').
+        """Split partially available moves
+
+        Create a new 'confirmed' move with the unavailable qty and make the
+        original move 'assigned'.
         """
-        partial_moves = self.filtered(lambda m: m.state == "partially_available")
-        for partial_move in partial_moves:
-            partial_move.split_other_move_lines(partial_move.move_line_ids)
-        return partial_moves
+        for move in self:
+            if move.state != "partially_available":
+                continue
+            qty_to_split = move.product_uom_qty - sum(
+                move.move_line_ids.mapped("reserved_uom_qty")
+            )
+            prec = self.env["decimal.precision"].precision_get(
+                "Product Unit of Measure"
+            )
+            # Do not split if we have full quantity to split
+            if (
+                float_compare(qty_to_split, move.product_uom_qty, precision_digits=prec)
+                == 0
+            ):
+                return self.browse()
+            new_move_vals_list = move._split(qty_to_split)
+            for vals in new_move_vals_list:
+                vals.update(
+                    state=move.state,
+                    reservation_date=move.reservation_date,
+                )
+            # Only create the move, never call _action_confirm on an already
+            # confirmed/assigned move as since Odoo 15.0, it calls
+            # _action_assign()
+            new_move = self.env["stock.move"].create(new_move_vals_list)
+            new_move._recompute_state()
+            move._recompute_state()
 
     def _last_move_from_package_level(self):
         """Returns True if self is the last move in the related package level"""
@@ -160,16 +185,19 @@ class StockMove(models.Model):
         to first extract some move lines in a separate move, then validate it
         with this method.
         """
-        # Process assigned moves
-        moves = self.filtered(lambda m: m.state == "assigned")
-        if not moves:
-            return False
         new_backorders = self.env["stock.picking"]
+        # Process assigned moves
+        moves = self.filtered(lambda m: m.state in ("assigned", "partially_available"))
+        if not moves:
+            return new_backorders
         for picking in moves.picking_id:
             existing_backorders = picking.backorder_ids
             moves_todo = picking.move_ids & moves
             # No need to create a new transfer if we are processing all moves
-            if moves_todo == picking.move_ids:
+            moves_todo.split_unavailable_qty()
+            if moves_todo == picking.move_ids.filtered(
+                lambda m: m.state not in ("cancel", "done")
+            ):
                 new_picking = picking
             # We process some available moves of the picking, but there are still
             # some other moves to process, then we put the moves to process in

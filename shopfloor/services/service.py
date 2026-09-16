@@ -161,3 +161,8 @@ class BaseShopfloorProcess(AbstractComponent):
         The menu is bind to one picking type
         """
         return self.work.menu.allow_move_create and len(self.picking_types) == 1
+
+    def get_qty_picked(self, move_line, packaging=False):
+        if self.work.menu.no_prefill_qty:
+            return packaging and packaging.qty or 1
+        return move_line.reserved_uom_qty

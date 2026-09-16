@@ -9,6 +9,7 @@ from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 
 from ..actions.search import SearchInvalidProduct
+from ..exceptions import ConcurentWorkOnTransfer
 from ..utils import to_float
 
 # NOTE for the implementation: share several similarities with the "cluster
@@ -273,6 +274,9 @@ class LocationContentTransfer(Component):
             return self._response_for_start(message=self.msg_store.no_work_found())
         move_lines = self._select_move_lines_first_location(move_lines)
         stock = self._actions_for("stock")
+        # allow another operator to process any partially available move
+        # that would have its availability increased
+        move_lines.move_id.split_unavailable_qty()
         stock.mark_move_line_as_picked(move_lines, quantity=0)
         return self._response_for_scan_location(location=move_lines.location_id)
 
@@ -414,7 +418,15 @@ class LocationContentTransfer(Component):
                 message=self.msg_store.no_putaway_destination_available()
             )
 
-        stock.mark_move_line_as_picked(move_lines)
+        try:
+            # allow another operator to process any partially available move
+            # that would have its availability increased
+            move_lines.move_id.split_unavailable_qty()
+            stock.mark_move_line_as_picked(move_lines)
+        except ConcurentWorkOnTransfer:
+            return self._response_for_start(
+                message=self.msg_store.concurrent_work(),
+            )
 
         unreserved_moves._action_assign()
 
