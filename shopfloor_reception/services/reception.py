@@ -1548,10 +1548,9 @@ class Reception(Component):
         if compare == -1:
             default_values = {
                 "lot_id": False,
-                "shopfloor_user_id": False,
                 "expiration_date": False,
             }
-            line._split_qty_to_be_done(quantity, **default_values)
+            line._split_partial_quantity_to_be_done(quantity, default_values)
 
     def _process(self, picking, line, quantity, callback, is_over_reception_confirmed):
         if message := self._check_picking_processible(picking):

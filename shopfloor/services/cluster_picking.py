@@ -775,13 +775,13 @@ class ClusterPicking(Component):
         if response:
             return response
 
-        new_line, qty_check = move_line._split_qty_to_be_done(quantity)
-        if qty_check == "greater":
+        if message := self._check_move_line_qty_picked(move_line, quantity):
             return self._response_for_scan_destination(
                 move_line,
-                message=self.msg_store.unable_to_pick_more(move_line.reserved_uom_qty),
+                message=message,
                 qty_done=quantity,
             )
+        new_line = move_line._split_partial_quantity_to_be_done(quantity)
 
         search = self._actions_for("search")
         bin_package = search.package_from_scan(barcode)
