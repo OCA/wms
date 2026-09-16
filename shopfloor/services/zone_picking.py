@@ -1034,7 +1034,6 @@ class ZonePicking(Component):
         if quantity:
             move_line._split_partial_quantity_to_be_done(quantity)
         stock = self._actions_for("stock")
-        stock._lock_lines(move_line)
         try:
             stock.mark_move_line_as_picked(move_line, quantity, package)
         except ConcurentWorkOnTransfer:

@@ -138,6 +138,9 @@ class StockAction(Component):
         if quantity:
             move_lines.ensure_one()
         user = user or self.env.user
+
+        self._lock_lines(move_lines)
+
         if split and check_user:
             # Unless we don't split the move lines in it's own picking, we
             # always want to check the user
@@ -171,6 +174,7 @@ class StockAction(Component):
 
     def unmark_move_line_as_picked(self, move_lines, split=True):
         """Reverse the change from `mark_move_line_as_picked`."""
+        self._lock_lines(move_lines)
         move_lines.write(
             {
                 "shopfloor_user_id": False,
@@ -275,6 +279,7 @@ class StockAction(Component):
         this process easy.
         """
         package_move_lines = package_level.move_line_ids
+        self._lock_lines(package_move_lines)
         package_moves = package_move_lines.move_id
         for package_move in package_moves:
             # Check if there is no other lines linked to the move others than
