@@ -1622,9 +1622,9 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/actions/stock.py:0
+#: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Someone is already working on these transfers"
+msgid "Someone is already working on it"
 msgstr ""
 
 #. module: shopfloor

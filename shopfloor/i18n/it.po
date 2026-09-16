@@ -1748,10 +1748,10 @@ msgstr ""
 
 #. module: shopfloor
 #. odoo-python
-#: code:addons/shopfloor/actions/stock.py:0
+#: code:addons/shopfloor/actions/message.py:0
 #, python-format
-msgid "Someone is already working on these transfers"
-msgstr "Qualcuno sta già lavorando su questi trasferimenti"
+msgid "Someone is already working on it"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_sort_order
@@ -2416,6 +2416,10 @@ msgstr "Prelievo per area"
 #, python-format
 msgid "{} is not a valid destination package."
 msgstr "{} non è un collo destinazione valido."
+
+#, python-format
+#~ msgid "Someone is already working on these transfers"
+#~ msgstr "Qualcuno sta già lavorando su questi trasferimenti"
 
 #, python-format
 #~ msgid ""
