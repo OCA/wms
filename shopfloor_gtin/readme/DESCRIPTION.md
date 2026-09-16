@@ -1,0 +1,1 @@
+Enables to match a GTIN-13 barcode when scanning a 14-digits GTIN-13 prefixed with a leading zéro during a shopfloor scan.
