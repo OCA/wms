@@ -1,0 +1,117 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* internal_stock_quant_package
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2025-01-22 12:06+0000\n"
+"Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
+"Language-Team: none\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__delivery_carrier_id
+msgid "Delivery Carrier"
+msgstr "Vettore consegna"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__empty
+msgid "Empty"
+msgstr "Vuoto"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking__empty_internal_package_on_transfer
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking_type__empty_internal_package_on_transfer
+msgid "Empty Internal Package On Transfer"
+msgstr "Collo interno vuoto nel trasferimento"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,help:internal_stock_quant_package.field_stock_picking_type__empty_internal_package_on_transfer
+msgid ""
+"If set internal packages are emptied after the transfer or when products are"
+" put in pack."
+msgstr ""
+"Se impostata, i colli interni sono svuotati dopo il trasferimento o quando i "
+"prodotti sono inseriti in un pacco."
+
+#. module: internal_stock_quant_package
+#: model_terms:ir.ui.view,arch_db:internal_stock_quant_package.stock_quant_package_search_view
+msgid "Internal"
+msgstr "Interno"
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_internal_package_config_line
+msgid "Internal Package Configuration Line"
+msgstr "Riga configurazione collo interno"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_quant_package__is_internal
+msgid "Internal use?"
+msgstr "Uso interno?"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line____last_update
+msgid "Last Modified on"
+msgstr "Ultima modifica il"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_quant_package
+msgid "Packages"
+msgstr "Colli"
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_picking_type
+msgid "Picking Type"
+msgstr "Tipo prelievo"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking_type__stock_internal_package_config_line_ids
+msgid "Stock Internal Package Config Line"
+msgstr "Riga configurazione collo interno magazzino"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__stock_picking_type_id
+msgid "Stock Picking Type"
+msgstr "Tipo prelievo di magazzino"
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_picking
+msgid "Transfer"
+msgstr "Trasferimento"
