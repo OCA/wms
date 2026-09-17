@@ -90,9 +90,9 @@ export var PackagingQtyPickerMixin = {
             const self = this;
             const res = {};
             let _remaining_qty = qty;
-            // Const min_unit = _.last(pkg_by_qty);
             pkg_by_qty.forEach(function (pkg) {
-                const [_qty_per_pkg, _remaining_qty] = self._qty_by_pkg(
+                let _qty_per_pkg;
+                [_qty_per_pkg, _remaining_qty] = self._qty_by_pkg(
                     pkg.qty,
                     _remaining_qty
                 );
