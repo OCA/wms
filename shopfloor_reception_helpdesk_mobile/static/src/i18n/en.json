@@ -1,0 +1,8 @@
+{
+  "reception.helpdesk.helpdesk": "Helpdesk",
+  "reception.helpdesk.description": "Description",
+  "reception.helpdesk.ticket_description": "Ticket Description",
+  "reception.helpdesk.description_required": "Description is required",
+  "reception.helpdesk.motive": "Motive",
+  "reception.helpdesk.create_ticket": "Create Helpdesk Ticket"
+}
