@@ -123,6 +123,7 @@ const messages_en = {
         lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
         picking_count: "{priority_picking_count}/{picking_count}",
         picking_count_extended: "{priority_picking_count}/{picking_count} picking(s)",
+        select_expiry_date: "Select expiry date",
     },
     list: {
         no_items: "No item to list.",

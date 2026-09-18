@@ -124,6 +124,7 @@ const messages_fr = {
         lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
         picking_count: "{priority_picking_count}/{picking_count}",
         picking_count_extended: "{priority_picking_count}/{picking_count} transfert(s)",
+        select_expiry_date: "Sélectionnez date d'expiration",
     },
     list: {
         no_items: "Aucun élément à lister.",
