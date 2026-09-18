@@ -536,9 +536,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
         states["pack_picking_put_in_pack"] = self.schemas.pack_picking()
         states["pack_picking_scan_pack"] = self.schemas.pack_picking()
         states["select_package"] = self.schemas.select_package()
-        states["select_delivery_package_type"] = (
-            self._schema_select_delivery_package_type
-        )
+        states[
+            "select_delivery_package_type"
+        ] = self._schema_select_delivery_package_type
         return states
 
     @property

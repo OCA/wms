@@ -7,7 +7,7 @@
     "summary": """Build delivery packages at the end of the cluster picking""",
     "author": "ACSONE SA/NV,BCIM,Camptocamp,Odoo Community Association (OCA)",
     "maintainers": ["jbaudoux", "TDu", "mmequignon"],
-    "website": "https://github.com/OCA/stock-logistics-shopfloor",
+    "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": [
         "shopfloor",
