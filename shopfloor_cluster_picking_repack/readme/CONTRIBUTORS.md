@@ -1,0 +1,4 @@
+- Souheil Bejaoui \<souheil.bejaoui@acsone.eu\>
+- Denis Roussel \<denis.roussel@acsone.eu\>
+- Jacques-Étienne Baudoux \<je@bcim.be\>
+- Sébastien Alix \<sebastien.alix@camptocamp.com\>

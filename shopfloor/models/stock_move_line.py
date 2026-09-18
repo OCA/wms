@@ -36,6 +36,11 @@ class StockMoveLine(models.Model):
     def qty_picked(self):
         return self.qty_done
 
+    @qty_picked.setter
+    def qty_picked(self, value):
+        self.ensure_one()
+        self.qty_done = value
+
     @property
     def picked(self):
         """:return: True if there is a quantity picked."""
@@ -55,6 +60,11 @@ class StockMoveLine(models.Model):
         return not float_is_zero(
             self.reserved_uom_qty, precision_rounding=self.product_uom_id.rounding
         )
+
+    @property
+    def quantity(self):
+        self.ensure_one()
+        return self.reserved_uom_qty
 
     def _split_partial_quantity(self):
         """Create new move line for the quantity remaining to do

@@ -1,0 +1,130 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* shopfloor_cluster_picking_repack
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_stock_picking_batch
+msgid "Batch Transfer"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_shopfloor_menu__default_pack_pickings_action
+msgid "Default Pack Pickings Action"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields.selection,name:shopfloor_cluster_picking_repack.selection__shopfloor_menu__default_pack_pickings_action__nbr_packages
+msgid "Enter the number of packages"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_stock_picking__is_shopfloor_packing_todo
+msgid "If set, some operations need to be packed by the shopdloor operator"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_stock_picking_batch__is_shopfloor_packing_todo
+msgid "If set, some operations need to be packed by the shopfloor operator"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_shopfloor_menu__pack_pickings
+msgid ""
+"If you tick this box, all the picked items will be put in a new pack at the "
+"end of the picking process."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_shopfloor_menu
+msgid "Menu displayed in the scanner application"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "Not able to put in pack transfer {}."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_stock_picking__is_shopfloor_packing_todo
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_stock_picking_batch__is_shopfloor_packing_todo
+msgid "Operations need to be packed"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_shopfloor_menu__pack_pickings
+msgid "Pack pickings"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_stock_quant_package
+msgid "Packages"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model_terms:ir.ui.view,arch_db:shopfloor_cluster_picking_repack.shopfloor_menu_form_view
+msgid "Packing"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,field_description:shopfloor_cluster_picking_repack.field_stock_picking__packing_scanned_packs_str
+msgid "Packing Scanned Packs Str"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields.selection,name:shopfloor_cluster_picking_repack.selection__shopfloor_menu__default_pack_pickings_action__package_type
+msgid "Scan the package type"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model.fields,help:shopfloor_cluster_picking_repack.field_stock_picking__packing_scanned_packs_str
+msgid ""
+"Technical field to know which pack has been scanned into the put in pack "
+"process"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "The number of packages must be greater than 0."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "The scanned package '{}' is for an other picking."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "The scanned package '{}' must be internal."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#: model:ir.model,name:shopfloor_cluster_picking_repack.model_stock_picking
+msgid "Transfer"
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "Transfer {} already packed."
+msgstr ""
+
+#. module: shopfloor_cluster_picking_repack
+#. odoo-python
+#: code:addons/shopfloor_cluster_picking_repack/actions/message.py:0
+msgid "Transfer {} has been packed successfully."
+msgstr ""
