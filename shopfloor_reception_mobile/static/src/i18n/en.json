@@ -1,3 +1,50 @@
 {
-  "reception.filter_products": "Filter products"
+  "btn.confirm_done.title": "Confirm done",
+
+  "reception.filter_products": "Filter products",
+  "reception.find_operation": "Find an operation",
+
+  "reception.select_document.title": "Choose an operation",
+  "reception.select_document.scan_placeholder": "Scan document / product / package",
+  "reception.select_document.lines": "Lines",
+
+  "reception.manual_select.title": "Choose an operation",
+  "reception.manual_select.pickings_to_process_today": "Receptions to process today",
+  "reception.manual_select.pickings_to_process": "Receptions to process",
+  "reception.manual_select.packs_available": "Packs available",
+  "reception.manual_select.weight": "Weight",
+  "reception.manual_select.lines_already_in_pack": "Lines already in pack",
+  "reception.manual_select.storage_type": "Package type",
+
+  "reception.select_move.title": "Select a move",
+  "reception.select_move.scan_placeholder": "Scan product / package",
+  "reception.select_move.btn.mark_as_done": "Mark as Done",
+
+  "reception.set_lot.title": "Set lot",
+  "reception.set_lot.scan_placeholder": "Scan lot",
+  "reception.set_lot.expiration_date_placeholder": "Scan expiration date",
+  "reception.set_lot.btn.continue": "Continue",
+
+  "reception.set_quantity.title": "Set quantity",
+  "reception.set_quantity.scan_placeholder": "Scan document / product / package / location",
+  "reception.set_quantity.btn.existing_pack": "Existing pack",
+  "reception.set_quantity.btn.new_pack": "New pack",
+  "reception.set_quantity.btn.no_pack": "Process without pack",
+
+  "reception.set_destination.title": "Set destination",
+  "reception.set_destination.scan_placeholder": "Scan destination location",
+
+  "reception.select_dest_package.title": "Select destination package",
+  "reception.select_dest_package.scan_placeholder": "Scan destination package",
+
+  "reception.confirm_new_package.title": "Confirm new package",
+
+  "reception.confirm_over_reception.title": "Confirm over reception",
+  "reception.confirm_over_reception.message": "You are about to receive more than expected. Are you sure?",
+
+  "reception.transfer.partner": "Partner",
+  "reception.transfer.source_document": "Source Document",
+  "reception.transfer.scheduled_date": "Scheduled date: {date}",
+
+  "common.qty_done": "Qty done"
 }
