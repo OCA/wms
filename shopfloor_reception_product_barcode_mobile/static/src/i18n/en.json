@@ -1,0 +1,8 @@
+{
+  "reception.product_barcode.barcode": "Barcode",
+  "reception.product_barcode.product_barcode": "Product Barcode",
+  "reception.product_barcode.done": "Done",
+  "reception.product_barcode.skip": "Skip",
+  "reception.product_barcode.set_product_barcode": "Set product barcode",
+  "reception.product_barcode.scan_product_barcode": "Scan product barcode"
+}
