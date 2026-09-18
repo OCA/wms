@@ -94,7 +94,7 @@ Vue.component("detail-location", {
     </item-detail-card>
 
     <div class="products" v-if="record.reserved_move_lines.length">
-        <separator-title>Reserved products</separator-title>
+        <separator-title>{{ $t("detail.location.reserved_products") }}</separator-title>
 
         <list
             :records="record.reserved_move_lines"
@@ -103,7 +103,7 @@ Vue.component("detail-location", {
 
     </div>
     <div class="available_products" v-if="record.products.length">
-        <separator-title>Available products</separator-title>
+        <separator-title>{{ $t("detail.location.available_products") }}</separator-title>
 
         <v-expansion-panels v-if="record.products.length > 0" flat :color="utils.colors.color_for('detail_main_card')">
             <v-expansion-panel v-for="(product, index) in record.products" :key="make_component_key(['product', index])">
