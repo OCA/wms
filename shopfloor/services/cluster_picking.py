@@ -1042,12 +1042,15 @@ class ClusterPicking(Component):
             return self._unload_next_package(batch)
 
     def _data_for_unload_all(self, batch, confirmation=None):
+        all_lines = self._lines_for_picking_batch(batch)
         lines = self._lines_to_unload(batch)
         # all the lines destinations are the same here, it looks
         # only for the first one
         first_line = fields.first(lines)
         data = self.data.picking_batch(batch)
-        backorder_move_lines = lines.filtered(lambda l: l.qty_done < l.product_uom_qty)
+        backorder_move_lines = all_lines.filtered(
+            lambda li: li.qty_done < li.product_uom_qty
+        )
         data.update(
             {
                 "location_dest": self.data.location(first_line.location_dest_id),

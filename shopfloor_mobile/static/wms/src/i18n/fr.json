@@ -31,6 +31,7 @@
   "cluster_picking.batch_picking_line.destination_not_selected": "Destination non sélectionnée.",
   "cluster_picking.done_line.line.bin": "Compartiment",
   "cluster_picking.done_line.line.lot": "Lot",
+  "cluster_picking.done_line.line.source": "Source",
   "cluster_picking.backorder_lines.title": "Lignes de reliquat",
   "batch_picking_detail.pickings_list": "Liste des transferts",
   "batch_picking_detail.total_operations": "Nb opérations",

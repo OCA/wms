@@ -18,6 +18,7 @@ Vue.component("done-line", {
                 v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"
                 />
             <span class="ml-3 text-no-wrap" v-if="record.lot">{{ $t("cluster_picking.done_line.line.lot") }}: {{ record.lot.name }}</span>
+            <span class="ml-3 text-no-wrap" v-if="record.location_src">{{ $t("cluster_picking.done_line.line.source") }}: {{ record.location_src.display_name }}</span>
             <span class="ml-3 text-no-wrap" v-if="record.package_dest">{{ $t("cluster_picking.done_line.line.bin") }}: {{ record.package_dest.name }}</span>
         </div>
     `,
@@ -301,7 +302,7 @@ const ClusterPicking = {
                 return {
                     key: picking_id,
                     title: title,
-                    group_color: self.utils.colors.color_for("screen_step_todo"),
+                    group_color: self.utils.colors.color_for("error"),
                     records: value,
                 };
             });

@@ -59,9 +59,12 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
         if pack:
             data["package"] = self.data.package(pack)
         if with_move_lines:
+            all_lines = self.service._lines_for_picking_batch(batch)
             lines = self.service._lines_to_unload(batch)
             data["move_lines"] = self.data.move_lines(lines, with_picking=True)
-            backorder_lines = lines.filtered(lambda l: l.qty_done < l.product_uom_qty)
+            backorder_lines = all_lines.filtered(
+                lambda li: li.qty_done < li.product_uom_qty
+            )
             data["backorder_lines"] = self.data.move_lines(
                 backorder_lines, with_picking=True
             )
