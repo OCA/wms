@@ -3,12 +3,12 @@
 
 {
     "name": "Shopfloor Cluster Picking Repack Mobile",
-    "version": "18.0.1.0.1",
+    "version": "16.0.1.0.1",
     "summary": """
     Shopfloor mobile extension for packing operation into cluster picking
     """,
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/stock-logistics-shopfloor",
+    "website": "https://github.com/OCA/wms",
     "category": "Stock Management",
     "depends": ["shopfloor_mobile", "shopfloor_cluster_picking_repack"],
     "data": ["templates/assets.xml"],
