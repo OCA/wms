@@ -5,7 +5,7 @@
 
 /* eslint-disable no-unused-vars */
 
-import {process_registry} from "/shopfloor_mobile_base/static/src/services/process_registry.esm.js";
+import {process_registry} from "/shopfloor_mobile_base/static/wms/src/services/process_registry.js";
 
 const registry_key = "cluster_picking";
 const ClusterPickingBase = process_registry.get(registry_key);
