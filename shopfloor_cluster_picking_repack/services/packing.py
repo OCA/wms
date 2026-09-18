@@ -10,7 +10,7 @@ from odoo.addons.stock.models.stock_picking import Picking
 
 class PackingAction(Component):
     _name = "shopfloor.packing.action"
-    _inherit = "shopfloor.packing.action"
+    _inherit = "shopfloor.process.action"
     _usage = "packing"
     _description = "This is the service to put products in pack"
 
@@ -61,15 +61,11 @@ class PackingAction(Component):
             "packaging",
             "lot",
             "serial",
-            "package_type",
+            "delivery_packaging",
         )
-        return search.find(
+        return search.for_products(picking.move_ids.product_id).find(
             barcode,
             types=search_types,
-            handler_kw=dict(
-                lot=dict(products=picking.move_ids.product_id),
-                serial=dict(products=picking.move_ids.product_id),
-            ),
         )
 
     def _check_scan_package_find(self, picking, search_result):

@@ -271,7 +271,6 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             response,
             next_state="start",
             message={"message_type": "success", "body": "Batch Transfer complete"},
-            popup=self.ANY,
         )
         self.assertRecordValues(
             move_lines[0].picking_id, [{"state": "done", "batch_id": self.batch.id}]

@@ -333,7 +333,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         msg_store = self.service.msg_store
-        message = msg_store.selected_lines_qty_picked_higher_than_allowed(line)
+        message = msg_store.selected_lines_qty_done_higher_than_allowed(line)
         data = self.data.select_package(picking, lines.sorted())
         # data  = self.data.pack_picking(next_picking)
         self.assert_response(
@@ -396,7 +396,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         )
         data = {}
         data["selected_lines_for_packing"] = self.data.move_lines(lines)
-        data["package_type"] = self.data.package_type_list(self.package_types)
+        data["package_type"] = self.data.delivery_packaging_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         self.assert_response(
             response,
@@ -490,7 +490,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
     def test_scan_package_wrong_picking_status(self):
         move_line = self.move_lines[-1]
         picking = move_line.picking_id
-        picking.action_cancel()  #  to trigger error in _check_picking_status
+        picking.action_cancel()  # to trigger error in _check_picking_status
         response = self.service.dispatch(
             "scan_package_action",
             params={
@@ -565,7 +565,7 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
             },
         )
         data = {}
-        data["package_type"] = self.data.package_type_list(self.package_types)
+        data["package_type"] = self.data.delivery_packaging_list(self.package_types)
         data["picking"] = self.data.picking(picking)
         message = {"message_type": "info", "body": "Operation already processed."}
         data = {}

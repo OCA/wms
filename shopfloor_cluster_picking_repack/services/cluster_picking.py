@@ -5,6 +5,7 @@ from odoo import fields
 
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
+from odoo.addons.shopfloor.actions.search import SearchInvalidProduct
 from odoo.addons.stock.models.stock_move_line import StockMoveLine
 from odoo.addons.stock.models.stock_package_type import PackageType
 from odoo.addons.stock.models.stock_picking import Picking
@@ -38,7 +39,7 @@ class ClusterPicking(Component):
             return self._response_for_select_package(
                 picking,
                 selected_lines,
-                message=self.msg_store.no_package_type_available(),
+                message=self.msg_store.no_delivery_packaging_available(),
             )
         response = self._check_allowed_qty_picked(picking, selected_lines)
         if response:
@@ -89,7 +90,14 @@ class ClusterPicking(Component):
                 message=message,
             )
 
-        search_result = packing_action._scan_package_find(picking, barcode)
+        try:
+            search_result = packing_action._scan_package_find(picking, barcode)
+        except SearchInvalidProduct as e:
+            return self._response_for_select_package(
+                picking,
+                selected_lines,
+                message=self.msg_store.wrong_record(e.recordset),
+            )
         message = packing_action._check_scan_package_find(picking, search_result)
         if message:
             return self._response_for_select_package(
@@ -97,7 +105,7 @@ class ClusterPicking(Component):
                 selected_lines,
                 message=message,
             )
-        if search_result and search_result.type == "package_type":
+        if search_result and search_result.type == "delivery_packaging":
             package_type_id = search_result.record.id
         else:
             return self._response_for_select_package(
@@ -375,7 +383,7 @@ class ClusterPicking(Component):
         return ""
 
     def _data_for_delivery_package_type(self, package_type, **kw):
-        return self.data.package_type_list(package_type, **kw)
+        return self.data.delivery_packaging_list(package_type, **kw)
 
     def _check_allowed_qty_picked(self, picking, lines) -> dict:
         for line in lines:
@@ -386,7 +394,7 @@ class ClusterPicking(Component):
                 return self._response_for_select_package(
                     picking,
                     lines,
-                    message=self.msg_store.selected_lines_qty_picked_higher_than_allowed(
+                    message=self.msg_store.selected_lines_qty_done_higher_than_allowed(
                         line
                     ),
                 )
@@ -430,7 +438,7 @@ class ClusterPicking(Component):
         packages_data = self.data.packages(
             packages.with_context(picking_id=picking.id).sorted(),
             picking=picking,
-            with_package_type=True,
+            with_packaging=True,
             with_package_move_line_count=True,
         )
         return self._response(
@@ -604,7 +612,9 @@ class ShopfloorClusterPickingValidatorResponse(Component):
             "selected_lines_for_packing": self.schemas._schema_list_of(
                 self.schemas.move_line()
             ),
-            "package_type": self.schemas._schema_list_of(self.schemas.package_type()),
+            "package_type": self.schemas._schema_list_of(
+                self.schemas.delivery_packaging()
+            ),
         }
 
     def scan_package_action(self) -> dict:

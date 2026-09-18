@@ -7,7 +7,7 @@ from odoo import models
 class StockQuantPackage(models.Model):
     _inherit = "stock.quant.package"
 
-    def _sync_package_type_from_single_product(self, product, quantity):
+    def _sync_package_type_from_single_product(self):
         return super(
             StockQuantPackage, self.filtered(lambda p: not p.number_of_parcels)
-        )._sync_package_type_from_single_product(product, quantity)
+        )._sync_package_type_from_single_product()
