@@ -1,0 +1,6 @@
+{
+  "cluster_picking.pack_picking_put_in_pack.title": "Packing: Enter the number of boxes used.",
+  "cluster_picking.pack_picking_put_in_pack.scan_placeholder": "Number of boxes used",
+  "cluster_picking.pack_picking_scan_pack.title": "Packing: Validate bin to pack.",
+  "cluster_picking.pack_picking_scan_pack.scan_placeholder": "Bin barcode "
+}
