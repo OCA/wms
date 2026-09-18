@@ -57,7 +57,12 @@ class Reception(Component):
         if action.get("res_model") == "stock.backorder.reason.choice":
             result = (
                 self.env["stock.backorder.reason.choice"]
-                .with_context(button_validate_picking_ids=picking.ids)
+                .with_context(
+                    button_validate_picking_ids=picking.ids,
+                    # ↓ odoo shows a confirmation wizard and does not validate
+                    # right away in case of expired products
+                    skip_expired=True,
+                )
                 .new(
                     {
                         "picking_ids": [Command.set([picking_id])],
