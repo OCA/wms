@@ -24,7 +24,7 @@ Vue.component("form-edit-stock-picking", {
 
     <v-form ref="form">
         <div class="fields-wrapper">
-            <separator-title>Change carrier</separator-title>
+            <separator-title>{{ $t("form_edit_stock_picking.change_carrier") }}</separator-title>
             <manual-select
                 :records="form.carrier_id.select_options"
                 :options="{showActions: false, initValue: record.carrier.id}"

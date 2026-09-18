@@ -37,8 +37,8 @@
                 type="module"
             />
             <script
-                id="script_add_translations_registry"
-                t-attf-src="/shopfloor_mobile/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{app_version}"
+                id="script_add_translations_registry_shopfloor_mobile"
+                t-attf-src="/shopfloor_mobile/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
                 type="module"
             />
             <script
