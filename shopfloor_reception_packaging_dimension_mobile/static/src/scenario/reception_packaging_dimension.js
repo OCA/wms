@@ -25,52 +25,52 @@ const new_template =
         <v-container>
             <v-row>
                 <v-text-field
-                    label="Barcode"
-                    placeholder="Packaging Barcode"
+                    :label="$t('Barcode')"
+                    :placeholder="$t('Packaging Barcode')"
                     v-model="state.data.packaging.barcode_input"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
-                    label="Quantiy"
+                    :label="$t('Quantity')"
                     type="number"
-                    placeholder="Packaging Quantity"
+                    :placeholder="$t('Packaging Quantity')"
                     v-model="state.data.packaging.qty_input"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
-                    label="Length"
+                    :label="$t('Length')"
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
-                    placeholder="Packaging Length"
+                    :placeholder="$t('Packaging Length')"
                     v-model="state.data.packaging.packaging_length_input"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
-                    label="Width"
+                    :label="$t('Width')"
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
-                    placeholder="Packaging Width"
+                    :placeholder="$t('Packaging Width')"
                     v-model="state.data.packaging.width_input"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
-                    label="Height"
+                    :label="$t('Height')"
                     type="number"
                     :suffix="state.data.packaging.length_uom_name"
-                    placeholder="Packaging Height"
+                    :placeholder="$t('Packaging Height')"
                     v-model="state.data.packaging.height_input"
                 ></v-text-field>
             </v-row>
             <v-row>
                 <v-text-field
-                    label="Weight"
+                    :label="$t('Weight')"
                     type="number"
                     :suffix="state.data.packaging.weight_uom_name"
-                    placeholder="Packaging Weight"
+                    :placeholder="$t('Packaging Weight')"
                     v-model="state.data.packaging.weight_input"
                 ></v-text-field>
             </v-row>
@@ -80,13 +80,13 @@ const new_template =
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action action="todo" @click="state.on_done">Done</btn-action>
+                <btn-action action="todo" @click="state.on_done">{{ $t('Done') }}</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
             <v-col class="text-center" cols="12">
 
-                <btn-action color="default" @click="state.on_skip">Skip</btn-action>
+                <btn-action color="default" @click="state.on_skip">{{ $t('Skip') }}</btn-action>
 
             </v-col>
         </v-row>
@@ -150,17 +150,17 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                 fields: [
                     {
                         path: "barcode",
-                        label: "Barcode",
+                        label: this.$t("Barcode"),
                         klass: _is_field_changed("barcode") ? "accent" : "",
                     },
                     {
                         path: "qty",
-                        label: "Quantity",
+                        label: this.$t("Quantity"),
                         klass: _is_field_changed("qty") ? "accent" : "",
                     },
                     {
                         path: "packaging_length",
-                        label: "Length",
+                        label: this.$t("Length"),
                         klass: _is_field_changed("packaging_length") ? "accent" : "",
                         renderer: function (rec, field) {
                             const value = _.result(rec, "packaging_length", "");
@@ -170,7 +170,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     },
                     {
                         path: "width",
-                        label: "Width",
+                        label: this.$t("Width"),
                         klass: _is_field_changed("width") ? "accent" : "",
                         renderer: function (rec, field) {
                             const value = _.result(rec, "width", "");
@@ -180,7 +180,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     },
                     {
                         path: "height",
-                        label: "Height",
+                        label: this.$t("Height"),
                         klass: _is_field_changed("height") ? "accent" : "",
                         renderer: function (rec, field) {
                             const value = _.result(rec, "height", "");
@@ -190,7 +190,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
                     },
                     {
                         path: "weight",
-                        label: "Weight",
+                        label: this.$t("Weight"),
                         klass: _is_field_changed("weight") ? "accent" : "",
                         renderer: function (rec, field) {
                             const value = _.result(rec, "weight", "");
@@ -210,7 +210,7 @@ const ReceptionPackageDimension = process_registry.extend("reception", {
 
             states["set_packaging_dimension"] = {
                 display_info: {
-                    title: "Set packaging dimension",
+                    title: this.$t("Set packaging dimension"),
                 },
                 events: {
                     go_back: "on_back",

@@ -11,11 +11,11 @@ Vue.component("detail-package", {
     methods: {
         detail_fields() {
             return [
-                {path: "location.name", label: "Location"},
-                {path: "weight", label: "Weight (kg)"},
-                {path: "packaging.name", label: "Packaging"},
-                {path: "storage_type.name", label: "Storage type"},
-                {path: "package_type.name", label: "Package type"},
+                {path: "location.name", label: this.$t("Location")},
+                {path: "weight", label: this.$t("Weight (kg)")},
+                {path: "packaging.name", label: this.$t("Packaging")},
+                {path: "storage_type.name", label: this.$t("Storage type")},
+                {path: "package_type.name", label: this.$t("Package type")},
             ];
         },
         product_list_options() {
@@ -35,11 +35,11 @@ Vue.component("detail-package", {
                     action_val_path: "product.barcode",
                     klass: "loud",
                 },
-                {path: "product.barcode", label: "Barcode"},
-                {path: "product.supplier_code", label: "Vendor code"},
-                {path: "lot.name", label: "Lot"},
-                {path: "quantity", label: "Reserved"},
-                {path: "product.qty_available", label: "In stock"},
+                {path: "product.barcode", label: this.$t("Barcode")},
+                {path: "product.supplier_code", label: this.$t("Vendor code")},
+                {path: "lot.name", label: this.$t("Lot")},
+                {path: "quantity", label: this.$t("Reserved")},
+                {path: "product.qty_available", label: this.$t("In stock")},
             ];
         },
     },
@@ -52,7 +52,7 @@ Vue.component("detail-package", {
                 />
 
             <div class="products mb-4" v-if="(record.move_lines || []).length">
-                <separator-title>Products</separator-title>
+                <separator-title>{{ $t("Products") }}</separator-title>
                 <list
                     :records="record.move_lines"
                     :options="product_list_options()"
@@ -61,7 +61,7 @@ Vue.component("detail-package", {
             </div>
 
             <div class="pickings" v-if="(record.pickings || []).length">
-                <separator-title>Transfers</separator-title>
+                <separator-title>{{ $t("Transfers") }}</separator-title>
                 <detail-picking
                     v-for="picking in record.pickings"
                     :record="picking"

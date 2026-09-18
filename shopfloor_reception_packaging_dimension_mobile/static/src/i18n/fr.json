@@ -1,0 +1,17 @@
+{
+  "Barcode": "Code-barres",
+  "Packaging Barcode": "Code-barres de l'emballage",
+  "Quantity": "Quantité",
+  "Packaging Quantity": "Quantité de l'emballage",
+  "Length": "Longueur",
+  "Packaging Length": "Longueur de l'emballage",
+  "Width": "Largeur",
+  "Packaging Width": "Largeur de l'emballage",
+  "Height": "Hauteur",
+  "Packaging Height": "Hauteur de l'emballage",
+  "Weight": "Poids",
+  "Packaging Weight": "Poids de l'emballage",
+  "Done": "Terminé",
+  "Skip": "Ignorer",
+  "Set packaging dimension": "Définir les dimensions de l'emballage"
+}

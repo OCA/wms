@@ -17,8 +17,8 @@ export const reception_states = function () {
         },
         select_document: {
             display_info: {
-                title: "Choose an operation",
-                scan_placeholder: "Scan document / product / package",
+                title: this.$t("Choose an operation"),
+                scan_placeholder: this.$t("Scan document / product / package"),
             },
             events: {
                 select: "on_select",
@@ -42,7 +42,7 @@ export const reception_states = function () {
             },
         },
         manual_selection: {
-            title: "Choose an operation",
+            title: this.$t("Choose an operation"),
             events: {
                 select: "on_select",
                 go_back: "on_back",
@@ -62,8 +62,8 @@ export const reception_states = function () {
         },
         select_move: {
             display_info: {
-                title: "Select a move",
-                scan_placeholder: "Scan product / package",
+                title: this.$t("Select a move"),
+                scan_placeholder: this.$t("Scan product / package"),
             },
             events: {
                 cancel_picking_line: "on_cancel",
@@ -104,7 +104,7 @@ export const reception_states = function () {
         },
         confirm_done: {
             display_info: {
-                title: "Confirm done",
+                title: this.$t("Confirm done"),
             },
             events: {
                 confirm: "on_confirm",
@@ -125,9 +125,9 @@ export const reception_states = function () {
         },
         set_lot: {
             display_info: {
-                title: "Set lot",
-                scan_placeholder: "Scan lot",
-                scan_input_placeholder_expiry: "Scan expiration date",
+                title: this.$t("Set lot"),
+                scan_placeholder: this.$t("Scan lot"),
+                scan_input_placeholder_expiry: this.$t("Scan expiration date"),
             },
             on_scan: (barcode) => {
                 this.wait_call(
@@ -167,8 +167,10 @@ export const reception_states = function () {
         },
         set_quantity: {
             display_info: {
-                title: "Set quantity",
-                scan_placeholder: "Scan document / product / package / location",
+                title: this.$t("Set quantity"),
+                scan_placeholder: this.$t(
+                    "Scan document / product / package / location"
+                ),
             },
             events: {
                 qty_edit: "on_qty_edit",
@@ -232,8 +234,8 @@ export const reception_states = function () {
         },
         set_destination: {
             display_info: {
-                title: "Set destination",
-                scan_placeholder: "Scan destination location",
+                title: this.$t("Set destination"),
+                scan_placeholder: this.$t("Scan destination location"),
             },
             on_scan: (location) => {
                 this.wait_call(
@@ -248,8 +250,8 @@ export const reception_states = function () {
         },
         select_dest_package: {
             display_info: {
-                title: "Select destination package",
-                scan_placeholder: "Scan destination package",
+                title: this.$t("Select destination package"),
+                scan_placeholder: this.$t("Scan destination package"),
             },
             events: {
                 select: "on_select",
@@ -275,7 +277,7 @@ export const reception_states = function () {
         },
         confirm_new_package: {
             display_info: {
-                title: "Confirm new package",
+                title: this.$t("Confirm new package"),
             },
             events: {
                 confirm: "on_confirm",
@@ -298,8 +300,10 @@ export const reception_states = function () {
         },
         confirm_over_reception: {
             display_info: {
-                title: "Confirm over reception",
-                message: "You are about to receive more than expected. Are you sure?",
+                title: this.$t("Confirm over reception"),
+                message: this.$t(
+                    "You are about to receive more than expected. Are you sure?"
+                ),
             },
             events: {
                 confirm: "on_confirm",
