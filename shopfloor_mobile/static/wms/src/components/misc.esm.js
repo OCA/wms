@@ -32,10 +32,10 @@ Vue.component("get-work", {
     template: `
   <div class="get-work fullscreen-buttons fullscreen-buttons-50">
     <btn-action id="btn-get-work" @click="$emit('get_work')">
-      {{ $t('misc.btn_get_work') }}
+      {{ $t('btn.get_work.title') }}
     </btn-action>
     <btn-action id="btn-manual" color="default" @click="$emit('manual_selection')">
-      {{ $t('misc.btn_manual_selection') }}
+      {{ $t('btn.manual_selection.title') }}
     </btn-action>
   </div>
   `,

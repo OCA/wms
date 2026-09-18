@@ -113,24 +113,24 @@ Vue.component("picking-select-package-content", {
         <div :class="[record.package_dest ? 'has-pack' : 'no-pack', get_wrapper_klass(record)]">
             <span class="record-name">{{ record.product.display_name }}</span>
             <div class="lot" v-if="record.lot">
-                <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+                <span class="label">{{ $t("common.lot") }}:</span> <span>{{ record.lot.name }}</span>
             </div>
             <div class="qty done">
-                <span class="label">Taken:</span>
+                <span class="label">{{ $t("picking_select.taken") }}</span>
                 <packaging-qty-picker-display
                     :key="make_component_key(['qty-picker-widget', 'taken', record.id])"
                     v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"
                     />
             </div>
             <div class="qty requested">
-                <span class="label">Requested:</span>
+                <span class="label">{{ $t("picking_select.requested") }}</span>
                 <packaging-qty-picker-display
                     :key="make_component_key(['qty-picker-widget', 'requested', record.id])"
                     v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.quantity})"
                     />
             </div>
             <div class="vendor-code">
-                <span class="label">Vendor code:</span> <span>{{ record.product.supplier_code }}</span>
+                <span class="label">{{ $t("common.vendor_code") }}</span> <span>{{ record.product.supplier_code }}</span>
             </div>
         </div>
     </div>

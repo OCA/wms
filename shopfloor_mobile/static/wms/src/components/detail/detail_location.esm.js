@@ -26,15 +26,23 @@ Vue.component("detail-location", {
                     action_val_path: "product.barcode",
                     klass: "loud",
                 },
-                {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
+                {
+                    path: "product.supplier_code",
+                    label: $t("common.vendor_code"),
+                    klass: "loud",
+                },
                 {
                     path: "package_src.name",
-                    label: "Pack",
+                    label: $t("common.pack"),
                     action_val_path: "package_src.name",
                 },
-                {path: "lot.name", label: "Lot", action_val_path: "lot.name"},
-                {path: "product.qty_reserved", label: "Qty reserved"},
-                {path: "product.qty_available", label: "Qty in stock"},
+                {
+                    path: "lot.name",
+                    label: $t("common.lot"),
+                    action_val_path: "lot.name",
+                },
+                {path: "product.qty_reserved", label: $t("common.qty_reserved")},
+                {path: "product.qty_available", label: $t("common.qty_in_stock")},
             ];
         },
         available_product_list_options() {
@@ -47,8 +55,8 @@ Vue.component("detail-location", {
         },
         available_product_list_fields() {
             return [
-                {path: "supplier_code", label: "Vendor code", klass: "loud"},
-                {path: "quantity", label: "Qty in stock"},
+                {path: "supplier_code", label: $t("common.vendor_code"), klass: "loud"},
+                {path: "quantity", label: $t("common.qty_in_stock")},
             ];
         },
         lot_detail_options() {
@@ -62,17 +70,17 @@ Vue.component("detail-location", {
         lot_detail_fields() {
             const self = this;
             return [
-                {path: "quantity", label: "Qty in stock"},
+                {path: "quantity", label: $t("common.qty_in_stock")},
                 {
                     path: "expiration_date",
-                    label: "Expiry date",
+                    label: $t("lot.expiry_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
-                    label: "Removal date",
+                    label: $t("lot.removal_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
@@ -94,7 +102,7 @@ Vue.component("detail-location", {
     </item-detail-card>
 
     <div class="products" v-if="record.reserved_move_lines.length">
-        <separator-title>Reserved products</separator-title>
+        <separator-title>{{ $t("location.reserved_products") }}</separator-title>
 
         <list
             :records="record.reserved_move_lines"
@@ -103,7 +111,7 @@ Vue.component("detail-location", {
 
     </div>
     <div class="available_products" v-if="record.products.length">
-        <separator-title>Available products</separator-title>
+        <separator-title>{{ $t("location.available_products") }}</separator-title>
 
         <v-expansion-panels v-if="record.products.length > 0" flat :color="utils.colors.color_for('detail_main_card')">
             <v-expansion-panel v-for="(product, index) in record.products" :key="make_component_key(['product', index])">

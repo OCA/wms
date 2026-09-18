@@ -46,11 +46,11 @@ Vue.component("detail-product", {
                     display_no_value: false,
                     render_component: "detail-product-image",
                 },
-                {path: "lot.name", label: "Lot"},
-                {path: "expiration_date", label: "Expiry date"},
-                {path: "default_code", label: "Internal ref"},
-                {path: "barcode", label: "Barcode"},
-                {path: "product.supplier_code", label: "Supplier ref"},
+                {path: "lot.name", label: this.$t("common.lot")},
+                {path: "expiration_date", label: this.$t("lot.expiry_date")},
+                {path: "default_code", label: this.$t("product.internal_ref")},
+                {path: "barcode", label: this.$t("product.barcode")},
+                {path: "product.supplier_code", label: this.$t("product.supplier_ref")},
             ];
         },
         packaging_detail_fields() {
@@ -59,8 +59,8 @@ Vue.component("detail-product", {
         supplier_detail_fields() {
             return [
                 {path: "partner", klass: "loud"},
-                {path: "product_code", label: "Vendor Code"},
-                {path: "product_name", label: "Vendor Name"},
+                {path: "product_code", label: this.$t("common.vendor_code")},
+                {path: "product_name", label: this.$t("common.vendor_name")},
             ];
         },
         unique_suppliers(suppliers) {
@@ -84,7 +84,7 @@ Vue.component("detail-product", {
             };
         },
         locations_fields() {
-            return [{path: "quantity", label: "Reserved"}];
+            return [{path: "quantity", label: this.$t("common.reserved")}];
         },
         available_product_list_options() {
             return {
@@ -98,7 +98,7 @@ Vue.component("detail-product", {
             };
         },
         available_product_list_fields() {
-            return [{path: "qty_available", label: "Qty on hand"}];
+            return [{path: "qty_available", label: this.$t("common.qty_on_hand")}];
         },
         lot_detail_options() {
             return {
@@ -111,17 +111,17 @@ Vue.component("detail-product", {
         lot_detail_fields() {
             const self = this;
             return [
-                {path: "quantity", label: "Qty in stock"},
+                {path: "quantity", label: this.$t("common.qty_in_stock")},
                 {
                     path: "expiration_date",
-                    label: "Expiry date",
+                    label: this.$t("lot.expiry_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
-                    label: "Removal date",
+                    label: this.$t("lot.removal_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
@@ -138,7 +138,7 @@ Vue.component("detail-product", {
         />
 
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
-        <separator-title>Suppliers</separator-title>
+        <separator-title>{{ $t("product.suppliers") }}</separator-title>
         <item-detail-card
             v-for="supp in unique_suppliers(record.suppliers)"
             :key="'supp' + supp.id"
@@ -148,7 +148,7 @@ Vue.component("detail-product", {
     </div>
 
     <div class="packaging mb-4" v-if="opts.full_detail && record.packaging">
-        <separator-title>Packaging</separator-title>
+        <separator-title>{{ $t("product.packaging") }}</separator-title>
         <list
             :records="record.packaging"
             :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
@@ -156,7 +156,7 @@ Vue.component("detail-product", {
     </div>
 
     <div class="locations mb-4" v-if="record.locations">
-        <separator-title>Locations</separator-title>
+        <separator-title>{{ $t("common.locations") }}</separator-title>
         <v-expansion-panels v-if="record.locations.length > 0" flat :color="utils.colors.color_for('detail_main_card')">
             <v-expansion-panel v-for="(location, index) in record.locations" :key="make_component_key(['location', index])">
               <v-expansion-panel-header>
@@ -173,7 +173,7 @@ Vue.component("detail-product", {
                     </item-detail-card>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <separator-title v-if="location.lots.length > 0">Lots</separator-title>
+                <separator-title v-if="location.lots.length > 0">{{ $t("common.lots") }}</separator-title>
                 <item-detail-card
                 v-for="(lot, i) in location.lots"
                 :record="lot"

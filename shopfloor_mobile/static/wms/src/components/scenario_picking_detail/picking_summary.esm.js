@@ -187,10 +187,10 @@ Vue.component("picking-summary-product-detail", {
             <template v-if="_.isEmpty(options.fields)">
                 <v-list-item-subtitle>
                     <div class="lot" v-if="record.lot">
-                        <span class="label">Lot:</span> <span>{{ record.lot.name }}</span>
+                        <span class="label">{{ $t("common.lot") }}:</span> <span>{{ record.lot.name }}</span>
                     </div>
                     <div class="qty">
-                        <span class="label">Qty:</span>
+                        <span class="label">{{ $t("common.qty") }}</span>
                         <packaging-qty-picker-display
                             :key="make_component_key(['picking-summary', 'qty-picker-widget', 'done', record.id])"
                             v-bind="utils.wms.move_line_qty_picker_props(record, {qtyInit: record.qty_done})"

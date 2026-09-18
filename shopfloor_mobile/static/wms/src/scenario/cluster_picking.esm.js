@@ -353,7 +353,7 @@ const ClusterPicking = {
                 unload_all: {
                     display_info: {
                         title: this.$t("cluster_picking.unload_all.title"),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t("placeholder.scan_location"),
                     },
                     on_scan: (scanned, confirmation = "") => {
                         this.state_set_data({location_barcode: scanned.text});
@@ -369,7 +369,7 @@ const ClusterPicking = {
                 confirm_unload_all: {
                     display_info: {
                         title: this.$t("cluster_picking.confirm_unload_all.title"),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t("placeholder.scan_location"),
                     },
                     on_scan: (scanned, confirmation = true) => {
                         this.on_state_exit();
@@ -400,7 +400,7 @@ const ClusterPicking = {
                 unload_set_destination: {
                     display_info: {
                         title: this.$t("cluster_picking.unload_set_destination.title"),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t("placeholder.scan_location"),
                     },
                     on_scan: (scanned) => {
                         this.wait_call(
@@ -417,7 +417,7 @@ const ClusterPicking = {
                         title: this.$t(
                             "cluster_picking.confirm_unload_set_destination.title"
                         ),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t("placeholder.scan_location"),
                     },
                     on_scan: (scanned) => {
                         this.wait_call(

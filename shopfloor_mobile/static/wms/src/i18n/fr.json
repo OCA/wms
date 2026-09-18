@@ -1,7 +1,7 @@
 {
   "app.nav.op_types": "Type d'operation",
   "app.nav.scenario": "Scénario:",
-  "btn.ok.title": "OK",
+
   "cluster_picking.change_pack_lot.scan_placeholder": "Scannez la boite ou le lot",
   "cluster_picking.change_pack_lot.title": "Changer de boite ou de lot",
   "cluster_picking.confirm_unload_all.title": "Confirmez le déchargement de tous les compartiments",
@@ -10,6 +10,8 @@
   "cluster_picking.scan_destination.scan_placeholder": "Scannez le compartiment de destination",
   "cluster_picking.scan_destination.title": "Vérifiez la qté et scannez un compartiment de destination",
   "cluster_picking.start_line.scan_placeholder": "Scannez l'emplacement / la boite / le produit / le lot",
+  "cluster_picking.start_line.scan_placeholder_location_pack": "Scannez l'emplacement / la boite",
+  "cluster_picking.start_line.scan_placeholder_product_lot_pack": "Scannez le produit / le lot / la boite",
   "cluster_picking.start_line.title": "Sélectionnez le produit en scannant quelque chose",
   "cluster_picking.unload_all.title": "Décharger tous les compartiments",
   "cluster_picking.unload_all.destination": "Destination:",
@@ -23,29 +25,74 @@
   "cluster_picking.batch_picking_line.action_stock_out": "Déclarer rupture de stock",
   "cluster_picking.batch_picking_line.action_change_pack_or_lot": "Changer de boite ou lot",
   "cluster_picking.batch_picking_line.destination_not_selected": "Destination non sélectionnée.",
+
   "batch_picking_detail.pickings_list": "Liste des transferts",
   "batch_picking_detail.total_operations": "Nb opérations",
   "batch_picking_detail.total_lines": "Nb lignes",
   "batch_picking_detail.total_weight": "Poids total",
   "batch_picking_detail.lines": "Lignes",
   "batch_picking_detail.weight": "Poids",
-  "detail.transfer.scheduled_on": "Prévu le",
-  "detail.transfer.operation_type": "Type d'opération",
-  "detail.transfer.carrier": "Transporteur",
-  "detail.transfer.priority": "Priorité",
-  "detail.transfer.pack": "Colis",
-  "detail.transfer.lot": "Lot",
-  "detail.transfer.qty_reserved": "Qté réservée",
-  "detail.transfer.qty_in_stock": "Qté en stock",
-  "detail.transfer.edit_carrier": "Modifier le transporteur",
+
   "location_content_transfer.scan_destination.title": "Définissez une qté et scannez l'emplacement de destination",
   "location_content_transfer.scan_destination_all.title": "Scannez l'emplacement de destination pour tous les produits",
   "location_content_transfer.scan_location.title": "Commencez en scannant un emplacement",
   "location_content_transfer.start_single.scan_placeholder": "Scannez une boite / un produit / un lot",
   "location_content_transfer.scan_destination.scan_placeholder": "Scannez un emplacement / pack",
-  "misc.btn_get_work": "Obtenir du travail",
-  "misc.btn_manual_selection": "Sélection manuelle",
+
+  "transfer.scheduled_on": "Prévu le",
+  "transfer.operation_type": "Type d'opération",
+  "transfer.carrier": "Transporteur",
+
+  "detail.transfer.edit_carrier": "Modifier le transporteur",
+
+  "location.reserved_products": "Produits réservés",
+  "location.available_products": "Produits disponibles",
+
+  "operation.source": "Source",
+  "operation.destination": "Destination",
+
+  "lot.expiry_date": "Date d'expiration",
+  "lot.removal_date": "Date de retrait",
+
+  "product.suppliers": "Fournisseurs",
+  "product.packaging": "Conditionnement",
+  "product.internal_ref": "Ref interne",
+  "product.barcode": "Code-barres",
+  "product.supplier_ref": "Ref fournisseur",
+
+  "common.location": "Emplacement",
+  "common.weight_kg": "Poids (kg)",
+  "common.package_type": "Type de colis",
+  "common.priority": "Priorité",
+  "common.pack": "Colis",
+  "common.products": "Produits",
+  "common.transfers": "Transferts",
+  "common.locations": "Emplacements",
+  "common.in_stock": "En stock",
+  "common.qty_on_hand": "Qté disponible",
+  "common.qty_in_stock": "Qté en stock",
+  "common.qty_reserved": "Qté réservée",
+  "common.barcode": "Code-barres",
+  "common.reserved": "Réservé",
+  "common.vendor_code": "Code fournisseur",
+  "common.lots": "Lots",
+  "common.lot": "Lot",
+  "common.vendor_name": "Nom Fournisseur",
+  "common.qty": "Qté",
+
+  "picking_select.requested": "Demandé",
+  "picking_select.taken": "Pris",
+
+  "form_edit_stock_picking.change_carrier": "Changer le transporteur",
+
+  "list.no_items": "Aucun élément à afficher.",
+
+  "btn.get_work.title": "Obtenir du travail",
+  "btn.manual_selection.title": "Sélection manuelle",
+
+  "misc.lines_count": "Nombre de lignes",
   "misc.stock_zero_check.confirm_stock_not_zero": "Confirmer le stock",
   "misc.stock_zero_check.confirm_stock_zero": "Rupture de stock",
-  "scan_placeholder_translation": "Scannez un emplacement"
+
+  "placeholder.scan_location": "Scannez un emplacement"
 }
