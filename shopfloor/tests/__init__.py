@@ -88,3 +88,4 @@ from . import test_stock_move
 from . import test_stock_split
 from . import test_picking_form
 from . import test_user
+from . import test_stock_issue_strategy
