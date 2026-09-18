@@ -1,3 +1,50 @@
 {
-  "reception.filter_products": "Filtrer les produits"
+  "btn.confirm_done.title": "Confirmer fait",
+
+  "reception.filter_products": "Filtrer les produits",
+  "reception.find_operation": "Trouver une opération",
+
+  "reception.select_document.title": "Choisissez une opération",
+  "reception.select_document.scan_placeholder": "Scannez document / produit / colis",
+  "reception.select_document.lines": "Lignes",
+
+  "reception.manual_select.title": "Choisissez une opération",
+  "reception.manual_select.pickings_to_process_today": "Réceptions à traiter aujourd'hui",
+  "reception.manual_select.pickings_to_process": "Réceptions à traiter",
+  "reception.manual_select.packs_available": "Colis disponibles",
+  "reception.manual_select.weight": "Poids",
+  "reception.manual_select.lines_already_in_pack": "Lignes déjà dans un colis",
+  "reception.manual_select.storage_type": "Type de colis",
+
+  "reception.select_move.title": "Sélectionnez un mouvement",
+  "reception.select_move.scan_placeholder": "Scannez produit / colis",
+  "reception.select_move.btn.mark_as_done": "Marquer comme Fait",
+
+  "reception.set_lot.title": "Définir le lot",
+  "reception.set_lot.scan_placeholder": "Scannez le lot",
+  "reception.set_lot.expiration_date_placeholder": "Scannez la date d'expiration",
+  "reception.set_lot.btn.continue": "Continuer",
+
+  "reception.set_quantity.title": "Définir la quantité",
+  "reception.set_quantity.scan_placeholder": "Scannez document / produit / colis / emplacement",
+  "reception.set_quantity.btn.existing_pack": "Colis existant",
+  "reception.set_quantity.btn.new_pack": "Nouveau colis",
+  "reception.set_quantity.btn.no_pack": "Traiter sans colis",
+
+  "reception.set_destination.title": "Définir l'emplacement",
+  "reception.set_destination.scan_placeholder": "Scannez l'emplacement de destination",
+
+  "reception.select_dest_package.title": "Sélectionnez le colis de destination",
+  "reception.select_dest_package.scan_placeholder": "Scannez le colis de destination",
+
+  "reception.confirm_new_package.title": "Confirmer nouveau colis",
+
+  "reception.confirm_over_reception.title": "Confirmer sur-réception",
+  "reception.confirm_over_reception.message": "Vous êtes sur le point de recevoir plus que prévu. En êtes-vous sûr ?",
+
+  "reception.transfer.partner": "Partenaire",
+  "reception.transfer.source_document": "Document Source",
+  "reception.transfer.scheduled_date": "Date prévue : {date}",
+
+  "common.qty_done": "Qté faite"
 }
