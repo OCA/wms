@@ -17,8 +17,8 @@ export const reception_states = function () {
         },
         select_document: {
             display_info: {
-                title: "Choose an operation",
-                scan_placeholder: "Scan document / product / package",
+                title: this.$t("reception.select_document.title"),
+                scan_placeholder: this.$t("reception.select_document.scan_placeholder"),
             },
             events: {
                 select: "on_select",
@@ -42,7 +42,7 @@ export const reception_states = function () {
             },
         },
         manual_selection: {
-            title: "Choose an operation",
+            title: this.$t("reception.manual_selection.title"),
             events: {
                 select: "on_select",
                 go_back: "on_back",
@@ -62,8 +62,8 @@ export const reception_states = function () {
         },
         select_move: {
             display_info: {
-                title: "Select a move",
-                scan_placeholder: "Scan product / package",
+                title: this.$t("reception.select_move.title"),
+                scan_placeholder: this.$t("reception.select_move.scan_placeholder"),
             },
             events: {
                 cancel_picking_line: "on_cancel",
@@ -104,7 +104,7 @@ export const reception_states = function () {
         },
         confirm_done: {
             display_info: {
-                title: "Confirm done",
+                title: this.$t("reception.confirm_done.title"),
             },
             events: {
                 confirm: "on_confirm",
@@ -125,9 +125,11 @@ export const reception_states = function () {
         },
         set_lot: {
             display_info: {
-                title: "Set lot",
-                scan_placeholder: "Scan lot",
-                scan_input_placeholder_expiry: "Scan expiration date",
+                title: this.$t("reception.set_lot.title"),
+                scan_placeholder: this.$t("reception.set_lot.scan_placeholder"),
+                scan_input_placeholder_expiry: this.$t(
+                    "reception.set_lot.expiration_date_placeholder"
+                ),
             },
             on_scan: (barcode) => {
                 this.wait_call(
@@ -167,8 +169,8 @@ export const reception_states = function () {
         },
         set_quantity: {
             display_info: {
-                title: "Set quantity",
-                scan_placeholder: "Scan document / product / package / location",
+                title: this.$t("reception.set_quantity.title"),
+                scan_placeholder: this.$t("reception.set_quantity.scan_placeholder"),
             },
             events: {
                 qty_edit: "on_qty_edit",
@@ -232,8 +234,8 @@ export const reception_states = function () {
         },
         set_destination: {
             display_info: {
-                title: "Set destination",
-                scan_placeholder: "Scan destination location",
+                title: this.$t("reception.set_destination.title"),
+                scan_placeholder: this.$t("reception.set_destination.scan_placeholder"),
             },
             on_scan: (location) => {
                 this.wait_call(
@@ -248,8 +250,10 @@ export const reception_states = function () {
         },
         select_dest_package: {
             display_info: {
-                title: "Select destination package",
-                scan_placeholder: "Scan destination package",
+                title: this.$t("reception.select_dest_package.title"),
+                scan_placeholder: this.$t(
+                    "reception.select_dest_package.scan_placeholder"
+                ),
             },
             events: {
                 select: "on_select",
@@ -275,7 +279,7 @@ export const reception_states = function () {
         },
         confirm_new_package: {
             display_info: {
-                title: "Confirm new package",
+                title: this.$t("reception.confirm_new_package.title"),
             },
             events: {
                 confirm: "on_confirm",
@@ -298,8 +302,8 @@ export const reception_states = function () {
         },
         confirm_over_reception: {
             display_info: {
-                title: "Confirm over reception",
-                message: "You are about to receive more than expected. Are you sure?",
+                title: this.$t("reception.confirm_over_reception.title"),
+                message: this.$t("reception.confirm_over_reception.message"),
             },
             events: {
                 confirm: "on_confirm",
