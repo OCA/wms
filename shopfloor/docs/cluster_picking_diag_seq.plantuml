@@ -1,13 +1,16 @@
 # Diagram to generate with PlantUML (https://plantuml.com/)
 #
 #   $ sudo apt install plantuml
-#   $ plantuml cluster_picking_diag_seq.plantuml
+#   $ PLANTUML_LIMIT_SIZE=8192 plantuml cluster_picking_diag_seq.plantuml
 #
 
 @startuml
 participant start
 participant manual_selection
 participant confirm_start
+
+participant start_product
+participant scan_product_destination
 
 participant start_line
 participant scan_destination
@@ -48,12 +51,24 @@ manual_selection -[#red]> manual_selection: **/select(picking_batch_id)** \n(err
 manual_selection -> confirm_start: **/select(picking_batch_id)**
 manual_selection -> start: Button **Back** (client-side)
 
+confirm_start -> start_product: **/confirm_start(picking_batch_id)** \n(pick_by_product enabled)
 confirm_start -> start_line: **/confirm_start(picking_batch_id)**
 confirm_start -> unload_all: **/confirm_start(picking_batch_id)** \n(we reopen a batch with all lines picked and have to be unloaded in the same destination)
 confirm_start -> unload_single: **/confirm_start(picking_batch_id)** \n(we reopen a batch with all lines picked and have to be unloaded in different destinations)
 confirm_start -> start: **/unassign(picking_batch_id)**
 
-== Picking ==
+== Picking all product quantities (optional) ==
+
+start_product -[#red]> start_product: **/scan_product(picking_batch_id, barcode[product])** \n(error: wrong or unknown barcode)
+start_product -> scan_product_destination: **/scan_product(picking_batch_id, barcode[product])** \n(product matches)
+
+scan_product_destination -[#red]> scan_product_destination: **/scan_product_destination_pack(picking_batch_id, product_id, barcode[package], quantity)** \n(error: bin not found)
+scan_product_destination -> start_product: **/scan_product_destination_pack(picking_batch_id, product_id, barcode[package], quantity)** \n(more products to process)
+scan_product_destination -> start_line: **/scan_product_destination_pack(picking_batch_id, product_id, barcode[package], quantity)** \n(remaining lines to pick)
+scan_product_destination -> unload_all: **/scan_product_destination_pack(picking_batch_id, product_id, barcode[package], quantity)** \n(all lines picked and same destination)
+scan_product_destination -> unload_single: **/scan_product_destination_pack(picking_batch_id, product_id, barcode[package], quantity)** \n(all lines picked and different destinations)
+
+== Picking line by line ==
 
 start_line -[#red]> start_line: **/scan_line(picking_batch_id, move_line_id, barcode[package|product|lot])** \n(error)
 start_line -> scan_destination: **/scan_line(picking_batch_id, move_line_id, barcode[package|product|lot])** \n(error)
