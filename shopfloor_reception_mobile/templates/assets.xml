@@ -26,6 +26,11 @@
                 t-attf-src="/shopfloor_reception_mobile/static/src/scenario/reception_states.js?v=#{mod_version}"
                 type="module"
             />
+            <script
+                id="script_load_translations"
+                t-attf-src="/shopfloor_reception_mobile/static/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
+                type="module"
+            />
 
         </script>
     </template>

@@ -62,6 +62,17 @@ const Reception = {
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :key="make_state_component_key(['reception-picking-item-detail', state.data.picking.id])"
                 />
+                <v-card class="pa-2 mb-2" flat>
+                    <v-text-field
+                        v-model="move_filter_query"
+                        :label="$t('reception.filter_products')"
+                        prepend-inner-icon="mdi-magnify"
+                        clearable
+                        hide-details
+                        dense
+                        outlined
+                    />
+                </v-card>
                 <manual-select
                     :card_color="utils.colors.color_for('screen_step_done')"
                     :records="ordered_moves"
@@ -244,9 +255,20 @@ const Reception = {
             return this.state.data.selected_move_line[0] || {};
         },
         ordered_moves: function () {
-            const moves = _.result(this.state, "data.picking.moves", []);
+            let moves = _.result(this.state, "data.picking.moves", []);
             if (_.isEmpty(moves)) {
-                return;
+                return [];
+            }
+            if (this.move_filter_query) {
+                const query = this.move_filter_query.toLowerCase();
+                moves = moves.filter((move) => {
+                    const productName = _.result(
+                        move,
+                        "product.display_name",
+                        ""
+                    ).toLowerCase();
+                    return productName.includes(query);
+                });
             }
             // We sort the moves to ensure that the following order always takes place:
             // Top: Partially done moves.
@@ -505,6 +527,7 @@ const Reception = {
             states: this._get_states(),
             filter_input_placeholder: "Find an operation",
             filtered_pickings: [],
+            move_filter_query: "",
         };
     },
 };
