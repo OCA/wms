@@ -1,2 +1,4 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-stock-location-release-channel-restriction @ git+https://github.com/OCA/stock-logistics-warehouse@refs/pull/2521/head#subdirectory=setup/stock_location_release_channel_restriction
