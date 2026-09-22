@@ -246,7 +246,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
         if kw.get("full"):
             detail.update(
                 {
-                    "image": f"/web/image/product.product/{record.id}/image_128"
+                    "image": self.data_detail._product_image_url(record, "image_128")
                     if record.image_128
                     else None,
                     "locations": locations_info,
