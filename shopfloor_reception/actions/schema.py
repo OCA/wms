@@ -15,6 +15,7 @@ class ShopfloorSchemaAction(Component):
                     "nullable": True,
                     "required": False,
                 },
+                "image": {"type": "string", "nullable": True, "required": False},
             }
         )
         return res
