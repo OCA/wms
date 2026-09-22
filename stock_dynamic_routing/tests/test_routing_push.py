@@ -1,8 +1,9 @@
 # Copyright 2019 Camptocamp (https://www.camptocamp.com)
 
-from odoo.tests import common
+from odoo.tests import common, tagged
 
 
+@tagged("post_install", "-at_install")
 class TestRoutingPush(common.TransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -437,7 +438,7 @@ class TestRoutingPush(common.TransactionCase):
         moves = self.env["stock.move"].browse(
             move.id for move in moves_with_routing_details
         )
-        moves._apply_routing_rule_push(moves_with_routing_details)
+        moves._apply_routing_rule(moves_with_routing_details)
         moves._action_assign()
 
         # At this point, we should have this
