@@ -52,6 +52,11 @@ const new_template =
                 <btn-action color="default" @click="state.on_skip">Skip</btn-action>
             </v-col>
         </v-row>
+        <v-row align="center">
+            <v-col class="text-center" cols="12">
+                <btn-back/>
+            </v-col>
+        </v-row>
     </div>
 </div>
 
