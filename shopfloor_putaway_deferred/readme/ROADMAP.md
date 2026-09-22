@@ -1,0 +1,2 @@
+- Currently supported scenarios: `location_content_transfer`, `zone_picking`.
+- Further scenarios (e.g. `checkout`) could be added if needed.
