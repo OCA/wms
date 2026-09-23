@@ -136,4 +136,4 @@ const messages_en = {
     },
 };
 
-translation_registry.add("en-US", messages_en);
+translation_registry.add("en", messages_en);

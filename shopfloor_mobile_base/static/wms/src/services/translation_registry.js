@@ -83,15 +83,15 @@ export class TranslationRegistry {
     available_langs_display($root) {
         return [
             {
-                id: "en-US",
+                id: "en",
                 name: $root.$t("language.name.English"),
             },
             {
-                id: "fr-FR",
+                id: "fr",
                 name: $root.$t("language.name.French"),
             },
             {
-                id: "de-DE",
+                id: "de",
                 name: $root.$t("language.name.German"),
             },
         ].filter((x) => {
