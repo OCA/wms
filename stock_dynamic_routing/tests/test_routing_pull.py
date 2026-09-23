@@ -640,6 +640,78 @@ class TestRoutingPull(TestRoutingPullCommon):
         self.assert_src_highbay(routing_move)
         self.assert_dest_handover(routing_move)
 
+    def test_reassign_without_routing_keeps_existing_line_destination(self):
+        # A move reserved in a non-routed location (no routing applies) whose
+        # move line destination was refined afterwards (by an operator, a
+        # putaway split module, a location restriction...) must keep that
+        # destination when the picking is assigned again: as in the core, the
+        # putaway is only recomputed on moves that get a new reservation.
+        bin_a = self.env["stock.location"].create(
+            {"location_id": self.wh.wh_output_stock_loc_id.id, "name": "Bin A"}
+        )
+        pick_picking, customer_picking = self._create_pick_ship(
+            self.wh, [(self.product1, 10)]
+        )
+        move_a = pick_picking.move_ids
+        self._update_product_qty_in_location(
+            self.location_shelf_1, move_a.product_id, 10
+        )
+        pick_picking.action_assign()
+        self.assertEqual(move_a.state, "assigned")
+        line = move_a.move_line_ids
+        self.assertEqual(len(line), 1)
+        self.assert_dest_output(line)
+
+        line.location_dest_id = bin_a
+        pick_picking.action_assign()
+
+        self.assertEqual(move_a.state, "assigned")
+        self.assertEqual(move_a.move_line_ids, line)
+        self.assertEqual(line.location_dest_id, bin_a)
+
+    def test_partial_availability_stock_and_highbay(self):
+        # In this case, we have stock in a non-routed stock location to partially
+        # fulfill the demand (10/30), and the rest in a routed location.
+        # The stock in the stock location is entered first, so it will be used first.
+        # The remaining demand will be fulfilled from the routed location,
+        # which has sufficient stock.
+        # We should only split the initial PICK picking, r
+        # esulting in the following after routing:
+        # +--------------------------------------------------------------------+
+        # | HO/xxxx  Assigned                                                  |
+        # | Stock → Stock/Handover                                             |
+        # | 20x Product Highbay/Bay1/Bin1 → Stock/Handover (available) move_ho |
+        # +--------------------------------------------------------------------+
+        #
+        # +-------------------------------------------------------------------+
+        # | PICK/xxxx Waiting                                                 |
+        # | Stock → Output                                                    |
+        # | 20x Product Stock/Handover → Output (waiting)   move_a2 (split)   |
+        # | 10x Product Stock/Shelf1   → Output (available) move_a1           |
+        # +-------------------------------------------------------------------+
+        #
+        # +-------------------------------------------------+
+        # | OUT/xxxx Waiting                                |
+        # | Output → Customer                               |
+        # | 30x Product Output → Customer (waiting) move_b  |
+        # +-------------------------------------------------+
+        pick_picking, customer_picking = self._create_pick_ship(
+            self.wh, [(self.product1, 30)]
+        )
+        move_a = pick_picking.move_ids
+
+        self._update_product_qty_in_location(
+            self.location_shelf_1, move_a.product_id, 10
+        )
+        self._update_product_qty_in_location(
+            self.location_hb_1_2, move_a.product_id, 100
+        )
+        pick_picking.action_assign()
+        self.assertEqual(len(pick_picking.move_ids), 2)
+        routing_move = pick_picking.move_ids.filtered(lambda m: m.id != move_a.id)
+        self.assertEqual(move_a.product_uom_qty, 10)
+        self.assertEqual(routing_move.product_uom_qty, 20)
+
     def test_change_dest_move_source(self):
         # Change the picking type destination so the move goes to a location
         # which is a parent destination of the routing destination (move will
