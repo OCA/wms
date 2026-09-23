@@ -16,6 +16,12 @@
                 t-attf-src="/shopfloor_mobile_base_auth_api_key/static/wms/src/login.js?v=#{get_version(mod_name)}"
                 type="module"
             />
+
+            <script
+                id="script_load_translations"
+                t-attf-src="/shopfloor_mobile_base_auth_api_key/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
+                type="module"
+            />
         </script>
     </template>
 </odoo>
