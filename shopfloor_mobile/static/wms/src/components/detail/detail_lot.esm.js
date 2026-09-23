@@ -23,14 +23,14 @@ Vue.component("detail-lot", {
             return [
                 {
                     path: "expiration_date",
-                    label: "Expiry date",
+                    label: this.$t("detail.lot.expiry_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
-                    label: "Removal date",
+                    label: this.$t("detail.lot.removal_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
@@ -40,8 +40,8 @@ Vue.component("detail-lot", {
         supplier_detail_fields() {
             return [
                 {path: "partner", klass: "loud"},
-                {path: "product_code", label: "Vendor Code"},
-                {path: "product_name", label: "Vendor Name"},
+                {path: "product_code", label: this.$t("detail.lot.vendor_cpde")},
+                {path: "product_name", label: this.$t("detail.lot.vendor_name")},
             ];
         },
         unique_suppliers(suppliers) {
@@ -80,7 +80,7 @@ Vue.component("detail-lot", {
 
 
         <div class="suppliers mb-4" v-if="record.product.suppliers.length">
-            <separator-title>Suppliers</separator-title>
+            <separator-title>{{ $("detail.lot.suppliers") }}</separator-title>
             <item-detail-card
                 v-for="supp in unique_suppliers(record.product.suppliers)"
                 :key="'supp' + supp.id"
@@ -89,7 +89,7 @@ Vue.component("detail-lot", {
         </div>
 
         <div class="packaging pb-2" v-if="opts.full_detail && record.product.packaging">
-            <separator-title>Packaging</separator-title>
+            <separator-title>{{ $t("detail.lot.packaging") }}</separator-title>
             <list
                 :records="record.product.packaging"
                 :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"

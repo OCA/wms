@@ -84,7 +84,7 @@ Vue.component("detail-product", {
             };
         },
         locations_fields() {
-            return [{path: "quantity", label: "Reserved"}];
+            return [{path: "quantity", label: this.$t("detail.product.reserved")}];
         },
         available_product_list_options() {
             return {
@@ -138,7 +138,7 @@ Vue.component("detail-product", {
         />
 
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
-        <separator-title>Suppliers</separator-title>
+        <separator-title>{{ $t("detail.product.suppliers") }}</separator-title>
         <item-detail-card
             v-for="supp in unique_suppliers(record.suppliers)"
             :key="'supp' + supp.id"
@@ -148,7 +148,7 @@ Vue.component("detail-product", {
     </div>
 
     <div class="packaging mb-4" v-if="opts.full_detail && record.packaging">
-        <separator-title>Packaging</separator-title>
+        <separator-title>{{ $t("detail.product.packaging") }}</separator-title>
         <list
             :records="record.packaging"
             :options="{key_title: 'display_name', list_item_fields: packaging_detail_fields()}"
@@ -156,7 +156,7 @@ Vue.component("detail-product", {
     </div>
 
     <div class="locations mb-4" v-if="record.locations">
-        <separator-title>Locations</separator-title>
+        <separator-title>{{ $t("detail.product.locations") }}</separator-title>
         <v-expansion-panels v-if="record.locations.length > 0" flat :color="utils.colors.color_for('detail_main_card')">
             <v-expansion-panel v-for="(location, index) in record.locations" :key="make_component_key(['location', index])">
               <v-expansion-panel-header>
@@ -173,7 +173,7 @@ Vue.component("detail-product", {
                     </item-detail-card>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <separator-title v-if="location.lots.length > 0">Lots</separator-title>
+                <separator-title v-if="location.lots.length > 0">{{ $t("detail.product.lots") }}</separator-title>
                 <item-detail-card
                 v-for="(lot, i) in location.lots"
                 :record="lot"
