@@ -125,7 +125,10 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         return data
 
     def _expected_supplier_code(self, product):
-        supplier_info = product.seller_ids.filtered(lambda x: x.product_id == product)
+        supplier_info = product.seller_ids.filtered(
+            lambda x: x.product_id == product
+            or (x.product_tmpl_id == product.product_tmpl_id)
+        )
         return supplier_info[0].product_code if supplier_info else ""
 
     def _expected_packaging(self, record, **kw):
