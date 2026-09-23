@@ -145,4 +145,4 @@ const messages_fr = {
     },
 };
 
-translation_registry.add("fr-FR", messages_fr);
+translation_registry.add("fr", messages_fr);
