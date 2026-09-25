@@ -9,15 +9,11 @@ class TestScanLocation(CommonCase):
         response = self.service.dispatch(
             "scan_location_or_package", params={"barcode": "NOPE"}
         )
-        expected_message = {
-            "message_type": "error",
-            "body": "Barcode not found",
-        }
         self.assert_response(
             response,
             next_state="select_location_or_package",
             data={},
-            message=expected_message,
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_scan_wrong_location(self):
@@ -25,18 +21,11 @@ class TestScanLocation(CommonCase):
         response = self.service.dispatch(
             "scan_location_or_package", params={"barcode": location.name}
         )
-        expected_message = {
-            "message_type": "error",
-            "body": (
-                f"The content of {location.name} cannot be "
-                "transferred with this scenario."
-            ),
-        }
         self.assert_response(
             response,
             next_state="select_location_or_package",
             data={},
-            message=expected_message,
+            message=self.msg_store.location_content_unable_to_transfer(location),
         )
 
     def test_scan_empty_location(self):
@@ -44,15 +33,11 @@ class TestScanLocation(CommonCase):
         response = self.service.dispatch(
             "scan_location_or_package", params={"barcode": location.name}
         )
-        expected_message = {
-            "message_type": "error",
-            "body": f"Location {location.name} empty",
-        }
         self.assert_response(
             response,
             next_state="select_location_or_package",
             data={},
-            message=expected_message,
+            message=self.msg_store.location_empty(location),
         )
 
     def test_scan_location_ok(self):
@@ -77,15 +62,11 @@ class TestScanLocation(CommonCase):
         response = self.service.dispatch(
             "scan_location_or_package", params={"barcode": location.name}
         )
-        expected_message = {
-            "message_type": "warning",
-            "body": "This location only contains packages, please scan one of them.",
-        }
         self.assert_response(
             response,
             next_state="select_location_or_package",
             data={},
-            message=expected_message,
+            message=self.msg_store.location_contains_only_packages_scan_one(),
         )
 
     def test_scan_location_only_lines_with_package(self):
@@ -100,15 +81,11 @@ class TestScanLocation(CommonCase):
         response = self.service.dispatch(
             "scan_location_or_package", params={"barcode": location.name}
         )
-        expected_message = {
-            "message_type": "warning",
-            "body": "This location only contains packages, please scan one of them.",
-        }
         self.assert_response(
             response,
             next_state="select_location_or_package",
             data={},
-            message=expected_message,
+            message=self.msg_store.location_contains_only_packages_scan_one(),
         )
 
         # Scan a package.

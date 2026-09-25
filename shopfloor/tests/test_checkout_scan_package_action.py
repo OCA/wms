@@ -100,10 +100,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
             move_line,
             # no change as the scan was not valid
             {move_line: origin_qty_done},
-            message={
-                "message_type": "warning",
-                "body": "Product tracked by lot, please scan one.",
-            },
+            message=self.msg_store.scan_lot_on_product_tracked_by_lot(),
         )
 
     def test_scan_package_action_scan_product_error_tracking(self):
@@ -448,7 +445,7 @@ class CheckoutScanPackageActionCase(CheckoutCommonCase, CheckoutSelectPackageMix
         self._assert_selected_response(
             response,
             selected_line,
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_put_in_pack(self):

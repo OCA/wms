@@ -89,7 +89,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             response,
             next_state="select_line",
             data=self._data_for_select_line(picking),
-            message={"body": "Package cancelled", "message_type": "success"},
+            message=self.msg_store.package_cancelled(),
         )
 
     def test_cancel_line_ok(self):
@@ -114,7 +114,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
             response,
             next_state="select_line",
             data=self._data_for_select_line(picking),
-            message={"body": "Line cancelled", "message_type": "success"},
+            message=self.msg_store.line_cancelled(),
         )
 
     def test_cancel_line_error_package_not_found(self):
@@ -129,10 +129,7 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(self.picking, done=True),
                 "all_processed": False,
             },
-            message={
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
     def test_cancel_line_error_line_not_found(self):
@@ -147,8 +144,5 @@ class CheckoutRemovePackageCase(CheckoutCommonCase):
                 "picking": self._stock_picking_data(self.picking, done=True),
                 "all_processed": False,
             },
-            message={
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            message=self.msg_store.record_not_found(),
         )

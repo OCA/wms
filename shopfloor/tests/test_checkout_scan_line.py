@@ -160,7 +160,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             "NOT A BARCODE",
-            {"message_type": "error", "body": "Barcode not found"},
+            self.msg_store.barcode_not_found(),
         )
 
     def test_scan_line_error_package_not_in_picking(self):
@@ -175,10 +175,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             package.name,
-            {
-                "message_type": "error",
-                "body": f"Package {package.name} not found in transfer {picking.name}",  # noqa
-            },
+            self.msg_store.package_not_found_in_picking(package, picking),
         )
 
     def test_scan_line_error_package_reserved_by_another_picking(self):
@@ -192,10 +189,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             package.name,
-            {
-                "message_type": "error",
-                "body": f"Reserved for Checkout {picking2.name}",
-            },
+            self.msg_store.reserved_for_other_picking_type(picking2),
         )
 
     def test_scan_line_error_product_tracked_by_lot(self):
@@ -208,10 +202,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             self.product_a.barcode,
-            {
-                "message_type": "warning",
-                "body": "Product tracked by lot, please scan one.",
-            },
+            self.msg_store.scan_lot_on_product_tracked_by_lot(),
         )
 
     def test_scan_line_error_product_in_two_packages(self):
@@ -226,11 +217,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             self.product_a.barcode,
-            {
-                "message_type": "warning",
-                "body": "This product is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.product_multiple_packages_scan_package(),
         )
 
     def test_scan_line_error_product_in_one_package_and_unit(self):
@@ -247,11 +234,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             self.product_a.barcode,
-            {
-                "message_type": "warning",
-                "body": "This product is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.product_multiple_packages_scan_package(),
         )
 
     def test_scan_line_error_product_not_in_picking(self):
@@ -261,10 +244,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             self.product_b.barcode,
-            {
-                "message_type": "error",
-                "body": "Product Product B is not in the current transfer.",
-            },
+            self.msg_store.product_not_found_in_current_picking(self.product_b),
         )
 
     def test_scan_line_error_product_in_another_picking(self):
@@ -276,10 +256,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             self.product_b.barcode,
-            {
-                "message_type": "error",
-                "body": f"Reserved for Checkout {picking2.name}",
-            },
+            self.msg_store.reserved_for_other_picking_type(picking2),
         )
 
     def test_scan_line_error_lot_different_change_success(self):
@@ -345,11 +322,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             lot.name,
-            {
-                "message_type": "warning",
-                "body": "This lot is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.lot_multiple_packages_scan_package(),
         )
 
     def test_scan_line_error_lot_in_one_package_and_unit(self):
@@ -368,11 +341,7 @@ class CheckoutScanLineCase(CheckoutScanLineCaseBase):
         self._test_scan_line_error(
             picking,
             lot.name,
-            {
-                "message_type": "warning",
-                "body": "This lot is part of multiple"
-                " packages, please scan a package.",
-            },
+            self.msg_store.lot_multiple_packages_scan_package(),
         )
 
     def test_scan_line_all_lines_done(self):

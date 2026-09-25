@@ -62,10 +62,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(next_line),
-            message={
-                "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
-            },
+            message=self.msg_store.x_units_put_in_package(
+                line.qty_done, line.product_id, self.bin1
+            ),
         )
 
     def test_scan_destination_pack_ok_last_line(self):
@@ -145,11 +144,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="scan_destination",
             data=self._line_data(line, qty_done=10.0),
-            message={
-                "message_type": "error",
-                "body": f"The destination bin {self.bin1.name} is not empty, "
-                "please take another.",
-            },
+            message=self.msg_store.destination_bin_not_empty(self.bin1),
         )
 
     def test_scan_destination_pack_not_empty_multi_pick_allowed(self):
@@ -207,10 +202,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="scan_destination",
             data=line_data,
-            message={
-                "message_type": "error",
-                "body": "Bin {} doesn't exist".format("⌿"),
-            },
+            message=self.msg_store.bin_not_found_for_barcode("⌿"),
         )
 
     def test_scan_destination_pack_quantity_more(self):
@@ -229,10 +221,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="scan_destination",
             data=self._line_data(line, qty_done=11.0),
-            message={
-                "message_type": "error",
-                "body": f"You must not pick more than {line.reserved_uom_qty} units.",
-            },
+            message=self.msg_store.unable_to_pick_more(line.reserved_uom_qty),
         )
 
     def test_scan_destination_pack_quantity_less(self):
@@ -265,10 +254,9 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(new_line),
-            message={
-                "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
-            },
+            message=self.msg_store.x_units_put_in_package(
+                line.qty_done, line.product_id, self.bin1
+            ),
         )
 
         self.assertRecordValues(
@@ -361,8 +349,7 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
             response,
             next_state="start_line",
             data=self._line_data(next_line),
-            message={
-                "message_type": "success",
-                "body": f"{line.qty_done} {line.product_id.display_name} put in {self.bin1.name}",  # noqa
-            },
+            message=self.msg_store.x_units_put_in_package(
+                line.qty_done, line.product_id, self.bin1
+            ),
         )
