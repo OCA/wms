@@ -18,7 +18,7 @@ const new_template =
     <div v-if="state.data.picking.helpdesk_ticket_allowed" class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action @click="state.on_declare_helpdesk"><v-icon>mdi-lifebuoy</v-icon>Helpdesk</btn-action>
+                <btn-action @click="state.on_declare_helpdesk"><v-icon>mdi-lifebuoy</v-icon>{{ $t('reception.helpdesk.helpdesk') }}</btn-action>
             </v-col>
         </v-row>
     </div>
@@ -26,16 +26,16 @@ const new_template =
 
  <template v-if="state_is('start_helpdesk')">
     <v-text-field
-        label="Description"
-        placeholder="Ticket Description"
+        :label="$t('reception.helpdesk.description')"
+        :placeholder="$t('reception.helpdesk.ticket_dscription')"
         class="current-value"
         v-model="state.data.helpdesk_wizard.description"
-        :rules="[v => !!v || 'Description is required']"
+        :rules="[v => !!v || $t('reception.helpdesk.description_required')]"
         required
     />
 
     <v-combobox
-        label="Motive"
+        :label="$t('reception.helpdesk.motive')"
         clearable
         :items="state.data.available_motives"
         item-text="name"
@@ -49,7 +49,7 @@ const new_template =
                     @click="state.on_create_helpdesk"
                     :disabled="!state.data.helpdesk_wizard.description || !state.data.helpdesk_wizard.description.trim()"
                 >
-                    Create Helpdesk Ticket
+                    {{ $t('reception.helpdesk.create_ticket') }}
                 </btn-action>
             </v-col>
             <v-col class="text-center" cols="12">

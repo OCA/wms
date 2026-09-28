@@ -19,6 +19,12 @@
                 type="module"
             />
 
+            <script
+                id="script_add_translations_registry"
+                t-attf-src="/shopfloor_reception_product_barcode_mobile/static/src/i18n/add_translations_to_registry.esm.js?v=#{app_version}"
+                type="module"
+            />
+
         </script>
     </template>
 

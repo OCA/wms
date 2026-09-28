@@ -15,16 +15,20 @@ Vue.component("detail-operation", {
             return [
                 {
                     path: "location_src.name",
-                    label: "Source",
+                    label: this.$t("detail.operation.source"),
                     action_val_path: "location_src.barcode",
                 },
                 {
                     path: "location_dest.name",
-                    label: "Destination",
+                    label: this.$t("detail.operation.destination"),
                     action_val_path: "location_dest.barcode",
                 },
                 {path: "product.display_name", action_val_path: "product.barcode"},
-                {path: "product.supplier_code", label: "Vendor code", klass: "loud"},
+                {
+                    path: "product.supplier_code",
+                    label: this.$t("detail.operation.vendor_code"),
+                    klass: "loud",
+                },
                 {path: "package_dest.name", action_val_path: "package_dest.barcode"},
                 {path: "lot.name", action_val_path: "lot.barcode"},
             ];

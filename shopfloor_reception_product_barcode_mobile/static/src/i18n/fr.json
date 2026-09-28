@@ -1,0 +1,8 @@
+{
+  "reception.product_barcode.barcode": "Code-barres",
+  "reception.product_barcode.product_barcode": "Code-barres du produit",
+  "reception.product_barcode.done": "Terminé",
+  "reception.product_barcode.skip": "Ignorer",
+  "reception.product_barcode.set_product_barcode": "Définir le code-barres du produit",
+  "reception.product_barcode.scan_product_barcode": "Scanner le code-barres du produit"
+}
