@@ -875,7 +875,6 @@ class StockMove(models.Model):
             # restore the procure_method overwritten by _action_cancel()
             move.procure_method = procure_method
         self._return_quantity_in_stock(qty_to_return_per_move)
-        moves_to_unrelease.write({"need_release": True})
         for picking, moves in itertools.groupby(
             moves_to_unrelease, lambda m: m.picking_id
         ):
