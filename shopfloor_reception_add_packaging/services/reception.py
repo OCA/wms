@@ -116,10 +116,9 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {"type": "dict", "schema": self.schemas.move_line()},
-            "packaging_levels": {
-                "type": "dict",
-                "schema": self.schemas._schema_list_of(self.schemas._simple_record()),
-            },
+            "packaging_levels": self.schemas._schema_list_of(
+                self.schemas._simple_record()
+            ),
         }
 
     def _create_new_packaging_next_state(self):
