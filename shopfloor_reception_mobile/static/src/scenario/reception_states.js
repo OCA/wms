@@ -129,14 +129,30 @@ export const reception_states = function () {
                 scan_placeholder: "Scan lot",
                 scan_input_placeholder_expiry: "Scan expiration date",
             },
-            on_scan: (barcode) => {
-                this.wait_call(
+            on_scan: async (barcode) => {
+                const lot = this.line_being_handled && this.line_being_handled.lot;
+                const previous_expiration_date = lot && lot.expiration_date;
+                await this.wait_call(
                     this.odoo.call("scan_lot", {
                         picking_id: this.state.data.picking.id,
                         selected_line_id: this.line_being_handled.id,
                         barcode: barcode.text,
                     })
                 );
+                // Preserve local draft expiration date in case backend did not find a
+                // matching lot in db and thus returned an empty expiration date
+                if (
+                    previous_expiration_date &&
+                    this.line_being_handled &&
+                    this.line_being_handled.lot &&
+                    !this.line_being_handled.lot.expiration_date
+                ) {
+                    this.$set(
+                        this.line_being_handled.lot,
+                        "expiration_date",
+                        previous_expiration_date
+                    );
+                }
             },
             on_date_change: (expiration_date) => {
                 if (!expiration_date) return;
