@@ -110,4 +110,4 @@ const messages_de = {
     },
 };
 
-translation_registry.add("de-DE", messages_de);
+translation_registry.add("de", messages_de);
