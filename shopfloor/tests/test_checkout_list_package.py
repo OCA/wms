@@ -98,7 +98,7 @@ class CheckoutListDestPackageCase(
         self._assert_selected_response(
             response,
             picking.move_line_ids,
-            message={"message_type": "warning", "body": "No valid package to select."},
+            message=self.msg_store.no_valid_package_to_select(),
         )
 
 
