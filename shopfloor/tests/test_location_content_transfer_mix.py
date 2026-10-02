@@ -384,6 +384,158 @@ class LocationContentTransferMixCase(LocationContentTransferCommonCase):
         self.assertEqual(picking_before, picking_after)
         self.assert_response_scan_destination_all(response, picking_after)
 
+    def test_with_zone_picking2_only_available(self):
+        """Test the following scenario:
+
+        1) Operator-1 processes the first pallet with the "zone picking" scenario
+           to move the goods to PACK-1 and unload in destination location1:
+
+            move1 PICK -> PACK-1 'done'
+
+        2) Operator-1 processes the second pallet with the "zone picking" scenario
+           to move the goods to PACK-2 and unload in destination location2:
+
+            move1 PICK -> PACK-2 'done'
+
+        3) Operator-2 with the "location content transfer" scenario scan
+          the location where the first pallet is (PACK-1):
+            - the app should found one move line
+            - this move line will be put in its own transfer as its sibling lines
+              are in another source location
+            - as such the app should ask the destination location (as there is
+              only one line)
+
+            move1 PACK-2 -> SHIP (still handled by the operator so not 'done')
+
+        4) Operator-3 with the "location content transfer" scenario scan
+          the location where the first pallet is (PACK-1):
+            - nothing is found as the pallet is currently handled by Operator-2
+            - message to user should be the location is empty
+
+        5) If Operator-2 is unable to finish the flow with the first pallet
+          (barcode device out of battery... etc), he should be able to recover
+          what he started.
+
+        6) Operator-2 then finishes its operation regarding the first pallet, and
+          scan the location where the second pallet is (PACK-2). He should find
+          only this pallet available.
+        """
+        self.menu.sudo().allow_reserve_only_available = True
+        move_lines = self.picking1.move_line_ids
+        pick_move_line1 = move_lines.filtered(
+            lambda ml: ml.result_package_id == self.package_1
+        )
+        pick_move_line2 = move_lines.filtered(
+            lambda ml: ml.result_package_id == self.package_2
+        )
+        # Operator-1 process the first pallet with the "zone picking" scenario
+        orig_dest_location = pick_move_line1.location_dest_id
+        dest_location1 = pick_move_line1.location_dest_id.sudo().copy(
+            {
+                "name": orig_dest_location.name + "_1",
+                "barcode": orig_dest_location.barcode + "_1",
+                "location_id": orig_dest_location.id,
+            }
+        )
+        self._zone_picking_process_line(pick_move_line1, dest_location=dest_location1)
+        # Operator-1 process the second pallet with the "zone picking" scenario
+        dest_location2 = orig_dest_location.sudo().copy(
+            {
+                "name": orig_dest_location.name + "_2",
+                "barcode": orig_dest_location.barcode + "_2",
+                "location_id": orig_dest_location.id,
+            }
+        )
+        self._zone_picking_process_line(pick_move_line2, dest_location=dest_location2)
+        pack_move_a = pick_move_line1.move_id.move_dest_ids.filtered(
+            lambda m: m.state not in ("cancel", "done")
+        )
+        self.assertEqual(pack_move_a, self.pack_move_a)
+        pack_first_pallet = pack_move_a.move_line_ids.filtered(
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location1
+        )
+        self.assertEqual(pack_first_pallet.reserved_uom_qty, 6)
+        self.assertEqual(pack_first_pallet.qty_done, 0)
+        pack_second_pallet = pack_move_a.move_line_ids.filtered(
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
+        )
+        self.assertEqual(pack_second_pallet.reserved_uom_qty, 4)
+        self.assertEqual(pack_second_pallet.qty_done, 0)
+        # Operator-2 with the "location content transfer" scenario scan
+        # the location where the first pallet is.
+        # This pallet/move line will be put in its own transfer as its sibling
+        # lines are in another source location.
+        previous_picking = pack_first_pallet.picking_id
+        response = self._location_content_transfer_process_line(pack_first_pallet)
+        new_picking = pack_first_pallet.picking_id
+        self.assertTrue(previous_picking != new_picking)
+        self.assert_response_scan_destination_all(response, new_picking)
+        response_packages = response["data"]["scan_destination_all"]["package_levels"]
+        self.assertEqual(len(response_packages), 1)
+        self.assertEqual(
+            response_packages[0]["package_src"]["id"], pack_first_pallet.package_id.id
+        )
+        # Ensure that the second pallet is untouched
+        self.assertEqual(pack_second_pallet.qty_done, 0)
+        # Operator-3 with the "location content transfer" scenario scan
+        # the location where the first pallet is: he should found nothing
+        response = self._location_content_transfer_process_line(
+            pack_first_pallet, user=self.stock_user2
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.location_empty(
+                pack_first_pallet.location_id
+            ),
+        )
+        # Check if Operator-2 is able to recover its session
+        expected_picking = pack_first_pallet.picking_id
+        response = self.service.start_or_recover()
+        self.assert_response_scan_destination_all(
+            response,
+            expected_picking,
+            message=self.service.msg_store.recovered_previous_session(),
+        )
+        # Operator-2 finishes its operation regarding the first pallet
+        qty = pack_first_pallet.reserved_uom_qty
+        response = self.service.set_destination_all(
+            pack_first_pallet.location_id.id, pack_first_pallet.location_dest_id.barcode
+        )
+        self.assert_response_start(
+            response,
+            message=self.service.msg_store.location_content_transfer_complete(
+                pack_first_pallet.location_id,
+                pack_first_pallet.location_dest_id,
+            ),
+        )
+        self.assertEqual(pack_first_pallet.qty_done, 6)
+        self.assertEqual(pack_first_pallet.state, "done")
+        self.assertEqual(pack_first_pallet.move_id.product_uom_qty, qty)
+        # Ensure that the second pallet is untouched
+        self.assertEqual(pack_second_pallet.qty_done, 0)
+        # Operator-2 (still with the "location content transfer" scenario) scan
+        # the location where the second pallet is
+        pack_move_a = pick_move_line2.move_id.move_dest_ids.filtered(
+            lambda m: m.state not in ("cancel", "done")
+        )
+        self.assertEqual(pack_move_a, self.pack_move_a)
+        pack_second_pallet = pack_move_a.move_line_ids.filtered(
+            lambda x: not x.shopfloor_user_id and x.location_id == dest_location2
+        )
+        picking_before = pack_second_pallet.picking_id
+        move_lines = self.service.search_move_line.search_move_lines(
+            locations=pack_second_pallet.location_id
+        )
+        response = self._location_content_transfer_process_line(pack_second_pallet)
+        response_packages = response["data"]["scan_destination_all"]["package_levels"]
+        self.assertEqual(len(response_packages), 1)
+        self.assertEqual(
+            response_packages[0]["package_src"]["id"], pack_second_pallet.package_id.id
+        )
+        picking_after = pack_second_pallet.picking_id
+        self.assertEqual(picking_before, picking_after)
+        self.assert_response_scan_destination_all(response, picking_after)
+
     def test_with_zone_picking3(self):
         """Test the following scenario:
 
