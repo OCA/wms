@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # Copyright 2021 ACSONE SA/NV (http://www.acsone.eu)
 # @author Simone Orsi <simahawk@gmail.com>
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 from odoo import fields, models
 
@@ -43,3 +44,11 @@ class ShopfloorMenu(models.Model):
         if not self.env.context.get("set_by_compute"):
             for rec in self:
                 rec.scenario = rec.scenario_id.key
+
+    def _get_allowed_companies(self):
+        """Return the companies the services of this menu should work with.
+
+        Used to set `allowed_company_ids` in the env of the request.
+        An empty recordset means no restriction.
+        """
+        return self.env["res.company"]

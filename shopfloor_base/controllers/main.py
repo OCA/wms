@@ -1,5 +1,6 @@
 # Copyright 2021 Camptocamp SA (http://www.camptocamp.com)
 # @author Simone Orsi <simahawk@gmail.com>
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
 
 import json
@@ -54,3 +55,20 @@ class ShopfloorController(RestController):
             collection=collection,
             params=params
         )
+
+    def _get_collection_env_context(self, collection, component_ctx):
+        ctx = super()._get_collection_env_context(collection, component_ctx)
+        menu = self._get_request_menu(collection)
+        companies = menu._get_allowed_companies() & collection.env.user.company_ids
+        if companies:
+            ctx["allowed_company_ids"] = companies.ids
+        return ctx
+
+    def _get_request_menu(self, collection):
+        menu_model = collection.env["shopfloor.menu"]
+        try:
+            menu_id = int(request.httprequest.environ.get("HTTP_SERVICE_CTX_MENU_ID"))
+        except (TypeError, ValueError):
+            # The header is validated by the services requiring it
+            return menu_model
+        return menu_model.browse(menu_id).exists()
