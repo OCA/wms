@@ -59,6 +59,70 @@ const ClusterPicking = {
                     </v-row>
                 </div>
             </div>
+            <div v-if="state_is('start_product')" class="product-scan">
+                <v-card class="main">
+                    <item-detail-card
+                        :key="'product-scan-location'"
+                        :record="state.data"
+                        :options="{main: true, key_title: 'location_src.display_name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                        :card_color="utils.colors.color_for('screen_step_todo')"
+                        />
+                    <item-detail-card
+                        :key="'product-scan-detail'"
+                        :record="state.data.product"
+                        :options="{main: true, key_title: 'display_name', title_action_field: {action_val_path: 'barcode'}}"
+                        :card_color="utils.colors.color_for('screen_step_todo')"
+                        />
+                    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                        <packaging-qty-picker
+                            :key="make_component_key(['packaging-qty-picker-product', state.data.product.id])"
+                            v-bind="product_scan_qty_picker_props(state.data)"
+                            :readonly="true"
+                            />
+                    </v-card>
+                    <v-card-text>
+                        <strong>{{ $t("cluster_picking.qty_per_transfer") }}</strong>
+                        <div class="lines" v-for="line in state.data.lines" :key="line.id">
+                            <div class="line-item">
+                                <span>{{ line.picking.name }}</span>:
+                                <span>{{ line.product_uom_qty }} {{ line.product_uom }}</span>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </div>
+            <div v-if="state_is('scan_product_destination')" class="product-scan-destination">
+                <v-card class="main">
+                    <item-detail-card
+                        :key="'product-scan-location'"
+                        :record="state.data"
+                        :options="{main: true, key_title: 'location_src.display_name', title_action_field: {action_val_path: 'location_src.barcode'}}"
+                        :card_color="utils.colors.color_for('screen_step_done')"
+                        />
+                    <item-detail-card
+                        :key="'product-scan-detail'"
+                        :record="state.data.product"
+                        :options="{main: true, key_title: 'display_name', title_action_field: {action_val_path: 'barcode'}}"
+                        :card_color="utils.colors.color_for('screen_step_done')"
+                        />
+                    <v-card class="pa-2" :color="utils.colors.color_for('screen_step_todo')">
+                        <packaging-qty-picker
+                            :key="make_component_key(['packaging-qty-picker-product', state.data.product.id])"
+                            v-bind="product_scan_qty_picker_props(state.data)"
+                            :readonly="false"
+                            />
+                    </v-card>
+                    <v-card-text>
+                        <strong>{{ $t("cluster_picking.qty_per_transfer") }}</strong>
+                        <div class="lines" v-for="line in state.data.lines" :key="line.id">
+                            <div class="line-item">
+                                <span>{{ line.picking.name }}</span>:
+                                <span>{{ line.product_uom_qty }} {{ line.product_uom }}</span>
+                            </div>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </div>
             <stock-zero-check
                 v-if="state_is('zero_check')"
                 v-on:action="state.on_action"
@@ -149,7 +213,17 @@ const ClusterPicking = {
             return title;
         },
         current_batch: function () {
-            return this.state_get_data("confirm_start");
+            const confirm_data = this.state_get_data("confirm_start");
+            if (confirm_data) {
+                return confirm_data;
+            }
+            for (const key of ["start_product", "scan_product_destination"]) {
+                const data = this.state_get_data(key);
+                if (data && data.batch) {
+                    return data.batch;
+                }
+            }
+            return {};
         },
         current_picking: function () {
             const data = this.state_get_data("start_line") || {};
@@ -166,6 +240,17 @@ const ClusterPicking = {
             return {
                 record: picking,
                 identifier: picking.name,
+            };
+        },
+        product_scan_qty_picker_props: function (data) {
+            return {
+                qtyTodo: parseInt(data.quantity, 10),
+                qtyInit: this.state_is("scan_product_destination")
+                    ? this.scan_destination_qty
+                    : parseInt(data.quantity, 10),
+                availablePackaging: data.product.packaging,
+                uom: data.product.uom,
+                nonZeroOnly: true,
             };
         },
         action_full_bin: function () {
@@ -224,6 +309,52 @@ const ClusterPicking = {
                         ).then(function () {
                             self.state_reset_data_all();
                         });
+                    },
+                },
+                start_product: {
+                    display_info: {
+                        title: this.$t("cluster_picking.start_product.title"),
+                        scan_placeholder: this.$t(
+                            "cluster_picking.start_product.scan_placeholder"
+                        ),
+                    },
+                    on_scan: (scanned) => {
+                        this.wait_call(
+                            this.odoo.call("scan_product", {
+                                picking_batch_id: this.current_batch().id,
+                                barcode: scanned.text,
+                            })
+                        );
+                    },
+                },
+                scan_product_destination: {
+                    display_info: {
+                        title: this.$t(
+                            "cluster_picking.scan_product_destination.title"
+                        ),
+                        scan_placeholder: this.$t(
+                            "cluster_picking.scan_product_destination.scan_placeholder"
+                        ),
+                    },
+                    events: {
+                        qty_edit: "on_qty_edit",
+                    },
+                    enter: () => {
+                        this.scan_destination_qty = this.state.data.quantity;
+                    },
+                    on_qty_edit: (qty) => {
+                        this.scan_destination_qty = parseInt(qty, 10);
+                    },
+                    on_scan: (scanned) => {
+                        this.wait_call(
+                            this.odoo.call("scan_product_destination_pack", {
+                                picking_batch_id: this.current_batch().id,
+                                product_id: this.state.data.product.id,
+                                location_id: this.state.data.location_src.id,
+                                barcode: scanned.text,
+                                quantity: this.scan_destination_qty,
+                            })
+                        );
                     },
                 },
                 start_line: {

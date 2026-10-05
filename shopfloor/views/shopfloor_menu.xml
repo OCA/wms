@@ -136,6 +136,13 @@
 
               </group>
               <group
+                    name="pick_by_product"
+                    attrs="{'invisible': [('pick_by_product_is_possible', '=', False)]}"
+                >
+                    <field name="pick_by_product_is_possible" invisible="1" />
+                    <field name="pick_by_product" />
+              </group>
+              <group
                     name="auto_post_line"
                     attrs="{'invisible': [('auto_post_line_is_possible', '=', False)]}"
                 >
