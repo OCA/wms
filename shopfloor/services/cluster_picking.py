@@ -1176,17 +1176,18 @@ class ClusterPicking(Component):
 
     def _unload_set_picking_to_done(self, picking):
         """Set picking to done when all picked move lines have been unloaded"""
-        if picking.state == "done":
-            return
+        if self._unload_is_picking_done(picking):
+            return True
         for ml in picking.move_line_ids:
             if ml.picked and not ml.shopfloor_unloaded:
                 # A picked move line is not unloaded, exit
-                return
+                return False
         stock = self._actions_for("stock")
         stock.validate_moves(picking.move_ids)
         if picking.state not in ("cancel", "done"):
             # A split order has been created, remove picking from batch
             self._clear_batch_and_assignment(picking)
+        return True
 
     def _unload_end(self, batch, completion_info_popup=None):
         """Remove unprocessed pickings from batch to close it.
@@ -1212,7 +1213,7 @@ class ClusterPicking(Component):
             )
             self._clear_batch_and_assignment(empty_pickings)
 
-        if batch.state != "done":
+        if not self._unload_is_batch_done(batch):
             # As processed pickings are already done, the batch should now be done
             raise UserError(_("Internal Error: Batch not properly done."))
 
@@ -1220,6 +1221,12 @@ class ClusterPicking(Component):
             message=self.msg_store.batch_transfer_complete(),
             popup=completion_info_popup,
         )
+
+    def _unload_is_picking_done(self, picking):
+        return picking.state == "done"
+
+    def _unload_is_batch_done(self, batch):
+        return batch.state == "done"
 
     def unload_split(self, picking_batch_id):
         """Indicates that now the batch must be treated line per line
