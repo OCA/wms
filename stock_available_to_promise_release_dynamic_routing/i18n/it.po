@@ -14,22 +14,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 4.17\n"
 
-#. module: stock_available_to_promise_release_dynamic_routing
-#: model:ir.model.fields,field_description:stock_available_to_promise_release_dynamic_routing.field_stock_move__display_name
-msgid "Display Name"
-msgstr "Nome visualizzato"
+#~ msgid "Display Name"
+#~ msgstr "Nome visualizzato"
 
-#. module: stock_available_to_promise_release_dynamic_routing
-#: model:ir.model.fields,field_description:stock_available_to_promise_release_dynamic_routing.field_stock_move__id
-msgid "ID"
-msgstr "ID"
+#~ msgid "ID"
+#~ msgstr "ID"
 
-#. module: stock_available_to_promise_release_dynamic_routing
-#: model:ir.model.fields,field_description:stock_available_to_promise_release_dynamic_routing.field_stock_move____last_update
-msgid "Last Modified on"
-msgstr "Ultima modifica il"
+#~ msgid "Last Modified on"
+#~ msgstr "Ultima modifica il"
 
-#. module: stock_available_to_promise_release_dynamic_routing
-#: model:ir.model,name:stock_available_to_promise_release_dynamic_routing.model_stock_move
-msgid "Stock Move"
-msgstr "Movimento di magazzino"
+#~ msgid "Stock Move"
+#~ msgstr "Movimento di magazzino"
