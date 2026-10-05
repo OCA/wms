@@ -1,4 +1,5 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
+# Copyright 2026 Michael Tietz (MT Software) <mtietz@mt-software.de>
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from .test_cluster_picking_base import ClusterPickingCommonCase
@@ -201,12 +202,40 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "quantity": line.product_uom_qty,
             },
         )
+        self.assertEqual(self.one_line_picking.move_line_ids, line)
         line_data = self._line_data(line)
         line_data["qty_done"] = 10
         self.assert_response(
             response,
             next_state="scan_destination",
             data=line_data,
+            message={
+                "message_type": "error",
+                "body": "Bin {} doesn't exist".format("⌿"),
+            },
+        )
+
+    def test_scan_destination_pack_bin_not_found_quantity_less(self):
+        """Scan a destination package that do not exist with less units
+
+        The move line must not be split.
+        """
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": line.id,
+                "barcode": "⌿",
+                "quantity": 3,
+            },
+        )
+        self.assertEqual(self.one_line_picking.move_line_ids, line)
+        self.assertEqual(line.product_uom_qty, 10)
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line, qty_done=3.0),
             message={
                 "message_type": "error",
                 "body": "Bin {} doesn't exist".format("⌿"),
@@ -234,6 +263,31 @@ class ClusterPickingScanDestinationPackCase(ClusterPickingCommonCase):
                 "body": "You must not pick more than {} units.".format(
                     line.product_uom_qty
                 ),
+            },
+        )
+
+    def test_scan_destination_pack_no_quantity(self):
+        line = self.one_line_picking.move_line_ids
+        response = self.service.dispatch(
+            "scan_destination_pack",
+            params={
+                "picking_batch_id": self.batch.id,
+                "move_line_id": line.id,
+                "barcode": self.bin1.name,
+                "quantity": 0,
+            },
+        )
+        # Since we processed no quantity, we shouldn't have a new line
+        new_line = self.one_line_picking.move_line_ids - line
+        self.assertFalse(new_line)
+        # However, an error should have been returned
+        self.assert_response(
+            response,
+            next_state="scan_destination",
+            data=self._line_data(line),
+            message={
+                "message_type": "error",
+                "body": "Quantity must be positive.",
             },
         )
 
