@@ -197,7 +197,8 @@ class TestClusterPickingPrepareUnload(ClusterPickingUnloadPackingCommonCase):
         # to unload is the one from the last move_line
         new_bin = move_lines[-1].result_package_id
         location = move_lines[-1].location_dest_id
-        data = self._data_for_batch(self.batch, location, pack=new_bin)
+        next_line = move_lines[1]
+        data = self._data_for_batch(self.batch, location, pack=new_bin, line=next_line)
         message = self.service.msg_store.stock_picking_packed_successfully(picking)
         self.assert_response(
             response, next_state="unload_single", data=data, message=message
