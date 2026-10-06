@@ -1267,7 +1267,7 @@ class ClusterPicking(Component):
         return self._response_for_unload_single(
             batch,
             package,
-            message={"message_type": "error", "body": _("Wrong bin")},
+            message=self.msg_store.wrong_bin(),
         )
 
     def _check_package_unloadable(self, batch, package) -> dict:

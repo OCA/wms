@@ -297,6 +297,9 @@ class MessageAction(Component):
     def wrong_record(self, record):
         return {"message_type": "error", "body": self._wrong_record_msg(record._name)}
 
+    def wrong_bin(self):
+        return {"message_type": "error", "body": _("Wrong bin")}
+
     def no_lot_for_barcode(self, barcode):
         return {
             "message_type": "error",
