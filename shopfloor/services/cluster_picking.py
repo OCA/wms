@@ -1300,7 +1300,10 @@ class ClusterPicking(Component):
         if package.name != barcode:
             wrong = True
             if self.work.menu.unload_single_package_choice:
-                package_from_barcode = batch._get_package_from_barcode(barcode)
+                search = self._actions_for("search").for_packages(
+                    batch.move_line_ids.result_package_id
+                )
+                package_from_barcode = search.package_from_scan(barcode)
                 if package_from_barcode:
                     package = package_from_barcode
                     wrong = False
