@@ -8,6 +8,7 @@ from markupsafe import Markup
 from odoo import _, fields
 from odoo.exceptions import UserError
 from odoo.osv import expression
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
@@ -781,7 +782,13 @@ class ClusterPicking(Component):
                 message=message,
                 qty_done=quantity,
             )
-        new_line = move_line._split_partial_quantity_to_be_done(quantity)
+        rounding = move_line.product_uom_id.rounding
+        if float_compare(quantity, 0, precision_rounding=rounding) <= 0:
+            return self._response_for_scan_destination(
+                move_line,
+                message=self.msg_store.quantity_must_be_positive(),
+                qty_done=quantity,
+            )
 
         search = self._actions_for("search")
         bin_package = search.package_from_scan(barcode)
@@ -811,6 +818,7 @@ class ClusterPicking(Component):
                 },
                 qty_done=quantity,
             )
+        new_line = move_line._split_partial_quantity_to_be_done(quantity)
         move_line.write({"qty_done": quantity, "result_package_id": bin_package.id})
         # Only apply zero check if the product is of type "product".
         zero_check = (
