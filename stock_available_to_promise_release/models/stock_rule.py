@@ -33,15 +33,15 @@ class StockRule(models.Model):
                 not self.env.context.get("_rule_no_available_defer")
                 and rule.available_to_promise_defer_pull
                 # We still want to create the first part of the chain
-                and not rule.picking_type_id.code == "outgoing"
+                # (outgoing for deliveries, incoming for inter-warehouse replenishment)
+                and rule.picking_type_id.code == "internal"
             ):
                 moves = procurement.values.get("move_dest_ids")
-                # Track the moves that need to have their pull rule
-                # done. Before the 'pull' is done, we don't know
-                # which route is chosen. We update the destination
-                # move (ie. the outgoing) when the current route
-                # defers the pull rules and return so we don't create
-                # the next move of the chain (pick or pack).
+                # Mark downstream moves to be handled by deferred pull.
+                # At this stage we only keep the first internal leg and do
+                # not execute pull for the rest of the chain yet.
+                # Setting need_release on destination moves prevents creating
+                # next chained moves (pick/pack) until deferred pull runs.
                 if moves:
                     moves.write({"need_release": True})
             else:
