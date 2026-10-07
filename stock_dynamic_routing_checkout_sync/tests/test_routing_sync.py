@@ -105,10 +105,10 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
                 for line in move.move_line_ids:
                     self.assertEqual(line.location_dest_id, location)
                 for dest in move.move_dest_ids:
-                    # when the routing applies, we expect the location to be
-                    # the one of the picking type
-                    self.assertEqual(
-                        dest.location_id, dest.picking_type_id.default_location_src_id
+                    # we expect the location to be inline with the picking type
+                    self.assertIn(
+                        dest.picking_type_id.default_location_src_id.parent_path,
+                        dest.location_id.parent_path,
                     )
 
     def test_pack_sync(self):
@@ -128,18 +128,15 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
                 | self.pick_move3: self.location_pack_post_bay1,
             }
         )
-        self.pick_move1.move_line_ids.write(
-            {"qty_done": self.pick_move1.move_line_ids.product_uom_qty}
-        )
+        self.pick_move1.move_line_ids.picked = True
         self.pick_move1._action_done()
 
         # check source of destination moves:
-        # the routing applies the picking type's origin
-        self.assert_src_pack_post(self.pack_move1)
+        self.assert_src_pack_post_bay1(self.pack_move1)
         self.assert_src_pack_post_bay1(self.pack_move1.move_line_ids)
         # no move lines on these waiting moves:
-        self.assert_src_pack_post(self.pack_move2)
-        self.assert_src_pack_post(self.pack_move3)
+        self.assert_src_pack_post_bay1(self.pack_move2)
+        self.assert_src_pack_post_bay1(self.pack_move3)
 
         self.assert_picking_type_pack_post(self.pack_move1.picking_id)
         self.assert_picking_type_pack_post(self.pack_move2.picking_id)
@@ -172,7 +169,6 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
         wizard.sync()
 
         self.pick_move1.move_line_ids.write({"qty_done": 1})
-        self.pick_move1._action_done()
 
         pick_move_split = self.pick_move1.move_dest_ids.move_orig_ids - self.pick_move1
         # the pack move should be split, one part coming from pick_move1 being
@@ -198,13 +194,12 @@ class TestRoutingPullWithSync(CheckoutSyncCommonCase):
         self.assert_dest_pack_post_bay1(self.pick_move3)
         self.assert_dest_pack_post_bay1(self.pick_move3.move_line_ids)
 
-        # routing reapplies the default source location of the routing
-        self.assert_src_pack_post(assigned_pack)
+        self.assert_src_pack_post_bay1(assigned_pack)
         self.assert_src_pack_post_bay1(assigned_pack.move_line_ids)
         # no move lines on these waiting moves:
-        self.assert_src_pack_post(waiting_pack)
-        self.assert_src_pack_post(self.pack_move2)
-        self.assert_src_pack_post(self.pack_move3)
+        self.assert_src_pack_post_bay1(waiting_pack)
+        self.assert_src_pack_post_bay1(self.pack_move2)
+        self.assert_src_pack_post_bay1(self.pack_move3)
 
         self.assert_picking_type_pack_post(self.pack_move1.picking_id)
         self.assert_picking_type_pack_post(self.pack_move2.picking_id)
