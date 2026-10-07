@@ -99,12 +99,7 @@ class ActionsDataCase(ActionsDataCaseBase):
         )
         data = self.data.lot(lot)
         self.assert_schema(self.schema.lot(), data)
-        expected = {
-            "id": lot.id,
-            "name": lot.name,
-            "ref": "#FOO",
-            "expiration_date": None,
-        }
+        expected = self._expected_lot(lot)
         self.assertDictEqual(data, expected)
 
     def test_data_package(self):
@@ -296,12 +291,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_b),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": None,
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
@@ -321,12 +311,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_c),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
