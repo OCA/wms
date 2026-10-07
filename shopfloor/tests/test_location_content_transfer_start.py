@@ -380,3 +380,76 @@ class LocationContentTransferStartSpecialCase(LocationContentTransferCommonCase)
             self.product_a | self.product_b | self.product_c | self.product_d,
         )
         self.assertEqual(picking.state, "assigned")
+
+    def test_scan_location_create_moves_partially_available(self):
+        """The scanned location has no move lines but has some quants to move."""
+        picking_type = self.menu.picking_type_ids
+        # product_a alone
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_a,
+            self.content_loc,
+            10,
+        )
+
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_b, self.content_loc, 10
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_c, self.content_loc, 5
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_d, self.content_loc, 5
+        )
+
+        # Create a move that reserve partially product b
+        move = self.env["stock.move"].create(
+            {
+                "product_id": self.product_b.id,
+                "name": self.product_b.name,
+                "product_uom_qty": 3.0,
+                "location_id": self.content_loc.id,
+                "location_dest_id": self.stock_location.id,
+            }
+        )
+        move._action_confirm()
+        move._action_assign()
+
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        self.assert_response(
+            response,
+            "scan_location",
+            message=self.service.msg_store.new_move_lines_not_assigned(),
+        )
+        picking = self.env["stock.picking"].search(
+            [("picking_type_id", "=", picking_type.id)]
+        )
+        self.assertEqual(len(picking), 0)
+
+        self.menu.sudo().allow_reserve_only_available = True
+
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.content_loc.barcode}
+        )
+        picking = self.env["stock.picking"].search(
+            [("picking_type_id", "=", picking_type.id)]
+        )
+
+        self.assert_response_scan_destination_all(response, picking)
+        move_line_id = response["data"]["scan_destination_all"]["move_lines"][0]["id"]
+        package_levels = response["data"]["scan_destination_all"]["package_levels"]
+        self.assertFalse(package_levels)
+        self.assertIn(move_line_id, picking.move_line_ids.ids)
+
+        self.assertEqual(picking.state, "assigned")
+
+        # Check the product b has 7.0 of reserved quantity
+        line_b_id = [
+            line["id"]
+            for line in response["data"]["scan_destination_all"]["move_lines"]
+            if line["product"]["id"] == self.product_b.id
+        ]
+        line_b = self.env["stock.move.line"].browse(line_b_id)
+        self.assertTrue(line_b)
+        self.assertEqual(7.0, line_b.reserved_qty)
