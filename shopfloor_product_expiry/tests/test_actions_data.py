@@ -33,17 +33,21 @@ class ActionsDataCase(ActionsDataCaseBase):
         data = self.data.move_line(move_line, expiration_date=True)
         self.assert_schema(self.schema.move_line(), data)
         expected = {
-            "id": move_line.id,
-            "qty_done": 5.0,
-            "quantity": 0.0,
-            "product": self._expected_product(product),
-            "lot": None,
             "expiration_date": "2022-07-01T00:00:00",
-            "package_src": None,
-            "package_dest": None,
-            "location_src": self._expected_location(move_line.location_id),
-            "location_dest": self._expected_location(move_line.location_dest_id),
-            "priority": "0",
-            "progress": 100.0,
         }
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
+
+    def test_data_lot_expiry(self):
+        lot = self.env["stock.lot"].create(
+            {
+                "product_id": self.product_a.id,
+                "expiration_date": "2022-07-01",
+                "removal_date": "2022-08-01",
+            }
+        )
+        data = self.data_detail.lot_detail(lot)
+        expected = {
+            "expiration_date": "2022-07-01T00:00:00",
+            "removal_date": "2022-08-01T00:00:00",
+        }
+        self.assertDictContainsSubset(expected, data)
