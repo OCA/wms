@@ -158,6 +158,9 @@ export class DemoTools {
             });
         }
         loc.barcode = loc.name;
+        loc.display_name = loc.parent_name
+            ? loc.parent_name + " / " + loc.name
+            : loc.name;
         this.index_record("barcode", loc, "location");
         return loc;
     }

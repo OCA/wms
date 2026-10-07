@@ -118,6 +118,34 @@ const DEMO_CLUSTER_PICKING_1 = {
         data: {
             unload_all: _.extend({}, demotools.makeBatch(), {
                 location_dest: demotools.makeLocation(),
+                skip_unload_all_scan: true,
+                move_lines: [
+                    demotools.makeMoveLine({
+                        picking: demotools.makePicking(
+                            {},
+                            {name_prefix: "PICK/OUT", full_detail: true}
+                        ),
+                    }),
+                    demotools.makeMoveLine({
+                        picking: demotools.makePicking(
+                            {},
+                            {name_prefix: "PICK/OUT", full_detail: true}
+                        ),
+                    }),
+                ],
+                backorder_lines: [
+                    demotools.makeMoveLine(
+                        {
+                            quantity: 4,
+                            qty_done: 3,
+                            picking: demotools.makePicking(
+                                {},
+                                {name_prefix: "PICK/OUT", full_detail: true}
+                            ),
+                        },
+                        {qty_done_random: false}
+                    ),
+                ],
             }),
         },
     },
