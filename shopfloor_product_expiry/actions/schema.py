@@ -20,3 +20,21 @@ class ShopfloorSchemaAction(Component):
             }
         )
         return schema
+
+    def lot(self):
+        schema = super().lot()
+        schema.update(
+            {
+                "expiration_date": {
+                    "type": "string",
+                    "nullable": True,
+                    "required": False,
+                },
+                "removal_date": {
+                    "type": "string",
+                    "nullable": True,
+                    "required": False,
+                },
+            },
+        )
+        return schema

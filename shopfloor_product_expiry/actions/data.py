@@ -16,3 +16,7 @@ class DataAction(Component):
                 value = fields.Datetime.to_datetime(value).isoformat()
             data["expiration_date"] = value
         return data
+
+    @property
+    def _lot_parser(self):
+        return super()._lot_parser + ["expiration_date", "removal_date"]
