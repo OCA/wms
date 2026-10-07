@@ -1,0 +1,6 @@
+{
+  "cluster_picking.pack_picking_put_in_pack.title": "Emballage: Nombre de colis.",
+  "cluster_picking.pack_picking_put_in_pack.scan_placeholder": "Nombre de colis créés?",
+  "cluster_picking.pack_picking_scan_pack.title": "Emballage: Validation emplacement à emballer.",
+  "cluster_picking.pack_picking_scan_pack.scan_placeholder": "Code-barre emplacement charriot "
+}
