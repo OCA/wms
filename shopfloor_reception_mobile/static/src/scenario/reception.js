@@ -154,6 +154,7 @@ const Reception = {
                         :card_color="utils.colors.color_for('screen_step_todo')"
                     />
                 </v-card>
+                <detail-product-image v-if="line_being_handled.product.image && !line_being_handled.lot" :record="line_being_handled.product"/>
                 <div class="button-list button-vertical-list full">
                     <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
