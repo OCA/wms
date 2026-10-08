@@ -21,7 +21,7 @@ const ReceptionGrn = process_registry.extend("reception", {
 
             res.push({
                 path: "grn.name",
-                label: "GRN",
+                label: this.$t("common.grn"),
             });
             return res;
         },
@@ -32,7 +32,9 @@ const ReceptionGrn = process_registry.extend("reception", {
             // Capture 'this' in a variable to be safe across async boundaries
             const self = this;
 
-            states["select_document"]["display_info"]["scan_placeholder"] += " / GRN";
+            states["select_document"]["display_info"]["scan_placeholder"] += this.$t(
+                "scan_placeholder.grn_addon"
+            );
 
             return states;
         },
