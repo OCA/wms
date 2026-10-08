@@ -19,7 +19,7 @@ export function loadJSON(callback, url) {
 export class TranslationRegistry {
     constructor() {
         this._data = {};
-        this._default_lang = "en-US";
+        this._default_lang = "en";
         this._enabled = [];
     }
 
@@ -137,6 +137,7 @@ export class TranslationRegistry {
             locale: this.default_lang(), // Set locale
             availableLocales: this.available_langs(),
             messages: this.messages(),
+            fallbackLocale: "en",
         });
     }
 }
