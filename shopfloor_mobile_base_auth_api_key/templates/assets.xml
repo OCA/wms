@@ -18,8 +18,8 @@
             />
 
             <script
-                id="script_load_translations"
-                t-attf-src="/shopfloor_mobile_base_auth_api_key/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
+                id="script_load_translations_shopfloor_mobile_base_auth_api_key"
+                t-attf-src="/shopfloor_mobile_base_auth_api_key/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{get_version(mod_name)}"
                 type="module"
             />
         </script>
