@@ -76,6 +76,13 @@
                     <field name="allow_force_reservation" />
                 </group>
                 <group
+                    name="stock_issue_strategy"
+                    attrs="{'invisible': [('stock_issue_strategy_is_possible', '=', False)]}"
+                >
+                    <field name="stock_issue_strategy_is_possible" invisible="1" />
+                    <field name="stock_issue_strategy" />
+                </group>
+                <group
                     name="prepackaged_product"
                     attrs="{'invisible': [('prepackaged_product_is_possible', '=', False)]}"
                 >

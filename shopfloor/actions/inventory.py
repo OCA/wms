@@ -1,6 +1,7 @@
 # Copyright 2020 Camptocamp SA (http://www.camptocamp.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 from odoo import _, fields
+from odoo.exceptions import UserError
 
 from odoo.addons.component.core import Component
 
@@ -15,6 +16,10 @@ class InventoryAction(Component):
     _name = "shopfloor.inventory.action"
     _inherit = "shopfloor.process.action"
     _usage = "inventory"
+
+    @property
+    def stock_issue_strategy(self):
+        return getattr(self.work, "stock_issue_strategy", "inventory_correction")
 
     @property
     def inventory_model(self):
@@ -98,12 +103,55 @@ class InventoryAction(Component):
         * assigned move lines in other batch transfers stay assigned.
         * assigned move lines in same batch but already picked stay assigned.
         """
-        other_lines = self._stock_issue_get_related_move_lines(
-            move, location, package, lot
+        self._create_stock_issue_inventory_correction(
+            move, location, package, lot, self.env["stock.move.line"]
+        )
+
+    def handle_stock_issue(self, move, location, package, lot, lines):
+        """Declare a stock issue for `lines`, creating the control
+        inventory and dispatching to the configured `stock_issue_strategy`.
+
+        `lines` are the move lines impacted by the stock issue (for the
+        given product/location/lot/package) - possibly empty if the move
+        itself was already fully canceled by the caller. They must still
+        be live records (not unreserved/canceled/unlinked by the caller):
+        the strategy owns their fate entirely, including reassigning
+        affected moves if relevant. The caller must not do anything else
+        with `lines` (or their moves) afterwards.
+        """
+        strategy_method_name = f"_create_stock_issue_{self.stock_issue_strategy}"
+        strategy_method = getattr(self, strategy_method_name, None)
+        if strategy_method is None:
+            raise UserError(
+                _(
+                    "Invalid stock issue strategy %(strategy)s",
+                    strategy=self.stock_issue_strategy,
+                )
+            )
+        self.create_control_stock(location, move.product_id, package, lot)
+        strategy_method(move, location, package, lot, lines)
+
+    def _create_stock_issue_inventory_correction(
+        self, move, location, package, lot, lines
+    ):
+        """Default strategy: reduce the quantity in a location in a way
+        that:
+        * assigned move lines in other batch transfers stay assigned.
+        * assigned move lines in same batch but already picked stay assigned.
+        """
+        other_lines = (
+            self._stock_issue_get_related_move_lines(move, location, package, lot)
+            - lines
         )
         qty_to_keep = sum(other_lines.mapped("reserved_qty"))
+        moves = lines.mapped("move_id")
+        # Unlink before applying the correction: the quant's reserved
+        # quantity must already be down to what these lines' reservation
+        # required freeing, otherwise applying an inventory count lower
+        # than what is still reserved leaves an inconsistent state.
+        lines.unlink()
         self.create_stock_correction(move, location, package, lot, qty_to_keep)
-        move._action_assign()
+        moves._action_assign()
 
     def create_stock_correction(self, move, location, package, lot, quantity):
         """Create an inventory with a forced quantity"""
