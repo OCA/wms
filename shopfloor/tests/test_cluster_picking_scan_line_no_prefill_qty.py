@@ -41,11 +41,16 @@ class ClusterPickingScanLineNoPrefillQtyCase(ClusterPickingLineCommonCase):
         """Check scanning a packaging when no_prefill_qty is enabled."""
         self._simulate_batch_selected(self.batch, in_package=False)
         self._enable_no_prefill()
-        packaging = self.env.ref(
-            "stock_storage_type.product_product_9_packaging_4_cardbox"
-        )
-        packaging.sudo().write(
-            {"product_id": self.line.product_id.id, "barcode": "cute-pack"}
+        packaging = (
+            self.env["product.packaging"]
+            .sudo()
+            .create(
+                {
+                    "name": "cute pack",
+                    "barcode": "cute-pack",
+                    "product_id": self.line.product_id.id,
+                }
+            )
         )
         # The quantity of the packaging is incremented
         self._assert_qty_done(self.line, packaging.barcode, packaging.qty)
