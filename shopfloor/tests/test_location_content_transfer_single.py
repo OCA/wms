@@ -122,7 +122,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._scan_package_error(
             self.picking1.move_line_ids.package_level_id,
             pack.name,
-            {"message_type": "error", "body": "Wrong pack."},
+            self.msg_store.wrong_record(pack),
         )
 
     def test_scan_package_error_wrong_product(self):
@@ -140,7 +140,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._scan_package_error(
             self.picking1.move_line_ids.package_level_id,
             product.barcode,
-            {"message_type": "error", "body": "Wrong product."},
+            self.msg_store.wrong_record(product),
         )
 
     def test_scan_package_error_wrong_lot(self):
@@ -159,7 +159,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._scan_package_error(
             self.picking1.move_line_ids.package_level_id,
             lot.name,
-            {"message_type": "error", "body": "Wrong lot."},
+            self.msg_store.wrong_record(lot),
         )
 
     def test_scan_package_barcode_not_found(self):
@@ -167,7 +167,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._scan_package_error(
             self.picking1.move_line_ids.package_level_id,
             "NO_EXISTING_BARCODE",
-            {"message_type": "error", "body": "Barcode not found"},
+            self.msg_store.barcode_not_found(),
         )
 
     def test_scan_package_product_ok(self):
@@ -215,7 +215,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_product_nok_different_line(self):
@@ -228,7 +228,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_product_nok_product_tracked(self):
@@ -237,7 +237,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_lot_nok_different_package(self):
@@ -258,7 +258,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_lot_nok_different_line(self):
@@ -279,7 +279,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         self._test_scan_package_nok(
             self.pickings | picking,
             self.product_a.barcode,
-            {"message_type": "error", "body": "Scan the package"},
+            self.msg_store.scan_the_package(),
         )
 
     def test_scan_package_package_level_not_exists(self):
@@ -363,7 +363,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             self.pickings,
             move_line.id,
             pack.name,
-            {"message_type": "error", "body": "Wrong pack."},
+            self.msg_store.wrong_record(pack),
         )
 
     def test_scan_line_error_wrong_product(self):
@@ -383,7 +383,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             self.pickings,
             move_line.id,
             product.barcode,
-            {"message_type": "error", "body": "Wrong product."},
+            self.msg_store.wrong_record(product),
         )
 
     def test_scan_line_error_wrong_lot(self):
@@ -404,7 +404,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
             self.pickings,
             move_line.id,
             lot.name,
-            {"message_type": "error", "body": "Wrong lot."},
+            self.msg_store.wrong_record(lot),
         )
 
     def test_scan_line_barcode_not_found(self):
@@ -572,10 +572,9 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         )
         backorder = self.picking3.backorder_ids
         self.assertTrue(backorder)
-        message = {
-            "body": "Content line transferred from Content Location to Shelf 1",
-            "message_type": "success",
-        }
+        message = self.msg_store.location_content_transfer_item_complete(
+            self.content_loc, self.shelf1
+        )
 
         # Check the backorder is proposed to operator
         self.assert_response_start_single(response, backorder, message=message)

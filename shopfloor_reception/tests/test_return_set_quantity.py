@@ -53,10 +53,7 @@ class TestSetQuantityReturn(CommonCaseReturn):
         response = self._dispatch(quantity=21.0)
         # Qty done has been kept as it was
         self.assertEqual(self.selected_move_line.qty_done, 20.0)
-        message = {
-            "message_type": "error",
-            "body": "You cannot return more quantity than what was initially sent.",
-        }
+        message = self.msg_store.return_line_invalid_qty()
         self.assert_response(
             response,
             next_state="set_quantity",
@@ -81,10 +78,7 @@ class TestSetQuantityReturn(CommonCaseReturn):
         response = self._dispatch(barcode=self.product.barcode)
         # We are not allowed to set qty_done 21.0, since the origin move's qty was 10.0
         self.assertEqual(self.selected_move_line.qty_done, 20.0)
-        message = {
-            "message_type": "error",
-            "body": "You cannot return more quantity than what was initially sent.",
-        }
+        message = self.msg_store.return_line_invalid_qty()
         self.assert_response(
             response,
             next_state="set_quantity",
@@ -103,10 +97,7 @@ class TestSetQuantityReturn(CommonCaseReturn):
         # Therefore, qty isn't increased, and an error is returned
         response = self._dispatch(barcode=packaging.barcode)
         self.assertEqual(self.selected_move_line.qty_done, 11.0)
-        message = {
-            "message_type": "error",
-            "body": "You cannot return more quantity than what was initially sent.",
-        }
+        message = self.msg_store.return_line_invalid_qty()
         self.assert_response(
             response,
             next_state="set_quantity",

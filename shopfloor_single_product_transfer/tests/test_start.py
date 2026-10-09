@@ -23,10 +23,9 @@ class TestStart(CommonCase):
             "move_line": self._data_for_move_line(move_line),
             "asking_confirmation": None,
         }
-        message = {
-            "message_type": "info",
-            "body": "Recovered previous session.",
-        }
         self.assert_response(
-            response, next_state="set_quantity", data=data, message=message
+            response,
+            next_state="set_quantity",
+            data=data,
+            message=self.msg_store.recovered_previous_session(),
         )

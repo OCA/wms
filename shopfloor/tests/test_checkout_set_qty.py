@@ -72,10 +72,7 @@ class CheckoutResetLineQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
 
@@ -120,10 +117,7 @@ class CheckoutSetLineQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
 
@@ -170,10 +164,7 @@ class CheckoutSetCustomQtyCase(CheckoutSetQtyCommonCase):
             response,
             selected_lines,
             {line: line.reserved_uom_qty for line in selected_lines},
-            message={
-                "body": "The record you were working on does not exist anymore.",
-                "message_type": "error",
-            },
+            message=self.msg_store.record_not_found(),
         )
 
     def test_set_custom_qty_above(self):
