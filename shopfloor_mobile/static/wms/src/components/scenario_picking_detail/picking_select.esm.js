@@ -113,7 +113,7 @@ Vue.component("picking-select-package-content", {
         <div :class="[record.package_dest ? 'has-pack' : 'no-pack', get_wrapper_klass(record)]">
             <span class="record-name">{{ record.product.display_name }}</span>
             <div class="lot" v-if="record.lot">
-                <span class="label">{{ $t("common.lot") }}:</span> <span>{{ record.lot.name }}</span>
+                <span class="label">{{ $t("common.lot") }}</span> <span>{{ record.lot.name }}</span>
             </div>
             <div class="qty done">
                 <span class="label">{{ $t("picking_select.taken") }}</span>

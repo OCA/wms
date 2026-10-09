@@ -134,7 +134,7 @@ Vue.component("picking-summary-content", {
                             {{ get_group_title(record, pkg_type) }}
                         </strong>
                         <div v-for="(field, index) in options.header_fields">
-                            <span v-if="field.label" class="label">{{ field.label }}:</span>
+                            <span v-if="field.label" class="label">{{ field.label }}</span>
                             <component
                                 v-if="field.render_component"
                                 :is="field.render_component"
@@ -187,7 +187,7 @@ Vue.component("picking-summary-product-detail", {
             <template v-if="_.isEmpty(options.fields)">
                 <v-list-item-subtitle>
                     <div class="lot" v-if="record.lot">
-                        <span class="label">{{ $t("common.lot") }}:</span> <span>{{ record.lot.name }}</span>
+                        <span class="label">{{ $t("common.lot") }}</span> <span>{{ record.lot.name }}</span>
                     </div>
                     <div class="qty">
                         <span class="label">{{ $t("common.qty") }}</span>
@@ -200,7 +200,7 @@ Vue.component("picking-summary-product-detail", {
             </template>
             <template v-else>
                 <v-list-item-subtitle v-for="(field, index) in options.fields">
-                    <span v-if="field.label" class="label">{{ field.label }}:</span>
+                    <span v-if="field.label" class="label">{{ field.label }}</span>
                     <component
                         v-if="field.render_component"
                         :is="field.render_component"
