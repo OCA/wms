@@ -15,6 +15,12 @@
                 t-attf-src="/shopfloor_workstation_mobile/static/wms/src/settings/workstation.js?v=#{app_info.version}"
                 type="module"
             />
+
+          <script
+                id="script_add_translations_registry_shopfloor_workstation_mobile"
+                t-attf-src="/shopfloor_workstation_mobile/static/wms/src/i18n/add_translations_to_registry.esm.js?v=#{app_info.version}"
+                type="module"
+            />
         </script>
     </template>
 </odoo>
