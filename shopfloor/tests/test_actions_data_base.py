@@ -250,12 +250,6 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                     if record.image_128
                     else None,
                     "locations": locations_info,
-                    "manufacturer": {
-                        "id": record.manufacturer_id.id,
-                        "name": record.manufacturer_id.name,
-                    }
-                    if record.manufacturer_id
-                    else None,
                     "suppliers": [
                         {
                             "id": v.partner_id.id,

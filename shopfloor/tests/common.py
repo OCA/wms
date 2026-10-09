@@ -155,6 +155,70 @@ class CommonCase(BaseCommonCase):
             )
         )
 
+    def _compare_dict_subset(self, expected, actual, path=""):
+        """Recursively checks if actual dict contains all keys/values from expected."""
+        missing, mismatched = [], []
+        for key, exp_val in expected.items():
+            curr_path = f"{path}.{key}" if path else str(key)
+            if key not in actual:
+                missing.append(curr_path)
+            else:
+                sub_missing, sub_mismatched = self._compare_value_subset(
+                    exp_val, actual[key], curr_path
+                )
+                missing.extend(sub_missing)
+                mismatched.extend(sub_mismatched)
+        return missing, mismatched
+
+    def _compare_list_subset(self, exp_list, act_list, path=""):
+        """Compares list items for subset equality."""
+        missing, mismatched = [], []
+        if len(exp_list) != len(act_list):
+            mismatched.append(
+                f"{path}: expected list length {len(exp_list)}, got {len(act_list)}"
+            )
+            return missing, mismatched
+
+        for idx, (exp_item, act_item) in enumerate(zip(exp_list, act_list)):
+            item_path = f"{path}[{idx}]"
+            sub_missing, sub_mismatched = self._compare_value_subset(
+                exp_item, act_item, item_path
+            )
+            missing.extend(sub_missing)
+            mismatched.extend(sub_mismatched)
+        return missing, mismatched
+
+    def _compare_value_subset(self, exp_val, act_val, path=""):
+        """Routes value comparison based on types."""
+        if isinstance(exp_val, dict) and isinstance(act_val, dict):
+            return self._compare_dict_subset(exp_val, act_val, path)
+        if isinstance(exp_val, list) and isinstance(act_val, list):
+            return self._compare_list_subset(exp_val, act_val, path)
+        if exp_val != act_val:
+            return [], [f"{path}: expected {exp_val}, got {act_val}"]
+        return [], []
+
+    def assertDictContainsSubset(self, expected, actual, msg=None):
+        """Recursively checks whether the actual dictionary is a superset of expected.
+
+        Allows other modules to inject extra keys into nested component responses
+        without breaking base tests.
+        """
+        missing, mismatched = self._compare_dict_subset(expected, actual)
+        if not (missing or mismatched):
+            return
+
+        errors = []
+        if missing:
+            errors.append(f"Missing keys: {', '.join(missing)}")
+        if mismatched:
+            errors.append(f"Mismatched values: {'; '.join(mismatched)}")
+
+        error_msg = "; ".join(errors)
+        if msg:
+            error_msg = f"{msg} : {error_msg}"
+        self.fail(error_msg)
+
     @classmethod
     def _create_picking(cls, picking_type=None, lines=None, confirm=True, **kw):
         picking_form = Form(cls.env["stock.picking"])
