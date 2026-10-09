@@ -176,7 +176,7 @@ Vue.component("list-item", {
         <div class="details">
             <div v-for="(field, index) in options.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                 <span v-if="raw_value(record, field) || field.display_no_value">
-                    <span v-if="field.label" class="label">{{ field.label }}:</span>
+                    <span v-if="field.label" class="label">{{ field.label }}</span>
                     <component
                         v-if="field.render_component"
                         :is="field.render_component"

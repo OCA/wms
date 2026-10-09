@@ -165,8 +165,8 @@ export var DatePicker = Vue.component("date-picker-input", {
             <v-text-field
                 :value="dateInput"
                 @input="onInput"
-                :error-messages="showInvalidDateInputMessage ? 'invalid input' : ''"
-                :label="\`Select expiry date (\${dateFormat})\`"
+                :error-messages="showInvalidDateInputMessage ? $t('misc.invalid_input') : ''"
+                :label="$t('misc.select_expiry_date') + \` (\${dateFormat})\`"
                 prepend-icon="mdi-calendar"
                 v-bind="attrs"
                 clearable

@@ -539,3 +539,10 @@ main.v-content > .v-content__wrap > .header .container {
     font-weight: bold;
     border: black 1px solid;
 }
+
+.label::after {
+    content: ":";
+}
+html[lang^="fr"] .label::after {
+    content: "\00A0:";
+}

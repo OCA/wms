@@ -19,6 +19,12 @@
                 type="module"
             />
 
+          <script
+                id="script_load_translations_shopfloor_reception_grn_mobile"
+                t-attf-src="/shopfloor_reception_grn_mobile/static/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
+                type="module"
+            />
+
         </xpath>
     </template>
 
