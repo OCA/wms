@@ -1,0 +1,26 @@
+<odoo>
+    <record id="view_create_call_off_wizard_form" model="ir.ui.view">
+        <field name="name">sale.order.deliver.remaining.wizard.form.atp.release</field>
+        <field name="model">sale.order.deliver.remaining.wizard</field>
+        <field
+            name="inherit_id"
+            ref="sale_order_blanket_order.view_create_call_off_wizard_form"
+        />
+        <field name="arch" type="xml">
+            <field name="wizard_line_ids" position="before">
+                <group>
+                    <field name="availability_filter" />
+                </group>
+            </field>
+            <field name="call_off_remaining_qty" position="after">
+                <field name="availability_status" />
+                <field name="available_qty" string="Available to Call Off" />
+                <field name="delayed_qty" />
+                <field name="expected_availability_date" optional="hide" />
+            </field>
+            <field name="sale_order_line_id" position="attributes">
+                <attribute name="force_save">1</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
