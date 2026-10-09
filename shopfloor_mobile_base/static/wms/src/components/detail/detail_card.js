@@ -33,7 +33,7 @@ Vue.component("item-detail-card", {
                 <v-card-text class="details" v-if="opts.fields.length">
                     <div v-for="(field, index) in opts.fields" :class="'field-detail ' + field.path.replace('.', '-') + ' ' + (field.klass || '')">
                         <div v-if="raw_value(record, field) !== undefined || field.display_no_value">
-                            <span v-if="field.label" class="label">{{ field.label }}:</span>
+                            <span v-if="field.label" class="label">{{ field.label }}</span>
                             <component
                                 v-if="field.render_component"
                                 :is="field.render_component"
