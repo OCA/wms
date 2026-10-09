@@ -110,6 +110,18 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
         cls.product_a_variant.flush_recordset()
         cls.product_a_vendor.flush_recordset()
 
+    def _is_module_installed(self, module_name):
+        return bool(
+            self.env["ir.module.module"]
+            .sudo()
+            .search_count(
+                [
+                    ("name", "=", module_name),
+                    ("state", "in", ("installed", "to upgrade")),
+                ]
+            )
+        )
+
     def _expected_location(self, record, **kw):
         data = {
             "id": record.id,
@@ -172,9 +184,11 @@ class ActionsDataCaseBase(CommonCase, ActionsDataTestMixin):
             "id": record.id,
             "name": record.name,
             "ref": record.ref or None,
-            "expiration_date": record.expiration_date or None,
         }
         data.update(kw)
+        if self._is_module_installed("shopfloor_product_expiry"):
+            data.update({"expiration_date": record.expiration_date or None})
+            data.update({"removal_date": record.removal_date or None})
         return data
 
 
@@ -207,13 +221,12 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
         )
 
     def _expected_location_lot(self, record, **kw):
-        return dict(
-            **self._expected_lot(record),
-            **{
-                "removal_date": record.removal_date or None,
-                "quantity": sum(record.quant_ids.mapped("quantity")),
-            },
-        )
+        data = self._expected_lot(record)
+        data.update({"quantity": sum(record.quant_ids.mapped("quantity"))})
+        data.update(kw)
+        if self._is_module_installed("shopfloor_product_expiry"):
+            data.update({"removal_date": record.removal_date or None})
+        return data
 
     def _expected_product_detail(self, record, **kw):
         qty_available = record.qty_available

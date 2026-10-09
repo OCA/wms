@@ -544,12 +544,6 @@ class MessageAction(Component):
             "body": _("Packaging not found in the current transfer."),
         }
 
-    def expiration_date_missing(self):
-        return {
-            "message_type": "error",
-            "body": _("Missing expiration date."),
-        }
-
     def multiple_picks_found_select_manually(self):
         return {
             "message_type": "error",

@@ -35,7 +35,6 @@ class ShopfloorSchemaDetailAction(Component):
         schema = self.lot()
         schema.update(
             {
-                "removal_date": {"type": "string", "nullable": True, "required": False},
                 "quantity": {"type": "float", "required": True},
             }
         )
@@ -72,8 +71,6 @@ class ShopfloorSchemaDetailAction(Component):
         schema = self.lot()
         schema.update(
             {
-                "removal_date": {"type": "string", "nullable": True, "required": False},
-                "expire_date": {"type": "string", "nullable": True, "required": False},
                 "product": self._schema_dict_of(self.product_detail()),
                 # TODO: packaging
             }
