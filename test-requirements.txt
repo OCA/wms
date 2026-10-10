@@ -1,2 +1,5 @@
 vcrpy-unittest
 odoo_test_helper
+
+odoo-addon-stock-package-level-name @ git+https://github.com/OCA/stock-logistics-tracking@refs/pull/62/head#subdirectory=setup/stock_package_level_name
+odoo-addon-stock-move-source-reassign @ git+https://github.com/OCA/stock-logistics-workflow@refs/pull/2369/head#subdirectory=setup/stock_move_source_reassign

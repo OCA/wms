@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="stock_move_reassign_form_view">
+        <field name="model">stock.move.reassign</field>
+        <field name="name">Stock Move Reassign</field>
+        <field
+            name="inherit_id"
+            ref="stock_move_source_reassign.stock_move_reassign_form_view"
+        />
+        <field name="arch" type="xml">
+            <field name="reassign_picking_type_id" position="after">
+                <field name="release_channel_id_domain" invisible="1" />
+                <label for="release_channel_id" />
+                <field
+                    name="release_channel_id"
+                    domain="release_channel_id_domain"
+                    class="oe_inline"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>
