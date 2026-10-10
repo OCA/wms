@@ -43,9 +43,10 @@ class DataAction(Component):
                 lot_expiration_date := kw.get("lot_expiration_date")
             ):
                 lot_data["expiration_date"] = lot_expiration_date.isoformat()
-        else:
-            if lot_name := kw.get("lot_name"):
-                lot_data["name"] = lot_name
+        elif lot_name := kw.get("lot_name"):
+            lot_data["name"] = lot_name
+            # NB: name is required when returning a lot
+            # so if there is an expiration date on the line but no lot_name -> discard
             if lot_expiration_date := kw.get("lot_expiration_date"):
                 lot_data["expiration_date"] = lot_expiration_date.isoformat()
 
