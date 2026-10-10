@@ -1,2 +1,5 @@
 vcrpy-unittest
 odoo_test_helper
+odoo-addon-shopfloor-base @ git+https://github.com/OCA/wms@refs/pull/1085/head#subdirectory=setup/shopfloor_base
+odoo-addon-shopfloor-printing-base @ git+https://github.com/OCA/wms@refs/pull/1085/head#subdirectory=setup/shopfloor_printing_base
+odoo-addon-shopfloor-mobile-printing-base @ git+https://github.com/OCA/wms@refs/pull/1085/head#subdirectory=setup/shopfloor_mobile_printing_base
