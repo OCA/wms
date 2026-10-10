@@ -1,0 +1,17 @@
+<!-- Copyright 2025 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+     <record model="ir.model.access" id="shopfloor_test">
+        <field name="name">shopfloor_test</field>
+        <field
+            name="model_id"
+            ref="shopfloor_printing_base.model_shopfloor_test_model"
+        />
+        <field name="group_id" ref="base.group_user" />
+        <field name="perm_read" eval="1" />
+        <field name="perm_create" eval="1" />
+        <field name="perm_write" eval="1" />
+        <field name="perm_unlink" eval="1" />
+    </record>
+
+</odoo>

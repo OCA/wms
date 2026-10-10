@@ -162,10 +162,9 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
     # Initial state of a workflow
     _start_state = "start"
 
-    def _states(self):
-        """List of possible next states
-
-        With the schema of the data send to the client to transition
+    def _states(self) -> dict:
+        """Returns a dict mapping next states with the schema
+        of the data sent to the client to transition
         to the next state.
         """
         return {}
@@ -180,6 +179,31 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
     @property
     def schemas_detail(self):
         return self._actions_for("schema_detail")
+
+    def _get_global_fields_schemas(self) -> dict:
+        """Returns schemas of fields to be added in all next states data schemas"""
+        return {}
+
+    def _validate_next_states(self, next_states: set, states_schemas: dict):
+        if self._start_state not in states_schemas:
+            raise ValueError(
+                "the _start_state is {} but this state does not exist"
+                ", you may want to change the property's value".format(
+                    self._start_state
+                )
+            )
+        unknown_states = set(next_states) - states_schemas.keys()
+        if unknown_states:
+            raise ValueError(
+                "states {!r} are not defined in _states".format(unknown_states)
+            )
+
+    def _add_global_fields_schemas(self, states_schemas: dict) -> dict:
+        "Modifies the 'states_schemas' dict to add the schemas of the global fields"
+        global_fields_schemas = self._get_global_fields_schemas()
+        for data_schema in states_schemas.values():
+            data_schema.update(global_fields_schemas)
+        return states_schemas
 
     def _response_schema(self, data_schema=None, next_states=None):
         """Schema for the return validator
@@ -225,19 +249,8 @@ class BaseShopfloorValidatorResponse(AbstractComponent):
             next_states = set(next_states)
             next_states.add(self._start_state)
             states_schemas = self._states()
-            if self._start_state not in states_schemas:
-                raise ValueError(
-                    "the _start_state is {} but this state does not exist"
-                    ", you may want to change the property's value".format(
-                        self._start_state
-                    )
-                )
-            unknown_states = set(next_states) - states_schemas.keys()
-            if unknown_states:
-                raise ValueError(
-                    "states {!r} are not defined in _states".format(unknown_states)
-                )
-
+            self._validate_next_states(next_states, states_schemas)
+            states_schemas = self._add_global_fields_schemas(states_schemas)
             data_schema = data_schema.copy()
             data_schema.update(
                 {
