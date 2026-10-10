@@ -1,0 +1,19 @@
+<!-- Copyright 2025 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <!-- This template works for all record types (lot, product, picking, move line, ...) -->
+    <template id="dummy_report">
+        <t t-foreach="docs" t-as="doc">
+            <t t-out="doc.create_date" />
+        </t>
+    </template>
+
+    <record model="ir.actions.report" id="report_test_document">
+        <field name="name">Test</field>
+        <!-- ↓ You can change the model as you which in the unit test -->
+        <field name="model">stock.move.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">shopfloor_reception_print_label.dummy_report</field>
+        <field name="report_file">shopfloor_reception_print_label.dummy_report</field>
+    </record>
+</odoo>

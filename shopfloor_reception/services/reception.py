@@ -750,6 +750,7 @@ class Reception(Component):
         # process without pack, set destination location, and go back to
         # `select_move`
         selected_line.location_dest_id = location
+        self._post_line(selected_line)
         return self._response_for_select_move(picking)
 
     def _set_quantity__by_lot(self, picking, selected_line, lot):
