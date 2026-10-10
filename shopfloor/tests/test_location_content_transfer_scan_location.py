@@ -32,3 +32,82 @@ class TestLocationContentTransferScanLocation(LocationContentTransferCommonCase)
         lines = response["data"]["scan_destination_all"]["move_lines"]
         line_ids = [line["id"] for line in lines]
         self.assertTrue(self.move1.move_line_ids.id not in line_ids)
+
+
+class TestLocationContentTransferScanLocationSameProduct(
+    LocationContentTransferCommonCase
+):
+    @classmethod
+    def setUpClassBaseData(cls):
+        super().setUpClassBaseData()
+        # If the product is available in several sub locations of the picking
+        # location (a view) and the scanned location is one of those children,
+        cls.parent = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Transfer",
+                    "location_id": cls.wh.view_location_id.id,
+                }
+            )
+        )
+        cls.child_1 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Child 1",
+                    "location_id": cls.parent.id,
+                    "barcode": "L#CHILD01",
+                }
+            )
+        )
+        cls.child_2 = (
+            cls.env["stock.location"]
+            .sudo()
+            .create(
+                {
+                    "name": "Child 2",
+                    "location_id": cls.parent.id,
+                    "barcode": "L#CHILD02",
+                }
+            )
+        )
+        cls.p_type = (
+            cls.env["stock.picking.type"]
+            .sudo()
+            .create(
+                {
+                    "name": "Transfer Test",
+                    "sequence_code": "TRANS-TEST",
+                    "default_location_dest_id": cls.wh.lot_stock_id.id,
+                    "default_location_src_id": cls.parent.id,
+                }
+            )
+        )
+        cls.menu.sudo().picking_type_ids = cls.p_type
+
+        cls._update_qty_in_location(cls.child_1, cls.product_a, 10.0)
+        cls._update_qty_in_location(cls.child_2, cls.product_a, 10.0)
+        cls.picking1 = cls._create_picking(
+            lines=[(cls.product_a, 12)], picking_type=cls.p_type
+        )
+        cls.picking1.move_type = "one"
+        cls.picking1.action_assign()
+
+        # During the mean time, the location has been filled in
+        cls._update_qty_in_location(cls.child_2, cls.product_a, 300.0)
+
+        cls.picking1.move_line_ids[1].reserved_uom_qty = 300.0
+
+    def test_lines_returned_by_scan_location(self):
+        """Check that lines from not ready pickings are not offered to work on."""
+        self.picking1.move_line_ids[1].location_dest_id = self.shelf1
+
+        response = self.service.dispatch(
+            "scan_location", params={"barcode": self.child_2.barcode}
+        )
+        lines = response["data"]["scan_destination_all"]["move_lines"]
+        line_ids = [line["id"] for line in lines]
+        self.assertTrue(self.picking1.move_line_ids[0].id not in line_ids)
