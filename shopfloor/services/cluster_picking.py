@@ -124,7 +124,7 @@ class ClusterPicking(Component):
             # suggest pack to be used for the next line
             data["package_dest"] = self.data.package(
                 last_picked_line.result_package_id.with_context(
-                    picking_id=move_line.picking_id.id
+                    picking_id=move_line.picking_id.id, no_quantity=True
                 ),
                 picking=move_line.picking_id,
             )
