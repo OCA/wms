@@ -41,13 +41,11 @@ class BarcodeParser(Component):
             return result
 
         parsed = GS1Barcode.parse(barcode)
-        if parsed:
-            for barcode_type in self.search_action._barcode_type_handler.keys():
-                for parsed_item in parsed:
-                    if parsed_item.ai in MAPPING_TYPE_TO_AI.get(barcode_type, tuple()):
-                        result[barcode_type] = BarcodeResult(
-                            type=barcode_type,
-                            value=parsed_item.value,
-                            raw=parsed_item.raw_value,
-                        )
+        for parsed_item in parsed:
+            if _type := MAPPING_AI_TO_TYPE.get(parsed_item.ai):
+                result[_type] = BarcodeResult(
+                    type=_type,
+                    value=parsed_item.value,
+                    raw=parsed_item.raw_value,
+                )
         return result
