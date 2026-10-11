@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 12.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-06-07 13:39+0000\n"
+"PO-Revision-Date: 2026-10-11 10:46+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.17\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
@@ -46,7 +46,7 @@ msgstr ""
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
 msgid "Add integration with Vertical Lift for Kardex hardware."
-msgstr "Aggiungere integrazione con sollevatore verticale per prdotti Kardex."
+msgstr "Aggiungere integrazione con magazzino verticale per prdotti Kardex."
 
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
@@ -95,7 +95,7 @@ msgstr "Estendere le regole inoltro con lo stoccaggio caotico ABC."
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
 msgid "If enabled, install Vertical Lift integration for Kardex hardware."
 msgstr ""
-"Se abilitata, installa l'integrazione sollevatore verticale per materiali "
+"Se abilitata, installa l'integrazione magazzino verticale per materiali "
 "Kardex."
 
 #. module: wms
@@ -147,12 +147,12 @@ msgstr "Visualizza dettagli completamento operazioni"
 #. module: wms
 #: model_terms:ir.ui.view,arch_db:wms.res_config_settings_view_form_wms
 msgid "Vertical Lift"
-msgstr "Sollevatore verticale"
+msgstr "Magazzino verticale"
 
 #. module: wms
 #: model:ir.model.fields,field_description:wms.field_res_config_settings__module_stock_vertical_lift_kardex
 msgid "Vertical Lift Using Kardex"
-msgstr "Sollevatore verticale che utilizza Kardex"
+msgstr "Magazzino verticale che utilizza Kardex"
 
 #. module: wms
 #: model:ir.ui.menu,name:wms.menu_wms_management
