@@ -1,6 +1,7 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.component.core import Component
 
@@ -27,4 +28,14 @@ class InventoryAction(Component):
         )
         loss_route = location.warehouse_id.loss_route_id
         for quant in quants:
-            quant._lock_with_route(loss_route)
+            # Nothing to lock if the quant is fully reserved by other
+            # operations (or over-reserved): their reservations are kept.
+            if (
+                float_compare(
+                    quant.available_quantity,
+                    0,
+                    precision_rounding=quant.product_uom_id.rounding,
+                )
+                > 0
+            ):
+                quant._lock_with_route(loss_route)

@@ -76,3 +76,32 @@ class LocationContentTransferLossQuantityStockOutCase(
         )
 
         self._assert_loss_declared(product, location, package)
+
+    def test_stock_out_package_without_available_quantity(self):
+        """No quantity is left in the location: the move is canceled and no
+        quant is locked, without error.
+        """
+        move = self.picking1.move_ids
+        package_level = self.picking1.move_line_ids.package_level_id
+        product = move.product_id
+        location = self.content_loc
+        package = package_level.package_id
+        # The quant is now over-reserved
+        self.env["stock.quant"]._update_available_quantity(
+            product, location, -10, package_id=package
+        )
+
+        self.service.dispatch(
+            "stock_out_package",
+            params={
+                "location_id": location.id,
+                "package_level_id": package_level.id,
+            },
+        )
+
+        self.assertEqual(move.state, "cancel")
+        self.assertFalse(
+            self.env["stock.picking"].search(
+                [("picking_type_id", "=", self.wh.loss_type_id.id)]
+            )
+        )
