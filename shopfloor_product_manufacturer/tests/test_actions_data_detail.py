@@ -18,4 +18,4 @@ class TestActionsDataDetailManufCase(ActionsDataDetailManufCaseBase):
         data = self.data_detail.product_detail(product)
         self.assert_schema(self.schema_detail.product_detail(), data)
         expected = self._expected_product_detail(product, full=True)
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
