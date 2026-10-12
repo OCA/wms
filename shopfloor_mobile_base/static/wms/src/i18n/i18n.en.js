@@ -7,6 +7,9 @@
 import {translation_registry} from "../services/translation_registry.js";
 
 const messages_en = {
+    common: {
+        label: "{label}:",
+    },
     screen: {
         login: {
             title: "Login",

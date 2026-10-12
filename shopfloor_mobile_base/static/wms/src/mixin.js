@@ -19,6 +19,12 @@ export var GlobalMixin = {
             bits.unshift(this.$options._componentTag);
             return bits.join("-");
         },
+        /*
+        Translate a label and append the locale-specific separator (eg: "Lot:" / "Lot :").
+        */
+        $t_label: function (key, values) {
+            return this.$t("common.label", {label: this.$t(key, values)});
+        },
     },
     computed: {
         /*
