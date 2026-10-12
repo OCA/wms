@@ -6,7 +6,7 @@
 {
     "name": "Shopfloor Product Manufacturer",
     "summary": "Show product manufacturer in shopfloor",
-    "version": "16.0.1.0.0",
+    "version": "16.0.2.0.0",
     "development_status": "Beta",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
