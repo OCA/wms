@@ -75,7 +75,7 @@ const Reception = {
                 </v-card>
                 <manual-select
                     :card_color="utils.colors.color_for('screen_step_done')"
-                    :records="ordered_moves"
+                    :records="filtered_moves"
                     :options="picking_detail_options_for_select_move()"
                     :key="make_state_component_key(['reception', 'manual-select-move'])"
                  />
@@ -254,7 +254,7 @@ const Reception = {
         line_being_handled: function () {
             return this.state.data.selected_move_line[0] || {};
         },
-        ordered_moves: function () {
+        filtered_moves: function () {
             let moves = _.result(this.state, "data.picking.moves", []);
             if (_.isEmpty(moves)) {
                 return [];
@@ -270,11 +270,7 @@ const Reception = {
                     return productName.includes(query);
                 });
             }
-            // We sort the moves to ensure that the following order always takes place:
-            // Top: Partially done moves.
-            // Middle: Moves with 0 quantity_done.
-            // Bottom: Completely done moves.
-            return moves.sort((a, b) => a.progress - b.progress);
+            return moves;
         },
     },
     methods: {
