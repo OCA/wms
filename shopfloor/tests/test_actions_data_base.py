@@ -261,7 +261,7 @@ class ActionsDataDetailCaseBase(ActionsDataCaseBase):
                     ],
                 }
             )
-        return dict(**self._expected_product(record), **detail)
+        return self._expected_product(record) | detail
 
     def _expected_packaging_detail(self, record, **kw):
         return dict(
