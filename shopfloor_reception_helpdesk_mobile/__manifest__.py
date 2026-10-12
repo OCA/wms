@@ -5,7 +5,7 @@
     "name": "Shopfloor Reception Helpdesk Mobile",
     "summary": """This module allows to manage front display for helpdesk
     management in reception scenario""",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/wms",
