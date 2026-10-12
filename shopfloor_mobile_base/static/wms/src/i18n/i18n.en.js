@@ -7,6 +7,9 @@
 import {translation_registry} from "../services/translation_registry.js";
 
 const messages_en = {
+    common: {
+        label: "{label}:",
+    },
     screen: {
         login: {
             title: "Login",
@@ -107,6 +110,9 @@ const messages_en = {
         reload_config: {
             title: "Reload config and menu",
         },
+        action: {
+            title: "Action",
+        },
     },
     misc: {
         // TODO: split out WMS messages
@@ -123,6 +129,8 @@ const messages_en = {
         lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
         picking_count: "{priority_picking_count}/{picking_count}",
         picking_count_extended: "{priority_picking_count}/{picking_count} picking(s)",
+        select_expiry_date: "Select expiry date",
+        invalid_input: "invalid input",
     },
     list: {
         no_items: "No item to list.",

@@ -14,17 +14,17 @@ Vue.component("detail-transfer", {
             return [
                 {
                     path: "scheduled_date",
-                    label: this.$t("detail.transfer.scheduled_on"),
+                    label: this.$t("transfer.scheduled_on"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "operation_type.name",
-                    label: this.$t("detail.transfer.operation_type"),
+                    label: this.$t("transfer.operation_type"),
                 },
-                {path: "carrier.name", label: this.$t("detail.transfer.carrier")},
-                {path: "priority", label: this.$t("detail.transfer.priority")},
+                {path: "carrier.name", label: this.$t("transfer.carrier")},
+                {path: "priority", label: this.$t("common.priority")},
                 {
                     path: "note",
                     renderer: function (rec, field) {
@@ -63,17 +63,17 @@ Vue.component("detail-transfer", {
                 },
                 {
                     path: "package_src.name",
-                    label: this.$t("detail.transfer.pack"),
+                    label: this.$t("common.pack"),
                     action_val_path: "package_src.name",
                 },
                 {
                     path: "lot.name",
-                    label: this.$t("detail.transfer.lot"),
+                    label: this.$t("common.lot"),
                     action_val_path: "lot.name",
                 },
                 {
                     path: "quantity",
-                    label: this.$t("detail.transfer.qty_reserved"),
+                    label: this.$t("common.qty_reserved"),
                     render_component: "packaging-qty-picker-display",
                     render_props: function (record) {
                         return self.utils.wms.move_line_qty_picker_props(record, {
@@ -83,7 +83,7 @@ Vue.component("detail-transfer", {
                 },
                 {
                     path: "product.qty_available",
-                    label: this.$t("detail.transfer.qty_in_stock"),
+                    label: this.$t("common.qty_in_stock"),
                     render_component: "packaging-qty-picker-display",
                     render_props: function (record) {
                         return self.utils.wms.move_line_qty_picker_props(record, {

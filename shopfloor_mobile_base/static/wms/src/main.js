@@ -326,6 +326,9 @@ new Vue({
         switch_language: function (lang_id) {
             this.$i18n.locale = lang_id;
             this.$set(this, "current_language", lang_id);
+            if (lang_id) {
+                document.documentElement.setAttribute("lang", lang_id);
+            }
             event_hub.$emit("language:updated", lang_id);
         },
         /*

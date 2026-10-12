@@ -197,7 +197,7 @@ Vue.component("line-actions-popup", {
         <div class="button-list button-vertical-list full">
           <v-row class="actions bottom-actions">
             <v-col class="text-center" cols="12">
-              <btn-action v-on="on">{{ $t('misc.actions_popup.btn_action') }}</btn-action>
+              <btn-action v-on="on">{{ $t('btn.action.title') }}</btn-action>
             </v-col>
           </v-row>
         </div>

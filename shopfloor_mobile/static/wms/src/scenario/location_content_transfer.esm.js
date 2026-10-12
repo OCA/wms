@@ -248,7 +248,7 @@ const LocationContentTransfer = {
                 scan_location: {
                     display_info: {
                         title: this.$t("location_content_transfer.scan_location.title"),
-                        scan_placeholder: this.$t("scan_placeholder_translation"),
+                        scan_placeholder: this.$t("placeholder.scan_location"),
                     },
                     on_cancel: () => {
                         this.state_reset_data("scan_location");

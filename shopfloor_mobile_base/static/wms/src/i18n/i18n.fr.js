@@ -7,6 +7,9 @@
 import {translation_registry} from "../services/translation_registry.js";
 
 const messages_fr = {
+    common: {
+        label: "{label}\u00a0:",
+    },
     screen: {
         login: {
             title: "Se connecter",
@@ -14,7 +17,7 @@ const messages_fr = {
                 login: "Se connecter",
             },
             error: {
-                login_invalid: "Iformations d'identification invalides",
+                login_invalid: "Informations d'identification invalides",
             },
         },
         home: {
@@ -109,6 +112,9 @@ const messages_fr = {
         reload_config: {
             title: "Recharger la configuration et le menu",
         },
+        action: {
+            title: "Action",
+        },
     },
     misc: {
         btn_get_work: "Obtenir du travail",
@@ -124,6 +130,8 @@ const messages_fr = {
         lines_count_extended: "{priority_lines_count}/{lines_count} position(s)",
         picking_count: "{priority_picking_count}/{picking_count}",
         picking_count_extended: "{priority_picking_count}/{picking_count} transfert(s)",
+        select_expiry_date: "Sélectionnez la date d'expiration",
+        invalid_input: "invalid input",
     },
     list: {
         no_items: "Aucun élément à lister.",

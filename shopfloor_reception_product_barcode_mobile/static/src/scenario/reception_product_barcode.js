@@ -32,8 +32,8 @@ const new_template =
         <v-container>
             <v-row>
                 <v-text-field
-                    label="Barcode"
-                    placeholder="Product Barcode"
+                    :label="$t('reception.product_barcode.barcode')"
+                    :placeholder="$t('reception.product_barcode.product_barcode')"
                     v-model="state.data.product_barcode"
                     v-on="on_scan"
                 ></v-text-field>
@@ -44,12 +44,12 @@ const new_template =
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action action="todo" @click="state.on_done">Done</btn-action>
+                <btn-action action="todo" @click="state.on_done">{{ $t('reception.product_barcode.done') }}</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action color="default" @click="state.on_skip">Skip</btn-action>
+                <btn-action color="default" @click="state.on_skip">{{ $t('reception.product_barcode.skip') }}</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
@@ -72,8 +72,10 @@ const ReceptionProductBarcode = process_registry.extend("reception", {
         let states = _get_states.bind(this)();
         states["set_product_barcode"] = {
             display_info: {
-                title: "Set product barcode",
-                scan_placeholder: "Scan product barcode",
+                title: this.$t("reception.product_barcode.set_product_barcode"),
+                scan_placeholder: this.$t(
+                    "reception.product_barcode.scan_product_barcode"
+                ),
             },
             events: {
                 go_back: "on_back",

@@ -1,0 +1,8 @@
+{
+  "reception.helpdesk.helpdesk": "Assistance",
+  "reception.helpdesk.description": "Description",
+  "reception.helpdesk.ticket_description": "Description du ticket",
+  "reception.helpdesk.description_required": "La description est obligatoire",
+  "reception.helpdesk.motive": "Raison",
+  "reception.helpdesk.create_ticket": "Créer un ticket d'assistance"
+}
