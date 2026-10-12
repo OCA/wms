@@ -50,10 +50,7 @@ class TestReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={
-                "message_type": "success",
-                "body": f"Transfer {self.return_picking.name} done",
-            },
+            message=self.msg_store.transfer_done_success(self.return_picking),
         )
 
     def test_set_done_partial_qty_done(self):
@@ -70,10 +67,7 @@ class TestReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={
-                "message_type": "success",
-                "body": f"Transfer {self.return_picking.name} done",
-            },
+            message=self.msg_store.transfer_done_success(self.return_picking),
         )
         # Now, since we still have returned 10 units out of ten, try to return
         # the next ones
@@ -100,10 +94,7 @@ class TestReturn(CommonCaseReturn):
             response,
             next_state="select_document",
             data={"pickings": []},
-            message={
-                "message_type": "success",
-                "body": f"Transfer {return_picking_2.name} done",
-            },
+            message=self.msg_store.transfer_done_success(return_picking_2),
         )
 
     def test_already_returned(self):
@@ -120,10 +111,7 @@ class TestReturn(CommonCaseReturn):
             "scan_line",
             params={"picking_id": second_return_picking.id, "barcode": product.barcode},
         )
-        expected_message = {
-            "message_type": "error",
-            "body": "The product/packaging you selected has already been returned.",
-        }
+        expected_message = self.msg_store.move_already_returned()
         self.assert_response(
             response,
             next_state="select_move",

@@ -23,7 +23,7 @@ class TestSelectLine(CommonCase):
             response,
             next_state="select_move",
             data=self._data_for_select_move(picking),
-            message={"message_type": "error", "body": "Barcode not found"},
+            message=self.msg_store.barcode_not_found(),
         )
 
     def test_scan_product(self):
@@ -271,12 +271,11 @@ class TestSelectLine(CommonCase):
             "scan_line",
             params={"picking_id": picking.id, "barcode": self.product_c.barcode},
         )
-        error_msg = "Product not found in the current transfer or already in a package."
         self.assert_response(
             response,
             next_state="select_move",
             data=self._data_for_select_move(picking),
-            message={"message_type": "warning", "body": error_msg},
+            message=self.msg_store.x_not_found_or_already_in_dest_package("Product"),
         )
 
     def test_scan_packaging_not_found(self):
@@ -289,14 +288,11 @@ class TestSelectLine(CommonCase):
                 "barcode": self.product_c_packaging.barcode,
             },
         )
-        error_msg = (
-            "Packaging not found in the current transfer or already in a package."
-        )
         self.assert_response(
             response,
             next_state="select_move",
             data=self._data_for_select_move(picking),
-            message={"message_type": "warning", "body": error_msg},
+            message=self.msg_store.x_not_found_or_already_in_dest_package("Packaging"),
         )
 
     def test_assign_shopfloor_user_to_line(self):
@@ -390,7 +386,7 @@ class TestSelectLine(CommonCase):
             response,
             next_state="confirm_done",
             data=data,
-            message={"message_type": "warning", "body": "Are you sure?"},
+            message=self.msg_store.need_confirmation(),
         )
         # Confirm the package is done.
         response = self.service.dispatch(
@@ -409,12 +405,11 @@ class TestSelectLine(CommonCase):
             ],
             order="scheduled_date ASC, id ASC",
         )
-        message = "Transfer {} done".format(picking.name)
         self.assert_response(
             response,
             next_state="select_document",
             data={"pickings": self._data_for_pickings(pickings)},
-            message={"message_type": "success", "body": message},
+            message=self.msg_store.transfer_done_success(picking),
         )
 
     def test_manual_select_move(self):

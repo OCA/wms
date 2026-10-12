@@ -89,10 +89,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         selected_lines.unlink()
         self._test_select_line_error(
             {"picking_id": self.picking.id, "package_id": selected_lines[0].id},
-            {
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            self.msg_store.record_not_found(),
         )
 
     def test_select_line_move_line_error_not_found(self):
@@ -100,10 +97,7 @@ class CheckoutSelectLineCase(CheckoutCommonCase, CheckoutSelectPackageMixin):
         selected_lines.unlink()
         self._test_select_line_error(
             {"picking_id": self.picking.id, "move_line_id": selected_lines[0].id},
-            {
-                "message_type": "error",
-                "body": "The record you were working on does not exist anymore.",
-            },
+            self.msg_store.record_not_found(),
         )
 
     def test_select_line_all_lines_done(self):

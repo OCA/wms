@@ -11,10 +11,6 @@ class TestRecover(CommonCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.recover_msg = {
-            "message_type": "info",
-            "body": "Recovered previous session.",
-        }
 
     def test_recover(self):
         # here, product isn't tracked by lot, but the move has a move
@@ -61,7 +57,7 @@ class TestRecover(CommonCase):
                 "selected_move_line": move_line_data,
                 "confirmation_required": None,
             },
-            message=self.recover_msg,
+            message=self.msg_store.recovered_previous_session(),
         )
         # Set qty_done to 5/10 on the move line, we should recover it
         selected_move_line.qty_done = 5
@@ -79,7 +75,7 @@ class TestRecover(CommonCase):
                 "selected_move_line": move_line_data,
                 "confirmation_required": None,
             },
-            message=self.recover_msg,
+            message=self.msg_store.recovered_previous_session(),
         )
         # If the goods were put in a pack, we move to set destination
         response = self.service.dispatch(
@@ -119,7 +115,7 @@ class TestRecover(CommonCase):
                 "selected_move_line": move_line_data,
                 "confirmation": None,
             },
-            message=self.recover_msg,
+            message=self.msg_store.recovered_previous_session(),
         )
 
     def test_recover_tracking_by_lot(self):
@@ -156,7 +152,7 @@ class TestRecover(CommonCase):
                 "picking": picking_data,
                 "selected_move_line": move_line_data,
             },
-            message=self.recover_msg,
+            message=self.msg_store.recovered_previous_session(),
         )
         # Set a lot to the move line, we recover again, but straight to set quantity.
         selected_move_line.lot_id = self._create_lot()
@@ -173,6 +169,6 @@ class TestRecover(CommonCase):
                 "selected_move_line": move_line_data,
                 "confirmation_required": None,
             },
-            message=self.recover_msg,
+            message=self.msg_store.recovered_previous_session(),
         )
         # The rest is all the same as test_recover

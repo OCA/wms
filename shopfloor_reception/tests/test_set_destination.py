@@ -127,7 +127,7 @@ class TestSetDestination(CommonCase):
                 "selected_move_line": self.data.move_lines(selected_move_line),
                 "confirmation": None,
             },
-            message={"message_type": "error", "body": "You cannot place it here"},
+            message=self.msg_store.dest_location_not_allowed(),
         )
 
     def test_auto_posting_partial(self):
