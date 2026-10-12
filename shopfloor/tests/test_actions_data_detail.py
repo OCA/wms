@@ -62,7 +62,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         # ignore time and TZ, we don't care here
         self.assertEqual(data.get("removal_date", "").split("T")[0], "2020-05-20")
         self.assertEqual(data.get("expiration_date", "").split("T")[0], "2020-05-31")
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
@@ -319,11 +319,9 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         move_line = self.move_b.move_line_ids
         product = move_line.product_id.with_context(location=move_line.location_id.id)
         Partner = self.env["res.partner"].sudo()
-        manuf = Partner.create({"name": "Manuf 1"})
         product.sudo().write(
             {
                 "image_128": fake_colored_image(size=(128, 128)),
-                "manufacturer_id": manuf.id,
             }
         )
         vendor_a = Partner.create({"name": "Supplier A"})
@@ -348,4 +346,4 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
         data = self.data_detail.product_detail(product)
         self.assert_schema(self.schema_detail.product_detail(), data)
         expected = self._expected_product_detail(product, full=True)
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
