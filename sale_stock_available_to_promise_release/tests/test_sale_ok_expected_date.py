@@ -27,8 +27,8 @@ class TestSaleOkExpectedDate(Common):
         )
 
     def test_expected_date_ok(self):
-        self.sale.action_confirm()
         self._set_stock(self.product, 100)
+        self.sale.action_confirm()
         self.assertTrue(self.sale.is_ok_expected_delivery_date)
 
     def test_no_availability(self):
