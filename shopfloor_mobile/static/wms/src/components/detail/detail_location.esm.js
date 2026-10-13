@@ -28,21 +28,21 @@ Vue.component("detail-location", {
                 },
                 {
                     path: "product.supplier_code",
-                    label: $t("common.vendor_code"),
+                    label: this.$t("common.vendor_code"),
                     klass: "loud",
                 },
                 {
                     path: "package_src.name",
-                    label: $t("common.pack"),
+                    label: this.$t("common.pack"),
                     action_val_path: "package_src.name",
                 },
                 {
                     path: "lot.name",
-                    label: $t("common.lot"),
+                    label: this.$t("common.lot"),
                     action_val_path: "lot.name",
                 },
-                {path: "product.qty_reserved", label: $t("common.qty_reserved")},
-                {path: "product.qty_available", label: $t("common.qty_in_stock")},
+                {path: "product.qty_reserved", label: this.$t("common.qty_reserved")},
+                {path: "product.qty_available", label: this.$t("common.qty_in_stock")},
             ];
         },
         available_product_list_options() {
@@ -55,8 +55,12 @@ Vue.component("detail-location", {
         },
         available_product_list_fields() {
             return [
-                {path: "supplier_code", label: $t("common.vendor_code"), klass: "loud"},
-                {path: "quantity", label: $t("common.qty_in_stock")},
+                {
+                    path: "supplier_code",
+                    label: this.$t("common.vendor_code"),
+                    klass: "loud",
+                },
+                {path: "quantity", label: this.$t("common.qty_in_stock")},
             ];
         },
         lot_detail_options() {
@@ -70,17 +74,17 @@ Vue.component("detail-location", {
         lot_detail_fields() {
             const self = this;
             return [
-                {path: "quantity", label: $t("common.qty_in_stock")},
+                {path: "quantity", label: this.$t("common.qty_in_stock")},
                 {
                     path: "expiration_date",
-                    label: $t("lot.expiry_date"),
+                    label: this.$t("lot.expiry_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
                 },
                 {
                     path: "removal_date",
-                    label: $t("lot.removal_date"),
+                    label: this.$t("lot.removal_date"),
                     renderer: function (rec, field) {
                         return self.utils.display.render_field_date(rec, field);
                     },
