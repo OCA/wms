@@ -118,7 +118,6 @@ const ClusterPicking = {
                     />
                 <detail-package
                     :record="state.data.package"
-                    :color="'detail_main_card'"
                 />
 
                 <detail-location-destination-operation

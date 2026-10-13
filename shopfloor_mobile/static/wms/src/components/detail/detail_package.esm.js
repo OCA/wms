@@ -9,7 +9,10 @@ import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/
 Vue.component("detail-package", {
     mixins: [ItemDetailMixin],
     props: {
-        color: String, // Used to determine card_color (See `utils.colors.color_for()`)
+        color: {
+            type: String, // Used to determine card_color (See `utils.colors.color_for()`)
+            default: "detail_main_card",
+        },
     },
     methods: {
         detail_fields() {
