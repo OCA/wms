@@ -84,21 +84,7 @@ Vue.component("detail-product", {
             };
         },
         locations_fields() {
-            return [{path: "quantity", label: this.$t("common.reserved")}];
-        },
-        available_product_list_options() {
-            return {
-                main: true,
-                key_title: "display_name",
-                klass: "loud-labels",
-                title_action_field: {
-                    action_val_path: "default_code",
-                },
-                fields: this.available_product_list_fields(),
-            };
-        },
-        available_product_list_fields() {
-            return [{path: "qty_available", label: this.$t("common.qty_on_hand")}];
+            return [{path: "quantity", label: this.$t("common.qty_on_hand")}];
         },
         lot_detail_options() {
             return {
