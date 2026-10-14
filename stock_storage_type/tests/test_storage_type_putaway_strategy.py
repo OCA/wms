@@ -419,7 +419,6 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         must give priority to location that already contains the product
         (less qty first).
         """
-        StockLocation = self.env["stock.location"]
         self.cardboxes_location_storage_type.storage_category_id.write(
             {"allow_new_product": "same"}
         )
@@ -437,7 +436,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             }
         )
 
-        location = StockLocation._get_package_type_putaway_strategy(
+        location = dest_location._get_package_type_putaway_strategy(
             dest_location, package, product, 1.0
         )
 
@@ -451,7 +450,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             self.cardboxes_bin_3_location,
             10.0,
         )
-        location = StockLocation._get_package_type_putaway_strategy(
+        location = dest_location._get_package_type_putaway_strategy(
             dest_location, package, product, 1.0
         )
         self.assertEqual(location, self.cardboxes_bin_3_location)
@@ -463,7 +462,7 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
             self.cardboxes_bin_4_location,
             1.0,
         )
-        location = StockLocation._get_package_type_putaway_strategy(
+        location = dest_location._get_package_type_putaway_strategy(
             dest_location, package, product, 1.0
         )
         self.assertEqual(location, self.cardboxes_bin_4_location)
@@ -1125,4 +1124,55 @@ class TestPutawayStorageTypeStrategy(TestStorageTypeCommon):
         )
         self.assertEqual(
             product_mls.mapped("location_dest_id"), self.cardboxes_bin_1_location
+        )
+
+    def test_storage_strategy_override_standard(self):
+        """When a package type has locations sequence, respect them
+
+        In standard odoo, the package types putaway config is used to compute
+        a destination location without caring on the locations sequence.
+        If a sequence is configured, replace the computed destination with a new
+        one respecting it.
+
+        For the cardbox package type, the sequence favors at first the stock location.
+        """
+        move = self._create_single_move(self.product)
+        # move.location_dest_id = self.cardboxes_location.id
+        move._assign_picking()
+        package = self.env["stock.quant.package"].create(
+            {"product_packaging_id": self.product_lot_cardbox_product_packaging.id}
+        )
+        self._update_qty_in_location(
+            move.location_id, move.product_id, move.product_qty, package=package
+        )
+
+        # configure the sequence with none and allow mixed products
+        sequences = self.cardboxes_package_storage_type.storage_location_sequence_ids
+        self.assertTrue(len(sequences) > 1)
+        for seq in sequences:
+            location = seq.location_id
+            location.usage = "internal"
+            location.pack_putaway_strategy = "none"
+            # the location storage category is cardbox with mixed
+
+        # create an odoo standard putaway
+        package = self.env["stock.putaway.rule"].create(
+            {
+                "product_id": move.product_id.id,
+                "location_in_id": self.warehouse.lot_stock_id.id,
+                "location_out_id": move.location_id.id,
+            }
+        )
+
+        # put stock in the first location so that it's not used by standard
+        # odoo putaway computation
+        self._update_qty_in_location(sequences[0].location_id, move.product_id, 1)
+
+        move._action_assign()
+        move_line = move.move_line_ids
+
+        self.assertEqual(
+            move_line.location_dest_id,
+            sequences[0].location_id,
+            "the move line's destination must respect the locations sequence",
         )
