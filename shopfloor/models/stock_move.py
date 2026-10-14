@@ -149,7 +149,7 @@ class StockMove(models.Model):
         new_picking = picking.copy(data)
         message = _(
             "The split order %s has been created.",
-            picking._get_html_link(title=picking.name),
+            new_picking._get_html_link(title=new_picking.name),
         )
         picking.message_post(body=message)
         self.picking_id = new_picking.id
