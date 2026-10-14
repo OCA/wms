@@ -39,8 +39,12 @@ Vue.component("detail-location", {
                     label: this.$t("common.lot"),
                     action_val_path: "lot.name",
                 },
-                {path: "product.qty_reserved", label: this.$t("common.qty_reserved")},
-                {path: "product.qty_available", label: this.$t("common.qty_in_stock")},
+                {path: "quantity", label: this.$t("common.qty_reserved")},
+                {
+                    path: "qty_done",
+                    label: this.$t("common.qty_done"),
+                    display_no_value: true,
+                },
             ];
         },
         available_product_list_options() {

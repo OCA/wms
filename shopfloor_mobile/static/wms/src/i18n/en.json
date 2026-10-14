@@ -79,6 +79,7 @@
   "common.lot": "Lot",
   "common.vendor_name": "Vendor Name",
   "common.qty": "Qty",
+  "common.qty_done": "Qty done",
 
   "picking_select.requested": "Requested",
   "picking_select.taken": "Taken",

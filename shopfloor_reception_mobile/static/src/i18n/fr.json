@@ -44,7 +44,5 @@
 
   "reception.transfer.partner": "Partenaire",
   "reception.transfer.source_document": "Document Source",
-  "reception.transfer.scheduled_date": "Date prévue : {date}",
-
-  "common.qty_done": "Qté faite"
+  "reception.transfer.scheduled_date": "Date prévue : {date}"
 }
