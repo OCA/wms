@@ -28,7 +28,6 @@ Vue.component("detail-location", {
                 {
                     path: "product.supplier_code",
                     label: this.$t("common.vendor_code"),
-                    klass: "loud",
                 },
                 {
                     path: "package_src.name",
@@ -57,7 +56,6 @@ Vue.component("detail-location", {
                 {
                     path: "supplier_code",
                     label: this.$t("common.vendor_code"),
-                    klass: "loud",
                 },
                 {path: "quantity", label: this.$t("common.qty_in_stock")},
             ];
