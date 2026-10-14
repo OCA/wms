@@ -143,11 +143,6 @@ Vue.component("detail-location", {
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
-        <!-- list
-            :records="record.products"
-            :options="available_product_list_options()"
-            /-->
-
     </div>
 
   </div>
