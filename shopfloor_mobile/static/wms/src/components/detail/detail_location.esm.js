@@ -45,6 +45,8 @@ Vue.component("detail-location", {
                     label: this.$t("common.qty_done"),
                     display_no_value: true,
                 },
+                {path: "location_src.name", label: this.$t("common.location_src")},
+                {path: "location_dest.name", label: this.$t("common.location_dest")},
             ];
         },
         available_product_list_options() {

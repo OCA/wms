@@ -61,6 +61,8 @@
   "product.supplier_ref": "Ref fournisseur",
 
   "common.location": "Emplacement",
+  "common.location_src": "Emplacement Source",
+  "common.location_dest": "Emplacement Destination",
   "common.weight_kg": "Poids (kg)",
   "common.package_type": "Type de colis",
   "common.priority": "Priorité",
