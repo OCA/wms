@@ -128,8 +128,8 @@ Vue.component("detail-product", {
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
         <separator-title>{{ $t("product.suppliers") }}</separator-title>
         <item-detail-card
-            v-for="supp in unique_suppliers(record.suppliers)"
-            :key="'supp' + supp.id"
+            v-for="(supp, index) in unique_suppliers(record.suppliers)"
+            :key="make_component_key(['supp', supp.id || index, index])"
             :record="supp"
             :options="{no_title: true, fields: supplier_detail_fields()}"
             />
