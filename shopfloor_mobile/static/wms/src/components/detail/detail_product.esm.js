@@ -50,7 +50,9 @@ Vue.component("detail-product", {
                 {path: "expiration_date", label: this.$t("lot.expiry_date")},
                 {path: "default_code", label: this.$t("product.internal_ref")},
                 {path: "barcode", label: this.$t("product.barcode")},
-                {path: "product.supplier_code", label: this.$t("product.supplier_ref")},
+                {path: "supplier_code", label: this.$t("product.supplier_ref")},
+                {path: "qty_available", label: this.$t("common.qty_on_hand")},
+                {path: "qty_reserved", label: this.$t("common.reserved")},
             ];
         },
         packaging_detail_fields() {
