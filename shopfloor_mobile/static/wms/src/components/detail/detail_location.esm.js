@@ -11,7 +11,6 @@ Vue.component("detail-location", {
     methods: {
         product_list_options() {
             return {
-                key_title: "display_name",
                 card_klass: "loud-labels",
                 list_item_options: {
                     fields: this.product_list_fields(),
