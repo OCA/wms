@@ -305,7 +305,9 @@ class Checkout(Component):
         # where qty >= packaging.qty, since it doesn't makes sense
         # to select a move line which have less qty than the packaging
         line_domain = [("reserved_uom_qty", ">=", packaging.qty)]
-        return self._select_document_from_product(product, line_domain=line_domain)
+        return self._select_document_from_product(
+            product, line_domain=line_domain, **kw
+        )
 
     def _select_document_from_none(self, *args, barcode=None, **kwargs):
         """Handle result when no record is found."""

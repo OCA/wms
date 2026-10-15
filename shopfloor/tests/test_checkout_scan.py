@@ -54,6 +54,20 @@ class CheckoutScanCase(CheckoutCommonCase):
             in_package=False,
         )
 
+    def test_scan_document_error_packaging_without_transfer(self):
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": self.product_c_packaging.barcode}
+        )
+        self.assert_response(
+            response,
+            next_state="select_document",
+            message={
+                "message_type": "error",
+                "body": "No transfer found for packaging Box",
+            },
+            data={"restrict_scan_first": False},
+        )
+
     def test_scan_document_error_not_found(self):
         response = self.service.dispatch("scan_document", params={"barcode": "NOPE"})
         self.assert_response(
