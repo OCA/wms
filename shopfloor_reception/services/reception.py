@@ -742,15 +742,26 @@ class Reception(Component):
         return self._response_for_set_destination(picking, selected_line)
 
     def _set_quantity__by_location(self, picking, selected_line, location):
-        if not self.is_dest_location_valid(selected_line.move_id, location):
-            message = self.msg_store.dest_location_not_allowed()
+        if err_message := self._prepare_set_destination(
+            picking, selected_line, location
+        ):
+            # ↓ necessary because of "_set_quantity__assign_quantity"
+            selected_line.qty_done = 0
             return self._response_for_set_quantity(
-                picking, selected_line, message=message
+                picking, selected_line, message=err_message
             )
-        # process without pack, set destination location, and go back to
-        # `select_move`
-        selected_line.location_dest_id = location
-        return self._response_for_select_move(picking)
+        self.process_without_pack(
+            picking.id,
+            selected_line.id,
+            selected_line.qty_done,
+            is_over_reception_confirmed=False,
+        )
+        return self.set_destination(
+            picking.id,
+            selected_line.id,
+            location.name,
+            confirmation=location.name,
+        )
 
     def _set_quantity__by_lot(self, picking, selected_line, lot):
         if selected_line.lot_id.name == lot.name or selected_line.lot_name == lot.name:
@@ -824,7 +835,7 @@ class Reception(Component):
         self, picking, line, message=None, lot_name=None, lot_expiration_date=None, **kw
     ):
         # ↓ In case "lot_name" is pre-filled on the line in odoo, pre-fill
-        # shpofloor screen
+        # shopfloor screen
         if lot_name and not lot_expiration_date and not message:
             lot = (
                 self._actions_for("search")
@@ -1687,6 +1698,22 @@ class Reception(Component):
             return False
         return super().is_dest_location_valid(moves, location)
 
+    def _prepare_set_destination(
+        self, picking, selected_line, location, confirmation=""
+    ):
+        err_message = None
+        if not location:
+            err_message = self.msg_store.no_location_found()
+        elif not self.is_dest_location_valid(selected_line.move_id, location):
+            err_message = self.msg_store.dest_location_not_allowed()
+        elif confirmation != location.name and self.is_dest_location_to_confirm(
+            selected_line.location_dest_id, location
+        ):
+            err_message = self.msg_store.place_in_location_ask_confirmation(
+                location.name
+            )
+        return err_message
+
     def set_destination(
         self, picking_id, selected_line_id, location_name, confirmation=""
     ):
@@ -1715,29 +1742,17 @@ class Reception(Component):
             )
 
         location = self._actions_for("search").location_from_scan(location_name)
-        if not location:
-            return self._response_for_set_destination(
-                picking, selected_line, message=self.msg_store.no_location_found()
-            )
-        if not self.is_dest_location_valid(selected_line.move_id, location):
-            return self._response_for_set_destination(
-                picking,
-                selected_line,
-                message=self.msg_store.dest_location_not_allowed(),
-            )
-        if confirmation != location_name and self.is_dest_location_to_confirm(
-            selected_line.location_dest_id, location
+        if err_message := self._prepare_set_destination(
+            picking, selected_line, location, confirmation
         ):
             return self._response_for_set_destination(
                 picking,
                 selected_line,
-                message=self.msg_store.place_in_location_ask_confirmation(
-                    location.name
-                ),
-                confirmation=location_name,
+                message=err_message,
+                confirmation=confirmation if confirmation else None,
             )
-        selected_line.location_dest_id = location
 
+        selected_line.location_dest_id = location
         response = self._post_line(selected_line)
         if response:
             return response
