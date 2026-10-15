@@ -25,6 +25,7 @@ class ClusterPicking(Component):
             group_by_commercial_partner=menu.batch_group_by_commercial_partner,
             maximum_number_of_preparation_lines=menu.batch_maximum_number_of_preparation_lines,
             stock_device_types=menu.stock_device_type_ids,
+            split_picking_exceeding_limits=menu.batch_split_picking_exceeding_limits,
             shopfloor_menu=menu,
         )
 

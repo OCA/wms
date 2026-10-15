@@ -29,6 +29,7 @@ class PickingBatchAutoCreateAction(Component):
         group_by_commercial_partner=False,
         maximum_number_of_preparation_lines=False,
         stock_device_types=None,
+        split_picking_exceeding_limits=False,
         **kwargs
     ):
         make_picking_batch = self.env["make.picking.batch"].create(
@@ -37,6 +38,7 @@ class PickingBatchAutoCreateAction(Component):
                 group_by_commercial_partner=group_by_commercial_partner,
                 maximum_number_of_preparation_lines=maximum_number_of_preparation_lines,
                 stock_device_types=stock_device_types,
+                split_picking_exceeding_limits=split_picking_exceeding_limits,
                 **kwargs
             )
         )
@@ -48,12 +50,14 @@ class PickingBatchAutoCreateAction(Component):
         group_by_commercial_partner=False,
         maximum_number_of_preparation_lines=False,
         stock_device_types=None,
+        split_picking_exceeding_limits=False,
         **kwargs
     ):
         values = {
             "restrict_to_same_partner": group_by_commercial_partner,
             "maximum_number_of_preparation_lines": maximum_number_of_preparation_lines,
             "restrict_to_same_priority": True,
+            "split_picking_exceeding_limits": split_picking_exceeding_limits,
         }
         if picking_types and picking_types.ids:
             values["picking_type_ids"] = [Command.set(picking_types.ids)]
