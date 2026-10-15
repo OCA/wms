@@ -1,5 +1,5 @@
-# Copyright 2019-2021 Camptocamp SA
-# Copyright 2019-2021 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
+# Copyright 2019 Camptocamp SA
+# Copyright 2019 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 import logging
 
@@ -490,7 +490,9 @@ class StockLocation(models.Model):
             return dest_location
 
         for package_sequence in package_locations:
-            if not package_sequence.can_be_applied(putaway_location, quants, product):
+            if not package_sequence.can_be_applied(
+                putaway_location, quants, package, product, quantity
+            ):
                 continue
             pref_loc = package_sequence.location_id
             storage_locations = pref_loc.get_storage_locations(products=product)

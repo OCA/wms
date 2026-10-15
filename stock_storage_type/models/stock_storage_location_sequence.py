@@ -1,4 +1,5 @@
 # Copyright 2019 Camptocamp SA
+# Copyright 2024 Jacques-Etienne Baudoux (BCIM) <je@bcim.be>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl)
 from odoo import _, fields, models
 
@@ -83,10 +84,12 @@ class StockStorageLocationSequence(models.Model):
         ]
         return action
 
-    def can_be_applied(self, putaway_location, quant, product):
+    def can_be_applied(self, putaway_location, quant, package, product, quantity):
         """Check if conditions are met."""
         self.ensure_one()
         for cond in self.location_sequence_cond_ids:
-            if not cond.evaluate(self, putaway_location, quant, product):
+            if not cond.evaluate(
+                self, putaway_location, quant, package, product, quantity
+            ):
                 return False
         return True
