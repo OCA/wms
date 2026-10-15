@@ -60,6 +60,7 @@ const messages_en = {
         loading: "Loading...",
         action: {
             logout: "Logout",
+            toggle_devtools: "Toggle DevTools",
         },
         nav: {
             scenario: "Scenario:",
