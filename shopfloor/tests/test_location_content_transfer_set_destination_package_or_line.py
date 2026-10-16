@@ -1094,3 +1094,54 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
                 self.content_loc, self.dest_location
             ),
         )
+
+    def test_set_destination_line_two_lines_on_move(self):
+        response = self.service.dispatch(
+            "scan_location",
+            params={
+                "barcode": self.content_loc_1.barcode,
+            },
+        )
+        picking = (
+            self.env["stock.move.line"]
+            .browse(response["data"]["scan_destination_all"]["move_lines"][0]["id"])
+            .picking_id
+        )
+        self.assertEqual(len(picking.move_ids), 1)
+        move_line1, move_line2 = picking.move_line_ids
+
+        # Process line by line
+        response = self.service.dispatch(
+            "go_to_single",
+            params={
+                "location_id": self.content_loc_1.id,
+            },
+        )
+
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "barcode": move_line1.lot_id.name,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line1.id,
+            },
+        )
+
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "barcode": self.shelf1.barcode,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line1.id,
+                "quantity": move_line1.reserved_uom_qty,
+            },
+        )
+
+        # The processed line should have been extracted in a split order
+        split_order = self.env["stock.picking"].search(
+            [("backorder_id", "=", picking.id)]
+        )
+        self.assertTrue(split_order)
+        self.assertEqual(split_order.state, "done")
+        self.assertEqual(split_order.move_line_ids, move_line1)
+        self.assertEqual(len(picking.move_line_ids), 1)

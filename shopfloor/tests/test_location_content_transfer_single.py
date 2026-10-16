@@ -55,11 +55,7 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         cls.picking2 = picking2 = cls._create_picking(
             lines=[(cls.product_c, 10), (cls.product_d, 10)]
         )
-        cls.picking3 = cls._create_picking(
-            lines=[(cls.product_e, 10)],
-        )
-        cls.picking3.location_dest_id = cls.shelves
-        cls.pickings = picking1 | picking2 | cls.picking3
+        cls.pickings = picking1 | picking2
         cls._fill_stock_for_moves(
             picking1.move_ids, in_package=True, location=cls.content_loc
         )
@@ -70,9 +66,6 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
         cls._fill_stock_for_moves(
             picking2.move_ids[1], location=cls.content_loc, in_lot=cls.product_d_lot
         )
-        # Set Product E in several content locations
-        cls._update_qty_in_location(cls.content_loc, cls.product_e, 5.0)
-        cls._update_qty_in_location(cls.content_loc_1, cls.product_e, 5.0)
         cls.pickings.action_assign()
         cls._simulate_pickings_selected(cls.pickings)
 
@@ -536,49 +529,84 @@ class LocationContentTransferSingleCase(LocationContentTransferCommonCase):
     def test_postpone_line_ok_with_two_lines_and_view(self):
         """
         Use case:
-            - A stock move with two move lines (e.g.: two different source locations)
+            - A stock move with two move lines (e.g.: two different lots)
             - A default destination as a view
             - Postpone the first line
             - Validate the second line
-            - Only the first quantity should be transfered
-            - The backorder line should be proposed after
+            - Only the second line quantity should be transfered
+            - Postponed first line should be proposed after
         """
-        move_line = self.picking3.move_line_ids[0]
-        previous_priority = move_line.shopfloor_priority
-        self.assertFalse(move_line.shopfloor_postponed)
+        response = self.service.dispatch(
+            "scan_location",
+            params={
+                "barcode": self.content_loc_1.barcode,
+            },
+        )
+        picking = (
+            self.env["stock.move.line"]
+            .browse(response["data"]["scan_destination_all"]["move_lines"][0]["id"])
+            .picking_id
+        )
+        self.assertEqual(len(picking.move_ids), 1)
+        self.assertEqual(len(picking.move_line_ids), 2)
+        move_line1, move_line2 = picking.move_line_ids
+
+        # Process line by line
+        self.service.dispatch(
+            "go_to_single",
+            params={
+                "location_id": self.content_loc_1.id,
+            },
+        )
+
+        # Postpone first line
+        previous_priority = move_line1.shopfloor_priority
+        self.assertFalse(move_line1.shopfloor_postponed)
         response = self.service.dispatch(
             "postpone_line",
-            params={"location_id": self.content_loc.id, "move_line_id": move_line.id},
+            params={
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line1.id,
+            },
         )
-        self.assertTrue(move_line.shopfloor_postponed)
-        self.assertEqual(move_line.shopfloor_priority, previous_priority + 1)
+        self.assertTrue(move_line1.shopfloor_postponed)
+        self.assertEqual(move_line1.shopfloor_priority, previous_priority + 1)
 
-        self.assert_response_start_single(response, self.picking3, postponed=True)
+        self.assert_response_start_single(response, picking, postponed=True)
 
-        # Select the next line
-        move_line = self.picking3.move_line_ids[1]
-        previous_priority = move_line.shopfloor_priority
-        self.assertFalse(move_line.shopfloor_postponed)
+        # Process second line
+        self.service.dispatch(
+            "scan_line",
+            params={
+                "barcode": move_line2.lot_id.name,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line2.id,
+            },
+        )
 
-        # Set the destination
         response = self.service.dispatch(
             "set_destination_line",
             params={
-                "location_id": self.content_loc.id,
-                "move_line_id": move_line.id,
-                "quantity": move_line.reserved_uom_qty,
                 "barcode": self.shelf1.barcode,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line2.id,
+                "quantity": move_line2.reserved_uom_qty,
             },
         )
-        backorder = self.picking3.backorder_ids
-        self.assertTrue(backorder)
-        message = {
-            "body": "Content line transferred from Content Location to Shelf 1",
-            "message_type": "success",
-        }
 
-        # Check the backorder is proposed to operator
-        self.assert_response_start_single(response, backorder, message=message)
+        # The second line has been extracted in a split order
+        split_order = move_line2.picking_id
+        self.assertEqual(split_order.backorder_id, picking)
+        self.assertEqual(split_order.state, "done")
+
+        # Check the remaining line is proposed to operator
+        self.assert_response_start_single(
+            response,
+            picking,
+            message=self.msg_store.location_content_transfer_item_complete(
+                move_line2.location_id, move_line2.location_dest_id
+            ),
+        )
 
     def test_stock_out_package_wrong_parameters(self):
         """Wrong 'location_id' and 'package_level_id' parameters, redirect the
