@@ -1,0 +1,1 @@
+Adds the package type of the product to reception screens.
