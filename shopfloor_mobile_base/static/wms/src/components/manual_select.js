@@ -123,6 +123,10 @@ Vue.component("manual-select", {
             }
         },
         handleSelect(rec, event) {
+            // Prevent selection if record is disabled
+            if (this.is_disabled(rec)) {
+                return;
+            }
             const elem = event.target;
             const val = isNaN(elem.value) ? elem.value : parseInt(elem.value, 10);
             this._updateValue(val, elem.checked);
@@ -150,6 +154,12 @@ Vue.component("manual-select", {
                 : this.selected === rec.id;
         },
         is_disabled(rec) {
+            // Check if custom disabling rule is provided in options
+            if (typeof this.opts.is_record_disabled === "function") {
+                if (this.opts.is_record_disabled(rec)) {
+                    return true;
+                }
+            }
             // If value is required and there's no btn to confirm block unselecting the checkbox
             return (
                 !this.opts.multiple &&
@@ -186,6 +196,7 @@ Vue.component("manual-select", {
                 selected_event: "select",
                 group_color: "",
                 group_title_default: "",
+                is_record_disabled: null,
             });
             return opts;
         },
@@ -258,7 +269,7 @@ Vue.component("manual-select", {
                         </v-list-item-content>
                         <v-list-item-action>
                             <div class="action action-select">
-                                <v-btn icon x-large rounded>
+                                <v-btn icon x-large rounded v-if="!is_disabled(rec)">
                                     <input
                                         :class="['sf-checkbox', is_selected(rec) ? selected_color_klass(rec, 'darken-3') : '']"
                                         type="checkbox"
@@ -266,7 +277,6 @@ Vue.component("manual-select", {
                                         :true-value="rec.id"
                                         :value="rec.id"
                                         :checked="is_selected(rec) ? 'checked' : null"
-                                        :disabled="is_disabled(rec) ? 'disabled' : null"
                                         :key="make_component_key(['list-checkbox', index, rec.id])"
                                         @click="handleSelect(rec, $event)"
                                         />
