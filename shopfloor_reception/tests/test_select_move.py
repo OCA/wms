@@ -1,7 +1,7 @@
 # Copyright 2022 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 # pylint: disable=missing-return
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from odoo import fields
 
@@ -436,6 +436,40 @@ class TestSelectLine(CommonCase):
             data={
                 "picking": data,
                 "selected_move_line": self.data.move_lines(selected_move_line),
+            },
+        )
+
+    def test_manual_select_move_to_set_lot(self):
+        # only a peremption date is prefilled, no lot name
+        picking = self._create_picking()
+        # The picking type is configured to create lots,
+        # so the line is prefilled with an expiration date, but no lot name.
+        # This test is a regression test to ensure that
+        # all the information of the lot are optional when the user is
+        # prompted to set a lot.
+        selected_move = picking.move_ids.filtered(
+            lambda m: m.product_id == self.product_a
+        )
+        expiration_date = datetime.now() + timedelta(days=30)
+        line = selected_move.move_line_ids[0]
+        line.expiration_date = expiration_date
+        self.assertTrue(line.expiration_date)
+        response = self.service.dispatch(
+            "manual_select_move",
+            params={"move_id": selected_move.id},
+        )
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        data = self.data.picking(picking)
+        self.assert_response(
+            response,
+            next_state="set_lot",
+            data={
+                "picking": data,
+                "selected_move_line": self.data.move_lines(
+                    selected_move_line, lot_expiration_date=expiration_date
+                ),
             },
         )
 
