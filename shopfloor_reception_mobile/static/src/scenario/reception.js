@@ -35,6 +35,13 @@ const Reception = {
                         </v-col>
                     </v-row>
                 </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
             </template>
             <template v-if="state_is('manual_selection') && visible_pickings">
                 <list-filter

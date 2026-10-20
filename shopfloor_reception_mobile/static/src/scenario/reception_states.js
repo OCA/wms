@@ -22,6 +22,7 @@ export const reception_states = function () {
             },
             events: {
                 select: "on_select",
+                go_back: "on_back",
             },
             on_select: (selected) => {
                 this.wait_call(
@@ -39,6 +40,10 @@ export const reception_states = function () {
             },
             on_manual_selection: () => {
                 this.wait_call(this.odoo.call("list_stock_pickings"));
+            },
+            on_back: () => {
+                // Return to the main menu screen where scenarios are selected
+                this.$router.push("/");
             },
         },
         manual_selection: {
