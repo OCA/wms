@@ -21,6 +21,7 @@ setuptools.setup(
         'odoo-addon-shopfloor_batch_automatic_creation>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_cluster_picking_repack>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_gs1>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_gtin>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_mobile_base>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_mobile_base_auth_api_key>=16.0dev,<16.1dev',
