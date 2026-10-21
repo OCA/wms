@@ -422,8 +422,8 @@ const Reception = {
                             label: this.$t("common.barcode"),
                         },
                         {
-                            path: "product.supplier_code",
-                            label: this.$t("common.vendor_code"),
+                            path: "product.default_code",
+                            label: this.$t("product.internal_ref"),
                         },
                         {
                             path: "quantity_done",

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from freezegun import freeze_time
 
-from odoo import fields
+from odoo import Command, fields
 
 from .common import CommonCase
 
@@ -273,4 +273,53 @@ class TestSelectDocument(CommonCase):
             next_state="select_document",
             data={"pickings": self._data_for_pickings(picking)},
             message=self.msg_store.multiple_picks_found_select_manually(),
+        )
+
+    def test_select_moves_shows_supplier_code_in_display_name(self):
+        picking = self._create_picking(
+            lines=[(self.product_a, 10), (self.product_b, 10), (self.product_c, 10)]
+        )
+        other_supplier = picking.partner_id.sudo().copy({"name": "Other Supplier"})
+        picking.move_ids.product_id.sudo().write({"seller_ids": False})
+        self.product_a.sudo().seller_ids = [
+            Command.create(
+                {"product_code": "CODE-0001", "partner_id": picking.partner_id.id}
+            )
+        ]
+        self.product_b.sudo().seller_ids = [
+            Command.create(
+                {"product_code": "CODE-0002", "partner_id": picking.partner_id.id}
+            ),
+            Command.create(
+                {"product_code": "OTHER-0002", "partner_id": other_supplier.id}
+            ),
+        ]
+        self.product_c.sudo().seller_ids = [
+            Command.create(
+                {"product_code": "OTHER-0003", "partner_id": other_supplier.id}
+            )
+        ]
+        response = self.service.dispatch(
+            "scan_document", params={"barcode": picking.name}
+        )
+
+        # Ensure each move shows the correct supplier code
+        self.assertIn(
+            "CODE-0001",
+            response["data"]["select_move"]["picking"]["moves"][0]["product"][
+                "display_name"
+            ],
+        )
+        self.assertIn(
+            "CODE-0002",
+            response["data"]["select_move"]["picking"]["moves"][1]["product"][
+                "display_name"
+            ],
+        )
+        # The supplier code we have for product c is not for current reception's supplier
+        self.assertNotIn(
+            "OTHER-",
+            response["data"]["select_move"]["picking"]["moves"][2]["product"][
+                "display_name"
+            ],
         )
