@@ -14,7 +14,7 @@ from odoo.osv import expression
 from odoo.addons.base_rest.components.service import to_bool, to_int
 from odoo.addons.component.core import Component
 
-from ..actions.search import SearchInvalidProduct
+from ..actions.search import SearchInvalidPackage, SearchInvalidProduct
 from ..utils import to_float
 
 _logger = logging.getLogger(__name__)
@@ -439,6 +439,26 @@ class ClusterPicking(Component):
             batch.write({"state": "draft", "user_id": False})
         return self._response_for_start()
 
+    def _scan_line__get_handlers_by_type(self):
+        # Necessary because all handlers do not have the same signature
+        return {
+            "package": lambda p, ml, b, sub, rec, bc: self._scan_line_by_package(
+                p, ml, rec, b, sub
+            ),
+            "product": lambda p, ml, b, sub, rec, bc: self._scan_line_by_product(
+                p, ml, rec, sub
+            ),
+            "packaging": lambda p, ml, b, sub, rec, bc: self._scan_line_by_packaging(
+                p, ml, rec, sub
+            ),
+            "lot": lambda p, ml, b, sub, rec, bc: self._scan_line_by_lot(
+                p, ml, rec, sub
+            ),
+            "location": lambda p, ml, b, sub, rec, bc: self._scan_line_by_location(
+                p, ml, rec
+            ),
+        }
+
     def scan_line(self, picking_batch_id, move_line_id, barcode, sublocation_id=None):
         """Scan a location, a pack, a product or a lots
 
@@ -449,11 +469,13 @@ class ClusterPicking(Component):
         have to precise what they want by scanning one of:
 
         * pack
-        * product
         * lot
+        * product
+
 
         The result must be unambigous. For instance if we scan a product but the
-        product is tracked by lot, scanning the lot has to be required.
+        product is tracked by lot, scanning the lot has to be required. We support
+        multi valued barcodes (like GS1) if lot is provided along with product.
 
         `sublocation_id` is used when the scan_location_or_pack_first option is
         switched on and the location contains multiple products with no lot or package.
@@ -482,43 +504,33 @@ class ClusterPicking(Component):
             )
 
         search = self._actions_for("search")
-
         picking = move_line.picking_id
 
-        package = search.package_from_scan(barcode)
-        if package and move_line.package_id == package:
-            return self._scan_line_by_package(
-                picking, move_line, package, batch, sublocation
-            )
-
-        product = search.product_from_scan(barcode)
-        if product and move_line.product_id == product:
-            return self._scan_line_by_product(picking, move_line, product, sublocation)
-
-        packaging = search.packaging_from_scan(barcode)
-        if move_line.product_id == packaging.product_id:
-            return self._scan_line_by_packaging(
-                picking, move_line, packaging, sublocation
-            )
+        handlers = self._scan_line__get_handlers_by_type()
 
         try:
-            lot = None
-            lot = search.lot_from_scan(barcode, products=move_line.product_id)
-        except SearchInvalidProduct:
-            _logger.debug("Cluster Picking: invalid product found on scanned lot.")
-        if lot and move_line.lot_id == lot:
-            return self._scan_line_by_lot(picking, move_line, lot, sublocation)
+            res = (
+                search.for_products(move_line.product_id)
+                .for_packages(move_line.package_id)
+                .find(barcode, types=list(handlers))
+            )
+        except (SearchInvalidProduct, SearchInvalidPackage) as e:
+            return self._response_for_start_line(
+                move_line, message=self.msg_store.wrong_record(e.recordset[:1])
+            )
 
-        location = search.location_from_scan(barcode)
-        if location and move_line.location_id == location:
-            return self._scan_line_by_location(picking, move_line, location)
+        if handler := handlers.get(res.type):
+            response = handler(
+                picking, move_line, batch, sublocation, res.record, barcode
+            )
+            if response:
+                return response
 
         # Nothing matches what is expected from the move line.
-        for rec in (package, product, lot, location):
-            if rec:
-                return self._response_for_start_line(
-                    move_line, message=self.msg_store.wrong_record(rec)
-                )
+        if res.record:
+            return self._response_for_start_line(
+                move_line, message=self.msg_store.wrong_record(res.record)
+            )
         return self._response_for_start_line(
             move_line, message=self.msg_store.barcode_not_found()
         )
@@ -635,9 +647,14 @@ class ClusterPicking(Component):
         If we scanned a lot and it's part of several packages, we can't be
         sure the user scanned the correct one, in such case, ask to scan a package
         """
-        response = self._check_first_scan_location_or_pack_first(move_line, sublocation)
-        if response:
+        if response := self._check_first_scan_location_or_pack_first(
+            move_line, sublocation
+        ):
             return response
+        if lot != move_line.lot_id:
+            return self._response_for_start_line(
+                move_line, message=self.msg_store.wrong_record(lot)
+            )
 
         location_quants = move_line.location_id.quant_ids.filtered(
             lambda quant: quant.quantity > 0 and quant.lot_id == lot
@@ -664,6 +681,10 @@ class ClusterPicking(Component):
         several products or a mix of several products and packages, we
         ask to scan a more precise barcode.
         """
+        if location != move_line.location_id:
+            return self._response_for_start_line(
+                move_line, message=self.msg_store.wrong_record(location)
+            )
         response = self._check_first_scan_location_or_pack_first(
             move_line, None, location_scanned=location
         )
