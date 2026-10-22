@@ -5,7 +5,7 @@
 {
     "name": "Shopfloor Workstation Mobile",
     "summary": "Shopfloor mobile app integration for workstation",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.1",
     "category": "Inventory",
     "website": "https://github.com/OCA/wms",
     "author": "Camptocamp, Odoo Community Association (OCA)",
