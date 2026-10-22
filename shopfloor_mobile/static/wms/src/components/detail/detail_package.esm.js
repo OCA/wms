@@ -8,6 +8,12 @@ import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/
 
 Vue.component("detail-package", {
     mixins: [ItemDetailMixin],
+    props: {
+        color: {
+            type: String, // Used to determine card_color (See `utils.colors.color_for()`)
+            default: "detail_main_card",
+        },
+    },
     methods: {
         detail_fields() {
             return [
@@ -59,8 +65,8 @@ Vue.component("detail-package", {
         <div :class="$options._componentTag">
             <item-detail-card
                 v-bind="$props"
-                :options="{main: true, fields: detail_fields(), klass: 'loud-labels'}"
-                :card_color="utils.colors.color_for('detail_main_card')"
+                :options="{main: true, fields: detail_fields(), klass: 'loud-labels', title_icon: 'mdi-package-variant-closed'}"
+                :card_color="utils.colors.color_for(color)"
                 />
 
             <div class="products mb-4" v-if="(record.move_lines || []).length">
