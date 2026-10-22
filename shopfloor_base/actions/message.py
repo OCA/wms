@@ -36,11 +36,9 @@ class MessageAction(Component):
     def add_message(self, body, message_type="info"):
         if not isinstance(body, str):
             raise TypeError("You should set a string to message queue!")
-        if message_type not in MESSAGE_TYPES.keys():
+        if message_type not in MESSAGE_TYPES:
             raise TypeError("You should use a correct Shopfloor message type!")
-        if not hasattr(self, "_message_queue"):
-            self._message_queue = []
-        self._message_queue.append(ShopfloorMessage(body, message_type))
+        self.message_queue.append(ShopfloorMessage(body, message_type))
 
     def clear_queue(self):
         self._message_queue = list()
@@ -75,7 +73,6 @@ class MessageAction(Component):
 
 
 class ShopfloorMessage:
-
     body = str()
     message_type = str()
 
