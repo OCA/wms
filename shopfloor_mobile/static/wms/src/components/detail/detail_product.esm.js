@@ -50,7 +50,9 @@ Vue.component("detail-product", {
                 {path: "expiration_date", label: this.$t("lot.expiry_date")},
                 {path: "default_code", label: this.$t("product.internal_ref")},
                 {path: "barcode", label: this.$t("product.barcode")},
-                {path: "product.supplier_code", label: this.$t("product.supplier_ref")},
+                {path: "supplier_code", label: this.$t("product.supplier_ref")},
+                {path: "qty_available", label: this.$t("common.qty_on_hand")},
+                {path: "qty_reserved", label: this.$t("common.reserved")},
             ];
         },
         packaging_detail_fields() {
@@ -84,21 +86,7 @@ Vue.component("detail-product", {
             };
         },
         locations_fields() {
-            return [{path: "quantity", label: this.$t("common.reserved")}];
-        },
-        available_product_list_options() {
-            return {
-                main: true,
-                key_title: "display_name",
-                klass: "loud-labels",
-                title_action_field: {
-                    action_val_path: "default_code",
-                },
-                fields: this.available_product_list_fields(),
-            };
-        },
-        available_product_list_fields() {
-            return [{path: "qty_available", label: this.$t("common.qty_on_hand")}];
+            return [{path: "quantity", label: this.$t("common.qty_on_hand")}];
         },
         lot_detail_options() {
             return {
@@ -140,8 +128,8 @@ Vue.component("detail-product", {
     <div class="suppliers mb-4" v-if="_.result(record, 'suppliers', []).length">
         <separator-title>{{ $t("product.suppliers") }}</separator-title>
         <item-detail-card
-            v-for="supp in unique_suppliers(record.suppliers)"
-            :key="'supp' + supp.id"
+            v-for="(supp, index) in unique_suppliers(record.suppliers)"
+            :key="make_component_key(['supp', supp.id || index, index])"
             :record="supp"
             :options="{no_title: true, fields: supplier_detail_fields()}"
             />

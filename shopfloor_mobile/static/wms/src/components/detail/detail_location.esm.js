@@ -11,7 +11,6 @@ Vue.component("detail-location", {
     methods: {
         product_list_options() {
             return {
-                key_title: "display_name",
                 card_klass: "loud-labels",
                 list_item_options: {
                     fields: this.product_list_fields(),
@@ -29,7 +28,6 @@ Vue.component("detail-location", {
                 {
                     path: "product.supplier_code",
                     label: this.$t("common.vendor_code"),
-                    klass: "loud",
                 },
                 {
                     path: "package_src.name",
@@ -41,8 +39,14 @@ Vue.component("detail-location", {
                     label: this.$t("common.lot"),
                     action_val_path: "lot.name",
                 },
-                {path: "product.qty_reserved", label: this.$t("common.qty_reserved")},
-                {path: "product.qty_available", label: this.$t("common.qty_in_stock")},
+                {path: "quantity", label: this.$t("common.qty_reserved")},
+                {
+                    path: "qty_done",
+                    label: this.$t("common.qty_done"),
+                    display_no_value: true,
+                },
+                {path: "location_src.name", label: this.$t("common.location_src")},
+                {path: "location_dest.name", label: this.$t("common.location_dest")},
             ];
         },
         available_product_list_options() {
@@ -58,7 +62,6 @@ Vue.component("detail-location", {
                 {
                     path: "supplier_code",
                     label: this.$t("common.vendor_code"),
-                    klass: "loud",
                 },
                 {path: "quantity", label: this.$t("common.qty_in_stock")},
             ];
@@ -140,11 +143,6 @@ Vue.component("detail-location", {
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
-        <!-- list
-            :records="record.products"
-            :options="available_product_list_options()"
-            /-->
-
     </div>
 
   </div>
