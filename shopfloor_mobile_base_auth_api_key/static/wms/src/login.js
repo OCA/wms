@@ -72,14 +72,3 @@ Vue.component("login-api_key", {
     </v-form>
     `,
 });
-
-translation_registry.add("en-US.screen.login.api_key_label", "API key");
-translation_registry.add("fr-FR.screen.login.api_key_label", "Clé API");
-translation_registry.add("de-DE.screen.login.api_key_label", "API-Schlüssel");
-
-translation_registry.add("en-US.screen.login.api_key_placeholder", "YOUR_API_KEY_HERE");
-translation_registry.add("fr-FR.screen.login.api_key_placeholder", "VOTRE_CLE_API_ICI");
-translation_registry.add(
-    "de-DE.screen.login.api_key_placeholder",
-    "DEIN_API-SCHLÜSSEL_HIER"
-);
