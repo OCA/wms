@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-30 15:46+0000\n"
+"PO-Revision-Date: 2026-10-22 14:46+0000\n"
 "Last-Translator: mymage <stefano.consolaro@mymage.it>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -77,7 +77,7 @@ msgstr ""
 #. module: stock_service_level_route
 #: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__service_level_selectable
 msgid "Service level"
-msgstr "Livello servizio"
+msgstr "Livello del servizio"
 
 #. module: stock_service_level_route
 #: model:ir.model.fields,field_description:stock_service_level_route.field_stock_location_route__service_level_ids
