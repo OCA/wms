@@ -1060,3 +1060,12 @@ class MessageAction(Component):
             "message_type": "error",
             "body": body,
         }
+
+    def location_source_invalid(self, location):
+        return {
+            "message_type": "error",
+            "body": _(
+                "The content of %(loc_name)s cannot be transferred with this scenario.",
+                loc_name=location.name,
+            ),
+        }
