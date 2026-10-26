@@ -1,0 +1,22 @@
+<!-- Copyright 2025 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template id="report_saleorder_document">
+        <t t-foreach="docs" t-as="doc">
+            <t t-out="doc.create_date" />
+        </t>
+
+    </template>
+
+    <record model="ir.actions.report" id="report_test_document">
+        <field name="name">Test</field>
+        <field name="model">shopfloor.test.model</field>
+        <field name="report_type">qweb-pdf</field>
+        <field
+            name="report_name"
+        >shopfloor_printing_base.report_saleorder_document</field>
+        <field
+            name="report_file"
+        >shopfloor_printing_base.report_saleorder_document</field>
+    </record>
+</odoo>
