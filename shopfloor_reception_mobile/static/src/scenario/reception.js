@@ -194,6 +194,13 @@ const Reception = {
                     :options="{key_title: 'location_dest.name'}"
                     :key="make_state_component_key(['reception-product-item-detail-set-destination-dest-location', state.data.picking.id])"
                 />
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back/>
+                        </v-col>
+                    </v-row>
+                </div>
             </template>
             <template v-if="state_is('select_dest_package')">
                 <item-detail-card

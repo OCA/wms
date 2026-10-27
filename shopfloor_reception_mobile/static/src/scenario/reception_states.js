@@ -237,6 +237,9 @@ export const reception_states = function () {
                 title: this.$t("reception.set_destination.title"),
                 scan_placeholder: this.$t("reception.set_destination.scan_placeholder"),
             },
+            events: {
+                go_back: "on_back",
+            },
             on_scan: (location) => {
                 this.wait_call(
                     this.odoo.call("set_destination", {
@@ -244,6 +247,14 @@ export const reception_states = function () {
                         selected_line_id: this.line_being_handled.id,
                         location_name: location.text,
                         confirmation: this.state.data.confirmation || "",
+                    })
+                );
+            },
+            on_back: () => {
+                this.wait_call(
+                    this.odoo.call("set_destination__back_action", {
+                        picking_id: this.state.data.picking.id,
+                        selected_line_id: this.line_being_handled.id,
                     })
                 );
             },
