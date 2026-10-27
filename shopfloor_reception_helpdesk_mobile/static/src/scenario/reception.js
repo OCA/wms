@@ -25,6 +25,15 @@ const new_template =
  </template>
 
  <template v-if="state_is('start_helpdesk')">
+
+    <v-combobox
+        :label="$t('reception.helpdesk.motive')"
+        clearable
+        :items="state.data.available_motives"
+        item-text="name"
+        v-model="state.data.helpdesk_wizard.motive"
+    />
+
     <v-text-field
         :label="$t('reception.helpdesk.description')"
         :placeholder="$t('reception.helpdesk.ticket_description')"
@@ -33,14 +42,6 @@ const new_template =
         :rules="[v => !!v || $t('reception.helpdesk.description_required')]"
         required
     />
-
-    <v-combobox
-        :label="$t('reception.helpdesk.motive')"
-        clearable
-        :items="state.data.available_motives"
-        item-text="name"
-        v-model="state.data.helpdesk_wizard.motive"
-    ></v-combobox>
 
     <div class="button-list button-vertical-list full">
         <v-row align="center">
