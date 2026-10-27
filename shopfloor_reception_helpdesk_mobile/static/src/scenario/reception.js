@@ -34,15 +34,19 @@ const new_template =
         item-value="id"
         return-object
         v-model="state.data.helpdesk_wizard.motive"
+        @change="state.on_change_motive"
     />
 
-    <v-text-field
+    <v-textarea
         :label="$t('reception.helpdesk.description')"
         :placeholder="$t('reception.helpdesk.ticket_description')"
         class="current-value"
+        rows="5"
+        auto-grow
         v-model="state.data.helpdesk_wizard.description"
         :rules="[v => !!v || $t('reception.helpdesk.description_required')]"
         required
+        clearable
     />
 
     <div class="button-list button-vertical-list full">
@@ -112,6 +116,12 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
                         origin_state: self.state.data.origin_state,
                     })
                 );
+            },
+            on_change_motive: (selected_motive) => {
+                if (selected_motive && selected_motive.description) {
+                    self.state.data.helpdesk_wizard.description =
+                        selected_motive.description;
+                }
             },
         };
         return states;
