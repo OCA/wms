@@ -62,7 +62,10 @@ class TestSetDestination(CommonCase):
         )
         self.assertEqual(selected_move_line.location_dest_id, self.sub_input_location)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
 
     def test_scan_location_valid_but_unexpected(self):
@@ -102,7 +105,10 @@ class TestSetDestination(CommonCase):
         )
         self.assertEqual(selected_move_line.location_dest_id, self.sub_input_location_2)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
 
     def test_scan_location_not_child_of_dest_locations(self):
@@ -163,7 +169,10 @@ class TestSetDestination(CommonCase):
         )
         # Next screen is select move, because picking is not done
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
         # The line has been moved to a different picking.
         self.assertNotEqual(picking, selected_move_line.picking_id)
@@ -241,7 +250,10 @@ class TestSetDestination(CommonCase):
             },
         )
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
         # Lines has been moved in another picking
         self.assertNotEqual(picking, selected_move_line.picking_id)

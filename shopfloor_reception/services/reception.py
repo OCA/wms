@@ -1751,7 +1751,9 @@ class Reception(Component):
             message = self.msg_store.transfer_done_success(picking)
             return self._response_for_select_document(message=message)
         # Else return select move
-        return self._response_for_select_move(picking)
+        return self._response_for_select_move(
+            picking, message=self.msg_store.line_destination_set_success(selected_line)
+        )
 
     def select_dest_package(
         self, picking_id, selected_line_id, barcode, confirmation=False
