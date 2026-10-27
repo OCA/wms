@@ -1,5 +1,8 @@
 # Copyright 2025 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
+from odoo.tools import is_html_empty
+
 from odoo.addons.base_rest.components.service import to_int
 from odoo.addons.component.core import Component
 from odoo.addons.helpdesk_mgmt_stock.wizards.stock_helpdesk_ticket_create import (
@@ -95,9 +98,17 @@ class Reception(Component):
 
     def _get_available_motives(self, picking: Picking) -> list[dict]:
         default_helpdesk_team = picking.picking_type_id.default_helpdesk_team_id
-        return self.env["helpdesk.ticket.motive"].search_read(
-            [("team_id", "in", default_helpdesk_team.ids + [False])], ["id", "name"]
+        motives = self.env["helpdesk.ticket.motive"].search_read(
+            [("team_id", "in", default_helpdesk_team.ids + [False])],
+            ["id", "name", "description_template"],
         )
+        for motive in motives:
+            description_template = motive.pop("description_template")
+            if not is_html_empty(description_template):
+                motive["description"] = description_template
+            else:
+                motive["description"] = None
+        return motives
 
 
 class ShopfloorReceptionValidator(Component):
