@@ -26,11 +26,13 @@ const new_template =
 
  <template v-if="state_is('start_helpdesk')">
 
-    <v-combobox
+    <v-select
         :label="$t('reception.helpdesk.motive')"
         clearable
         :items="state.data.available_motives"
         item-text="name"
+        item-value="id"
+        return-object
         v-model="state.data.helpdesk_wizard.motive"
     />
 
