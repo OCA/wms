@@ -11,6 +11,7 @@ setuptools.setup(
         'odoo14-addon-delivery_carrier_preference',
         'odoo14-addon-delivery_carrier_warehouse',
         'odoo14-addon-delivery_preference_glue_stock_picking_group',
+        'odoo14-addon-internal_stock_quant_package',
         'odoo14-addon-sale_stock_available_to_promise_release',
         'odoo14-addon-sale_stock_available_to_promise_release_cutoff',
         'odoo14-addon-sale_stock_available_to_promise_release_dropshipping',
