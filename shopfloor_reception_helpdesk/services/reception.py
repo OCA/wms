@@ -87,7 +87,9 @@ class Reception(Component):
         wizard: StockHelpdeskTicketCreate,
         **kwargs,
     ):
-        action = wizard.action_create_helpdesk_ticket()
+        action = wizard.with_context(
+            from_shopfloor_reception=True
+        ).action_create_helpdesk_ticket()
         ticket = self.env["helpdesk.ticket"].search(action["domain"])
         return ticket
 
