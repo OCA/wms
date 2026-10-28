@@ -53,11 +53,21 @@ class ClusterPickingCommonCase(CommonCase, PickingBatchMixin):
                 {"qty_done": line.product_uom_qty, "result_package_id": dest_package.id}
             )
 
-    def _data_for_batch(self, batch, location, pack=None):
+    def _data_for_batch(self, batch, location, pack=None, with_move_lines=False):
         data = self.data.picking_batch(batch)
         data["location_dest"] = self.data.location(location)
         if pack:
             data["package"] = self.data.package(pack)
+        if with_move_lines:
+            all_lines = self.service._lines_for_picking_batch(batch)
+            lines = self.service._lines_to_unload(batch)
+            data["move_lines"] = self.data.move_lines(lines, with_picking=True)
+            backorder_lines = all_lines.filtered(
+                lambda li: li.qty_done < li.product_uom_qty
+            )
+            data["backorder_lines"] = self.data.move_lines(
+                backorder_lines, with_picking=True
+            )
         return data
 
 
