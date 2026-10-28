@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2021 ACSONE SA/NV
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+        <record model="ir.ui.view" id="stock_internal_package_config_line_form_view">
+        <field name="name">stock.internal.package.config.line.form</field>
+        <field name="model">stock.internal.package.config.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="empty" />
+                            <field name="delivery_carrier_id" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_picking_type_form_view">
+        <field
+            name="name"
+        >stock.picking.type.form (in internal_stock_quant_package)</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form" />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+                <field name="empty_internal_package_on_transfer" />
+                <field name="stock_internal_package_config_line_ids">
+                    <tree>
+                        <field name="delivery_carrier_id" />
+                        <field name="empty" />
+                    </tree>
+                </field>
+            </field>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="stock_picking_type_tree_view">
+        <field
+            name="name"
+        >stock.picking.type.tree (in internal_stock_quant_package)</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_tree" />
+        <field name="arch" type="xml">
+            <field name="warehouse_id" position="after">
+            <field name="empty_internal_package_on_transfer" />
+            <field name="stock_internal_package_config_line_ids">
+                <tree>
+                    <field name="delivery_carrier_id" />
+                    <field name="empty" />
+                </tree>
+            </field>
+        </field>
+        </field>
+    </record>
+
+</odoo>

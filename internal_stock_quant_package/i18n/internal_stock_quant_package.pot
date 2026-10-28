@@ -1,0 +1,112 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* internal_stock_quant_package
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__delivery_carrier_id
+msgid "Delivery Carrier"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__empty
+msgid "Empty"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking__empty_internal_package_on_transfer
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking_type__empty_internal_package_on_transfer
+msgid "Empty Internal Package On Transfer"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__id
+msgid "ID"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,help:internal_stock_quant_package.field_stock_picking_type__empty_internal_package_on_transfer
+msgid ""
+"If set internal packages are emptied after the transfer or when products are"
+" put in pack."
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model_terms:ir.ui.view,arch_db:internal_stock_quant_package.stock_quant_package_search_view
+msgid "Internal"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_internal_package_config_line
+msgid "Internal Package Configuration Line"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_quant_package__is_internal
+msgid "Internal use?"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_quant_package
+msgid "Packages"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_picking_type
+msgid "Picking Type"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_picking_type__stock_internal_package_config_line_ids
+msgid "Stock Internal Package Config Line"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model.fields,field_description:internal_stock_quant_package.field_stock_internal_package_config_line__stock_picking_type_id
+msgid "Stock Picking Type"
+msgstr ""
+
+#. module: internal_stock_quant_package
+#: model:ir.model,name:internal_stock_quant_package.model_stock_picking
+msgid "Transfer"
+msgstr ""
