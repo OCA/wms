@@ -1600,7 +1600,7 @@ class Reception(Component):
             is_over_reception_confirmed=is_over_reception_confirmed,
         ):
             return response
-        picking._put_in_pack(selected_line)
+        picking._put_in_pack(selected_line, create_package_level=False)
         return self._response_for_set_destination(picking, selected_line)
 
     def process_without_pack(
