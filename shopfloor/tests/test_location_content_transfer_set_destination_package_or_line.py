@@ -1094,3 +1094,62 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
                 self.content_loc, self.dest_location
             ),
         )
+
+    def test_set_destination_line_two_lines_on_move(self):
+        # create qties for 2 lots in same location in order to have
+        # a picking with one move and 2 move lines
+        lot1 = self._create_lot(self.product_e)
+        lot2 = self._create_lot(self.product_e)
+        self.product_e.tracking = "lot"
+        self._update_qty_in_location(self.content_loc_1, self.product_e, 5.0, lot=lot1)
+        self._update_qty_in_location(self.content_loc_1, self.product_e, 5.0, lot=lot2)
+
+        response = self.service.dispatch(
+            "scan_location",
+            params={
+                "barcode": self.content_loc_1.barcode,
+            },
+        )
+        picking = (
+            self.env["stock.move.line"]
+            .browse(response["data"]["scan_destination_all"]["move_lines"][0]["id"])
+            .picking_id
+        )
+        self.assertEqual(len(picking.move_ids), 1)
+        move_line1, move_line2 = picking.move_line_ids
+
+        # Process line by line
+        response = self.service.dispatch(
+            "go_to_single",
+            params={
+                "location_id": self.content_loc_1.id,
+            },
+        )
+
+        response = self.service.dispatch(
+            "scan_line",
+            params={
+                "barcode": lot1.name,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line1.id,
+            },
+        )
+
+        response = self.service.dispatch(
+            "set_destination_line",
+            params={
+                "barcode": self.content_loc.barcode,
+                "location_id": self.content_loc_1.id,
+                "move_line_id": move_line1.id,
+                "quantity": move_line1.reserved_uom_qty,
+            },
+        )
+
+        # The processed line should have been extracted in a split order
+        backorder = self.env["stock.picking"].search(
+            [("backorder_id", "=", picking.id)]
+        )
+        self.assertEqual(len(picking.move_line_ids), 1)
+        self.assertTrue(backorder)
+        self.assertEqual(backorder.move_line_ids, move_line1)
+        self.assertEqual(backorder.state, "done")
