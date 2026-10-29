@@ -113,6 +113,7 @@ class TestReceptionHelpdesk(CommonCase):
 
         helpdesk_ticket = line.move_id.helpdesk_ticket_ids
         self.assertTrue(helpdesk_ticket)
+        self.assertTrue(helpdesk_ticket.is_shopfloor_created)
         self.assertEqual(helpdesk_ticket.motive_id, self.motive)
         self.assert_response(
             response,
@@ -137,6 +138,7 @@ class TestReceptionHelpdesk(CommonCase):
 
         helpdesk_ticket = line.move_id.helpdesk_ticket_ids
         self.assertTrue(helpdesk_ticket)
+        self.assertTrue(helpdesk_ticket.is_shopfloor_created)
         self.assertEqual(helpdesk_ticket.motive_id, self.motive)
         self.assert_response(
             response,
@@ -154,6 +156,7 @@ class TestReceptionHelpdesk(CommonCase):
 
         helpdesk_ticket = picking.helpdesk_ticket_ids
         self.assertTrue(helpdesk_ticket)
+        self.assertTrue(helpdesk_ticket.is_shopfloor_created)
         self.assertEqual(helpdesk_ticket.motive_id, self.motive)
         self.assert_response(
             response,
