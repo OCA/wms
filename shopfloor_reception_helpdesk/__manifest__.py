@@ -14,5 +14,5 @@
         "helpdesk_motive",
         "helpdesk_motive_template",
     ],
-    "data": ["views/shopfloor_menu.xml"],
+    "data": ["views/shopfloor_menu.xml", "views/helpdesk_ticket.xml"],
 }

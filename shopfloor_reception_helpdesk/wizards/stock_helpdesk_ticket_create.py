@@ -12,6 +12,7 @@ class StockHelpdeskTicketCreate(models.TransientModel):
     def _prepare_ticket_values(self) -> dict:
         res = super()._prepare_ticket_values()
         if self.env.context.get("from_shopfloor_reception"):
+            res["is_shopfloor_created"] = True
             stock_move = self.env["stock.move"].browse(res.get("stock_move_id"))
             stock_picking = self.env["stock.picking"].browse(
                 res.get("stock_picking_id")
