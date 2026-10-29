@@ -57,6 +57,13 @@ msgid "Menu displayed in the scanner application"
 msgstr "Menu visualizzato nell'applicazione di scansione"
 
 #. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid "Product '%(product)s' moved to '%(location)s'."
+msgstr ""
+
+#. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
 #: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
@@ -80,8 +87,8 @@ msgid ""
 "The scanned lot contains the product barcode '%(product_barcode)s' but you "
 "have no product with this barcode in Odoo."
 msgstr ""
-"Il lotto scansionato contiene il codice a barre del prodotto '%"
-"(product_barcode)s', ma in Odoo non è presente alcun prodotto con questo "
+"Il lotto scansionato contiene il codice a barre del prodotto "
+"'%(product_barcode)s', ma in Odoo non è presente alcun prodotto con questo "
 "codice a barre."
 
 #. module: shopfloor_reception
@@ -93,8 +100,8 @@ msgid ""
 "'%(current_product)s' but the scanned lot is for '%(lot_product)s'."
 msgstr ""
 "Il lotto scansionato non corrisponde al prodotto selezionato. Il prodotto "
-"corrente è '%(current_product)s', ma il lotto scansionato è per '%"
-"(lot_product)s'."
+"corrente è '%(current_product)s', ma il lotto scansionato è per "
+"'%(lot_product)s'."
 
 #. module: shopfloor_reception
 #. odoo-python
