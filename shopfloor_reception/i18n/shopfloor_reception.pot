@@ -51,6 +51,13 @@ msgid "Menu displayed in the scanner application"
 msgstr ""
 
 #. module: shopfloor_reception
+#. odoo-python
+#: code:addons/shopfloor_reception/actions/message.py:0
+#, python-format
+msgid "Product '%(product)s' moved to '%(location)s'."
+msgstr ""
+
+#. module: shopfloor_reception
 #: model:shopfloor.menu,name:shopfloor_reception.shopfloor_menu_demo_reception
 #: model:shopfloor.scenario,name:shopfloor_reception.scenario_reception
 #: model:stock.picking.type,name:shopfloor_reception.picking_type_reception_demo
