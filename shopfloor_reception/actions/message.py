@@ -64,3 +64,13 @@ class MessageAction(Component):
                 product_barcode=product_barcode,
             ),
         }
+
+    def line_destination_set_success(self, move_line):
+        return {
+            "message_type": "success",
+            "body": _(
+                "Product '%(product)s' moved to '%(location)s'.",
+                product=move_line.product_id.display_name,
+                location=move_line.location_dest_id.display_name,
+            ),
+        }

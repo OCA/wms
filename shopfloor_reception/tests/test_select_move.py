@@ -121,6 +121,7 @@ class TestSelectLine(CommonCase):
             response,
             next_state="select_move",
             data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
         lines = picking.move_line_ids.filtered(lambda l: l.product_id == self.product_a)
         self.assertEqual(2, len(lines))

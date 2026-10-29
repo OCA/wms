@@ -877,7 +877,10 @@ class TestSetQuantity(CommonCase):
         # When posted, the move line reserved_uom_qty has been set to qty_done
         self.assertEqual(move_line_user_2.qty_done, move_line_user_2.reserved_uom_qty)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(move_line_user_2),
         )
         # Now, user1 can start working on this again
         service_user_1.dispatch(
