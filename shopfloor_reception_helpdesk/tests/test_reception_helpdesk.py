@@ -43,7 +43,7 @@ class TestReceptionHelpdesk(CommonCase):
             .create({"name": "Test Motive", "team_id": cls.other_team.id})
         )
 
-    def _create_ticket_from_state(self, state, picking, line=None):
+    def _create_ticket_from_state(self, state, picking, line=None, description=None):
         response = self.service.dispatch(
             "start_helpdesk",
             params={
@@ -60,7 +60,7 @@ class TestReceptionHelpdesk(CommonCase):
                 "picking_id": picking.id,
                 "selected_line_id": line.id if line else None,
                 "helpdesk_wizard_id": start_helpdesk_data["helpdesk_wizard"]["id"],
-                "description": "Test Helpdesk",
+                "description": description or "Test Helpdesk",
                 "motive_id": self.motive.id,
                 "origin_state": state,
             },
@@ -164,3 +164,16 @@ class TestReceptionHelpdesk(CommonCase):
             data=self._data_for_select_move(picking),
             message=self.msg_store.helpdesk_ticket_created(helpdesk_ticket),
         )
+
+    def test_create_ticket_from_shopfloor_renders_template(self):
+        self.menu.sudo().picking_type_ids = self.type_rec
+        picking = self._create_picking(picking_type=self.type_rec)
+        self.assertFalse(picking.helpdesk_ticket_ids)
+
+        self._create_ticket_from_state(
+            "select_move",
+            picking=picking,
+            description="<p>Ticket {{ticket.number}}</p>",
+        )
+        helpdesk_ticket = picking.helpdesk_ticket_ids
+        self.assertIn(helpdesk_ticket.number, helpdesk_ticket.description)

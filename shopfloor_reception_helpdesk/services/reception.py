@@ -69,6 +69,9 @@ class Reception(Component):
         )
 
         ticket = self._create_helpdesk(picking, line, wizard)
+        ticket.description = ticket._render_description_from_template(
+            ticket.description
+        )
         message = {}
         if ticket:
             message = self.msg_store.helpdesk_ticket_created(ticket)
