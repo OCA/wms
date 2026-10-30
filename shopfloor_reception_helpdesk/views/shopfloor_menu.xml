@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_type_ids']/tree" position="inside">
                 <field name="allow_helpdesk_ticket" optional="show" />
+                <field name="default_helpdesk_team_id" optional="show" />
             </xpath>
         </field>
     </record>

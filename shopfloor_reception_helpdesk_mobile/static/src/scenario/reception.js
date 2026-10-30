@@ -25,22 +25,29 @@ const new_template =
  </template>
 
  <template v-if="state_is('start_helpdesk')">
-    <v-text-field
-        :label="$t('reception.helpdesk.description')"
-        :placeholder="$t('reception.helpdesk.ticket_description')"
-        class="current-value"
-        v-model="state.data.helpdesk_wizard.description"
-        :rules="[v => !!v || $t('reception.helpdesk.description_required')]"
-        required
-    />
 
-    <v-combobox
+    <v-select
         :label="$t('reception.helpdesk.motive')"
         clearable
         :items="state.data.available_motives"
         item-text="name"
+        item-value="id"
+        return-object
         v-model="state.data.helpdesk_wizard.motive"
-    ></v-combobox>
+        @change="state.on_change_motive"
+    />
+
+    <v-textarea
+        :label="$t('reception.helpdesk.description')"
+        :placeholder="$t('reception.helpdesk.ticket_description')"
+        class="current-value"
+        rows="5"
+        auto-grow
+        v-model="state.data.helpdesk_wizard.description"
+        :rules="[v => !!v || $t('reception.helpdesk.description_required')]"
+        required
+        clearable
+    />
 
     <div class="button-list button-vertical-list full">
         <v-row align="center">
@@ -109,6 +116,12 @@ const ReceptionHelpdesk = process_registry.extend("reception", {
                         origin_state: self.state.data.origin_state,
                     })
                 );
+            },
+            on_change_motive: (selected_motive) => {
+                if (selected_motive && selected_motive.description) {
+                    self.state.data.helpdesk_wizard.description =
+                        selected_motive.description;
+                }
             },
         };
         return states;
