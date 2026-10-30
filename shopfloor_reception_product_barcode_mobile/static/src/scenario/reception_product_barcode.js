@@ -26,6 +26,7 @@ const new_template =
         :key="make_state_component_key(['product', state.data.product.id])"
         :record="state.data.product"
         :options="{main: true, key_title: 'name', title_icon: 'mdi-barcode'}"
+        :card_color="state.data.product_barcode ? 'screen_step_done' : 'screen_step_todo'"
     />
 
      <v-form ref="form_dimension">
@@ -44,7 +45,7 @@ const new_template =
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action action="todo" @click="state.on_done">{{ $t('reception.product_barcode.done') }}</btn-action>
+                <btn-action :disabled="!state.data.product_barcode" @click="state.on_done">{{ $t('reception.product_barcode.done') }}</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
@@ -76,9 +77,6 @@ const ReceptionProductBarcode = process_registry.extend("reception", {
                 scan_placeholder: this.$t(
                     "reception.product_barcode.scan_product_barcode"
                 ),
-            },
-            events: {
-                go_back: "on_back",
             },
             on_scan: (barcode) => {
                 this.wait_call(
