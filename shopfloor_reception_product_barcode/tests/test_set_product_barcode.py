@@ -21,11 +21,12 @@ class TestSetProductDimension(CommonCase):
     def _assert_response_set_barcode(
         self, response, picking, line, barcode, message=None
     ):
+        product_detail = self.data_detail.product_detail(line.product_id)
+        product_detail["barcode"] = barcode
         data = {
             "picking": self.data.picking(picking),
             "selected_move_line": self.data.move_line(line),
-            "product": self.data_detail.product_detail(line.product_id),
-            "product_barcode": barcode,
+            "product": product_detail,
         }
         self.assert_response(
             response,
@@ -95,6 +96,9 @@ class TestSetProductDimension(CommonCase):
         )
         self._assert_response_set_barcode(
             response, self.picking, selected_move_line, "0799439112766"
+        )
+        self.assertFalse(
+            selected_move_line.product_id.barcode, "Scan should not update the barcode"
         )
 
     def test_scan_product_dont_ask_for_barcode(self):
