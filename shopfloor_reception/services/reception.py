@@ -4,6 +4,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 
+import logging
 from datetime import date, datetime, time, timezone
 
 import pytz
@@ -18,6 +19,7 @@ from odoo.addons.shopfloor.actions.search import SearchInvalidProduct, SearchRes
 from odoo.addons.shopfloor.utils import to_float
 
 UTC = timezone.utc
+_logger = logging.getLogger(__name__)
 
 
 class Reception(Component):
@@ -1755,6 +1757,54 @@ class Reception(Component):
             picking, message=self.msg_store.line_destination_set_success(selected_line)
         )
 
+    def set_destination__back_action(self, picking_id, selected_line_id):
+        picking = self.env["stock.picking"].browse(picking_id)
+        selected_line = self.env["stock.move.line"].browse(selected_line_id)
+
+        message = self._check_picking_processible(picking)
+        if message:
+            return self._response_for_set_destination(
+                picking, selected_line, message=message
+            )
+        if not selected_line.exists():
+            return self._response_for_select_move(
+                picking, message=self.msg_store.record_not_found()
+            )
+
+        package = selected_line.result_package_id
+        if package:
+            selected_line.result_package_id = False
+            # If the package was just created try delete it
+            if package.create_uid == self.env.user:
+                # (rely on SQL delete restrictions instead of checking every condition here)
+                try:
+                    with self.env.cr.savepoint():
+                        package.unlink()
+                except Exception as error:
+                    _logger.warning(
+                        "Could not remove empty package %s: %s",
+                        package.display_name,
+                        error,
+                    )
+
+        # Clean up partial split lines if any were created during set_qty_and_split
+        move = selected_line.move_id
+        sibling_split_lines = move.move_line_ids.filtered(
+            lambda line: line != selected_line
+            and not line.qty_done
+            and not line.shopfloor_user_id
+            and not line.shopfloor_unloaded
+            and not line.lot_id
+        )
+        if sibling_split_lines:
+            # Re-absorb reserved quantity into selected_line if applicable and remove split line
+            selected_line.reserved_uom_qty += sum(
+                sibling_split_lines.mapped("reserved_uom_qty")
+            )
+            sibling_split_lines.unlink()
+
+        return self._response_for_set_quantity(picking, selected_line)
+
     def select_dest_package(
         self, picking_id, selected_line_id, barcode, confirmation=False
     ):
@@ -1917,6 +1967,16 @@ class ShopfloorReceptionValidator(Component):
             "is_over_reception_confirmed": {"type": "boolean"},
         }
 
+    def set_destination__back_action(self):
+        return {
+            "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
+            "selected_line_id": {
+                "coerce": to_int,
+                "type": "integer",
+                "required": True,
+            },
+        }
+
     def set_destination(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
@@ -2018,7 +2078,15 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_quantity", "select_move"}
 
     def _set_destination_next_states(self):
-        return {"set_destination", "select_move"}
+        return {"set_destination", "select_move", "set_quantity"}
+
+    def _set_destination__back_action_next_states(self):
+        return {"set_quantity", "set_destination", "select_move"}
+
+    def set_destination__back_action(self):
+        return self._response_schema(
+            next_states=self._set_destination__back_action_next_states()
+        )
 
     def _select_dest_package_next_states(self):
         return {"set_lot", "select_dest_package", "confirm_new_package", "select_move"}
