@@ -73,18 +73,22 @@ class Reception(Component):
         This will parse the scanned barcode and return the result
         """
         search = self._actions_for("search")
-        result_value = search._get_parse_results_value(
+        parsed_barcode = search._get_parse_results_value(
             search.parser.parse(barcode), "product"
         )
         picking = self.env["stock.picking"].browse(picking_id)
         selected_line = self.env["stock.move.line"].browse(selected_line_id)
+
+        # add the scanned barcode to product data sent back to frontend
+        product_detail = self.data_detail.product_detail(selected_line.product_id)
+        product_detail["barcode"] = parsed_barcode
+
         return self._response(
             next_state="set_product_barcode",
             data={
                 "picking": self.data.picking(picking),
                 "selected_move_line": self.data.move_line(selected_line),
-                "product": self.data_detail.product_detail(selected_line.product_id),
-                "product_barcode": result_value,
+                "product": product_detail,
             },
         )
 
@@ -172,5 +176,4 @@ class ShopfloorReceptionValidatorResponse(Component):
             "picking": {"type": "dict", "schema": self.schemas.picking()},
             "selected_move_line": {"type": "dict", "schema": self.schemas.move_line()},
             "product": {"type": "dict", "schema": self.schemas_detail.product_detail()},
-            "product_barcode": {"type": "string", "required": False, "nullable": True},
         }
