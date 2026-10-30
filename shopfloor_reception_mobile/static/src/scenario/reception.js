@@ -405,6 +405,7 @@ const Reception = {
             return {
                 show_title: true,
                 showActions: false,
+                is_record_disabled: (rec) => rec.progress === 100,
                 list_item_options: {
                     loud_title: true,
                     title_action_field: {
