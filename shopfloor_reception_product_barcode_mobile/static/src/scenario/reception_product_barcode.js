@@ -25,27 +25,24 @@ const new_template =
     <item-detail-card
         :key="make_state_component_key(['product', state.data.product.id])"
         :record="state.data.product"
-        :options="{main: true, key_title: 'name', title_icon: 'mdi-barcode'}"
-        :card_color="state.data.product_barcode ? 'screen_step_done' : 'screen_step_todo'"
+        :options="{
+            main: true,
+            key_title: 'display_name',
+            title_icon: 'mdi-barcode',
+            fields: [
+                {
+                    path: 'barcode',
+                    label: $t('reception.product_barcode.barcode'),
+                },
+            ],
+        }"
+        :card_color="state.data.product.barcode ? 'screen_step_done' : 'screen_step_todo'"
     />
-
-     <v-form ref="form_dimension">
-        <v-container>
-            <v-row>
-                <v-text-field
-                    :label="$t('reception.product_barcode.barcode')"
-                    :placeholder="$t('reception.product_barcode.product_barcode')"
-                    v-model="state.data.product_barcode"
-                    v-on="on_scan"
-                ></v-text-field>
-            </v-row>
-       </v-container>
-    </v-form>
 
     <div class="button-list button-vertical-list full">
         <v-row align="center">
             <v-col class="text-center" cols="12">
-                <btn-action :disabled="!state.data.product_barcode" @click="state.on_done">{{ $t('reception.product_barcode.done') }}</btn-action>
+                <btn-action :disabled="!state.data.product.barcode" @click="state.on_done">{{ $t('reception.product_barcode.done') }}</btn-action>
             </v-col>
         </v-row>
         <v-row align="center">
@@ -80,19 +77,11 @@ const ReceptionProductBarcode = process_registry.extend("reception", {
             },
             on_scan: (barcode) => {
                 this.wait_call(
-                    this.odoo
-                        .call("set_product_barcode_scan", {
-                            barcode: barcode.text,
-                            picking_id: this.state.data.picking.id,
-                            selected_line_id: this.state.data.selected_move_line.id,
-                        })
-                        .then((res) => {
-                            this.state_set_data({
-                                product_barcode:
-                                    res.data.set_product_barcode.product_barcode,
-                            });
-                            return res;
-                        })
+                    this.odoo.call("set_product_barcode_scan", {
+                        barcode: barcode.text,
+                        picking_id: this.state.data.picking.id,
+                        selected_line_id: this.state.data.selected_move_line.id,
+                    })
                 );
             },
             get_payload_set_product_barcode: () => {
@@ -100,8 +89,8 @@ const ReceptionProductBarcode = process_registry.extend("reception", {
                     picking_id: this.state.data.picking.id,
                     selected_line_id: this.state.data.selected_move_line.id,
                     product: this.state.data.product.id,
+                    barcode: this.state.data.product.barcode,
                 };
-                values["barcode"] = this.state.data.product_barcode;
                 return values;
             },
             on_skip: () => {
