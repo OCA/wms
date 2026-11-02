@@ -166,6 +166,117 @@ Vue.component("btn-reset-config", {
     template: `<btn-action action="warn" @click="reset_data()">{{ $t('btn.reload_config.title') }}</btn-action>`,
 });
 
+Vue.component("btn-confirm-dialog", {
+    inheritAttrs: false,
+    props: {
+        title: {
+            type: String,
+            default: function () {
+                return this.$t("misc.confirmation");
+            },
+        },
+        message: {
+            type: String,
+        },
+        confirmBtnText: {
+            type: String,
+            default: function () {
+                return this.$t("btn.confirm.title");
+            },
+        },
+        cancelBtnText: {
+            type: String,
+            default: function () {
+                return this.$t("btn.back.title");
+            },
+        },
+        color: {
+            type: String,
+        },
+        bypass: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    computed: {
+        // ↓ Necessary since we need this.utils and there is no way to access it in default
+        action_btn_color() {
+            return this.color || this.utils.colors.color_for("btn_action");
+        },
+    },
+    data() {
+        return {
+            dialog: false,
+        };
+    },
+    methods: {
+        onActivatorClick(event) {
+            if (this.bypass) {
+                this.$emit("click", event);
+            } else {
+                this.dialog = true;
+            }
+        },
+        onConfirm(event) {
+            this.dialog = false;
+            // Fires the @click defined on <btn-confirm-dialog @click="...">
+            this.$emit("click", event);
+        },
+        onCancel() {
+            this.dialog = false;
+            this.$emit("cancel");
+        },
+    },
+    template: `
+        <div>
+            <v-dialog
+                v-model="dialog"
+                fullscreen
+                hide-overlay
+                :disabled="bypass"
+            >
+                <!-- Activator Button -->
+                <template v-slot:activator="{ attrs }">
+                    <btn-action
+                        :color="action_btn_color"
+                        v-bind="{ ...$attrs, ...attrs }"
+                        @click="onActivatorClick"
+                    >
+                        <slot></slot>
+                    </btn-action>
+                </template>
+
+                <!-- Fullscreen Overlay Content -->
+                <v-card class="d-flex flex-column" color="background">
+                    <v-row v-if="title || message" align="center" justify="center" class="flex-grow-0">
+                        <v-col cols="12" class="text-center">
+                            <h2 v-if="title" class="text-h5 font-weight-medium mb-2">{{ title }}</h2>
+                            <p v-if="message" class="text-body-1 grey--text text--darken-2">{{ message }}</p>
+                        </v-col>
+                    </v-row>
+
+                    <div class="button-list button-vertical-list full">
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-action action="todo" @click="onConfirm">
+                                    {{ confirmBtnText }}
+                                </btn-action>
+                            </v-col>
+                        </v-row>
+                        <v-row align="center">
+                            <v-col class="text-center" cols="12">
+                                <btn-action color="secondary" action="cancel" @click="onCancel">
+                                    <v-icon>mdi-keyboard-backspace</v-icon>{{ cancelBtnText }}
+                                </btn-action>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </v-card>
+            </v-dialog>
+        </div>
+    `,
+});
+
 // TODO: make it generic as `actions-btn-popup`
 Vue.component("line-actions-popup", {
     props: {
