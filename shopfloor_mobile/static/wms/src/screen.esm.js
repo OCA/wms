@@ -29,8 +29,8 @@ Vue.component("nav-item-content").extendOptions.template = `
 
 Vue.component("nav-item-action").extendOptions.template = `
     <div :class="$options._componentTag">
-        <div class="pa-4 secondary text-no-wrap rounded-pill" v-if="item.lines_count">
-            {{ $t('misc.lines_count', item) }}
+        <div class="pa-4 secondary text-no-wrap rounded-pill" v-if="item.picking_count">
+            {{ $t('misc.picking_count', item) }}
         </div>
     </div>
 `;
