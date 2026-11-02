@@ -39,6 +39,10 @@
 
   "reception.confirm_new_package.title": "Confirmer nouveau colis",
 
+  "reception.confirm_reception.title": "Confirmer Réception",
+  "reception.confirm_reception.message": "Toutes les lignes ont été traitées dans leur intégralité.",
+  "reception.confirm_partial_reception.title": "Transfert Partiel",
+  "reception.confirm_partial_reception.message": "Toutes les lignes n'ont pas été traitées dans leur intégralité. Confirmez-vous l'exécution partielle ?",
   "reception.confirm_over_reception.title": "Confirmer sur-réception",
   "reception.confirm_over_reception.message": "Vous êtes sur le point de recevoir plus que prévu. En êtes-vous sûr ?",
 

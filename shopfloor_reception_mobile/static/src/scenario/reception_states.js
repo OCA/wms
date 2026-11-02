@@ -102,27 +102,6 @@ export const reception_states = function () {
                 // );
             },
         },
-        confirm_done: {
-            display_info: {
-                title: this.$t("btn.confirm_done.title"),
-            },
-            events: {
-                confirm: "on_confirm",
-                go_back: "on_back",
-            },
-            on_confirm: () => {
-                this.wait_call(
-                    this.odoo.call("done_action", {
-                        picking_id: this.state.data.picking.id,
-                        confirmation: true,
-                    })
-                );
-            },
-            on_back: () => {
-                this.state_to("select_move");
-                this.reset_notification();
-            },
-        },
         set_lot: {
             display_info: {
                 title: this.$t("reception.set_lot.title"),
