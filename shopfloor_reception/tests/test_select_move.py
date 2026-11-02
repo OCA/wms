@@ -386,21 +386,6 @@ class TestSelectLine(CommonCase):
                 "picking_id": picking.id,
             },
         )
-        data = {"picking": self._data_for_picking_with_moves(picking)}
-        self.assert_response(
-            response,
-            next_state="confirm_done",
-            data=data,
-            message={"message_type": "warning", "body": "Are you sure?"},
-        )
-        # Confirm the package is done.
-        response = self.service.dispatch(
-            "done_action",
-            params={
-                "picking_id": picking.id,
-                "confirmation": True,
-            },
-        )
         pickings = self.env["stock.picking"].search(
             [
                 ("state", "=", "assigned"),

@@ -31,8 +31,8 @@ class TestReturn(CommonCaseReturn):
         }
         self.service.dispatch("set_quantity", params=params)
 
-    def _dispatch(self, confirmation=False):
-        params = {"picking_id": self.return_picking.id, "confirmation": confirmation}
+    def _dispatch(self):
+        params = {"picking_id": self.return_picking.id}
         response = self.service.dispatch("done_action", params=params)
         # Here, since we receive goods in input location, which triggers creation of
         # an internal shipping, sending goods from input to stock.

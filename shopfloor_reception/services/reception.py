@@ -1170,16 +1170,12 @@ class Reception(Component):
         picking = move.picking_id
         return self._scan_line__find_or_create_line(picking, move, qty_done=0)
 
-    def done_action(self, picking_id, confirmation=False):
+    def done_action(self, picking_id):
         """Mark a picking as done
-
-        input:
-            confirmation: if false, ask for confirmation; if true, mark as done
 
         transitions:
           - select_move: Error: no qty done
           - select_move: Error: picking not found
-          - confirm_done: Ask for confirmation
           - select_document: Mark as done
         """
         picking = self.env["stock.picking"].browse(picking_id)
@@ -1192,18 +1188,6 @@ class Reception(Component):
                 picking, message=self.msg_store.transfer_no_qty_done()
             )
         cancel_backorder = picking.is_shopfloor_created and self.work.menu.allow_return
-        if not confirmation and not cancel_backorder:
-            to_backorder = picking._check_backorder()
-            if to_backorder:
-                # Not all lines are fully done, ask the user to confirm the
-                # backorder creation
-                return self._response_for_confirm_done(
-                    picking, message=self.msg_store.transfer_confirm_done()
-                )
-            # all lines are done, ask the user to confirm anyway
-            return self._response_for_confirm_done(
-                picking, message=self.msg_store.need_confirmation()
-            )
         self._handle_backorder(picking, cancel_backorder)
         return self._response_for_select_document(
             message=self.msg_store.transfer_done_success(picking)
@@ -1944,7 +1928,6 @@ class ShopfloorReceptionValidator(Component):
     def done_action(self):
         return {
             "picking_id": {"coerce": to_int, "required": True, "type": "integer"},
-            "confirmation": {"type": "boolean"},
         }
 
 
@@ -1967,7 +1950,6 @@ class ShopfloorReceptionValidatorResponse(Component):
             "select_document": self._schema_select_document,
             "manual_selection": self._schema_manual_selection,
             "select_move": self._schema_select_move,
-            "confirm_done": self._schema_confirm_done,
             "confirm_over_reception": self._schema_confirm_over_reception,
             "set_lot": self._schema_set_lot,
             "set_quantity": self._schema_set_quantity,
@@ -2024,7 +2006,7 @@ class ShopfloorReceptionValidatorResponse(Component):
         return {"set_lot", "select_dest_package", "confirm_new_package", "select_move"}
 
     def _done_next_states(self):
-        return {"select_document", "select_move", "confirm_done"}
+        return {"select_document", "select_move"}
 
     def _process_with_existing_pack_next_states(self):
         return {"set_quantity", "select_dest_package", "confirm_over_reception"}

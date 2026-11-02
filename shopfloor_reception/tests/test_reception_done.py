@@ -15,16 +15,6 @@ class TestReceptionDone(CommonCase):
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
         )
-        # User is asked to confirm the action
-        self.assert_response(
-            response,
-            next_state="confirm_done",
-            data={"picking": self._data_for_picking_with_moves(picking)},
-            message={"message_type": "warning", "body": "Are you sure?"},
-        )
-        response = self.service.dispatch(
-            "done_action", params={"picking_id": picking.id, "confirmation": True}
-        )
         self.assertEqual(picking.state, "done")
         # No more picking to process. Success message
         self.assert_response(
@@ -63,21 +53,6 @@ class TestReceptionDone(CommonCase):
         selected_move_line.qty_done = 10.0
         response = self.service.dispatch(
             "done_action", params={"picking_id": picking.id}
-        )
-        self.assert_response(
-            response,
-            next_state="confirm_done",
-            data={"picking": self._data_for_picking_with_moves(picking)},
-            message={
-                "message_type": "warning",
-                "body": (
-                    "Not all lines have been processed with full quantity. "
-                    "Do you confirm partial operation?"
-                ),
-            },
-        )
-        response = self.service.dispatch(
-            "done_action", params={"picking_id": picking.id, "confirmation": True}
         )
         self.assertEqual(picking.state, "done")
         backorder = picking.backorder_ids
