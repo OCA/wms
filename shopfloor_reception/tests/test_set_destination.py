@@ -308,3 +308,39 @@ class TestSetDestination(CommonCase):
         self.assertEqual(picking.state, "assigned")
         # So the quantity left to do on the current move has decreased
         self.assertEqual(move.product_uom_qty, 9)
+
+    def test_set_destination__back_action(self):
+        picking = self._create_picking(lines=[(self.product_a, 10)])
+        selected_move_line = picking.move_line_ids.filtered(
+            lambda l: l.product_id == self.product_a
+        )
+        response_process = self.service.dispatch(
+            "process_with_new_pack",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+                "quantity": 4,
+            },
+        )
+        self.assert_response(
+            response_process, next_state="set_destination", data=self.ANY
+        )
+
+        created_package = selected_move_line.result_package_id
+        self.assertTrue(created_package.exists())
+        self.assertEqual(len(picking.move_line_ids), 2)
+
+        response_back = self.service.dispatch(
+            "set_destination__back_action",
+            params={
+                "picking_id": picking.id,
+                "selected_line_id": selected_move_line.id,
+            },
+        )
+        self.assert_response(response_back, next_state="set_quantity", data=self.ANY)
+
+        self.assertFalse(selected_move_line.result_package_id)
+        self.assertFalse(created_package.exists())
+
+        self.assertEqual(len(picking.move_line_ids), 1)
+        self.assertEqual(selected_move_line.reserved_uom_qty, 10)
