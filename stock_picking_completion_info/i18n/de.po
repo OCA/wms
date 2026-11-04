@@ -6,23 +6,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2026-11-04 20:53+0000\n"
+"Last-Translator: Bastian Günther <mail@bastian-guenther.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking__completion_info
 msgid "Completion Info"
-msgstr ""
+msgstr "Abschlussinformation"
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields,field_description:stock_picking_completion_info.field_stock_picking_type__display_completion_info
 msgid "Display Completion Info"
-msgstr ""
+msgstr "Abschlussinformation anzeigen"
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields.selection,name:stock_picking_completion_info.selection__stock_picking__completion_info__full_order_picking
@@ -30,12 +32,16 @@ msgid ""
 "Full order picking: You are processing a full order picking that will allow "
 "next operation to be processed"
 msgstr ""
+"Kommissionierung des gesamten Auftrags: Die Kommissionierung eines gesamten "
+"Auftrags wird bearbeitet, nach der der nächste Vorgang bearbeitet werden kann"
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields,help:stock_picking_completion_info.field_stock_picking_type__display_completion_info
 msgid ""
 "Inform operator of a completed operation at processing and at completion"
 msgstr ""
+"Informiert den Bearbeiter bei der Bearbeitung und beim Abschluss über einen "
+"abgeschlossenen Vorgang."
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields.selection,name:stock_picking_completion_info.selection__stock_picking__completion_info__last_picking
@@ -43,28 +49,30 @@ msgid ""
 "Last picking: Completion of this operation allows next operations to be "
 "processed."
 msgstr ""
+"Letzte Kommissionierung: Nach Abschluss dieses Vorgangs können die nächsten "
+"Vorgänge bearbeitet werden."
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields.selection,name:stock_picking_completion_info.selection__stock_picking__completion_info__next_picking_ready
 msgid "Next operations are ready to be processed."
-msgstr ""
+msgstr "Die nächsten Vorgänge sind zur Bearbeitung bereit."
 
 #. module: stock_picking_completion_info
 #: model:ir.model.fields.selection,name:stock_picking_completion_info.selection__stock_picking__completion_info__no
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #. module: stock_picking_completion_info
 #: model:ir.model,name:stock_picking_completion_info.model_stock_picking_type
 msgid "Picking Type"
-msgstr ""
+msgstr "Vorgangsart"
 
 #. module: stock_picking_completion_info
 #: model:ir.model,name:stock_picking_completion_info.model_stock_move
 msgid "Stock Move"
-msgstr ""
+msgstr "Lagerbuchung"
 
 #. module: stock_picking_completion_info
 #: model:ir.model,name:stock_picking_completion_info.model_stock_picking
 msgid "Transfer"
-msgstr ""
+msgstr "Transfer"
