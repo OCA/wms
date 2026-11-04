@@ -39,6 +39,10 @@
 
   "reception.confirm_new_package.title": "Confirm new package",
 
+  "reception.confirm_reception.title": "Confirm Receipt",
+  "reception.confirm_reception.message": "All lines have been fully processed.",
+  "reception.confirm_partial_reception.title": "Partial Transfer",
+  "reception.confirm_partial_reception.message": "Not all lines have been processed with full quantity. Do you confirm partial operation?",
   "reception.confirm_over_reception.title": "Confirm over reception",
   "reception.confirm_over_reception.message": "You are about to receive more than expected. Are you sure?",
 

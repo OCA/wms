@@ -102,27 +102,6 @@ export const reception_states = function () {
                 // );
             },
         },
-        confirm_done: {
-            display_info: {
-                title: this.$t("btn.confirm_done.title"),
-            },
-            events: {
-                confirm: "on_confirm",
-                go_back: "on_back",
-            },
-            on_confirm: () => {
-                this.wait_call(
-                    this.odoo.call("done_action", {
-                        picking_id: this.state.data.picking.id,
-                        confirmation: true,
-                    })
-                );
-            },
-            on_back: () => {
-                this.state_to("select_move");
-                this.reset_notification();
-            },
-        },
         set_lot: {
             display_info: {
                 title: this.$t("reception.set_lot.title"),
@@ -308,30 +287,6 @@ export const reception_states = function () {
             },
             on_back: () => {
                 this.state_to("select_dest_package");
-                this.reset_notification();
-            },
-        },
-        confirm_over_reception: {
-            display_info: {
-                title: this.$t("reception.confirm_over_reception.title"),
-                message: this.$t("reception.confirm_over_reception.message"),
-            },
-            events: {
-                confirm: "on_confirm",
-                go_back: "on_back",
-            },
-            on_confirm: () => {
-                this.wait_call(
-                    this.odoo.call(this.state.data.callback, {
-                        picking_id: this.state.data.picking.id,
-                        selected_line_id: this.line_being_handled.id,
-                        quantity: this.state.data.quantity,
-                        is_over_reception_confirmed: true,
-                    })
-                );
-            },
-            on_back: () => {
-                this.state_to("set_quantity");
                 this.reset_notification();
             },
         },

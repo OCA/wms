@@ -132,6 +132,7 @@ const messages_fr = {
         picking_count_extended: "{priority_picking_count}/{picking_count} transfert(s)",
         select_expiry_date: "Sélectionnez la date d'expiration",
         invalid_input: "invalid input",
+        confirmation: "Confirmation",
     },
     list: {
         no_items: "Aucun élément à lister.",

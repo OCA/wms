@@ -131,6 +131,7 @@ const messages_en = {
         picking_count_extended: "{priority_picking_count}/{picking_count} picking(s)",
         select_expiry_date: "Select expiry date",
         invalid_input: "invalid input",
+        confirmation: "Confirmation",
     },
     list: {
         no_items: "No item to list.",

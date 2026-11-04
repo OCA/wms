@@ -74,7 +74,6 @@ const Reception = {
                     />
                 </v-card>
                 <manual-select
-                    :card_color="utils.colors.color_for('screen_step_done')"
                     :records="filtered_moves"
                     :options="picking_detail_options_for_select_move()"
                     :key="make_state_component_key(['reception', 'manual-select-move'])"
@@ -82,35 +81,11 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_mark_as_done">{{ $t("reception.select_move.btn.mark_as_done") }}</btn-action>
-                        </v-col>
-                    </v-row>
-                </div>
-            </template>
-            <template v-if="state_is('confirm_over_reception')">
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action action="todo" @click="state.on_confirm">{{ $t("btn.confirm.title") }}</btn-action>
-                        </v-col>
-                    </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
-                        </v-col>
-                    </v-row>
-                </div>
-            </template>
-            <template v-if="state_is('confirm_done')">
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action action="todo" @click="state.on_confirm">{{ $t("btn.confirm.title") }}</btn-action>
-                        </v-col>
-                    </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
+                            <btn-confirm-dialog
+                                @click="state.on_mark_as_done"
+                                :title="picking_complete ? $t('reception.confirm_reception.title') : $t('reception.confirm_partial_reception.title')"
+                                :message="picking_complete ? $t('reception.confirm_reception.message') : $t('reception.confirm_partial_reception.message')"
+                                >{{ $t("reception.select_move.btn.mark_as_done") }}</btn-confirm-dialog>
                         </v-col>
                     </v-row>
                 </div>
@@ -156,17 +131,38 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_add_to_existing_pack">{{ $t("reception.set_quantity.btn.existing_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_add_to_existing_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.existing_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_create_new_pack">{{ $t("reception.set_quantity.btn.new_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_create_new_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.new_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <v-row v-if="show_without_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_process_without_pack">{{ $t("reception.set_quantity.btn.no_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_process_without_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.no_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <div class="button-list button-vertical-list full">
@@ -278,6 +274,14 @@ const Reception = {
                 });
             }
             return moves;
+        },
+        picking_complete: function () {
+            const moves = _.result(this.state, "data.picking.moves", []);
+            return moves.every((move) => move.progress === 100);
+        },
+        is_over_quantity: function () {
+            if (!this.line_being_handled) return false;
+            return this.scan_destination_qty > this.line_being_handled.quantity;
         },
     },
     methods: {
