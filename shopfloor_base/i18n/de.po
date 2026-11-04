@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-02-11 11:09+0000\n"
-"Last-Translator: Artur Machura <artur@artur-machura.de>\n"
+"PO-Revision-Date: 2026-11-04 20:53+0000\n"
+"Last-Translator: Bastian Günther <mail@bastian-guenther.de>\n"
 "Language-Team: none\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -178,6 +178,8 @@ msgid ""
 "Identify scenario univocally. This value must match a service component's "
 "`usage`."
 msgstr ""
+"Identifiziert das Szenario eindeutig. Dieser Wert muss mit der `usage` einer "
+"Service-Komponente übereinstimmen."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__lang_id
@@ -222,12 +224,12 @@ msgstr "Zuletzt aktualisiert am"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_menu__scenario
 msgid "Legacy scenario field"
-msgstr ""
+msgstr "Veraltetes Szenario-Feld"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
 msgid "Main"
-msgstr ""
+msgstr "Allgemein"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_menu_form_view
@@ -237,7 +239,7 @@ msgstr "Menüoptionen"
 #. module: shopfloor_base
 #: model:ir.model,name:shopfloor_base.model_shopfloor_menu
 msgid "Menu displayed in the scanner application"
-msgstr ""
+msgstr "In der Scanner-App angezeigtes Menü"
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_menu
@@ -267,7 +269,7 @@ msgstr "Für das Manifest der App notwendig"
 #. module: shopfloor_base
 #: model:ir.model.fields.selection,name:shopfloor_base.selection__shopfloor_app__category__
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__registry_sync
@@ -277,6 +279,12 @@ msgid ""
 "\n"
 "OFF: record in line with the registry, nothing to do."
 msgstr ""
+"EIN: Der Datensatz wurde geändert und die Registry wurde nicht "
+"benachrichtigt.\n"
+"Keine Änderung wird aktiv, bis dieses Kennzeichen über die entsprechende "
+"Aktion auf „falsch“ gesetzt wird.\n"
+"\n"
+"AUS: Der Datensatz stimmt mit der Registry überein, es ist nichts zu tun."
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -302,7 +310,7 @@ msgstr "Profil"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__profile_required
 msgid "Profile Required"
-msgstr ""
+msgstr "Profil erforderlich"
 
 #. module: shopfloor_base
 #: model:ir.actions.act_window,name:shopfloor_base.action_shopfloor_profile
@@ -323,6 +331,9 @@ msgid ""
 "field is not required in case you don't need profiles and menu items from "
 "the backend."
 msgstr ""
+"Von dieser App verwendete Profile. Diese bestimmen auch die Menüeinträge. "
+"Das Feld ist jedoch nicht erforderlich, wenn keine Profile und Menüeinträge "
+"aus dem Backend benötigt werden."
 
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__api_docs_url
@@ -332,7 +343,7 @@ msgstr "Öffentliche URL für Schnittstellendokumentation."
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_app__url
 msgid "Public URL to use the app."
-msgstr ""
+msgstr "Öffentliche URL zum Aufrufen der App."
 
 #. module: shopfloor_base
 #. odoo-python
@@ -349,6 +360,8 @@ msgid ""
 "Record not found.\n"
 "We've tried with the following types: {}"
 msgstr ""
+"Datensatz nicht gefunden.\n"
+"Folgende Typen wurden versucht: {}"
 
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registered_routes
@@ -358,7 +371,7 @@ msgstr "Registrierte Routen"
 #. module: shopfloor_base
 #: model:ir.model.fields,field_description:shopfloor_base.field_shopfloor_app__registry_sync
 msgid "Registry Sync"
-msgstr ""
+msgstr "Registry-Synchronisierung"
 
 #. module: shopfloor_base
 #: model_terms:ir.ui.view,arch_db:shopfloor_base.shopfloor_app_form_view
@@ -428,7 +441,7 @@ msgstr "Kurzname"
 #. module: shopfloor_base
 #: model:shopfloor.menu,name:shopfloor_base.shopfloor_menu_demo_1
 msgid "Simple Thing To Do"
-msgstr ""
+msgstr "Einfache Aufgabe"
 
 #. module: shopfloor_base
 #: model:ir.actions.server,name:shopfloor_base.server_action_registry_sync
@@ -487,7 +500,7 @@ msgstr "Menüeinträge ansehen"
 #. module: shopfloor_base
 #: model:ir.model.fields,help:shopfloor_base.field_shopfloor_menu__profile_id
 msgid "Visible on this profile only"
-msgstr ""
+msgstr "Nur in diesem Profil sichtbar"
 
 #. module: shopfloor_base
 #: model:ir.model.constraint,message:shopfloor_base.constraint_shopfloor_app_tech_name
