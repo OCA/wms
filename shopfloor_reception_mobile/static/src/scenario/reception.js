@@ -90,20 +90,6 @@ const Reception = {
                     </v-row>
                 </div>
             </template>
-            <template v-if="state_is('confirm_over_reception')">
-                <div class="button-list button-vertical-list full">
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-action action="todo" @click="state.on_confirm">{{ $t("btn.confirm.title") }}</btn-action>
-                        </v-col>
-                    </v-row>
-                    <v-row align="center">
-                        <v-col class="text-center" cols="12">
-                            <btn-back />
-                        </v-col>
-                    </v-row>
-                </div>
-            </template>
             <template v-if="state_is('set_lot')">
                 <date-picker-input
                     v-if="line_being_handled.product.use_expiration_date"
@@ -145,17 +131,38 @@ const Reception = {
                 <div class="button-list button-vertical-list full">
                     <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_add_to_existing_pack">{{ $t("reception.set_quantity.btn.existing_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_add_to_existing_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.existing_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <v-row v-if="show_with_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_create_new_pack">{{ $t("reception.set_quantity.btn.new_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_create_new_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.new_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <v-row v-if="show_without_pack_actions" align="center">
                         <v-col class="text-center" cols="12">
-                            <btn-action @click="state.on_process_without_pack">{{ $t("reception.set_quantity.btn.no_pack") }}</btn-action>
+                            <btn-confirm-dialog
+                                :bypass="!is_over_quantity"
+                                :title="$t('reception.confirm_over_reception.title')"
+                                :message="$t('reception.confirm_over_reception.message')"
+                                @click="state.on_process_without_pack"
+                            >
+                                {{ $t("reception.set_quantity.btn.no_pack") }}
+                            </btn-confirm-dialog>
                         </v-col>
                     </v-row>
                     <div class="button-list button-vertical-list full">
@@ -264,6 +271,10 @@ const Reception = {
         picking_complete: function () {
             const moves = _.result(this.state, "data.picking.moves", []);
             return moves.every((move) => move.progress === 100);
+        },
+        is_over_quantity: function () {
+            if (!this.line_being_handled) return false;
+            return this.scan_destination_qty > this.line_being_handled.quantity;
         },
     },
     methods: {
