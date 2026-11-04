@@ -1,7 +1,7 @@
 # Copyright 2026 ACSONE SA/NV
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
@@ -30,7 +30,35 @@ class SaleOrderLine(models.Model):
         "move_ids.used_for_sale_reservation",
     )
     def _compute_availability_status(self):
-        return super()._compute_availability_status()
+        # if the line is a call-off line, we need to take the availability
+        # data from the blanket line, if any otherwise we take the call-off
+        # line itself (This should not happen, but it's defensive programming
+        # and will avoid to duplicate the logic of assigning the default value
+        # for availability data into this method)
+        self_call_off_lines = self.filtered(lambda line: line.order_type == "call_off")
+        processed_lines = self.browse()
+        if self_call_off_lines:
+            matching_dict = (
+                self_call_off_lines._get_blanket_lines_for_call_off_lines_dict(
+                    validate=False
+                )
+            )
+            for call_off_lines, blanket_lines in matching_dict.values():
+                for call_off_line in call_off_lines:
+                    if call_off_line not in processed_lines:
+                        data_line = (
+                            call_off_line.blanket_line_id
+                            or fields.first(blanket_lines)
+                            or call_off_line
+                        )
+                        call_off_line.update(data_line._get_availability_data())
+                        processed_lines |= call_off_line
+        other_lines = self - processed_lines
+        return (
+            super(SaleOrderLine, other_lines)._compute_availability_status()
+            if other_lines
+            else None
+        )
 
     def _get_availability_required_qty(self):
         if self.order_type == "blanket":

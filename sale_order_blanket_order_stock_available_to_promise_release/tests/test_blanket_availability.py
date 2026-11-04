@@ -125,6 +125,13 @@ class TestBlanketAvailability(SaleOrderBlanketOrderStockPrebookReleaseCase):
         self.assertEqual(line.available_qty, 4.0)
         self.assertEqual(line.delayed_qty, 0.0)
 
+    def test_call_off_availability_uses_blanket_line_data(self):
+        call_off_so = self._create_call_off_order(self.blanket_so, self.product1, 6.0)
+        line = call_off_so.order_line
+        self.assertEqual(line.availability_status, "full")
+        self.assertEqual(line.available_qty, 4.0)
+        self.assertEqual(line.delayed_qty, 0.0)
+
     def test_at_confirm_uses_only_prebook_reservation_moves(self):
         line = self.blanket_so.order_line
         move = self._create_stock_move(
