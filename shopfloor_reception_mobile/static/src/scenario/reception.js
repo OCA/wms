@@ -35,6 +35,13 @@ const Reception = {
                         </v-col>
                     </v-row>
                 </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
+                        </v-col>
+                    </v-row>
+                </div>
             </template>
             <template v-if="state_is('manual_selection') && visible_pickings">
                 <list-filter
@@ -83,6 +90,13 @@ const Reception = {
                     <v-row align="center">
                         <v-col class="text-center" cols="12">
                             <btn-action @click="state.on_mark_as_done">{{ $t("reception.select_move.btn.mark_as_done") }}</btn-action>
+                        </v-col>
+                    </v-row>
+                </div>
+                <div class="button-list button-vertical-list full">
+                    <v-row align="center">
+                        <v-col class="text-center" cols="12">
+                            <btn-back />
                         </v-col>
                     </v-row>
                 </div>
