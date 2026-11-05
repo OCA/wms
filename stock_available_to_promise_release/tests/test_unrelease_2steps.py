@@ -86,7 +86,11 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         action_cancel is called on all related pickings not set to done.
         """
         self.picking1.printed = True
-        with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
+        message = (
+            "You are not allowed to unrelease | Some origin moves are not "
+            "consumed by their destination moves."
+        )
+        with self.assertRaisesRegex(UserError, message):
             self.shipping1.action_cancel()
 
     def test_simulate_cancel_so_line_success(self):
@@ -111,5 +115,10 @@ class TestAvailableToPromiseRelease(PromiseReleaseCommonCase):
         action_cancel is called on all related moves not set to done.
         """
         self.picking1.printed = True
-        with self.assertRaisesRegex(UserError, "You are not allowed to unrelease"):
+        message = (
+            "You are not allowed to unrelease | Some origin moves are currently "
+            "in progress. Either the picking is printed, either the move done quantity "
+            "is already filled in."
+        )
+        with self.assertRaisesRegex(UserError, message):
             self.shipping1.move_ids._action_cancel()
