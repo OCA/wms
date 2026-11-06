@@ -1,0 +1,3 @@
+- Go to Shopfloor App menus
+- Select the menu you want to configure
+- Select the report you want to use in the 'Print Report for Labels'
