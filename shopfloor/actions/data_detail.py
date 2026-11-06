@@ -66,9 +66,7 @@ class DataDetailAction(Component):
 
     @property
     def _location_lot_detail_parser(self):
-        return self._lot_parser + [
-            "removal_date",
-        ]
+        return self._lot_parser
 
     @ensure_model("stock.picking")
     def picking_detail(self, record, **kw):
@@ -131,7 +129,6 @@ class DataDetailAction(Component):
     @property
     def _lot_detail_parser(self):
         return self._lot_parser + [
-            "removal_date",
             (
                 "product_id:product",
                 lambda record, fname: self.product_detail(record[fname]),

@@ -29,9 +29,6 @@
         "stock_quant_package_dimension",
         "stock_quant_package_product_packaging",
         "stock_picking_progress",
-        # TODO: used for prod lot expire detail info.
-        # This must be an optional dep
-        "product_expiry",
         # TODO: used for picking.carrier_id detail info
         # and to validate packaging/carrier in checkout scenario
         # This must be an optional dep

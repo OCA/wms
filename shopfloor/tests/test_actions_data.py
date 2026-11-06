@@ -99,13 +99,8 @@ class ActionsDataCase(ActionsDataCaseBase):
         )
         data = self.data.lot(lot)
         self.assert_schema(self.schema.lot(), data)
-        expected = {
-            "id": lot.id,
-            "name": lot.name,
-            "ref": "#FOO",
-            "expiration_date": None,
-        }
-        self.assertDictEqual(data, expected)
+        expected = self._expected_lot(lot)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_package(self):
         package = self.move_a.move_line_ids.package_id
@@ -296,12 +291,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_b),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": None,
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
@@ -309,7 +299,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "priority": "1",
             "progress": 0.0,
         }
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_move_line_package_lot(self):
         move_line = self.move_c.move_line_ids
@@ -321,12 +311,7 @@ class ActionsDataCase(ActionsDataCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product(self.product_c),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
@@ -350,12 +335,12 @@ class ActionsDataCase(ActionsDataCaseBase):
             "priority": "1",
             "progress": 0.0,
         }
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
         data = self.data.move_line(move_line, with_package_move_line_count=True)
         self.assert_schema(self.schema.move_line(), data)
         expected["package_src"]["move_line_count"] = 2
         expected["package_dest"]["move_line_count"] = 2
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_move_line_raw(self):
         move_line = self.move_d.move_line_ids

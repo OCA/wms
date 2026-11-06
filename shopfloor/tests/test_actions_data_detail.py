@@ -44,24 +44,15 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
                 "product_id": self.product_b.id,
                 "company_id": self.env.company.id,
                 "ref": "#FOO",
-                "removal_date": "2020-05-20",
-                "expiration_date": "2020-05-31",
             }
         )
         data = self.data_detail.lot_detail(lot)
         self.assert_schema(self.schema_detail.lot_detail(), data)
 
-        expected = {
-            "id": lot.id,
-            "name": lot.name,
-            "ref": "#FOO",
-            "expiration_date": "2020-05-31T00:00:00",
-            "removal_date": "2020-05-20T00:00:00",
-            "product": self._expected_product_detail(self.product_b, full=True),
-        }
+        expected = self._expected_lot(
+            lot, product=self._expected_product_detail(self.product_b, full=True)
+        )
         # ignore time and TZ, we don't care here
-        self.assertEqual(data.get("removal_date", "").split("T")[0], "2020-05-20")
-        self.assertEqual(data.get("expiration_date", "").split("T")[0], "2020-05-31")
         self.assertDictContainsSubset(expected, data)
 
     def test_data_package(self):
@@ -235,12 +226,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": None,
             "package_dest": None,
             "location_src": self._expected_location(move_line.location_id),
@@ -248,7 +234,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "priority": "1",
             "progress": 0.0,
         }
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_move_line_package_lot(self):
         move_line = self.move_c.move_line_ids
@@ -260,12 +246,7 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "qty_done": 0.0,
             "quantity": move_line.reserved_uom_qty,
             "product": self._expected_product_detail(product),
-            "lot": {
-                "id": move_line.lot_id.id,
-                "name": move_line.lot_id.name,
-                "ref": None,
-                "expiration_date": None,
-            },
+            "lot": self._expected_lot(move_line.lot_id),
             "package_src": {
                 "id": move_line.package_id.id,
                 "name": move_line.package_id.name,
@@ -289,11 +270,11 @@ class TestActionsDataDetailCase(ActionsDataDetailCaseBase):
             "priority": "1",
             "progress": 0.0,
         }
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
         data = self.data_detail.move_line(move_line, with_package_move_line_count=True)
         expected["package_src"]["move_line_count"] = 2
         expected["package_dest"]["move_line_count"] = 2
-        self.assertDictEqual(data, expected)
+        self.assertDictContainsSubset(expected, data)
 
     def test_data_move_line_raw(self):
         move_line = self.move_d.move_line_ids
