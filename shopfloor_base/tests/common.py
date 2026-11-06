@@ -119,9 +119,15 @@ class CommonCase(TransactionCase, RegistryMixin, ComponentMixin):
         with cls.work_on_actions(cls) as work:
             cls.data = work.component(usage="data")
             cls.data_detail = work.component(usage="data_detail")
-            cls.msg_store = work.component(usage="message")
             cls.schema = work.component(usage="schema")
             cls.schema_detail = work.component(usage="schema_detail")
+
+    # Instantiate dynamically per access to guarantee a clean message
+    # queue and avoid state leakage across test cases
+    @property
+    def msg_store(self):
+        with self.work_on_actions() as work:
+            return work.component(usage="message")
 
     @classmethod
     def setUpClassUsers(cls):
