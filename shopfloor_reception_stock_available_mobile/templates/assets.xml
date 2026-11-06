@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2023 Camptocamp SA
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <template
+        id="shopfloor_app_assets"
+        inherit_id="shopfloor_reception_mobile.shopfloor_app_assets"
+    >
+        <script id="script_scenario_reception_states" position="after">
+
+          <t
+                t-set="mod_version"
+                t-value="get_version('shopfloor_reception_stock_available_mobile')"
+            />
+          <script
+                id="script_reception_stock_available"
+                t-attf-src="/shopfloor_reception_stock_available_mobile/static/src/scenario/reception_stock_available.js?v=#{mod_version}"
+                type="module"
+            />
+
+            <script
+                id="script_add_translations_registry_shopfloor_reception_stock_available_mobile"
+                t-attf-src="/shopfloor_reception_stock_available_mobile/static/src/i18n/add_translations_to_registry.esm.js?v=#{mod_version}"
+                type="module"
+            />
+
+        </script>
+    </template>
+
+</odoo>

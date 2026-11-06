@@ -184,9 +184,17 @@ class DataAction(Component):
     def _lot_parser(self):
         return self._simple_record_parser() + ["ref", "expiration_date"]
 
+    def _add_quants_context(self, record):
+        # Incoming moves should not restrict their quants computations
+        # to origin location
+        if record.location_id.usage != "supplier":
+            record = record.with_context(location=record.location_id.id)
+
+        return record
+
     @ensure_model("stock.move.line")
     def move_line(self, record, with_picking=False, **kw):
-        record = record.with_context(location=record.location_id.id)
+        record = self._add_quants_context(record)
         parser = self._move_line_parser
         if with_picking:
             parser += [("picking_id:picking", self._picking_parser)]
@@ -232,7 +240,7 @@ class DataAction(Component):
 
     @ensure_model("stock.move")
     def move(self, record, **kw):
-        record = record.with_context(location=record.location_id.id)
+        record = self._add_quants_context(record)
         parser = self._move_parser
         return self._jsonify(record, parser)
 
