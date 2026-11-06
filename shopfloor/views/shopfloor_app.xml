@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record id="shopfloor_app_form_view" model="ir.ui.view">
+        <field name="model">shopfloor.app</field>
+        <field name="inherit_id" ref="shopfloor_base.shopfloor_app_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='profiles']" position="inside">
+                <group>
+                    <field name="show_counters" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+
+</odoo>
