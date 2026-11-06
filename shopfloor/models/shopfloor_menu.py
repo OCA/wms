@@ -284,6 +284,11 @@ class ShopfloorMenu(models.Model):
         compute="_compute_force_detailed_scan_is_possible"
     )
 
+    show_counters = fields.Boolean(
+        default=True,
+        help="If checked, display move line counters on menu item.",
+    )
+
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
         # Uncheck pick_pack_same_time when unload_package_at_destination is set to True
