@@ -169,3 +169,28 @@ class TestMenuCountersCommonCase(MenuCountersCommonCase):
             expected_menu_items.sorted("sequence"),
             expected_counters=expected_counters,
         )
+
+    def test_menu_search_counters_disabled_has_work(self):
+        """When show_counters is False, counters are omitted and has_work is provided."""
+        self.shopfloor_app.sudo().show_counters = False
+
+        # Configure menu1 to have zero matching lines
+        self.menu1.sudo().move_line_search_additional_domain = [("id", "=", 0)]
+
+        service = self.get_service("menu", profile=self.wms_profile)
+        response = service.dispatch("search")
+
+        menu_items_by_id = {item["id"]: item for item in response["data"]["records"]}
+
+        self.assertIn(self.menu1.id, menu_items_by_id)
+        self.assertIn(self.menu2.id, menu_items_by_id)
+
+        # menu1 has no lines matching domain -> has_work is False
+        menu1_data = menu_items_by_id[self.menu1.id]
+        self.assertFalse(menu1_data.get("has_work"))
+        self.assertNotIn("lines_count", menu1_data)
+
+        # menu2 has pending lines -> has_work is True
+        menu2_data = menu_items_by_id[self.menu2.id]
+        self.assertTrue(menu2_data.get("has_work"))
+        self.assertNotIn("lines_count", menu2_data)
