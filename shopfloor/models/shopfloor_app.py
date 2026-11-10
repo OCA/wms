@@ -7,3 +7,7 @@ class ShopfloorApp(models.Model):
     _inherit = "shopfloor.app"
 
     category = fields.Selection(selection_add=[("wms", "WMS")])
+    show_counters = fields.Boolean(
+        default=True,
+        help="If checked, display move line counters on menu items.",
+    )
