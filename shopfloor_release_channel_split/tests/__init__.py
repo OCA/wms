@@ -1,0 +1,1 @@
+from . import test_shopfloor_release_channel_split
