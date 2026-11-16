@@ -330,7 +330,10 @@ class TestSetQuantity(CommonCase):
         self.assertEqual(selected_move_line.qty_done, 4)
         self.assertEqual(selected_move_line.location_dest_id, self.dispatch_location)
         self.assert_response(
-            response, next_state="select_move", data=self._data_for_select_move(picking)
+            response,
+            next_state="select_move",
+            data=self._data_for_select_move(picking),
+            message=self.msg_store.line_destination_set_success(selected_move_line),
         )
 
     def test_scan_location_not_child_of_dest_location(self):
