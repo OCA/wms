@@ -191,5 +191,8 @@ class TestShopfloorReceptionPutinpackRestriction(CommonCase):
                 "barcode": loc_dest.name,
             },
         )
-        self.assertIsNone(response.get("message"))
+        self.assertMessage(
+            response,
+            self.msg_store.line_destination_set_success(self.selected_move_line),
+        )
         self.assertEqual(self.selected_move_line.location_dest_id, loc_dest)
