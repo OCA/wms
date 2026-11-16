@@ -7,12 +7,15 @@
 import {ItemDetailMixin} from "/shopfloor_mobile_base/static/wms/src/components/detail/detail_mixin.js";
 
 Vue.component("detail-product-image", {
-    props: ["record"],
+    props: {
+        record: Object,
+        maxWidth: {type: [Number, String], default: 256},
+    },
     template: `
         <div v-if="record.image" class="detail-product-image-wrapper my-3 d-flex justify-center">
             <v-img
                 :src="record.image"
-                max-width="256"
+                :max-width="maxWidth"
                 contain
                 class="rounded elevation-1"
             >
