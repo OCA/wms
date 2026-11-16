@@ -1,0 +1,1 @@
+This module allows to print labels during 'location_content_transfer' flow.
