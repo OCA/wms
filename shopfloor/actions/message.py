@@ -6,6 +6,7 @@ import logging
 from odoo import _
 
 from odoo.addons.component.core import Component
+from odoo.addons.stock.models.stock_quant import QuantPackage
 
 _logger = logging.getLogger(__name__)
 
@@ -295,6 +296,9 @@ class MessageAction(Component):
 
     def wrong_record(self, record):
         return {"message_type": "error", "body": self._wrong_record_msg(record._name)}
+
+    def wrong_bin(self):
+        return {"message_type": "error", "body": _("Wrong bin")}
 
     def no_lot_for_barcode(self, barcode):
         return {
@@ -1051,6 +1055,21 @@ class MessageAction(Component):
             "picking_type": picking.picking_type_id.name,
             "picking_name": picking.name,
         }
+        return {
+            "message_type": "error",
+            "body": body,
+        }
+
+    def package_already_unloaded(self, package: QuantPackage):
+        locations = (
+            package.planned_move_line_ids.location_dest_id or package.location_id
+        )
+        body = _(
+            "The package '%(package_name)s' is already unloaded there: "
+            "%(location)s, you cannot do it twice!",
+            location=",".join(locations.mapped("name")),
+            package_name=package.name,
+        )
         return {
             "message_type": "error",
             "body": body,
