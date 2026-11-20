@@ -32,10 +32,10 @@ Vue.component("nav-item-action").extendOptions.template = `
         <div v-if="item.lines_count" class="pa-4 secondary text-no-wrap rounded-pill">
             {{ $t('misc.lines_count', item) }}
         </div>
-        <div v-else-if="item.has_urgent_work" class="pa-2 warning rounded-pill">
-            <v-icon color="white">mdi-progress-alert</v-icon>
+        <div v-else-if="item.has_urgent_work" class="pa-2 screen_step_todo rounded-pill">
+            <v-icon color="error">mdi-progress-alert</v-icon>
         </div>
-        <div v-else-if="item.has_work" class="pa-2 warning rounded-pill">
+        <div v-else-if="item.has_work" class="pa-2 screen_step_todo rounded-pill">
             <v-icon color="white">mdi-progress-clock</v-icon>
         </div>
     </div>
