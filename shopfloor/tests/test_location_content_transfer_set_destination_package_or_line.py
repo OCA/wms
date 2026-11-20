@@ -59,7 +59,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         user to the 'start' screen.
         """
         package_level = self.picking1.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -88,7 +88,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
     def test_set_destination_package_dest_location_nok(self):
         """Scanned destination location not valid, redirect to 'scan_destination'."""
         package_level = self.picking1.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         # Unknown destination location
         response = self.service.dispatch(
             "set_destination_package",
@@ -129,7 +129,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move = package_level.move_line_ids.move_id
         move.location_dest_id = self.shelf1
         move.picking_id.location_dest_id = self.shelf1
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -148,7 +148,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         """Scanned destination location valid, but need a confirmation."""
         barcode = self.env.ref("stock.stock_location_14").barcode
         package_level = self.picking1.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -168,7 +168,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         """Scanned destination location valid, moves set to done."""
         original_picking = self.picking1
         package_level = original_picking.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -213,7 +213,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         next_move._assign_picking()
         self.assertEqual(next_move.state, "waiting")
         self.assertTrue(next_move.picking_id)
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -247,7 +247,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         user to the 'start' screen.
         """
         move_line = self.picking2.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -278,7 +278,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
     def test_set_destination_line_dest_location_nok(self):
         """Scanned destination location not valid, redirect to 'scan_destination'."""
         move_line = self.picking2.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         # Unknown destination location
         response = self.service.dispatch(
             "set_destination_line",
@@ -320,7 +320,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         # refuse the action
         move_line.move_id.location_dest_id = self.shelf1
         move_line.picking_id.location_dest_id = self.shelf1
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -340,7 +340,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         """Scanned destination location valid, but need a confirmation."""
         barcode = self.env.ref("stock.stock_location_14").barcode
         move_line = self.picking2.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -361,7 +361,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         """Scanned destination location valid, moves set to done."""
         original_picking = self.picking2
         move_line = original_picking.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -409,7 +409,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         next_move._assign_picking()
         self.assertEqual(next_move.state, "waiting")
         self.assertTrue(next_move.picking_id)
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -449,9 +449,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line_c = original_picking.move_line_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
-        self.assertEqual(move_line_c.reserved_uom_qty, 10)
-        self.assertEqual(move_line_c.qty_done, 10)
-        self._simulate_selected_move_line(move_line_c)
+        self._scan_location(move_line_c.location_id)
         # Scan partial qty (6/10)
         response = self.service.dispatch(
             "set_destination_line",
@@ -462,36 +460,34 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "barcode": self.dest_location.barcode,
             },
         )
-        done_picking = original_picking.backorder_ids
+        split_order = original_picking.backorder_ids
         # Check move line data
         self.assertEqual(move_line_c.move_id.product_uom_qty, 6)
         self.assertEqual(move_line_c.reserved_uom_qty, 0)
         self.assertEqual(move_line_c.qty_done, 6)
         self.assertEqual(move_line_c.state, "done")
-        self.assertEqual(original_picking.backorder_ids, done_picking)
-        self.assertEqual(done_picking.state, "done")
+        self.assertEqual(original_picking.backorder_ids, split_order)
+        self.assertEqual(split_order.state, "done")
 
-        # the remaining move is put in a backorder
-        move = done_picking.backorder_ids.move_ids
-        self.assertEqual(move.picking_id.state, "assigned")
+        # the remaining move and partial move line stay in original picking
+        self.assertEqual(len(original_picking.move_ids), 2)
+        self.assertEqual(len(original_picking.move_line_ids), 2)
+        remaining_move_line_c = original_picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_c
+        )
+        self.assertEqual(remaining_move_line_c.reserved_uom_qty, 4)
+        self.assertEqual(remaining_move_line_c.qty_done, 4)
 
-        self.assertEqual(move.state, "assigned")
-        self.assertEqual(move.product_id, self.product_c)
-        self.assertEqual(move.product_uom_qty, 4)
-        self.assertEqual(move.move_line_ids.reserved_uom_qty, 4)
-        self.assertEqual(move.move_line_ids.qty_done, 4)
-        # Check the response -> we must first process the backorder
+        # Check the response -> we must first process the split line
         self.assert_response_start_single(
             response,
-            done_picking.backorder_ids,
+            original_picking,
             message=self.service.msg_store.location_content_transfer_item_complete(
                 self.content_loc, self.dest_location
             ),
         )
-        self.assertEqual(move_line_c.move_id.state, "done")
+
         # Scan remaining qty (4/10)
-        remaining_move_line_c = move.move_line_ids
-        self._simulate_selected_move_line(remaining_move_line_c)
         self.service.dispatch(
             "set_destination_line",
             params={
@@ -501,17 +497,17 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
                 "barcode": self.dest_location.barcode,
             },
         )
-        done_picking2 = remaining_move_line_c.picking_id
+        split_order_2 = remaining_move_line_c.picking_id
         # Check move line data
         self.assertEqual(remaining_move_line_c.move_id.product_uom_qty, 4)
         self.assertEqual(remaining_move_line_c.reserved_uom_qty, 0)
         self.assertEqual(remaining_move_line_c.qty_done, 4)
         self.assertEqual(remaining_move_line_c.state, "done")
-        self.assertTrue(done_picking2 != original_picking)
-        self.assertEqual(done_picking2.state, "done")
-        # All move lines related to product_c are now done and extracted from
+        self.assertTrue(split_order_2 != original_picking)
+        self.assertEqual(split_order_2.state, "done")
+        # All move lines related to product_c are now done and extracted out of
         # the initial transfer
-        all_pickings = original_picking | done_picking | done_picking2
+        all_pickings = original_picking | split_order | split_order_2
         moves_product_c = all_pickings.move_ids.filtered(
             lambda m: m.product_id == self.product_c
         )
@@ -525,7 +521,6 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line_d = original_picking.move_line_ids.filtered(
             lambda m: m.product_id == self.product_d
         )
-        self._simulate_selected_move_line(move_line_d)
         self.service.dispatch(
             "set_destination_line",
             params={
@@ -555,7 +550,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         picking.action_assign()
         self._simulate_pickings_selected(picking)
         move_line = picking.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         # Scan partial qty (6/10)
         self.service.dispatch(
             "set_destination_line",
@@ -599,7 +594,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line = picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_a
         )
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         # Scan partial qty (6/10)
         self.service.dispatch(
             "set_destination_line",
@@ -626,7 +621,6 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
         move_line = picking.move_line_ids.filtered(
             lambda ml: ml.product_id == self.product_b
         )
-        self._simulate_selected_move_line(move_line)
         # Scan partial qty (6/10)
         self.service.dispatch(
             "set_destination_line",
@@ -651,7 +645,7 @@ class LocationContentTransferSetDestinationXCase(LocationContentTransferCommonCa
 
     def test_set_destination_line_exceeding_quantity(self):
         move_line = self.picking2.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         # Process more than expected
         response = self.service.dispatch(
             "set_destination_line",
@@ -741,7 +735,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
         self.assertEqual(len(original_picking.move_ids), 2)
         self.assertEqual(len(self.move_product_a.move_line_ids), 2)
         package_level = original_picking.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self.stock_action.mark_move_line_as_picked(package_level.move_line_ids)
         response = self.service.dispatch(
             "set_destination_package",
             params={
@@ -788,7 +782,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
         move_line = self.move_product_b.move_line_ids.filtered(
             lambda ml: ml.reserved_uom_qty == 6
         )
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         response = self.service.dispatch(
             "set_destination_line",
             params={
@@ -841,7 +835,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
             lambda ml: ml.state == "assigned"
         )
         for ml in remaining_move_lines:
-            self._simulate_selected_move_line(ml)
+            self._scan_location(ml.location_id)
             self.service.dispatch(
                 "set_destination_line",
                 params={
@@ -853,7 +847,7 @@ class LocationContentTransferSetDestinationXSpecialCase(
             )
         self.assertEqual(original_picking.state, "assigned")
         package_level = original_picking.package_level_ids[0]
-        self._simulate_selected_move_line(package_level.move_line_ids)
+        self._scan_location(package_level.move_line_ids.location_id)
         self.service.dispatch(
             "set_destination_package",
             params={
@@ -923,8 +917,6 @@ class LocationContentTransferSetDestinationChainSpecialCase(
             lambda m: m.product_id == self.product_c
         )
 
-        self.assertEqual(move_line_c.reserved_uom_qty, 10)
-        self.assertEqual(move_line_c.qty_done, 10)
         # Scan partial qty (6/10)
         self.service.dispatch(
             "set_destination_line",
@@ -941,15 +933,15 @@ class LocationContentTransferSetDestinationChainSpecialCase(
         self.assertEqual(move_line_c.qty_done, 6)
         self.assertEqual(move_line_c.state, "done")
         # the move has been split
-        move = move_line_c.picking_id.backorder_ids.move_ids
-        self.assertNotEqual(move_line_c.move_id, move)
+        self.assertEqual(move_line_c.picking_id.state, "done")
+        self.assertEqual(move_line_c.picking_id.backorder_id, picking_b)
 
         # Check the move handling the remaining qty
-        self.assertEqual(move.state, "assigned")
-        move_line = move.move_line_ids
-        self.assertEqual(move_line.move_id.product_uom_qty, 4)
-        self.assertEqual(move_line.reserved_uom_qty, 4)
-        self.assertEqual(move_line.qty_done, 4)
+        remaining_move_line = picking_b.move_line_ids
+        self.assertEqual(remaining_move_line.state, "assigned")
+        self.assertEqual(remaining_move_line.move_id.product_uom_qty, 4)
+        self.assertEqual(remaining_move_line.reserved_uom_qty, 4)
+        self.assertEqual(remaining_move_line.qty_done, 4)
 
     def test_set_destination_package_partial_qty_with_move_orig_ids(self):
         """Scanned destination location with partial qty, but related moves
@@ -980,7 +972,7 @@ class LocationContentTransferSetDestinationChainSpecialCase(
 
         self.assertEqual(move_line.reserved_uom_qty, 6.0)
         self.assertEqual(move_line.qty_done, 6.0)
-        self._simulate_selected_move_line(move_line)
+        self._scan_location(move_line.location_id)
         # Scan partial qty (6/10)
         self.service.dispatch(
             "set_destination_line",
@@ -1046,8 +1038,10 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
         should be the one for the remaining qty.
         """
 
-        move_line = self.picking.move_line_ids[0]
-        self._simulate_selected_move_line(move_line)
+        move_line = self.picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_a
+        )
+        self._scan_location(move_line.location_id)
         # Scan partial qty (6/10)
         response = self.service.dispatch(
             "set_destination_line",
@@ -1058,32 +1052,32 @@ class LocationContentTransferSetDestinationNextOperationSpecialCase(
                 "barcode": self.dest_location.barcode,
             },
         )
-        # the new qty is in a backorder of the backorder where the done qty has bee
-        # processed
-        backorder = self.picking.backorder_ids.backorder_ids
-        self.assertTrue(backorder)
+        # the new qty is original picking and done qty is moves to a split order
+        split_order = self.picking.backorder_ids
+        self.assertTrue(split_order)
 
         self.assert_response_start_single(
             response,
-            backorder,
+            self.picking,
             message=self.service.msg_store.location_content_transfer_item_complete(
                 self.content_loc, self.dest_location
             ),
         )
         # check that the next operation has the appropriate attributes
-        move_line = backorder.move_line_ids
-        self.assertEqual(move_line.reserved_uom_qty, 4)
-        self.assertEqual(move_line.qty_done, 4)
-        self.assertEqual(move_line.picking_id.user_id, self.env.user)
-        # if we process the quantity of the backorder, the next operation should
+        remaining_move_line = self.picking.move_line_ids.filtered(
+            lambda ml: ml.product_id == self.product_a
+        )
+        self.assertEqual(remaining_move_line.reserved_uom_qty, 4)
+        self.assertEqual(remaining_move_line.qty_done, 4)
+        self.assertEqual(remaining_move_line.picking_id.user_id, self.env.user)
+        # if we process the remaining quantity of the move, the next operation should
         # be the remaining one of the initial picking
-        self._simulate_selected_move_line(move_line)
         response = self.service.dispatch(
             "set_destination_line",
             params={
                 "location_id": self.content_loc.id,
-                "move_line_id": move_line.id,
-                "quantity": move_line.reserved_uom_qty,  # Scan 6 qty
+                "move_line_id": remaining_move_line.id,
+                "quantity": remaining_move_line.reserved_uom_qty,  # Scan 4 qty
                 "barcode": self.dest_location.barcode,
             },
         )
