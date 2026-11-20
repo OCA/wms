@@ -17,6 +17,9 @@
                 </field>
             </group>
             <group name="options" position="inside">
+                <group>
+                    <field name="show_counters" />
+                </group>
                 <group
                     name="quantity_exceeding_demand"
                     attrs="{'invisible': [('allow_quantity_exceeding_demand_is_possible', '=', False)]}"
