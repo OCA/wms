@@ -30,6 +30,7 @@ class LocationContentTransferCommonCase(CommonCase):
                     "default_code": "E",
                     "barcode": "E",
                     "weight": 3,
+                    "tracking": "lot",
                 }
             )
         )
@@ -55,8 +56,7 @@ class LocationContentTransferCommonCase(CommonCase):
                 }
             )
         )
-        # This is an additional content location to manage the cases
-        # where a product can be stored in several locations
+
         cls.content_loc_1 = (
             cls.env["stock.location"]
             .sudo()
@@ -69,6 +69,13 @@ class LocationContentTransferCommonCase(CommonCase):
             )
         )
 
+        # create qties for 2 lots in same location to allow to generate
+        # a picking with one move and 2 move lines
+        lot1 = cls._create_lot(cls, cls.product_e)
+        lot2 = cls._create_lot(cls, cls.product_e)
+        cls._update_qty_in_location(cls.content_loc_1, cls.product_e, 5.0, lot=lot1)
+        cls._update_qty_in_location(cls.content_loc_1, cls.product_e, 5.0, lot=lot2)
+
     def setUp(self):
         super().setUp()
         self.service = self.get_service(
@@ -76,9 +83,14 @@ class LocationContentTransferCommonCase(CommonCase):
         )
         self.stock_action = self.service._actions_for("stock")
 
-    def _simulate_selected_move_line(self, move_line):
-        """Mark the move line as picked (as it's done into the scan_location method)"""
-        self.stock_action.mark_move_line_as_picked(move_line)
+    def _scan_location(self, location):
+        res = self.service.dispatch(
+            "scan_location",
+            params={
+                "barcode": location.barcode,
+            },
+        )
+        return res
 
     @classmethod
     def _simulate_pickings_selected(cls, pickings):

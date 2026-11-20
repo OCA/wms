@@ -391,9 +391,8 @@ class LocationContentTransfer(Component):
                 return self._response_for_start(
                     message=self.msg_store.location_empty(location)
                 )
-            new_moves._action_confirm(merge=False)
-            new_moves._action_assign()
-            if not all([x.state == "assigned" for x in new_moves]):
+            new_moves = new_moves._action_confirm()
+            if any([x.state != "assigned" for x in new_moves]):
                 savepoint.rollback()
                 return self._response_for_start(
                     message=self.msg_store.new_move_lines_not_assigned()
@@ -920,31 +919,38 @@ class LocationContentTransfer(Component):
                 message=message,
             )
 
-        move_line.qty_done = quantity
+        stock_action = self._actions_for("stock")
+        move_lines = self.env["stock.move.line"]
         if empty_package and not scan_package:
             scan_package = empty_package
+        if quantity < move_line.qty_done:
+            move_line.qty_done = quantity
+            new_split_line = move_line._split_partial_quantity()
+            if new_split_line.picking_type_id.create_backorder == "never":
+                new_split_line.unlink()
+            else:
+                new_split_line.write(
+                    {
+                        "qty_done": new_split_line.reserved_uom_qty,
+                        # ↓ process first backorder of current line
+                        "shopfloor_priority": max(
+                            0, new_split_line.shopfloor_priority - 1
+                        ),
+                    }
+                )
+
+        stock_action.mark_move_line_as_picked(move_line, quantity, scan_package)
         self._write_destination_on_lines(move_line, dest_location, scan_package)
+        stock_action.validate_moves(move_line.move_id)
 
-        stock = self._actions_for("stock")
+        next_move_lines = self._find_transfer_move_lines(move_line.location_id)
 
-        backorders = stock.validate_moves(move_line.move_id)
-        if backorders:
-            for move_line in backorders.mapped("move_line_ids"):
-                move_line.qty_done = move_line.reserved_uom_qty
-            backorders.user_id = self.env.user
-            # process first backorder of current line
-            move_lines = backorders.move_line_ids
-        else:
-            move_lines = self._find_transfer_move_lines(move_line.location_id)
-        message = self.msg_store.location_content_transfer_item_complete(
-            location, dest_location
-        )
-        completion_info = self._actions_for("completion.info")
-        completion_info_popup = completion_info.popup(move_line)
         return self._response_for_start_single(
-            move_lines.mapped("picking_id"),
-            message=message,
-            popup=completion_info_popup,
+            next_move_lines.picking_id,
+            message=self.msg_store.location_content_transfer_item_complete(
+                location, dest_location
+            ),
+            popup=self._actions_for("completion.info").popup(move_line),
         )
 
     def postpone_package(self, location_id, package_level_id):
