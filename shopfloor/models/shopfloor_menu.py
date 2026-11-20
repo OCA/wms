@@ -226,6 +226,22 @@ class ShopfloorMenu(models.Model):
     allow_alternative_destination_package_is_possible = fields.Boolean(
         compute="_compute_allow_alternative_destination_package_is_possible"
     )
+    pick_by_product = fields.Boolean(
+        string="Pick by product",
+        default=False,
+        help=(
+            "Instead of processing move lines one by one, the operator works "
+            "product by product. When confirmed, the batch shows the first product "
+            "to pick. After scanning the product and a destination bin, all its "
+            "lines in the batch are processed at once (qty done and destination "
+            "bin are set). Continues to the next product until all are completed. "
+            "Only applies to lines without a source package and not tracked by "
+            "lot/serial."
+        ),
+    )
+    pick_by_product_is_possible = fields.Boolean(
+        compute="_compute_pick_by_product_is_possible"
+    )
 
     @api.onchange("unload_package_at_destination")
     def _onchange_unload_package_at_destination(self):
@@ -454,4 +470,11 @@ class ShopfloorMenu(models.Model):
         for menu in self:
             menu.allow_alternative_destination_package_is_possible = (
                 menu.scenario_id.has_option("allow_alternative_destination_package")
+            )
+
+    @api.depends("scenario_id")
+    def _compute_pick_by_product_is_possible(self):
+        for menu in self:
+            menu.pick_by_product_is_possible = menu.scenario_id.has_option(
+                "pick_by_product"
             )
