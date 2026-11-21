@@ -28,6 +28,12 @@ class SaleOrderLine(models.Model):
 
     @api.depends(
         "move_ids.ordered_available_to_promise_uom_qty",
+        "move_ids.need_release",
+        "move_ids.product_uom",
+        "move_ids.picking_id.last_release_date",
+        "move_ids.product_uom_qty",
+        "move_ids.reserved_availability",
+        "product_uom",
         "product_id.route_ids",
         "route_id",
         "product_uom_qty",
@@ -56,15 +62,40 @@ class SaleOrderLine(models.Model):
             data["availability_status"] = "full"
             data["available_qty"] = self.product_uom_qty
             return data
+        product = self.product_id
         # Fallback values
         availability_status = "no"
         expected_availability_date = False
-        available_qty = sum(
-            self.mapped("move_ids.ordered_available_to_promise_uom_qty")
-        )
+        # Get availabile qty as sale order line's UOM.
+        available_qty = 0
+        for move in self.move_ids:
+            if move.state == "cancel":
+                continue
+            # INFO: If needs release, setting is enabled, and available_qty
+            # is move.ordered_available_to_promise_uom_qty
+            if move.need_release:
+                available_qty += move.product_uom._compute_quantity(
+                    move.ordered_available_to_promise_uom_qty,
+                    self.product_uom,
+                    rounding_method="HALF-UP",
+                )
+            # INFO: If picking was released, then release is enabled, therefore
+            # a backorder was created for whatever wasn't available at release.
+            # in such case, available_qty == move.product_uom_qty
+            elif move.picking_id.last_release_date:
+                available_qty += move.product_uom._compute_quantity(
+                    move.product_uom_qty, self.product_uom, rounding_method="HALF-UP"
+                )
+            # INFO: If picking doesn't need release, and was never released, then
+            # setting is disabled, therefore, available_qty is reserved quantity
+            else:
+                available_qty += move.product_uom._compute_quantity(
+                    move.reserved_availability,
+                    self.product_uom,
+                    rounding_method="HALF-UP",
+                )
         delayed_qty = 0
         # required values
-        product = self.product_id
         rounding = product.uom_id.rounding
         # Fully available
         if (
