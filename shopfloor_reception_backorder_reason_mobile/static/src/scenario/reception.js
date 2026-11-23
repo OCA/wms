@@ -21,7 +21,7 @@ const ReceptionBackorderReason = process_registry.extend("reception", {
             <div class="button-list button-vertical-list full">
                 <v-row align="center">
                     <v-col class="text-center" cols="12">
-                        <btn-back />
+                        <btn-back :router_back="false"/>
                     </v-col>
                 </v-row>
             </div>
@@ -63,6 +63,17 @@ const ReceptionBackorderReason = process_registry.extend("reception", {
                         self.odoo.call("choose_backorder_reason", {
                             picking_id: self.state.data.picking.id,
                             reason_id: selected.id,
+                        })
+                    );
+                },
+
+                events: {
+                    go_back: "on_back",
+                },
+                on_back: () => {
+                    self.wait_call(
+                        self.odoo.call("scan_document", {
+                            barcode: self.state.data.picking.name,
                         })
                     );
                 },
