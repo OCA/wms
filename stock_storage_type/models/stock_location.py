@@ -435,6 +435,8 @@ class StockLocation(models.Model):
         putaway_location = super()._putaway_strategy_finalizer(
             putaway_location, product, quantity, package, packaging, additional_qty
         )
+        if self.env.context.get("disable_package_type_putaway_strategy"):
+            return putaway_location
         if package:
             # If package provided, the product is not set (in the get_putaway_strategy() method)
             product = package.single_product_id or product
@@ -477,18 +479,20 @@ class StockLocation(models.Model):
         if not package_type:
             # Fallback on standard one
             return putaway_location
-        # TODO: Remove this and use only putaway_location as always filled in
-        dest_location = putaway_location or self
-        _logger.debug("putaway location: %s", dest_location.name)
+        # Search for storage type configuration by looking at any sequence. In
+        # this case, we discard the putaway location computed in standard as
+        # this package type putaway config is interpreted without considering
+        # the sequence.
         package_locations = self.env["stock.storage.location.sequence"].search(
             [
                 ("package_type_id", "=", package_type.id),
-                ("location_id", "child_of", dest_location.ids),
+                ("location_id", "child_of", self.ids),
             ]
         )
         if not package_locations:
-            return dest_location
+            return putaway_location
 
+        _logger.debug("Start location: %s", self.complete_name)
         for package_sequence in package_locations:
             if not package_sequence.can_be_applied(putaway_location, quants, product):
                 continue
@@ -506,16 +510,16 @@ class StockLocation(models.Model):
                 # Reapply putaway strategy if particular rules have been put on product level
                 # Check if the allowed location is not self to avoid recursive computations
                 if allowed_location != self:
-                    final_location = allowed_location._get_putaway_strategy(
-                        product, quantity, package
-                    )
+                    final_location = allowed_location.with_context(
+                        disable_package_type_putaway_strategy=True
+                    )._get_putaway_strategy(product, quantity, package)
                     return final_location
                 return allowed_location
         _logger.debug(
             "Could not find a valid putaway location, fallback to %s"
-            % putaway_location.complete_name
+            % self.complete_name
         )
-        return putaway_location
+        return self
 
     def get_storage_locations(self, products=None):
         # TODO support multiple products? cf ABC
