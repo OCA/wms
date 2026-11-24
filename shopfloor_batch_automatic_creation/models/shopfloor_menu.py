@@ -29,6 +29,14 @@ class ShopfloorMenu(models.Model):
         string="Maximum number of preparation lines for the batch",
         required=True,
     )
+    batch_split_picking_exceeding_limits = fields.Boolean(
+        string="Split pickings exceeding limits",
+        help="If checked, the pickings exceeding the maximum number of lines, "
+        "volume or weight of available devices will be split into multiple pickings "
+        "to respect the limits. If unchecked, the pickings exceeding the limits will not "
+        "be added to the batch. The limits are defined by the limits of the last available "
+        "devices.",
+    )
     stock_device_type_ids = fields.Many2many(
         comodel_name="stock.device.type",
         relation="shopfloor_menu_device_type_rel",
