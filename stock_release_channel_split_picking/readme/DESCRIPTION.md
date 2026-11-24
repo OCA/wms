@@ -1,0 +1,1 @@
+This module is a glue module that integrates the ***stock_release_channel*** module with the ***stock_picking_split*** module. It ensures that when a stock picking is split, the new picking is linked to the same release channel as the original picking.
