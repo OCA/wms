@@ -33,7 +33,9 @@
     "unload_package_at_destination": true,
     "multiple_move_single_pack": true,
     "no_prefill_qty": true,
-    "scan_location_or_pack_first": true
+    "scan_location_or_pack_first": true,
+    "pick_by_product": true,
+    "skip_unload_all_scan": true
 }
         </field>
     </record>
