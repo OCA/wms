@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Copyright 2025 ACSONE SA/NV (https://acsone.eu)
+    License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+-->
+<odoo>
+    <template
+        id="shopfloor_app_assets"
+        name="Shopfloor app assets"
+        inherit_id="shopfloor_mobile_base.shopfloor_app_assets"
+    >
+        <script id="script_component_input_number_spinner" position="after">
+            <link
+                id="link_css_main"
+                t-attf-href="/shopfloor_mobile_printing_base/static/src/css/main.css?v=#{app_info.version}"
+                rel="stylesheet"
+            />
+
+            <script
+                id="script_print_label_mixin"
+                t-attf-src="/shopfloor_mobile_printing_base/static/src/scenarios/mixins.js?v=#{app_info.version}"
+                type="module"
+            />
+
+            <script
+                id="script_component_printing_widget"
+                t-attf-src="/shopfloor_mobile_printing_base/static/src/components/printing-widget.js?v=#{app_info.version}"
+                type="module"
+            />
+        </script>
+
+    </template>
+</odoo>
