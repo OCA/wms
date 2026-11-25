@@ -59,7 +59,7 @@
         <xpath expr="//div[@name='expiration_date']" position="after">
             <div
                 t-if="doc.is_ok_expected_delivery_date"
-                class="col"
+                class="col-auto col-3 mw-100 mb-2"
                 name="expected_delivery_date"
             >
                 <strong>Expected delivery</strong>
