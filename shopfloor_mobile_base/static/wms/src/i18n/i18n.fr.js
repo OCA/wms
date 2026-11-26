@@ -61,6 +61,7 @@ const messages_fr = {
         loading: "Chargement en cours...",
         action: {
             logout: "Se déconnecter",
+            toggle_devtools: "Activer/désactiver les outils de développement",
         },
         nav: {
             scenario: "Scénario:",
