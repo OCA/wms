@@ -31,6 +31,13 @@ msgstr "# prijenosa koje treba otpustiti"
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
+msgid "- Product: %(product_name)s (Picking: %(picking_name)s)\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
 msgid "- blocking transfer(s): %(picking_names)s"
 msgstr ""
 
@@ -236,6 +243,15 @@ msgid "Moves Need Release"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid ""
+"Moves:\n"
+"\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__need_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_picking__need_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.stock_picking_type_kanban
@@ -261,6 +277,15 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__ordered_available_to_promise_qty
 msgid "Ordered Available to Promise (Real Qty)"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid ""
+"Origin Moves:\n"
+"\n"
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -350,6 +375,22 @@ msgid "Reverse done transfer on cancellation"
 msgstr ""
 
 #. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid ""
+"Some origin moves are currently in progress. Either the picking is printed, "
+"either the move done quantity is already filled in.\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "Some origin moves are not consumed by their destination moves.\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
 #: model:ir.model,name:stock_available_to_promise_release.model_stock_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_release_form
 msgid "Stock Allocations Release"
@@ -402,6 +443,26 @@ msgstr ""
 #. odoo-python
 #: code:addons/stock_available_to_promise_release/models/stock_move.py:0
 #, python-format
+msgid ""
+"The move for product (%(product_name)s) in picking (%(picking_name)s) is not "
+"allowed to be unreleased:\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid ""
+"The move in picking (%(picking_name)s) for product (%(product_name)s) is not "
+"unreleaseable (Need release, state not in Done or Canceled, not an outgoing "
+"picking, the stock rule parameter 'Release based on Available to Promise' is "
+"not set."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
 msgid "The operation %(picking_names)s is done and cannot be returned"
 msgstr ""
 
@@ -413,6 +474,18 @@ msgstr "Odabrani zapisi će biti otpušteni."
 #. module: stock_available_to_promise_release
 #: model_terms:ir.ui.view,arch_db:stock_available_to_promise_release.view_stock_unrelease_form
 msgid "The selected records will be unreleased."
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#. odoo-python
+#: code:addons/stock_available_to_promise_release/models/stock_move.py:0
+#, python-format
+msgid "The user is not in the Stock Group.\n"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,help:stock_available_to_promise_release.field_stock_move__unrelease_not_allowed_message
+msgid "This is the reason why unrelease is not allowed for this move."
 msgstr ""
 
 #. module: stock_available_to_promise_release
@@ -455,6 +528,11 @@ msgstr ""
 #. module: stock_available_to_promise_release
 #: model:ir.actions.act_window,name:stock_available_to_promise_release.action_view_stock_move_unrelease_form
 msgid "Unrelease Move Allocations"
+msgstr ""
+
+#. module: stock_available_to_promise_release
+#: model:ir.model.fields,field_description:stock_available_to_promise_release.field_stock_move__unrelease_not_allowed_message
+msgid "Unrelease Not Allowed Message"
 msgstr ""
 
 #. module: stock_available_to_promise_release
