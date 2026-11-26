@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 ACSONE SA/NV
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+
+    <record model="ir.ui.view" id="ticket_view_form">
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_info']" position="after">
+                <page name="shopfloor" string="Shopfloor">
+                    <group>
+                        <field name="is_shopfloor_created" />
+                        <field
+                            name="create_uid"
+                            string="Shopfloor Operator"
+                            readonly="1"
+                            attrs="{'invisible': [('is_shopfloor_created', '=', False)]}"
+                        />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="helpdesk_ticket_view_search" model="ir.ui.view">
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.helpdesk_ticket_view_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='archived']" position="after">
+                <separator />
+                <filter
+                    string="Created from Shopfloor"
+                    name="shopfloor_created"
+                    domain="[('is_shopfloor_created', '=', True)]"
+                />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
