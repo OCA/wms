@@ -44,6 +44,7 @@ setuptools.setup(
         'odoo-addon-shopfloor_reception_product_barcode_mobile>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_putinpack_restriction>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_reception_refund_return>=16.0dev,<16.1dev',
+        'odoo-addon-shopfloor_release_channel_split>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_rest_log>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_single_product_transfer>=16.0dev,<16.1dev',
         'odoo-addon-shopfloor_single_product_transfer_mobile>=16.0dev,<16.1dev',
