@@ -6,13 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"Last-Translator: Nicolas Delbovier <nicolas.delbovier@acsone.eu>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "Language: fr\n"
+"PO-Revision-Date: 2026-11-26 09:46+0000\n"
+"X-Generator: Weblate 2026.11.2\n"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__pick_pack_same_time
@@ -93,13 +95,15 @@ msgstr ""
 msgid ""
 "%(message_code)s not found in the current transfer or already in a package."
 msgstr ""
+"%(message_code)s introuvable dans le transfert en cours ou déjà présent dans "
+"un colis."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "%(qty)s %(product_name)s put in %(package_name)s"
-msgstr ""
+msgstr "%(qty)s %(product_name)s placé(s) dans %(package_name)s"
 
 #. module: shopfloor
 #. odoo-python
@@ -135,6 +139,9 @@ msgid ""
 "<code>get_sort_key_assigned_to_current_user</code>: Return sort key to get "
 "line assigned to current user first. (return a tuple)"
 msgstr ""
+"<code>get_sort_key_assigned_to_current_user</code> : Renvoie une clé de tri "
+"permettant de placer en premier les lignes affectées à l'utilisateur actuel. "
+"(renvoie un tuple)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
@@ -142,6 +149,8 @@ msgid ""
 "<code>get_sort_key_location</code>: Return sort key to sort by location. "
 "(return a tuple)"
 msgstr ""
+"<code>get_sort_key_location</code> : Renvoie une clé de tri permettant "
+"d'effectuer un tri par l'emplacement. (renvoie un tuple)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
@@ -149,11 +158,13 @@ msgid ""
 "<code>get_sort_key_priority</code>: Return sort key to sort by priority. "
 "(return a tuple)"
 msgstr ""
+"<code>get_sort_key_priority</code> : Renvoie une clé de tri permettant "
+"d'effectuer un tri par priorité. (renvoie un tuple)"
 
 #. module: shopfloor
 #: model_terms:ir.ui.view,arch_db:shopfloor.shopfloor_menu_form_view
 msgid "<code>line</code>: The move line for with the key must be computed."
-msgstr ""
+msgstr "<code>line</code> : La ligne pour laquelle la clé doit être calculée."
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_app
@@ -165,7 +176,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "A destination package is required."
-msgstr ""
+msgstr "Un colis de destination est requis."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -175,7 +186,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__move_line_search_additional_domain
 msgid "Additional domain used when searching move lines"
-msgstr ""
+msgstr "Domaine supplémentaire utilisé lors de la recherche des opérations"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_shopfloor_priority_postpone_mixin
@@ -187,7 +198,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "All packages processed."
-msgstr ""
+msgstr "Tous les colis ont été traités."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_alternative_destination_is_possible
@@ -254,7 +265,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Are you sure?"
-msgstr ""
+msgstr "Êtes-vous sûr ?"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__auto_post_line_is_possible
@@ -271,14 +282,14 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode does not match with {}."
-msgstr ""
+msgstr "Le code-barres ne correspond pas à {}."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Barcode not found"
-msgstr ""
+msgstr "Code-barres introuvable"
 
 #. module: shopfloor
 #: model:ir.model,name:shopfloor.model_stock_picking_batch
@@ -304,7 +315,7 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Bin %s doesn't exist"
-msgstr ""
+msgstr "Le bac %s n'existe pas"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_picking__bulk_line_count
@@ -316,19 +327,19 @@ msgstr ""
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Canceled, you can scan a new pack."
-msgstr ""
+msgstr "Annulé ; vous pouvez scanner un nouveau colis."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Cannot change to lot {} which is entirely picked."
-msgstr ""
+msgstr "Impossible de passer au lot {} qui est entièrement prélevé."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_app__category
 msgid "Category"
-msgstr ""
+msgstr "Catégorie"
 
 #. module: shopfloor
 #: model:shopfloor.menu,name:shopfloor.shopfloor_menu_demo_checkout
@@ -355,6 +366,8 @@ msgstr ""
 #, python-format
 msgid "Confirm location change from %(location_from)s to %(location_to)s?"
 msgstr ""
+"Confirmer le changement d'emplacement de %(location_from)s vers %"
+"(location_to)s ?"
 
 #. module: shopfloor
 #. odoo-python
@@ -363,27 +376,29 @@ msgstr ""
 msgid ""
 "Content line transferred from %(location_name)s to %(location_dest_name)s"
 msgstr ""
+"Contenu de la ligne transféré de %(location_name)s vers %(location_dest_name)"
+"s"
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Content transferred from %(location_name)s to %(location_dest_name)s."
-msgstr ""
+msgstr "Contenu transféré de %(location_name)s vers %(location_dest_name)s."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Create new PACK {}? Scan it again to confirm."
-msgstr ""
+msgstr "Créer un nouveau PACK {} ? Scannez-le à nouveau pour confirmer."
 
 #. module: shopfloor
 #. odoo-python
 #: code:addons/shopfloor/models/shopfloor_menu.py:0
 #, python-format
 msgid "Creation of moves is not allowed for menu {}."
-msgstr ""
+msgstr "La création de mouvements n’est pas autorisée pour le menu {}."
 
 #. module: shopfloor
 #: model:ir.model.fields.selection,name:shopfloor.selection__shopfloor_menu__move_line_search_sort_order__custom_code
@@ -434,16 +449,18 @@ msgid ""
 "Delivery package type scanned: %(name)s. Scan again to place all goods in "
 "the same package."
 msgstr ""
+"Type de colis de livraison scanné : %(name)s. Scannez à nouveau pour "
+"regrouper tous les articles dans le même colis."
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_stock_move_line__result_package_id
 msgid "Destination Package"
-msgstr ""
+msgstr "Colis de destination"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__require_destination_package
 msgid "Destination package required"
-msgstr ""
+msgstr "Colis de destination requis"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__disable_full_bin_action_is_possible
@@ -458,12 +475,12 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__show_oneline_package_content
 msgid "Display the content of package if it contains 1 line only"
-msgstr ""
+msgstr "Afficher le contenu du colis s'il ne contient qu'une seule ligne"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__no_prefill_qty
 msgid "Do not pre-fill quantity to pick"
-msgstr ""
+msgstr "Ne pas pré-remplir la quantité à sélectionner"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_picking_type__shopfloor_zero_check
@@ -476,7 +493,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__force_detailed_scan
 msgid "Force Detailed Scan"
-msgstr ""
+msgstr "Forcer Scan Détaillé"
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__force_detailed_scan_is_possible
@@ -486,7 +503,7 @@ msgstr ""
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_force_reservation
 msgid "Force stock reservation"
-msgstr ""
+msgstr "Forcer la réservation de stock"
 
 #. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__force_detailed_scan
