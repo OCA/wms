@@ -56,23 +56,100 @@ class StockMove(models.Model):
     )
     need_release = fields.Boolean(index=True)
     unrelease_allowed = fields.Boolean(compute="_compute_unrelease_allowed")
+    unrelease_not_allowed_message = fields.Char(
+        compute="_compute_unrelease_allowed",
+        help="This is the reason why unrelease is not allowed for this move.",
+    )
+
+    def _get_unrelease_not_allowed_group_message(self) -> str:
+        self.ensure_one()
+        return _("The user is not in the Stock Group.\n")
+
+    def _get_unrelease_not_allowed_unreleasable_message(self) -> str:
+        self.ensure_one()
+        return _(
+            "The move in picking (%(picking_name)s) for product (%(product_name)s)"
+            " is not unreleaseable (Need release, state not in Done or Canceled, not an "
+            "outgoing picking, the stock rule parameter "
+            "'Release based on Available to Promise' is not set.",
+            picking_name=self.picking_id.display_name,
+            product_name=self.product_id.display_name,
+        )
+
+    def _get_unrelease_not_allowed_progress_message(self) -> str:
+        message = _(
+            "Some origin moves are currently in progress. Either the picking"
+            " is printed, either the move done quantity is already filled in.\n"
+        )
+        message += _("Moves:\n\n")
+        for move in self:
+            message += _(
+                "- Product: %(product_name)s (Picking: %(picking_name)s)\n",
+                product_name=move.product_id.display_name,
+                picking_name=move.picking_id.display_name,
+            )
+        return message
+
+    def _get_unrelease_not_allowed_dest_message(self) -> str:
+        message = _("Some origin moves are not consumed by their destination moves.\n")
+        message += _("Origin Moves:\n\n")
+        for move in self:
+            message += _(
+                "- Product: %(product_name)s (Picking: %(picking_name)s)\n",
+                product_name=move.product_id.display_name,
+                picking_name=move.picking_id.display_name,
+            )
+        return message
 
     @api.depends("need_release", "rule_id", "rule_id.available_to_promise_defer_pull")
+    @api.depends_context("uid")
     def _compute_unrelease_allowed(self):
         user_is_allowed = self.env.user.has_group("stock.group_stock_user")
         for move in self:
+            # The unrelease_allowed field can trigger an error at unrelease()
+            # As there can have several reasons to that trigger, build an explicit
+            # message for user in order to ease diagnostics.
+            move.unrelease_not_allowed_message = ""
+            if not user_is_allowed:
+                move.unrelease_not_allowed_message += (
+                    move._get_unrelease_not_allowed_group_message()
+                )
+            unreleaseable = move._is_unreleaseable()
+            if not unreleaseable:
+                move.unrelease_not_allowed_message += (
+                    move._get_unrelease_not_allowed_unreleasable_message()
+                )
             unrelease_allowed = user_is_allowed and move._is_unreleaseable()
             if unrelease_allowed:
                 iterator = move._get_chained_moves_iterator("move_orig_ids")
                 next(iterator)  # skip the current move
                 for origin_moves in iterator:
-                    unrelease_allowed = (
-                        not origin_moves._in_progress_for_unrelease()
-                        and move._is_unrelease_allowed_on_origin_moves(origin_moves)
+                    in_progress = origin_moves._in_progress_for_unrelease()
+                    if in_progress:
+                        move.unrelease_not_allowed_message += (
+                            origin_moves._get_unrelease_not_allowed_progress_message()
+                        )
+                    origin_allowed = move._is_unrelease_allowed_on_origin_moves(
+                        origin_moves
                     )
+                    if not origin_allowed:
+                        move.unrelease_not_allowed_message += (
+                            origin_moves._get_unrelease_not_allowed_dest_message()
+                        )
+                    unrelease_allowed = not in_progress and origin_allowed
                     if not unrelease_allowed:
                         break
             move.unrelease_allowed = unrelease_allowed
+            if move.unrelease_not_allowed_message:
+                message = _(
+                    "The move for product (%(product_name)s) in picking "
+                    "(%(picking_name)s) is not allowed to be unreleased:\n",
+                    product_name=move.product_id.display_name,
+                    picking_name=move.picking_id.display_name,
+                )
+                move.unrelease_not_allowed_message = (
+                    message + move.unrelease_not_allowed_message
+                )
 
     def _is_unreleaseable(self):
         """Check if the move can be unrelease. At this stage we only check if
@@ -153,7 +230,6 @@ class StockMove(models.Model):
 
     def _unrelease_not_allowed_error(self):
         message = _("You are not allowed to unrelease those deliveries:\n")
-
         for picking, forbidden_moves_by_picking in groupby(
             self, lambda m: m.picking_id
         ):
@@ -180,6 +256,10 @@ class StockMove(models.Model):
                     "- blocking transfer(s): %(picking_names)s",
                     picking_names=" ".join(forbidden_origin_pickings.mapped("name")),
                 )
+        for move in self:
+            if move.unrelease_not_allowed_message:
+                message += "\n"
+                message += move.unrelease_not_allowed_message
         raise UserError(message)
 
     def _previous_promised_qty_sql_main_query(self):
