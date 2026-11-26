@@ -416,6 +416,9 @@ const Reception = {
             return {
                 show_title: true,
                 showActions: false,
+                is_record_disabled: (rec) =>
+                    !this.menu_item().allow_quantity_exceeding_demand &&
+                    rec.progress === 100,
                 list_item_options: {
                     loud_title: true,
                     title_action_field: {
