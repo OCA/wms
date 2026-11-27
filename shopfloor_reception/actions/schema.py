@@ -19,14 +19,15 @@ class ShopfloorSchemaAction(Component):
         )
         return res
 
-    def lot(self):
-        res = super().lot()
+    def lot_suggestion(self):
+        """Schema used to suggest a lot payload before creation.
 
-        # We need to be able to send lot name and expiration date info
-        # for "virtual lot" not yet created -> not yet an id
-        res.update(
-            {
-                "id": {"required": False, "type": "integer"},
-            }
-        )
+        All attributes are optional so the client can progressively complete
+        values before sending a final payload for lot creation.
+        """
+        res = super().lot()
+        for _field, spec in res.items():
+            if isinstance(spec, dict):
+                spec["required"] = False
+                spec.setdefault("nullable", True)
         return res
