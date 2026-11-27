@@ -8,13 +8,17 @@
 
 # Each type can be mapped to multiple AIs.
 # For instance, you can search a product by barcode (01) or manufacturer code (240).
+# NB: The order matters: if multiple AIs map to the same type, the last entry takes
+# precedence.
 MAPPING_AI_TO_TYPE = {
     "00": "package",
     "01": "product",
+    "240": "product",
     "10": "lot",
     "11": "production_date",
+    "15": "expiration_date",
     "17": "expiration_date",
     "21": "serial",
-    "240": "product",
+    "37": "qty",
     "254": "location",
 }
