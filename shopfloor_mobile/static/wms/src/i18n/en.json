@@ -25,6 +25,7 @@
   "cluster_picking.batch_picking_line.action_stock_out": "Declare stock out",
   "cluster_picking.batch_picking_line.action_change_pack_or_lot": "Change lot or pack",
   "cluster_picking.batch_picking_line.destination_not_selected": "Destination not selected.",
+  "cluster_picking.unload_scan_pack.scan_placeholder": "Scan Bin",
 
   "batch_picking_detail.pickings_list": "Transfers list",
   "batch_picking_detail.total_operations": "Total operations",
@@ -32,7 +33,6 @@
   "batch_picking_detail.total_weight": "Total weight",
   "batch_picking_detail.lines": "Lines",
   "batch_picking_detail.weight": "Weight",
-
   "location_content_transfer.scan_destination.title": "Set a qty and scan destination location",
   "location_content_transfer.scan_destination_all.title": "Scan destination location for all items",
   "location_content_transfer.scan_location.title": "Start by scanning a location",
