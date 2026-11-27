@@ -613,6 +613,11 @@ msgstr ""
 "geplant verarbeitet wird."
 
 #. module: shopfloor
+#: model:ir.model.fields,help:shopfloor.field_shopfloor_menu__show_counters
+msgid "If checked, display move line counters on menu item."
+msgstr ""
+
+#. module: shopfloor
 #: model:ir.model.fields,help:shopfloor.field_stock_move_line__result_package_id
 msgid "If set, the operations are packed into this package"
 msgstr "Wenn gesetzt, werden die Vorgänge in dieses Paket gepackt"
@@ -689,8 +694,8 @@ msgid ""
 "Last operation of transfer %(picking_names)s. Next operation "
 "(%(next_picking_names)s) is ready to proceed."
 msgstr ""
-"Letzter Vorgang des Transfers %(picking_names)s. Der nächste Vorgang (%"
-"(next_picking_names)s) ist bereit zur Bearbeitung."
+"Letzter Vorgang des Transfers %(picking_names)s. Der nächste Vorgang "
+"(%(next_picking_names)s) ist bereit zur Bearbeitung."
 
 #. module: shopfloor
 #. odoo-python
@@ -1134,8 +1139,8 @@ msgid ""
 "Package %(package_name)s contains already lines from a different operation "
 "type %(picking_type_name)s."
 msgstr ""
-"Paket %(package_name)s enthält bereits Zeilen einer anderen Vorgangsart %"
-"(picking_type_name)s."
+"Paket %(package_name)s enthält bereits Zeilen einer anderen Vorgangsart "
+"%(picking_type_name)s."
 
 #. module: shopfloor
 #. odoo-python
@@ -1258,8 +1263,8 @@ msgid ""
 "Packaging '%(package_name)s' is not allowed for carrier %(carrier_name)s.or "
 "carrier %(carrier_name)s."
 msgstr ""
-"Verpackung '%(package_name)s' ist für das Transportunternehmen %"
-"(carrier_name)s nicht zulässig (Transportunternehmen %(carrier_name)s)."
+"Verpackung '%(package_name)s' ist für das Transportunternehmen "
+"%(carrier_name)s nicht zulässig (Transportunternehmen %(carrier_name)s)."
 
 #. module: shopfloor
 #. odoo-python
@@ -1601,7 +1606,8 @@ msgstr "Mehrere Lose in %s gefunden. Ein Los scannen."
 #: code:addons/shopfloor/actions/message.py:0
 #, python-format
 msgid "Several moves found for different lots, please scan the lot."
-msgstr "Mehrere Lagerbuchungen für verschiedene Lose gefunden. Das Los scannen."
+msgstr ""
+"Mehrere Lagerbuchungen für verschiedene Lose gefunden. Das Los scannen."
 
 #. module: shopfloor
 #. odoo-python
@@ -1712,6 +1718,11 @@ msgstr "Shopfloor WMS (Demo)"
 #: model:ir.model.fields,field_description:shopfloor.field_stock_quant_package__shopfloor_weight
 msgid "Shopfloor weight (kg)"
 msgstr "Shopfloor-Gewicht (kg)"
+
+#. module: shopfloor
+#: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__show_counters
+msgid "Show Counters"
+msgstr ""
 
 #. module: shopfloor
 #: model:ir.model.fields,field_description:shopfloor.field_shopfloor_menu__allow_get_work
@@ -1932,8 +1943,8 @@ msgid ""
 "allowed. (%(product_name)s : %(quantity_done)s > %(quantity_reserved)s)"
 msgstr ""
 "Die gescannte Menge für eine oder mehrere Zeilen darf nicht höher sein als "
-"das zulässige Maximum. (%(product_name)s : %(quantity_done)s > %"
-"(quantity_reserved)s)"
+"das zulässige Maximum. (%(product_name)s : %(quantity_done)s > "
+"%(quantity_reserved)s)"
 
 #. module: shopfloor
 #. odoo-python
