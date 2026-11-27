@@ -9,7 +9,13 @@ class TestStart(CommonCase):
         response = self.service.dispatch("start")
         self.assert_response(response, next_state="select_location_or_package", data={})
 
-    def test_recover(self):
+    def test_start_with_work(self):
+        self.menu.sudo().allow_get_work = True
+        response = self.service.dispatch("start")
+
+        self.assert_response(response, next_state="get_work")
+
+    def _check_recover(self):
         product = self.product_a
         location = self.location_src
         self._add_stock_to_product(product, location, 10)
@@ -30,3 +36,10 @@ class TestStart(CommonCase):
         self.assert_response(
             response, next_state="set_quantity", data=data, message=message
         )
+
+    def test_recover(self):
+        self._check_recover()
+
+    def test_recover_with_work(self):
+        self.menu.sudo().allow_get_work = True
+        self._check_recover()

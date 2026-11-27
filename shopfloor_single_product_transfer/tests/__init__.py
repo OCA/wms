@@ -1,3 +1,4 @@
+from . import test_find_work
 from . import test_start
 from . import test_scan_location_or_package
 from . import test_scan_product
