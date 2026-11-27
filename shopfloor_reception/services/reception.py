@@ -267,6 +267,10 @@ class Reception(Component):
         If none are found create a new line.
 
         """
+        if self.search_result.parse_result and (
+            qty_scanned := self.search_result.parse_result.get("qty")
+        ):
+            qty_done = qty_scanned.value
         unassigned_lines = self.env["stock.move.line"]
         for line in move.move_line_ids:
             if line.shopfloor_unloaded:

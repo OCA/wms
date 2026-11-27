@@ -48,6 +48,8 @@ class GS1Barcode:
         a GTIN 13, which is the one used by Odoo.
         """
         value = ai_value.date or ai_value.value
+        if ai_value.ai.ai == "37" and ai_value.value:
+            value = int(ai_value.value)
         if ai_value.gtin and ai_value.gtin.payload:
             value = ai_value.gtin.payload + str(ai_value.gtin.check_digit)
         return value
