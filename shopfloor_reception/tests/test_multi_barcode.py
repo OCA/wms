@@ -22,7 +22,7 @@ class TestStructuredBarcode(CommonCase):
     def test_scan_multiple_attribute_barcode(self):
         """
         Check that scanning a product with multi attribute barcode
-        will fill in the lot
+        will fill in the lot and qty
         """
         picking = self._create_picking()
         lot = self._create_lot()
@@ -30,6 +30,7 @@ class TestStructuredBarcode(CommonCase):
         selected_move_line = picking.move_line_ids.filtered(
             lambda l: l.product_id == self.product_a
         )
+        scan_qty = 2
         # selected_move_line.lot_id = lot
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
             mock_parse.return_value = {
@@ -39,6 +40,7 @@ class TestStructuredBarcode(CommonCase):
                     value=date(2025, 4, 15),
                     raw="250415",
                 ),
+                "qty": BarcodeResult(type="qty", raw=str(scan_qty), value=scan_qty),
             }
             response = self.service.dispatch(
                 "scan_line",
@@ -61,3 +63,4 @@ class TestStructuredBarcode(CommonCase):
             selected_move_line.expiration_date,
             fields.Datetime.to_datetime("2025-04-15"),
         )
+        self.assertEqual(selected_move_line.qty_done, scan_qty)
