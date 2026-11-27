@@ -1,0 +1,1 @@
+Adds `package_type_id` in products info sent by shopfloor endpoints.
