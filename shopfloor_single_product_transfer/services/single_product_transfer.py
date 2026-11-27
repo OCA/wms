@@ -132,7 +132,7 @@ class ShopfloorSingleProductTransfer(Component):
     def _scan_location__check_location(self, location):
         """Check that location belongs to the source location of the operation type."""
         if not self.is_src_location_valid(location):
-            message = self.msg_store.location_content_unable_to_transfer(location)
+            message = self.msg_store.location_source_invalid(location)
             return self._response_for_select_location_or_package(message=message)
 
     def _scan_location__check_stock(self, location):
