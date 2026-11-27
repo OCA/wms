@@ -165,11 +165,11 @@ class StockAction(Component):
         if split:
             move_lines._extract_in_split_order(values_assigned)
         else:
-            lines = move_lines.picking_id.filtered(
-                lambda picking: not picking.printed or not picking.user_id == user
+            pickings_to_update = move_lines.picking_id.filtered(
+                lambda picking: not picking.printed or picking.user_id != user
             )
-            if lines:
-                lines.write(values_assigned)
+            if pickings_to_update:
+                pickings_to_update.write(values_assigned)
         move_lines.picking_id.filtered(lambda p: p.user_id != user).user_id = user.id
 
     def unmark_move_line_as_picked(self, move_lines, split=True):
