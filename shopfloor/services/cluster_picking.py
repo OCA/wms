@@ -442,6 +442,9 @@ class ClusterPicking(Component):
     def _scan_line__get_handlers_by_type(self):
         # Necessary because all handlers do not have the same signature
         return {
+            "lot": lambda p, ml, b, sub, rec, bc: self._scan_line_by_lot(
+                p, ml, rec, sub
+            ),
             "package": lambda p, ml, b, sub, rec, bc: self._scan_line_by_package(
                 p, ml, rec, b, sub
             ),
@@ -449,9 +452,6 @@ class ClusterPicking(Component):
                 p, ml, rec, sub
             ),
             "packaging": lambda p, ml, b, sub, rec, bc: self._scan_line_by_packaging(
-                p, ml, rec, sub
-            ),
-            "lot": lambda p, ml, b, sub, rec, bc: self._scan_line_by_lot(
                 p, ml, rec, sub
             ),
             "location": lambda p, ml, b, sub, rec, bc: self._scan_line_by_location(

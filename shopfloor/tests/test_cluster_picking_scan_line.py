@@ -451,16 +451,28 @@ class ClusterPickingScanLineCase(ClusterPickingLineCommonCase):
 
     def test_scan_line_multi_barcode_ok(self):
         self._simulate_batch_selected(self.batch)
-        lot = self._create_lot(self.product_a)
+        self.product_a.sudo().tracking = "lot"
+        lot1 = self._create_lot(self.product_a)
+        lot2 = self._create_lot(self.product_a)
+
+        # Create two lots at this location to verify that the lot encoded in the
+        # multi-barcode is used to resolve the scan.
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_a, self.stock_location, 1, package_id=None, lot_id=lot1
+        )
+        self.env["stock.quant"]._update_available_quantity(
+            self.product_a, self.stock_location, 1, package_id=None, lot_id=lot2
+        )
+
         line = self.batch.picking_ids.move_line_ids
-        line.lot_id = lot
+        line.lot_id = lot1
         with mock.patch.object(BarcodeParser, "parse") as mock_parse:
             mock_parse.return_value = {
-                "lot": BarcodeResult(type="lot", value=lot.name, raw=lot.name),
+                "lot": BarcodeResult(type="lot", value=lot1.name, raw=lot1.name),
                 "product": BarcodeResult(
                     type="product",
                     value=self.product_a.barcode,
                     raw=self.product_a.barcode,
                 ),
             }
-            self._scan_line_ok(line, f"(01){self.product_a.barcode}(17){lot.name}")
+            self._scan_line_ok(line, f"(01){self.product_a.barcode}(17){lot1.name}")
