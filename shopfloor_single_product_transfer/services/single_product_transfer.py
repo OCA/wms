@@ -873,10 +873,12 @@ class ShopfloorSingleProductTransfer(Component):
             .search([("location_id", "=", location.id or package.location_id.id)])
             .product_id
         )
+        # TODO: Find a better way to manager multi valued barcodes
+        # in order to find in a single call all records (product, lot, ....)
         handlers_by_type = {
+            "lot": self._scan_product__scan_lot,
             "product": self._scan_product__scan_product,
             "packaging": self._scan_product__scan_packaging,
-            "lot": self._scan_product__scan_lot,
         }
         try:
             search = self._actions_for("search").for_products(products)
@@ -929,8 +931,8 @@ class ShopfloorSingleProductTransfer(Component):
         move_line.qty_done = quantity
         handlers_by_type = {
             # Increment qty done if a product / lot / packaging is scanned
-            "product": self._set_quantity__by_product,
             "lot": self._set_quantity__by_lot,
+            "product": self._set_quantity__by_product,
             "packaging": self._set_quantity__by_packaging,
             # Post the move if a location is scanned
             "location": self._set_quantity__by_location,
