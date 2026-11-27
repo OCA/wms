@@ -8,16 +8,6 @@
 
 # Each type can be mapped to multiple AIs.
 # For instance, you can search a product by barcode (01) or manufacturer code (240).
-MAPPING_TYPE_TO_AI = {
-    "product": ("01", "240"),
-    "lot": ("10",),
-    "production_date": ("11",),
-    "expiration_date": ("17",),
-    "serial": ("21",),
-    "manuf_product_code": ("240",),
-    "location": ("254",),
-    "package": ("00",),
-}
 MAPPING_AI_TO_TYPE = {
     "00": "package",
     "01": "product",

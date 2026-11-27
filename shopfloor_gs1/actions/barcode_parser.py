@@ -4,7 +4,7 @@
 from odoo.addons.component.core import Component
 from odoo.addons.shopfloor.actions.barcode_parser import BarcodeResult
 
-from ..config import MAPPING_AI_TO_TYPE, MAPPING_TYPE_TO_AI
+from ..config import MAPPING_AI_TO_TYPE
 from ..utils import GS1Barcode
 
 
@@ -14,18 +14,6 @@ class BarcodeParser(Component):
     """
 
     _inherit = "shopfloor.barcode.parser"
-
-    def _search_type_to_gs1_ai(self, _type):
-        """Convert search type to AIs.
-
-        Each type can be mapped to multiple AIs.
-        For instance, you can search a product by barcode (01) or manufacturer code (240).
-        """
-        return MAPPING_TYPE_TO_AI.get(_type)
-
-    def _gs1_ai_to_search_type(self, ai):
-        """Convert back GS1 AI to search type."""
-        return MAPPING_AI_TO_TYPE[ai]
 
     def parse(self, barcode):
         """
